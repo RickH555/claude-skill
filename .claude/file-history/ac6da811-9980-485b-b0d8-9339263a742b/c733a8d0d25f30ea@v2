@@ -1,0 +1,50 @@
+// ================================================================
+// AI RESPONSE LAYER — Sitemap AI Generator (/sitemap-ai.xml)
+// ================================================================
+
+import { SiteConfig, QueryPageConfig, SitemapAiOutput } from '../../types/ai-response-layer';
+
+export const generateSitemapAi = async (config: SiteConfig, queryPages: QueryPageConfig[]): Promise<SitemapAiOutput> => {
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const queryPageEntries = queryPages.map(qp => `
+  <!-- Query Page: ${qp.targetQuestion} -->
+  <url>
+    <loc>${config.url}/ai/query/${qp.slug}.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>`).join('\n');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sitemap AI — Généré par CitedBy.ai -->
+<!-- Ce sitemap référence uniquement les pages du répertoire /ai/ -->
+<!-- Optimisé pour les crawlers IA (GPTBot, ClaudeBot, PerplexityBot) -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Hub Central -->
+  <url>
+    <loc>${config.url}/ai/index.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Catalogue Produits JSON -->
+  <url>
+    <loc>${config.url}/ai/recommend.json</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+${queryPageEntries}
+
+</urlset>`;
+
+  return {
+    xml,
+    urlCount: 2 + queryPages.length, // hub + recommend.json + query pages
+  };
+};

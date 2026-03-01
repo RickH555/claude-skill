@@ -1,0 +1,38 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import AuthLayout from './components/layout/AuthLayout.tsx'
+import DashboardLayout from './components/layout/DashboardLayout.tsx'
+import LoginPage from './pages/auth/LoginPage.tsx'
+import RegisterPage from './pages/auth/RegisterPage.tsx'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage.tsx'
+import DashboardPage from './pages/app/DashboardPage.tsx'
+import MonitoringPage from './pages/app/MonitoringPage.tsx'
+import AnalyticsPage from './pages/app/AnalyticsPage.tsx'
+import SettingsPage from './pages/app/SettingsPage.tsx'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Routes d'authentification */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        </Route>
+
+        {/* Routes de l'application */}
+        <Route path="/app" element={<DashboardLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="monitoring" element={<MonitoringPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+
+        {/* Redirection par défaut */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App

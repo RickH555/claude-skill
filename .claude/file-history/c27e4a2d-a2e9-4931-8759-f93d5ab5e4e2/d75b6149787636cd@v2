@@ -1,0 +1,60 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import QrGenerator from '@/components/merchant/QrGenerator';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function QrCodesPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: programs } = await supabase
+    .from('loyalty_programs')
+    .select('*')
+    .eq('merchant_id', user!.id)
+    .eq('is_active', true);
+
+  // Fetch existing QR codes
+  const { data: qrCodes } = await supabase
+    .from('merchant_qr_codes')
+    .select('*, loyalty_programs(name)')
+    .eq('merchant_id', user!.id)
+    .order('created_at', { ascending: false });
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="QR Codes" description="Générez des QR codes pour vos programmes." />
+      <QrGenerator
+        programs={programs || []}
+        merchantId={user!.id}
+        appUrl={process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}
+      />
+
+      {/* Existing QR codes */}
+      {qrCodes && qrCodes.length > 0 && (
+        <div>
+          <h2 className="text-[15px] font-semibold text-[var(--text-primary)] mb-4">QR codes existants</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {qrCodes.map((qr: any, i: number) => (
+              <Card key={qr.id} className={`stagger-enter stagger-${Math.min(i + 1, 6)}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[13px] font-medium text-[var(--text-primary)]">
+                    {qr.loyalty_programs?.name || 'Programme'}
+                  </p>
+                  <Badge variant={qr.is_active ? 'success' : 'default'}>
+                    {qr.is_active ? 'Actif' : 'Inactif'}
+                  </Badge>
+                </div>
+                <p className="text-[11px] text-[var(--text-tertiary)] break-all">{qr.qr_url}</p>
+                <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
+                  {new Date(qr.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

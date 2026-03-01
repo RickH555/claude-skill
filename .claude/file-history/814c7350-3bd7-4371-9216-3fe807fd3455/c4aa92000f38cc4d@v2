@@ -1,0 +1,279 @@
+import React, { useState } from 'react';
+import {
+  LayoutDashboard, FolderKanban,
+  PlusCircle, BarChart3, Zap, Clock,
+  Activity, Radio, Brain, MonitorCheck, Bell, Globe,
+  Sparkles, BookOpen, PenTool, MessageSquare, Shield, AlertTriangle,
+  Code, Bot, FileCheck, FileJson,
+  Search as SearchIcon, Compass, Users, ShoppingBag,
+  Settings, Menu, X, Coins
+} from 'lucide-react';
+import CollapsibleSection from '../ui/CollapsibleSection';
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION STRUCTURE
+// ═══════════════════════════════════════════════════════════
+
+interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+  badge?: string;
+}
+
+interface NavGroup {
+  id: string;
+  title: string;
+  emoji: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    id: 'overview',
+    title: 'Overview',
+    emoji: '',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'projects', label: 'Projets', icon: FolderKanban },
+    ],
+  },
+  {
+    id: 'analyse',
+    title: 'Analyse',
+    emoji: '',
+    items: [
+      { id: 'new-analysis', label: 'Nouvel audit', icon: PlusCircle },
+      { id: 'results', label: 'Resultats', icon: BarChart3 },
+      { id: 'history', label: 'Historique', icon: Clock },
+      { id: 'action-plan', label: "Plan d'action", icon: Zap },
+    ],
+  },
+  {
+    id: 'citations',
+    title: 'Citations IA',
+    emoji: '',
+    items: [
+      { id: 'ai-monitoring', label: 'Monitoring IA', icon: Activity },
+      { id: 'ai-citation-simulator', label: 'Simulateur', icon: Radio },
+      { id: 'ai-response-layer', label: 'AI Response Layer', icon: Brain },
+      { id: 'bot-tracking', label: 'Tracking Bots', icon: MonitorCheck },
+      { id: 'alerts-aeo', label: 'Alertes AEO', icon: Bell },
+      { id: 'multilingual', label: 'Citations multilingues', icon: Globe },
+    ],
+  },
+  {
+    id: 'outils',
+    title: 'Outils',
+    emoji: '',
+    items: [
+      { id: 'smc-studio', label: 'AEO Studio (SMC)', icon: Sparkles },
+      { id: 'blog-optimizer', label: 'Blog Optimizer', icon: BookOpen },
+      { id: 'content-writer', label: 'Redacteur IA', icon: PenTool },
+      { id: 'answer-first', label: 'Answer First Audit', icon: MessageSquare },
+      { id: 'eeat-builder', label: 'E-E-A-T Builder', icon: Shield },
+      { id: 'reputation', label: 'Reputation', icon: AlertTriangle },
+    ],
+  },
+  {
+    id: 'technique',
+    title: 'Technique',
+    emoji: '',
+    items: [
+      { id: 'schema-org', label: 'Schema.org', icon: Code },
+      { id: 'robots-txt', label: 'Robots.txt', icon: Bot },
+      { id: 'source-of-truth', label: 'Source of Truth', icon: FileCheck },
+      { id: 'llms-txt', label: 'LLMs.txt Generator', icon: FileJson },
+    ],
+  },
+  {
+    id: 'marketplace',
+    title: 'Marketplace',
+    emoji: '',
+    items: [
+      { id: 'publisher-search', label: 'Publishers', icon: SearchIcon },
+      { id: 'directory', label: 'Annuaire', icon: Compass },
+      { id: 'clients', label: 'Clients', icon: Users },
+      { id: 'messages', label: 'Messages', icon: MessageSquare },
+      { id: 'mission-orders', label: 'Commandes', icon: ShoppingBag },
+    ],
+  },
+];
+
+// Page aliases for active item highlighting
+const PAGE_ALIASES: Record<string, string> = {
+  'analyze': 'new-analysis',
+  'audit-aeo': 'results',
+  'alerts': 'alerts-aeo',
+  'answer-first-audit': 'answer-first',
+  'api-keys': 'api-developer',
+  'credits': 'recharge',
+  'profile': 'account',
+  'subscription': 'plan',
+  'publisher-request': 'publisher-search',
+  'generative-tools': 'smc-studio',
+  'directory-entity': 'directory',
+  'rescan': 'projects',
+};
+
+export { NAV_GROUPS, PAGE_ALIASES };
+
+function resolveActivePage(pageId: string): string {
+  return PAGE_ALIASES[pageId] || pageId;
+}
+
+// Derive section from page
+export function getSectionFromPage(pageId: string): string {
+  const resolved = resolveActivePage(pageId);
+  for (const group of NAV_GROUPS) {
+    if (group.items.some(item => item.id === resolved)) {
+      return group.id;
+    }
+  }
+  return 'overview';
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMPONENT
+// ═══════════════════════════════════════════════════════════
+
+interface SidebarProps {
+  activePage: string;
+  onPageChange: (page: string) => void;
+  credits: number;
+  plan: string;
+  onLogoClick?: () => void;
+  onNavigateToSettings?: () => void;
+}
+
+export default function Sidebar({
+  activePage,
+  onPageChange,
+  credits,
+  plan,
+  onLogoClick,
+  onNavigateToSettings,
+}: SidebarProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const resolved = resolveActivePage(activePage);
+
+  const renderNavItem = (item: NavItem, onClose?: () => void) => {
+    const Icon = item.icon;
+    const isActive = resolved === item.id;
+
+    return (
+      <button
+        key={item.id}
+        onClick={() => { onPageChange(item.id); onClose?.(); }}
+        className={`group flex items-center gap-2.5 w-full px-3 py-[7px] rounded-lg text-[13px] leading-none cursor-pointer transition-all duration-150 relative ${
+          isActive
+            ? 'text-[var(--text-primary)] bg-[var(--accent-subtle)] font-medium'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--glass-active)]'
+        }`}
+      >
+        {isActive && (
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[var(--accent)] rounded-r-full" />
+        )}
+        <Icon className={`w-4 h-4 flex-shrink-0 ${
+          isActive
+            ? 'text-[var(--accent)]'
+            : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]'
+        }`} />
+        <span className="truncate">{item.label}</span>
+        {item.badge && (
+          <span className="ml-auto text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 bg-[var(--error-subtle)] text-[var(--error)]">
+            {item.badge}
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  const renderSidebarContent = (onClose?: () => void) => (
+    <>
+      {/* Nav groups */}
+      <nav className="flex-1 overflow-y-auto py-2 px-2">
+        {NAV_GROUPS.map(group => (
+          <CollapsibleSection
+            key={group.id}
+            title={group.title}
+          >
+            {group.items.map(item => renderNavItem(item, onClose))}
+          </CollapsibleSection>
+        ))}
+      </nav>
+
+      {/* Footer — Credits + Plan + Settings */}
+      <div className="border-t border-[var(--border-default)] p-3 shrink-0 space-y-2">
+        {/* Credits bar */}
+        <div className="px-1">
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center gap-1.5 text-[12px] text-[var(--text-secondary)]">
+              <Coins size={12} className="text-[var(--accent)]" />
+              <span className="font-medium text-[var(--text-primary)]">{credits}</span>
+              <span>/ 200</span>
+            </div>
+            <span className="text-[11px] font-medium text-[var(--accent)] uppercase">
+              {plan === 'enterprise' ? 'Agency' : plan === 'pro' ? 'Pro' : 'Free'}
+            </span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+            <div
+              className="h-full bg-[var(--accent)] rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(100, (credits / 200) * 100)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Settings */}
+        <button
+          onClick={() => { onNavigateToSettings?.(); onClose?.(); }}
+          className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--glass-active)] transition-all"
+        >
+          <Settings size={14} className="text-[var(--text-tertiary)]" />
+          <span>Parametres</span>
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* ═══ Desktop sidebar ═══ */}
+      <aside className="hidden md:flex flex-col shrink-0 w-56 bg-[var(--bg-sidebar)] border-r border-[var(--border-default)] overflow-hidden">
+        {renderSidebarContent()}
+      </aside>
+
+      {/* ═══ Mobile hamburger ═══ */}
+      <button
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="md:hidden fixed top-2 left-2 z-[60] p-2 rounded-lg bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+      >
+        {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* ═══ Mobile overlay ═══ */}
+      {mobileOpen && (
+        <>
+          <div
+            className="md:hidden fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+          <aside className="md:hidden flex flex-col fixed top-0 left-0 bottom-0 w-72 z-[56] bg-[var(--bg-sidebar)] border-r border-[var(--border-default)]">
+            {/* Logo mobile */}
+            <div
+              className="px-5 h-12 flex items-center border-b border-[var(--border-default)] shrink-0 cursor-pointer"
+              onClick={() => { onLogoClick?.(); setMobileOpen(false); }}
+            >
+              <span className="text-[var(--text-primary)] font-bold text-[15px] tracking-tight">Cited</span>
+              <span className="text-[var(--accent)] font-bold text-[15px]">By</span>
+              <span className="text-[var(--text-tertiary)] font-normal text-[13px]">.io</span>
+            </div>
+
+            {renderSidebarContent(() => setMobileOpen(false))}
+          </aside>
+        </>
+      )}
+    </>
+  );
+}

@@ -1,0 +1,9 @@
+{
+  "id": "6",
+  "subject": "Transition vers l'implémentation",
+  "description": "Invoquer le skill writing-plans pour créer un plan d'implémentation",
+  "activeForm": "Transition vers l'implémentation",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

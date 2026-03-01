@@ -1,0 +1,5 @@
+# CitedBy.ai Environment Variables
+# Copy this file to .env.local and fill in your values
+
+# Google Gemini AI (optional - falls back to simulation if not set)
+API_KEY=your_google_gemini_api_key_here

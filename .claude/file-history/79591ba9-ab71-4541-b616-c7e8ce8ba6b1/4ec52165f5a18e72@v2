@@ -1,0 +1,54 @@
+import { type FormEvent, useState } from 'react'
+import { Link } from 'react-router-dom'
+import Button from '../../components/ui/Button.tsx'
+import Input from '../../components/ui/Input.tsx'
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    console.log('Connexion', { email, password })
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 rounded-xl bg-white p-8 shadow-sm"
+    >
+      <h2 className="text-center text-xl font-semibold text-gray-900">
+        Se connecter
+      </h2>
+
+      <Input
+        label="Email"
+        type="email"
+        placeholder="vous@exemple.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <Input
+        label="Mot de passe"
+        type="password"
+        placeholder="••••••••"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <Button type="submit" className="w-full">
+        Se connecter
+      </Button>
+
+      <div className="flex flex-col items-center gap-2 text-sm">
+        <Link to="/forgot-password" className="text-blue-600 hover:underline">
+          Mot de passe oublié ?
+        </Link>
+        <Link to="/register" className="text-blue-600 hover:underline">
+          Créer un compte
+        </Link>
+      </div>
+    </form>
+  )
+}

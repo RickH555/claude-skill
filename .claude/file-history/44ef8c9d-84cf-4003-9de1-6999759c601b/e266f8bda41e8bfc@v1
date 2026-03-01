@@ -1,0 +1,380 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════
+   DESIGN SYSTEM — CitedBy.ai
+   Inspiré de Linear, Vercel, Stripe, Raycast, Notion
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ═══ SURFACES ═══ */
+  --bg-base:        #09090B;     /* Fond principal (zinc-950) */
+  --bg-surface:     #18181B;     /* Cards, sidebar (zinc-900) */
+  --bg-elevated:    #27272A;     /* Inputs, hovers (zinc-800) */
+  --bg-overlay:     #3F3F46;     /* Tooltips, dropdowns (zinc-700) */
+
+  /* ═══ BORDERS ═══ */
+  --border-default: #27272A;     /* Bordures standards (zinc-800) */
+  --border-subtle:  #1E1E22;     /* Bordures légères */
+  --border-strong:  #3F3F46;     /* Bordures actives (zinc-700) */
+
+  /* ═══ TEXTE ═══ */
+  --text-primary:   #FAFAFA;     /* Titres, texte important (zinc-50) */
+  --text-secondary: #A1A1AA;     /* Texte secondaire (zinc-400) */
+  --text-tertiary:  #71717A;     /* Labels, hints (zinc-500) */
+  --text-disabled:  #52525B;     /* Désactivé (zinc-600) */
+
+  /* ═══ ACCENTS ═══ */
+  --accent:         #3B82F6;     /* Bleu primaire (blue-500) */
+  --accent-hover:   #2563EB;     /* Bleu hover (blue-600) */
+  --accent-subtle:  #3B82F610;   /* Bleu très léger pour backgrounds */
+  --accent-text:    #60A5FA;     /* Bleu pour texte sur fond sombre (blue-400) */
+
+  /* ═══ SÉMANTIQUE ═══ */
+  --success:        #22C55E;     /* Vert (green-500) */
+  --success-subtle: #22C55E15;
+  --warning:        #F59E0B;     /* Orange (amber-500) */
+  --warning-subtle: #F59E0B15;
+  --error:          #EF4444;     /* Rouge (red-500) */
+  --error-subtle:   #EF444415;
+
+  /* ═══ MOTEURS IA (identité visuelle) ═══ */
+  --engine-chatgpt:    #10B981;  /* Emerald */
+  --engine-perplexity: #3B82F6;  /* Blue */
+  --engine-gemini:     #8B5CF6;  /* Violet */
+
+  color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FONDATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Geist Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+
+code, pre, .font-mono, kbd {
+  font-family: 'Geist Mono', 'SF Mono', Consolas, monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Geist Sans', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.025em;
+}
+
+/* ═══ SELECTION ═══ */
+::selection {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR (style Linear/Raycast — fine, discrète)
+   ═══════════════════════════════════════════════════════════ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Custom scrollbar for modals */
+.modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-scroll::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-radius: 3px;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+.modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-disabled);
+}
+
+/* ═══ FOCUS VISIBLE (accessibilité) ═══ */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+/* Page enter animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+/* Existing animations (preserved) */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoom-in { from { transform: scale(0.95); } to { transform: scale(1); } }
+@keyframes slide-in-from-bottom { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slide-in-from-right { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.animate-in { animation: fade-in 0.5s ease-out, zoom-in 0.3s ease-out; }
+.animate-slide-up { animation: slide-in-from-bottom 0.3s ease-out; }
+.animate-slide-right { animation: slide-in-from-right 0.3s ease-out; }
+
+/* Shimmer skeleton animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Fade up in */
+@keyframes fade-up-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade-up { animation: fade-up-in 0.25s ease-out; }
+
+/* ═══ STAGGERED ANIMATIONS (cards, lists) ═══ */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+
+/* Slide up for staggered items */
+@keyframes staggerSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-enter {
+  opacity: 0;
+  animation: staggerSlideUp 0.3s ease-out forwards;
+}
+
+/* Scale in for modals/tooltips */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.scale-enter {
+  animation: scaleIn 0.15s ease-out;
+}
+
+/* ═══ MICRO-INTERACTION UTILITIES ═══ */
+
+/* Card hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Subtle press effect for buttons */
+.press-effect:active {
+  transform: scale(0.98);
+}
+
+/* Glow effect for accent elements */
+.glow-accent {
+  transition: box-shadow 0.3s ease-out;
+}
+.glow-accent:hover {
+  box-shadow: 0 0 20px -5px var(--accent);
+}
+
+/* Pulse dot animation (for live indicators) */
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+.pulse-dot {
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+/* Spin animation for loaders */
+@keyframes smoothSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.smooth-spin {
+  animation: smoothSpin 0.8s linear infinite;
+}
+
+/* ═══ TOOLTIP STYLES ═══ */
+.tooltip-container {
+  position: relative;
+}
+.tooltip-content {
+  position: absolute;
+  z-index: 50;
+  padding: 6px 10px;
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.4;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+.tooltip-container:hover .tooltip-content {
+  opacity: 1;
+  transform: translateY(0);
+}
+.tooltip-top { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) translateY(4px); }
+.tooltip-container:hover .tooltip-top { transform: translateX(-50%) translateY(0); }
+.tooltip-bottom { top: calc(100% + 6px); left: 50%; transform: translateX(-50%) translateY(-4px); }
+.tooltip-container:hover .tooltip-bottom { transform: translateX(-50%) translateY(0); }
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY — Reduced Motion
+   ═══════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .page-enter,
+  .animate-in,
+  .animate-slide-up,
+  .animate-slide-right,
+  .animate-fade-up,
+  .stagger-enter,
+  .scale-enter {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .skeleton-shimmer {
+    animation: none !important;
+    background: var(--bg-elevated) !important;
+  }
+
+  .hover-lift:hover {
+    transform: none !important;
+  }
+
+  .press-effect:active {
+    transform: none !important;
+  }
+
+  .pulse-dot {
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITIES (preserved from legacy)
+   ═══════════════════════════════════════════════════════════ */
+
+.btn-gradient {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+  padding: 0.625rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+.btn-gradient:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ninja-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ninja-card:hover {
+  border-color: var(--border-strong);
+}
+
+.dot-grid-bg {
+  background-image: radial-gradient(var(--border-default) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.card-surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 0.75rem;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Scroll progress bar */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), #818CF8, #C084FC);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}

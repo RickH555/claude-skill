@@ -1,0 +1,88 @@
+export interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  link: string;
+}
+
+export interface SocialLink {
+  label: string;
+  href: string;
+}
+
+export const SITE_CONFIG = {
+  name: "ALEX DUBOIS",
+  role: "FULL-STACK DEVELOPER",
+  tagline: "I build bold digital experiences with clean code and raw aesthetics.",
+  email: "hello@alexdubois.dev",
+} as const;
+
+export const PROJECTS: Project[] = [
+  {
+    title: "BRUTALIST UI KIT",
+    description:
+      "A component library embracing raw aesthetics. No rounded corners, no soft shadows — just pure, honest interfaces.",
+    tags: ["React", "TypeScript", "Tailwind"],
+    link: "#",
+  },
+  {
+    title: "SIGNAL DASHBOARD",
+    description:
+      "Real-time analytics platform with WebSocket feeds, dark-mode-first design, and sub-second latency.",
+    tags: ["Next.js", "D3.js", "PostgreSQL"],
+    link: "#",
+  },
+  {
+    title: "NOIR E-COMMERCE",
+    description:
+      "High-performance headless storefront with brutalist product pages and lightning-fast checkout.",
+    tags: ["Next.js", "Stripe", "Sanity"],
+    link: "#",
+  },
+  {
+    title: "TERMINAL BLOG",
+    description:
+      "A markdown-powered blog that looks and feels like a terminal. Monospace everything, green on black.",
+    tags: ["Astro", "MDX", "Vercel"],
+    link: "#",
+  },
+  {
+    title: "RAW API GATEWAY",
+    description:
+      "Microservices gateway with rate limiting, auth, and monitoring. Built for scale, designed for chaos.",
+    tags: ["Node.js", "Redis", "Docker"],
+    link: "#",
+  },
+  {
+    title: "PIXEL FORGE",
+    description:
+      "Generative art tool producing unique visual compositions from algorithmic patterns and user input.",
+    tags: ["Canvas API", "WebGL", "React"],
+    link: "#",
+  },
+];
+
+export const SKILLS = [
+  "TypeScript",
+  "React",
+  "Next.js",
+  "Node.js",
+  "PostgreSQL",
+  "Redis",
+  "Docker",
+  "AWS",
+  "GraphQL",
+  "Tailwind CSS",
+  "Figma",
+  "Git",
+  "Python",
+  "REST APIs",
+  "CI/CD",
+  "Linux",
+] as const;
+
+export const SOCIAL_LINKS: SocialLink[] = [
+  { label: "GITHUB", href: "https://github.com" },
+  { label: "LINKEDIN", href: "https://linkedin.com" },
+  { label: "TWITTER / X", href: "https://x.com" },
+];

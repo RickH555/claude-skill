@@ -1,0 +1,69 @@
+import Link from 'next/link';
+
+const footerLinks = {
+  Product: [
+    { name: 'Features', href: '/#features' },
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'DocAI', href: '/#features' },
+    { name: 'FeedbackAI', href: '/#features' },
+  ],
+  Resources: [
+    { name: 'Documentation', href: '#' },
+    { name: 'API Reference', href: '#' },
+    { name: 'Blog', href: '#' },
+    { name: 'Changelog', href: '#' },
+  ],
+  Company: [
+    { name: 'About', href: '#' },
+    { name: 'Contact', href: '#' },
+    { name: 'Careers', href: '#' },
+  ],
+  Legal: [
+    { name: 'Privacy Policy', href: '#' },
+    { name: 'Terms of Service', href: '#' },
+  ],
+};
+
+export function Footer() {
+  return (
+    <footer className="border-t bg-slate-50 dark:bg-slate-900/50">
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">N</span>
+              </div>
+              <span className="text-lg font-bold">NexusAI</span>
+            </Link>
+            <p className="mt-4 text-sm text-muted-foreground">
+              AI-powered document processing and feedback analysis platform.
+            </p>
+          </div>
+          {Object.entries(footerLinks).map(([category, links]) => (
+            <div key={category}>
+              <h3 className="text-sm font-semibold mb-3">{category}</h3>
+              <ul className="space-y-2">
+                {links.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="mt-12 border-t pt-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} NexusAI. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}

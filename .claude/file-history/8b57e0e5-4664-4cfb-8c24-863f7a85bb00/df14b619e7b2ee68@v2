@@ -1,0 +1,33 @@
+'use client';
+export const dynamic = 'force-dynamic';
+
+import { I18nProvider } from '@/i18n';
+import { AppProvider, useAppContext } from '@/lib/app-context';
+import { ToastProvider } from '@/lib/toast-context';
+import AppShellWrapper from '@/components/layout/AppShellWrapper';
+import Home from '@/views/Home';
+
+function HomeInner() {
+  const { navigateTo, user, handleDirectRecharge } = useAppContext();
+  return (
+    <Home
+      onNavigate={navigateTo}
+      user={user}
+      onDirectRecharge={handleDirectRecharge}
+    />
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <I18nProvider>
+      <AppProvider>
+        <ToastProvider>
+          <AppShellWrapper>
+            <HomeInner />
+          </AppShellWrapper>
+        </ToastProvider>
+      </AppProvider>
+    </I18nProvider>
+  );
+}

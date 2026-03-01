@@ -1,0 +1,9 @@
+{
+  "id": "25",
+  "subject": "Create auth middleware (src/middleware.ts)",
+  "description": "Create Next.js middleware for Supabase auth, redirecting unauthenticated users to /login",
+  "activeForm": "Creating auth middleware",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

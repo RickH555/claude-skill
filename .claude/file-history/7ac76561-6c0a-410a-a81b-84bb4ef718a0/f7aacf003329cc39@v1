@@ -1,0 +1,741 @@
+
+import React, { useState, useEffect } from 'react';
+import { Shield, Zap, Globe, Check, Lock, ChevronRight, Server, Sparkles, CreditCard, Loader2, RefreshCw, ArrowLeft, Search, Filter, Star, ExternalLink, TrendingUp, ArrowRight, Plus, AlertCircle, ClipboardList, Building2, Mail, User as UserIcon, BarChart3, CheckCircle2, Award, Crown, Target, Clock } from 'lucide-react';
+import { AnalysisResult, CategoryScore, Recommendation } from '../types';
+
+interface DirectoryProps {
+  onBack: () => void;
+  onViewEntity: (result: AnalysisResult) => void;
+  onNavigateToPlan: () => void;
+  user: { name: string; email: string; plan: 'free' | 'pro' | 'enterprise'; credits: number } | null;
+  directClientCount: number;
+  maxClients: number;
+  actionPlanComplete: boolean;
+  actionPlanProgress: { completed: number; total: number };
+  onNavigateToActionPlan: () => void;
+}
+
+// Données simulées pour l'annuaire public
+const DIRECTORY_DATA = [
+  { id: 1, name: 'Stripe', sector: 'Fintech', aeoScore: 98, status: 'Elite', verified: true, desc: "Infrastructure de paiement pour internet." },
+  { id: 2, name: 'Linear', sector: 'SaaS B2B', aeoScore: 94, status: 'Elite', verified: true, desc: "Outil de gestion de projet moderne." },
+  { id: 3, name: 'Algolia', sector: 'Search API', aeoScore: 89, status: 'Premium', verified: true, desc: "API de recherche rapide et pertinente." },
+  { id: 4, name: 'Qonto', sector: 'Banque', aeoScore: 88, status: 'Premium', verified: true, desc: "La néobanque des PME et indépendants." },
+  { id: 5, name: 'Doctolib', sector: 'Santé', aeoScore: 85, status: 'Premium', verified: true, desc: "Plateforme de prise de rendez-vous médicaux." },
+  { id: 6, name: 'Alan', sector: 'Assurance', aeoScore: 92, status: 'Elite', verified: true, desc: "L'assurance santé simple et transparente." },
+  { id: 7, name: 'Swile', sector: 'RH', aeoScore: 78, status: 'Standard', verified: true, desc: "La carte titre-restaurant nouvelle génération." },
+  { id: 8, name: 'Payfit', sector: 'RH Tech', aeoScore: 81, status: 'Premium', verified: true, desc: "Gestion de la paie simplifiée." },
+];
+
+const SECTORS = [
+  'SaaS / Tech', 'E-commerce', 'Fintech', 'Santé', 'Immobilier', 'Éducation',
+  'Assurance', 'RH / Recrutement', 'Marketing', 'Juridique', 'Énergie', 'Autre'
+];
+
+const INDEXATION_PLANS = [
+  {
+    id: 'standard',
+    name: 'Standard',
+    requiredPlan: 'free' as const,
+    planLabel: 'Starter',
+    price: 'Inclus',
+    icon: Shield,
+    color: 'gray',
+    colorClasses: 'text-gray-400 border-gray-500/20 bg-gray-500/5',
+    activeClasses: 'text-white border-gray-400/40 bg-gray-500/10 ring-2 ring-gray-400/30',
+    features: [
+      'Fiche entreprise dans l\'annuaire',
+      'Badge "Verified" standard',
+      'Score AEO visible publiquement',
+      '1 mise à jour / mois',
+    ],
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    requiredPlan: 'pro' as const,
+    planLabel: 'Pro',
+    price: 'Inclus',
+    icon: Award,
+    color: 'blue',
+    colorClasses: 'text-blue-400 border-blue-500/20 bg-blue-500/5',
+    activeClasses: 'text-white border-blue-400/40 bg-blue-500/10 ring-2 ring-blue-400/30',
+    features: [
+      'Tout Standard +',
+      'Badge "Premium Member"',
+      'Fiche enrichie (logo, vidéo, témoignages)',
+      'Mises à jour illimitées',
+      'Priorité dans les résultats',
+    ],
+  },
+  {
+    id: 'elite',
+    name: 'Elite',
+    requiredPlan: 'enterprise' as const,
+    planLabel: 'Agency',
+    price: 'Inclus',
+    icon: Crown,
+    color: 'purple',
+    colorClasses: 'text-purple-400 border-purple-500/20 bg-purple-500/5',
+    activeClasses: 'text-white border-purple-400/40 bg-purple-500/10 ring-2 ring-purple-400/30',
+    features: [
+      'Tout Premium +',
+      'Badge "Elite Member" doré',
+      'Position sponsorisée en tête',
+      'Analytics détaillés de visibilité IA',
+      'Support dédié + account manager',
+      'Multi-domaines',
+    ],
+  },
+];
+
+const getScoreColor = (s: number) => s >= 70 ? 'text-green-400' : s >= 50 ? 'text-yellow-400' : s >= 30 ? 'text-orange-400' : 'text-red-400';
+const getScoreBg = (s: number) => s >= 70 ? 'bg-green-500' : s >= 50 ? 'bg-yellow-500' : s >= 30 ? 'bg-orange-500' : 'bg-red-500';
+
+const Directory: React.FC<DirectoryProps> = ({ onBack, onViewEntity, onNavigateToPlan, user, directClientCount, maxClients, actionPlanComplete, actionPlanProgress, onNavigateToActionPlan }) => {
+  const [viewMode, setViewMode] = useState<'browse' | 'join'>('browse');
+  const [joinStep, setJoinStep] = useState<'form' | 'audit' | 'plan' | 'payment' | 'success'>('form');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('All');
+  const [showLimitAlert, setShowLimitAlert] = useState(false);
+  const [showActionPlanAlert, setShowActionPlanAlert] = useState(false);
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditScore, setAuditScore] = useState<number | null>(null);
+  const [auditProgress, setAuditProgress] = useState(0);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  const isAtLimit = directClientCount >= maxClients && user?.plan !== 'enterprise';
+  const planLabel = user?.plan === 'free' ? 'Starter' : user?.plan === 'pro' ? 'Pro' : 'Agency';
+
+  // Map user plan to indexation tier
+  const userIndexationPlan = user?.plan === 'enterprise' ? 'elite' : user?.plan === 'pro' ? 'premium' : 'standard';
+
+  const [formData, setFormData] = useState({
+    companyName: '',
+    website: '',
+    sector: '',
+    description: '',
+    contactName: user?.name || '',
+    contactEmail: user?.email || '',
+  });
+
+  const handleJoinIndex = () => {
+    // Priorité 1 : vérifier quota
+    if (isAtLimit) {
+      setShowLimitAlert(true);
+      return;
+    }
+    // Priorité 2 : vérifier plan d'action complet
+    if (!actionPlanComplete) {
+      setShowActionPlanAlert(true);
+      return;
+    }
+    setViewMode('join');
+    setJoinStep('form');
+    setAuditScore(null);
+    setAuditProgress(0);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setJoinStep('audit');
+    runAudit();
+  };
+
+  const runAudit = () => {
+    setIsAuditing(true);
+    setAuditProgress(0);
+    // Simulate audit progress
+    const interval = setInterval(() => {
+      setAuditProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + Math.random() * 15 + 5;
+      });
+    }, 400);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      setAuditProgress(100);
+      const score = Math.floor(Math.random() * 45) + 20; // 20-65
+      setAuditScore(score);
+      setIsAuditing(false);
+    }, 3500);
+  };
+
+  const handlePayment = () => {
+    setIsProcessingPayment(true);
+    setTimeout(() => {
+      setIsProcessingPayment(false);
+      setJoinStep('success');
+    }, 2500);
+  };
+
+  const formValid = formData.companyName.trim() && formData.website.trim() && formData.sector && formData.contactEmail.trim();
+
+  const filteredDirectory = DIRECTORY_DATA.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.desc.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = selectedFilter === 'All' || item.sector === selectedFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+  const uniqueSectors = ['All', ...Array.from(new Set(DIRECTORY_DATA.map(item => item.sector)))];
+
+  const generateMockAnalysis = (item: typeof DIRECTORY_DATA[0]): AnalysisResult => {
+    const url = `https://www.${item.name.toLowerCase()}.com`;
+    const score = item.aeoScore;
+    const isElite = score > 90;
+    const categories: Record<string, CategoryScore> = {
+      technical: { name: "Infrastructure Technique", score: isElite ? 95 : 85, weight: 10, items: [{ status: 'success', message: 'Temps de réponse TTFB < 100ms' }, { status: 'success', message: 'Rendu SSR optimisé' }] },
+      entity: { name: "Autorité Entité", score, weight: 10, items: [{ status: 'success', message: 'Fiche Knowledge Graph détectée' }, { status: isElite ? 'success' : 'warning', message: isElite ? 'Page "À propos" détaillée' : 'Page "À propos" perfectible' }] },
+      semantic: { name: "Structure Sémantique", score: score - 5, weight: 10, items: [{ status: 'success', message: 'Balisage Schema.org Organization valide' }, { status: 'success', message: 'Structure Hn logique' }] },
+      content: { name: "Profondeur Contenu", score: score - 2, weight: 10, items: [{ status: 'success', message: 'Densité entités nommées élevée' }] },
+    };
+    return {
+      url, timestamp: new Date().toISOString(), globalScore: score, categories, recommendations: [],
+      aiCitation: { before: `Je n'ai pas d'informations précises sur ${item.name}.`, after: `D'après ses données structurées, ${item.name} est un leader en ${item.sector}.`, probability: Math.max(score - 10, 50) }
+    };
+  };
+
+  const handleViewDetails = (item: typeof DIRECTORY_DATA[0]) => {
+    onViewEntity(generateMockAnalysis(item));
+  };
+
+  // =============================================
+  // BROWSER VIEW
+  // =============================================
+  const renderBrowser = () => (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="text-center space-y-4 mb-12">
+        <h1 className="text-4xl md:text-5xl font-sans font-bold text-white">
+          Annuaire <span className="text-purple-400 italic">Knowledge Graph</span>
+        </h1>
+        <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+          Explorez les entités certifiées AEO. Ces entreprises ont structuré leurs données pour être citées en priorité par ChatGPT, Claude et Gemini.
+        </p>
+        <div className="flex justify-center gap-4 pt-4 items-center">
+          {user && user.plan !== 'enterprise' && (
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+              <span className="text-[11px] text-gray-500">Quota projets</span>
+              <span className={`text-sm font-bold ${isAtLimit ? 'text-red-400' : 'text-white'}`}>{directClientCount}/{maxClients}</span>
+            </div>
+          )}
+          <button onClick={handleJoinIndex}
+            className={`px-6 py-3 font-bold rounded-2xl transition-all flex items-center gap-2 transform hover:scale-105 ${
+              isAtLimit ? 'bg-white/[0.06] border border-white/[0.08] text-gray-400 shadow-none' : !actionPlanComplete ? 'bg-white/[0.06] border border-amber-500/20 text-gray-300 shadow-none' : 'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white shadow-lg shadow-purple-500/20'
+            }`}>
+            <Sparkles size={18} /> Rejoindre l'Index
+            {isAtLimit ? <span className="text-[10px] ml-1 text-red-400">Limite</span> : !actionPlanComplete && <span className="text-[10px] ml-1 px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded-full">Plan d'action</span>}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white/[0.04] p-4 rounded-2xl border border-white/[0.08]">
+        <div className="relative w-full md:w-96">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+          <input type="text" placeholder="Rechercher une entité..." className="w-full bg-black/40 border border-white/[0.08] rounded-2xl pl-10 pr-4 py-2.5 text-white focus:border-purple-500/50 outline-none" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+        </div>
+        <div className="flex gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-2 md:pb-0">
+          {uniqueSectors.map(sector => (
+            <button key={sector} onClick={() => setSelectedFilter(sector)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${selectedFilter === sector ? 'bg-white/20 text-white' : 'bg-transparent text-gray-500 hover:bg-purple-500/10'}`}>
+              {sector}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Upsell Card */}
+        <div className={`border border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group ${isAtLimit ? 'border-red-500/20 hover:bg-red-500/[0.02]' : !actionPlanComplete ? 'border-amber-500/20 hover:bg-amber-500/[0.02]' : 'border-white/20 hover:bg-white/[0.04]'}`} onClick={handleJoinIndex}>
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${isAtLimit ? 'bg-red-500/[0.06]' : !actionPlanComplete ? 'bg-amber-500/[0.06]' : 'bg-white/[0.04]'}`}>
+            {isAtLimit ? <Lock size={28} className="text-red-400/60" /> : !actionPlanComplete ? <ClipboardList size={28} className="text-amber-400/60" /> : <Plus size={32} className="text-gray-500 group-hover:text-white" />}
+          </div>
+          <h3 className="font-bold text-white mb-1">{isAtLimit ? 'Limite atteinte' : !actionPlanComplete ? 'Plan d\'action requis' : 'Votre entreprise ici ?'}</h3>
+          <p className="text-sm text-gray-500 mb-4">{isAtLimit ? `Votre plan ${planLabel} est limité à ${maxClients} projet${maxClients > 1 ? 's' : ''}.` : !actionPlanComplete ? `Complétez votre plan d'action (${actionPlanProgress.completed}/${actionPlanProgress.total}).` : "Rejoignez l'index et boostez votre visibilité IA."}</p>
+          <span className={`text-sm font-bold flex items-center gap-1 group-hover:underline ${isAtLimit ? 'text-purple-400' : !actionPlanComplete ? 'text-amber-400' : 'text-purple-400'}`}>
+            {isAtLimit ? 'Upgrader mon plan' : !actionPlanComplete ? 'Compléter le plan d\'action' : 'Ajouter mon site'} <ArrowRight size={14} />
+          </span>
+        </div>
+
+        {filteredDirectory.map((item) => (
+          <div key={item.id} className="ninja-card p-6 rounded-2xl border border-white/[0.08] group hover:border-primary/30 transition-all hover:-translate-y-1 flex flex-col">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/[0.08] flex items-center justify-center text-white font-bold font-sans text-xl shadow-inner">{item.name.charAt(0)}</div>
+                <div>
+                  <h3 className="font-bold text-white flex items-center gap-1">{item.name} {item.verified && <Check size={14} className="text-purple-400" />}</h3>
+                  <p className="text-xs text-gray-500">{item.sector}</p>
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <div className={`text-lg font-bold ${item.aeoScore >= 90 ? 'text-purple-300' : 'text-purple-400'}`}>{item.aeoScore}</div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-wider">AEO Score</div>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mb-6 line-clamp-2 h-10">{item.desc}</p>
+            <div className="flex items-center justify-between pt-4 border-t border-white/[0.06] mt-auto">
+              <span className={`text-xs px-2 py-1 rounded border ${item.status === 'Elite' ? 'bg-purple-500/10 border-purple-500/30 text-purple-400' : item.status === 'Premium' ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-gray-500/10 border-gray-500/30 text-gray-500'}`}>{item.status} Member</span>
+              <button onClick={() => handleViewDetails(item)} className="text-xs text-white hover:text-purple-400 flex items-center gap-1 transition-colors">Voir la fiche <ArrowRight size={12} /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // =============================================
+  // JOIN FUNNEL
+  // =============================================
+  const renderJoinFunnel = () => {
+    const steps = [
+      { key: 'form', label: 'Entreprise' },
+      { key: 'audit', label: 'Audit AEO' },
+      { key: 'plan', label: 'Indexation' },
+      { key: 'payment', label: 'Confirmation' },
+    ];
+    const currentStepIndex = steps.findIndex(s => s.key === joinStep);
+
+    return (
+      <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
+        {/* Back + Title */}
+        <button onClick={() => { setViewMode('browse'); setJoinStep('form'); }} className="flex items-center text-sm text-gray-500 hover:text-white mb-6 transition-colors group">
+          <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" /> Retour à l'annuaire
+        </button>
+
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-sans font-bold text-white mb-2">Rejoindre l'Index <span className="text-purple-400">CitedBy.ai</span></h2>
+          <p className="text-gray-500 text-sm">Faites référencer votre entreprise dans l'annuaire Knowledge Graph</p>
+        </div>
+
+        {/* Progress bar */}
+        {joinStep !== 'success' && (
+          <div className="flex items-center gap-2 mb-10">
+            {steps.map((s, i) => (
+              <React.Fragment key={s.key}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${
+                    i < currentStepIndex ? 'bg-purple-500 border-purple-500 text-white' :
+                    i === currentStepIndex ? 'bg-purple-500/20 border-purple-500/50 text-purple-300' :
+                    'bg-white/5 border-white/10 text-gray-600'
+                  }`}>
+                    {i < currentStepIndex ? <Check size={14} /> : i + 1}
+                  </div>
+                  <span className={`text-xs font-medium hidden sm:block ${i <= currentStepIndex ? 'text-white' : 'text-gray-600'}`}>{s.label}</span>
+                </div>
+                {i < steps.length - 1 && <div className={`flex-1 h-px ${i < currentStepIndex ? 'bg-purple-500' : 'bg-white/10'}`} />}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+
+        {/* ---- STEP 1: FORM ---- */}
+        {joinStep === 'form' && (
+          <form onSubmit={handleFormSubmit} className="space-y-5">
+            <div className="bg-[#111111] border border-white/[0.06] rounded-2xl p-6 space-y-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-2"><Building2 size={18} className="text-purple-400" /> Informations de l'entreprise</h3>
+
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Nom de l'entreprise *</label>
+                <input type="text" name="companyName" value={formData.companyName} onChange={handleInputChange} placeholder="Ex: MonEntreprise SAS" required
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50" />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">URL du site web *</label>
+                <div className="relative">
+                  <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input type="url" name="website" value={formData.website} onChange={handleInputChange} placeholder="https://www.monsite.fr" required
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Secteur d'activité *</label>
+                <select name="sector" value={formData.sector} onChange={handleInputChange} required
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 cursor-pointer">
+                  <option value="" className="bg-[#111] text-gray-500">Sélectionnez un secteur</option>
+                  {SECTORS.map(s => <option key={s} value={s} className="bg-[#111]">{s}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Description courte</label>
+                <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Décrivez votre activité en 1-2 phrases..." rows={3}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 resize-none" />
+              </div>
+            </div>
+
+            <div className="bg-[#111111] border border-white/[0.06] rounded-2xl p-6 space-y-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-2"><UserIcon size={18} className="text-purple-400" /> Contact référent</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Nom complet</label>
+                  <input type="text" name="contactName" value={formData.contactName} onChange={handleInputChange} placeholder="Prénom Nom"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Email *</label>
+                  <input type="email" name="contactEmail" value={formData.contactEmail} onChange={handleInputChange} placeholder="email@entreprise.com" required
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50" />
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" disabled={!formValid}
+              className="w-full py-3.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 text-sm">
+              Lancer l'audit AEO <ArrowRight size={16} />
+            </button>
+          </form>
+        )}
+
+        {/* ---- STEP 2: AUDIT ---- */}
+        {joinStep === 'audit' && (
+          <div className="space-y-6">
+            <div className="bg-[#111111] border border-white/[0.06] rounded-2xl p-8 text-center">
+              {isAuditing ? (
+                <div className="space-y-6">
+                  <div className="w-20 h-20 mx-auto rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                    <Loader2 size={36} className="text-purple-400 animate-spin" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2">Audit AEO en cours...</h3>
+                    <p className="text-gray-500 text-sm mb-4">Analyse de <span className="text-purple-400 font-mono">{formData.website}</span></p>
+                  </div>
+                  <div className="max-w-xs mx-auto">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+                      <span>Progression</span>
+                      <span>{Math.min(100, Math.round(auditProgress))}%</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-purple-500 to-violet-500 rounded-full transition-all duration-300" style={{ width: `${Math.min(100, auditProgress)}%` }} />
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-600 space-y-1">
+                    {auditProgress > 10 && <p className="animate-in fade-in">Analyse de l'infrastructure technique...</p>}
+                    {auditProgress > 35 && <p className="animate-in fade-in">Vérification des données structurées Schema.org...</p>}
+                    {auditProgress > 60 && <p className="animate-in fade-in">Évaluation de l'autorité entité...</p>}
+                    {auditProgress > 85 && <p className="animate-in fade-in">Calcul du score AEO final...</p>}
+                  </div>
+                </div>
+              ) : auditScore !== null ? (
+                <div className="space-y-6">
+                  <div className={`w-24 h-24 mx-auto rounded-full ${auditScore >= 50 ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-orange-500/10 border-orange-500/20'} border-2 flex items-center justify-center`}>
+                    <span className={`text-3xl font-bold ${getScoreColor(auditScore)}`}>{auditScore}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-1">Score AEO : <span className={getScoreColor(auditScore)}>{auditScore}/100</span></h3>
+                    <p className="text-gray-500 text-sm">
+                      {auditScore >= 50 ? 'Votre site a un potentiel AEO intéressant.' : 'Votre site a un fort potentiel d\'amélioration AEO.'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-left max-w-sm mx-auto">
+                    {[
+                      { label: 'Schema.org', score: Math.max(10, auditScore - 15 + Math.floor(Math.random() * 10)) },
+                      { label: 'Contenu IA', score: Math.max(10, auditScore - 5 + Math.floor(Math.random() * 15)) },
+                      { label: 'Technique', score: Math.max(20, auditScore + Math.floor(Math.random() * 20)) },
+                      { label: 'Autorité', score: Math.max(15, auditScore - 10 + Math.floor(Math.random() * 10)) },
+                    ].map(cat => (
+                      <div key={cat.label} className="p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="text-xs text-gray-500">{cat.label}</span>
+                          <span className={`text-xs font-bold ${getScoreColor(cat.score)}`}>{cat.score}%</span>
+                        </div>
+                        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${getScoreBg(cat.score)}`} style={{ width: `${cat.score}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="bg-purple-500/5 border border-purple-500/15 rounded-xl p-4 text-left">
+                    <p className="text-sm text-purple-300 flex items-start gap-2">
+                      <Sparkles size={16} className="text-purple-400 mt-0.5 flex-shrink-0" />
+                      En rejoignant l'index, CitedBy.ai optimisera automatiquement votre visibilité auprès des IA génératives.
+                    </p>
+                  </div>
+
+                  <button onClick={() => setJoinStep('plan')}
+                    className="w-full py-3.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 text-sm">
+                    Choisir mon plan d'indexation <ArrowRight size={16} />
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        {/* ---- STEP 3: PLAN SELECTION ---- */}
+        {joinStep === 'plan' && (
+          <div className="space-y-6">
+            <div className="text-center mb-2">
+              <p className="text-sm text-gray-400">Votre abonnement <span className="font-bold text-white">{planLabel}</span> inclut l'indexation <span className="font-bold text-purple-400">{INDEXATION_PLANS.find(p => p.id === userIndexationPlan)?.name}</span></p>
+            </div>
+
+            <div className="grid gap-4">
+              {INDEXATION_PLANS.map(plan => {
+                const isUserPlan = plan.id === userIndexationPlan;
+                const isLocked = (plan.id === 'premium' && user?.plan === 'free') || (plan.id === 'elite' && user?.plan !== 'enterprise');
+                const PlanIcon = plan.icon;
+
+                return (
+                  <div key={plan.id} className={`relative border rounded-2xl p-5 transition-all ${
+                    isUserPlan ? plan.activeClasses : isLocked ? 'border-white/[0.04] bg-white/[0.01] opacity-50' : plan.colorClasses
+                  }`}>
+                    {isUserPlan && (
+                      <div className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-purple-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                        Votre plan
+                      </div>
+                    )}
+                    {isLocked && (
+                      <div className="absolute top-4 right-4">
+                        <Lock size={16} className="text-gray-600" />
+                      </div>
+                    )}
+
+                    <div className="flex items-start gap-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        plan.id === 'elite' ? 'bg-purple-500/20' : plan.id === 'premium' ? 'bg-blue-500/20' : 'bg-white/10'
+                      }`}>
+                        <PlanIcon size={22} className={plan.id === 'elite' ? 'text-purple-400' : plan.id === 'premium' ? 'text-blue-400' : 'text-gray-400'} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1">
+                          <h4 className="text-lg font-bold text-white">{plan.name}</h4>
+                          <span className="text-xs text-gray-500">Plan {plan.planLabel}</span>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isUserPlan ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-gray-500'}`}>
+                            {isUserPlan ? 'Inclus' : isLocked ? 'Upgrade requis' : plan.price}
+                          </span>
+                        </div>
+                        <ul className="space-y-1 mt-2">
+                          {plan.features.map((f, i) => (
+                            <li key={i} className="flex items-center gap-2 text-sm text-gray-400">
+                              <Check size={13} className={isUserPlan ? 'text-green-400' : isLocked ? 'text-gray-700' : 'text-gray-600'} />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {isLocked && !isUserPlan && (
+                      <button onClick={onNavigateToPlan}
+                        className="mt-3 w-full py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-xs text-gray-400 hover:text-white hover:bg-white/[0.08] transition-colors flex items-center justify-center gap-1.5">
+                        <Zap size={12} /> Passer au plan {plan.planLabel}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <button onClick={() => setJoinStep('payment')}
+              className="w-full py-3.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 text-sm">
+              Confirmer et finaliser <ArrowRight size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* ---- STEP 4: PAYMENT / CONFIRMATION ---- */}
+        {joinStep === 'payment' && (
+          <div className="space-y-6">
+            <div className="bg-[#111111] border border-white/[0.06] rounded-2xl p-6 space-y-5">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2"><CreditCard size={18} className="text-purple-400" /> Récapitulatif</h3>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]">
+                  <div className="flex items-center gap-3">
+                    <Building2 size={16} className="text-gray-500" />
+                    <div>
+                      <p className="text-sm text-white font-medium">{formData.companyName}</p>
+                      <p className="text-[11px] text-gray-500">{formData.website}</p>
+                    </div>
+                  </div>
+                  <span className={`text-sm font-bold ${getScoreColor(auditScore || 0)}`}>{auditScore}/100</span>
+                </div>
+
+                <div className="flex justify-between items-center p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]">
+                  <div className="flex items-center gap-3">
+                    <Target size={16} className="text-gray-500" />
+                    <div>
+                      <p className="text-sm text-white font-medium">Secteur</p>
+                      <p className="text-[11px] text-gray-500">{formData.sector}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center p-3 bg-purple-500/5 rounded-xl border border-purple-500/15">
+                  <div className="flex items-center gap-3">
+                    <Sparkles size={16} className="text-purple-400" />
+                    <div>
+                      <p className="text-sm text-white font-medium">Indexation {INDEXATION_PLANS.find(p => p.id === userIndexationPlan)?.name}</p>
+                      <p className="text-[11px] text-gray-500">Inclus dans votre plan {planLabel}</p>
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-green-400">0,00 €</span>
+                </div>
+              </div>
+
+              <div className="border-t border-white/[0.06] pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">Total à payer</span>
+                  <span className="text-2xl font-bold text-white">0,00 €</span>
+                </div>
+                <p className="text-[11px] text-gray-600 mt-1">Indexation incluse dans votre abonnement {planLabel}</p>
+              </div>
+            </div>
+
+            <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-3">
+              <p className="text-xs text-amber-300/80 flex items-start gap-2">
+                <AlertCircle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
+                Votre fiche sera vérifiée par l'équipe CitedBy.ai sous 24-48h avant publication dans l'annuaire.
+              </p>
+            </div>
+
+            <button onClick={handlePayment} disabled={isProcessingPayment}
+              className="w-full py-3.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 disabled:opacity-60 text-white font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 text-sm">
+              {isProcessingPayment ? <><Loader2 size={16} className="animate-spin" /> Traitement en cours...</> : <><CheckCircle2 size={16} /> Confirmer l'inscription</>}
+            </button>
+          </div>
+        )}
+
+        {/* ---- SUCCESS ---- */}
+        {joinStep === 'success' && (
+          <div className="text-center space-y-6 py-8">
+            <div className="w-24 h-24 mx-auto rounded-full bg-green-500/10 border-2 border-green-500/20 flex items-center justify-center">
+              <CheckCircle2 size={48} className="text-green-400" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-2">Inscription réussie !</h3>
+              <p className="text-gray-400 max-w-md mx-auto">
+                <span className="font-bold text-white">{formData.companyName}</span> a été soumise pour indexation dans l'annuaire Knowledge Graph avec le niveau <span className="text-purple-400 font-bold">{INDEXATION_PLANS.find(p => p.id === userIndexationPlan)?.name}</span>.
+              </p>
+            </div>
+
+            <div className="max-w-sm mx-auto space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left">
+                <CheckCircle2 size={16} className="text-green-400 flex-shrink-0" />
+                <span className="text-sm text-gray-300">Score AEO initial : <span className={`font-bold ${getScoreColor(auditScore || 0)}`}>{auditScore}/100</span></span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left">
+                <Clock size={16} className="text-amber-400 flex-shrink-0" />
+                <span className="text-sm text-gray-300">Vérification par CitedBy.ai sous 24-48h</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-left">
+                <Mail size={16} className="text-purple-400 flex-shrink-0" />
+                <span className="text-sm text-gray-300">Confirmation envoyée à <span className="text-white">{formData.contactEmail}</span></span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-center pt-4">
+              <button onClick={() => { setViewMode('browse'); setJoinStep('form'); }}
+                className="px-6 py-3 bg-white/[0.06] border border-white/[0.08] rounded-2xl text-white text-sm font-medium hover:bg-white/10 transition-colors">
+                Retour à l'annuaire
+              </button>
+              <button onClick={onNavigateToPlan}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-2xl text-sm flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                <Zap size={16} /> Booster mon indexation
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // =============================================
+  // RENDER
+  // =============================================
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-10 animate-in fade-in duration-500 min-h-[80vh]">
+
+      {viewMode === 'browse' && (
+        <button onClick={onBack} className="flex items-center text-gray-500 hover:text-white mb-6 transition-colors">
+          <ArrowLeft size={18} className="mr-2" /> Retour
+        </button>
+      )}
+
+      {viewMode === 'browse' ? renderBrowser() : renderJoinFunnel()}
+
+      {/* --- ALERTE LIMITE ATTEINTE --- */}
+      {showLimitAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLimitAlert(false)} />
+          <div className="relative bg-[#111111] border border-red-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-red-500/5 overflow-hidden">
+            <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-b border-white/[0.06] p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <AlertCircle size={32} className="text-red-400" />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Limite de projets atteinte</h2>
+              <p className="text-sm text-gray-400">
+                Votre plan <span className="font-bold text-white">{planLabel}</span> autorise <span className="font-bold text-white">{maxClients}</span> projet{maxClients > 1 ? 's' : ''} maximum.
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]">
+                <span className="text-sm text-gray-400">Projets utilisés</span>
+                <span className="text-lg font-bold text-red-400">{directClientCount}/{maxClients}</span>
+              </div>
+              <p className="text-xs text-gray-500 text-center">Passez à un plan supérieur pour ajouter votre entreprise à l'annuaire.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setShowLimitAlert(false)} className="flex-1 px-4 py-2.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-xl transition-colors">Fermer</button>
+                <button onClick={() => { setShowLimitAlert(false); onNavigateToPlan(); }}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-purple-500/20">
+                  <Zap size={16} /> Upgrader
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* --- ALERTE PLAN D'ACTION INCOMPLET --- */}
+      {showActionPlanAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowActionPlanAlert(false)} />
+          <div className="relative bg-[#111111] border border-amber-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-amber-500/5 overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-white/[0.06] p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <ClipboardList size={32} className="text-amber-400" />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Plan d'action à compléter</h2>
+              <p className="text-sm text-gray-400">
+                Vous devez valider toutes les solutions de votre plan d'action AEO avant de pouvoir rejoindre l'index.
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Solutions validées</span>
+                  <span className="font-bold text-amber-400">{actionPlanProgress.completed}/{actionPlanProgress.total}</span>
+                </div>
+                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500"
+                    style={{ width: actionPlanProgress.total > 0 ? `${(actionPlanProgress.completed / actionPlanProgress.total) * 100}%` : '0%' }}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 text-center">Générez et validez chaque solution d'amélioration dans l'onglet Monitoring AEO.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setShowActionPlanAlert(false)} className="flex-1 px-4 py-2.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-xl transition-colors">Fermer</button>
+                <button onClick={() => { setShowActionPlanAlert(false); onNavigateToActionPlan(); }}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-amber-500/20 text-sm">
+                  Compléter mon plan d'action <ArrowRight size={14} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Directory;

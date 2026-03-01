@@ -1,0 +1,582 @@
+warning: in the working copy of 'components/layout/AppShell.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/layout/Sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+diff --git a/App.tsx b/App.tsx
+index c0d7fb3..f5a5008 100644
+--- a/App.tsx
++++ b/App.tsx
+@@ -4,10 +4,10 @@ import { analyzeUrl } from './services/analyzer';
+ import { db } from './services/database';
+ import { megaGenerate } from './services/mega-generator';
+ import Home from './pages/Home';
+-import Login from './pages/Login';
+-import Analyze from './pages/Analyze';
+ 
+ // Lazy-loaded pages for bundle optimization
++const Login = lazy(() => import('./pages/Login'));
++const Analyze = lazy(() => import('./pages/Analyze'));
+ const Dashboard = lazy(() => import('./pages/Dashboard'));
+ const GenerativeTools = lazy(() => import('./pages/GenerativeTools'));
+ const Results = lazy(() => import('./pages/Results').then(m => ({ default: m.Results })));
+@@ -141,14 +141,10 @@ const AppContent: React.FC = () => {
+     setToasts(prev => prev.filter(t => t.id !== id));
+   }, []);
+ 
+-  // ── Page transition ──
+-  const [pageKey, setPageKey] = useState(0);
+-
+   // ── 2-level routing ──
+   const [currentView, setCurrentView] = useState<string>('home');
+   const [activeSection, setActiveSection] = useState<string>('dashboard');
+   const [viewHistory, setViewHistory] = useState<string[]>([]);
+-  const [refreshKey, setRefreshKey] = useState(0);
+ 
+   const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+   const [history, setHistory] = useState<AnalysisResult[]>([]);
+@@ -256,49 +252,46 @@ const AppContent: React.FC = () => {
+     return { complete: total > 0 && completed === total, completed, total };
+   }, [history]);
+ 
+-  // ── Navigation ──
+-  const navigateTo = (view: string) => {
++  // ── Navigation (stable callbacks — no re-render cascade) ──
++  const navigateTo = useCallback((view: string) => {
+     setIsMobileMenuOpen(false);
+     if (view !== 'recharge') setInitialRechargePackId(null);
+     if (view !== 'account') setInitialAccountTab('profile');
+-    setViewHistory(prev => [...prev, currentView]);
+-    setCurrentView(view);
+-    // Auto-sync section from page
++    setCurrentView(prev => {
++      setViewHistory(h => [...h, prev]);
++      return view;
++    });
+     const section = PAGE_TO_SECTION[view];
+     if (section) setActiveSection(section);
+-    setRefreshKey(prev => prev + 1);
+-    setPageKey(prev => prev + 1);
+-  };
++  }, []);
+ 
+-  const handleSectionChange = (section: string) => {
++  const handleSectionChange = useCallback((section: string) => {
+     const firstPage = FIRST_PAGE_PER_SECTION[section] || section;
+     navigateTo(firstPage);
+-  };
++  }, [navigateTo]);
+ 
+-  const handlePageChange = (page: string) => {
++  const handlePageChange = useCallback((page: string) => {
+     navigateTo(page);
+-  };
++  }, [navigateTo]);
+ 
+-  const goBack = () => {
++  const goBack = useCallback(() => {
+     setIsMobileMenuOpen(false);
+-    if (viewHistory.length > 0) {
+-      const newHistory = [...viewHistory];
+-      const prevView = newHistory.pop();
+-      setViewHistory(newHistory);
+-      if (prevView) {
+-        setCurrentView(prevView);
+-        setRefreshKey(prev => prev + 1);
++    setViewHistory(prev => {
++      if (prev.length > 0) {
++        const newHistory = [...prev];
++        const prevView = newHistory.pop();
++        if (prevView) setCurrentView(prevView);
++        return newHistory;
+       }
+-    } else {
+       setCurrentView('home');
+-      setRefreshKey(prev => prev + 1);
+-    }
+-  };
++      return [];
++    });
++  }, []);
+ 
+-  const handleDirectRecharge = (packId: number) => {
++  const handleDirectRecharge = useCallback((packId: number) => {
+     setInitialRechargePackId(packId);
+     navigateTo('recharge');
+-  };
++  }, [navigateTo]);
+ 
+   const handleAnalyze = async (url: string) => {
+     if (user) {
+@@ -411,19 +404,19 @@ const AppContent: React.FC = () => {
+     });
+   }, []);
+ 
+-  const handleAddToSmcLibrary = (item: SMCContent) => setSmcLibrary(prev => [item, ...prev]);
+-  const handleAddToTruthLibrary = (item: SMCContent) => setTruthLibrary(prev => [item, ...prev]);
+-  const handleAddToSchemaLibrary = (item: SMCContent) => setSchemaLibrary(prev => [item, ...prev]);
+-  const handleAddToRobotsLibrary = (item: SMCContent) => setRobotsLibrary(prev => [item, ...prev]);
++  const handleAddToSmcLibrary = useCallback((item: SMCContent) => setSmcLibrary(prev => [item, ...prev]), []);
++  const handleAddToTruthLibrary = useCallback((item: SMCContent) => setTruthLibrary(prev => [item, ...prev]), []);
++  const handleAddToSchemaLibrary = useCallback((item: SMCContent) => setSchemaLibrary(prev => [item, ...prev]), []);
++  const handleAddToRobotsLibrary = useCallback((item: SMCContent) => setRobotsLibrary(prev => [item, ...prev]), []);
+ 
+-  const handleNavigateToPublisher = (data: { topic: string, url: string, brief: string }) => {
++  const handleNavigateToPublisher = useCallback((data: { topic: string, url: string, brief: string }) => {
+     setPublisherRequestData(data);
+     navigateTo('publisher-request');
+-  };
++  }, [navigateTo]);
+ 
+-  const handleNavigateToDirectory = () => {
++  const handleNavigateToDirectory = useCallback(() => {
+     navigateTo('directory');
+-  };
++  }, [navigateTo]);
+ 
+   const handleDeductCredits = (amount: number): boolean => {
+     if (!user) {
+@@ -457,22 +450,20 @@ const AppContent: React.FC = () => {
+     setUser({ ...user, plan: newPlan });
+   };
+ 
+-  const handleLogin = (loggedInUser: User) => {
++  const handleLogin = useCallback((loggedInUser: User) => {
+     setUser(loggedInUser);
+     setViewHistory(['home']);
+     setCurrentView('dashboard');
+     setActiveSection('dashboard');
+-    setRefreshKey(prev => prev + 1);
+-  };
++  }, []);
+ 
+-  const handleLogout = () => {
++  const handleLogout = useCallback(() => {
+     setIsMobileMenuOpen(false);
+     setUser(null);
+     setCurrentView('home');
+     setActiveSection('dashboard');
+     setViewHistory([]);
+-    setRefreshKey(prev => prev + 1);
+-  };
++  }, []);
+ 
+   useEffect(() => {
+     if (!user && isMobileMenuOpen) {
+@@ -484,100 +475,100 @@ const AppContent: React.FC = () => {
+   const renderPage = () => {
+     switch (currentView) {
+       case 'home':
+-        return <Home key={`home-${refreshKey}`} onNavigate={(view) => navigateTo(view)} user={user} onDirectRecharge={handleDirectRecharge} />;
++        return <Home onNavigate={navigateTo} user={user} onDirectRecharge={handleDirectRecharge} />;
+       case 'login':
+-        return <Login key={`login-${refreshKey}`} onLogin={handleLogin} onBack={goBack} />;
++        return <Login onLogin={handleLogin} onBack={goBack} />;
+       case 'dashboard':
+-        return <Dashboard key={`dashboard-${refreshKey}`} onBack={goBack} history={history} onView={handleViewAnalysis} onNavigate={navigateTo} />;
++        return <Dashboard onBack={goBack} history={history} onView={handleViewAnalysis} onNavigate={navigateTo} />;
+       case 'new-analysis':
+       case 'analyze':
+-        return <Analyze key={`analyze-${refreshKey}`} onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />;
++        return <Analyze onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />;
+       case 'generative-tools':
+-        return <GenerativeTools key={`generative-tools-${refreshKey}`} onNavigate={navigateTo} history={history} megaStatus={megaStatus} />;
++        return <GenerativeTools onNavigate={navigateTo} history={history} megaStatus={megaStatus} />;
+       case 'results':
+       case 'audit-aeo':
+-        return analysisData ? <Results key={`results-${refreshKey}`} data={analysisData} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} onSaveSolution={handleSaveSolution} initialTab={resultsTab as any} onNewAnalysis={() => navigateTo('new-analysis')} /> : null;
++        return analysisData ? <Results data={analysisData} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} onSaveSolution={handleSaveSolution} initialTab={resultsTab as any} onNewAnalysis={() => navigateTo('new-analysis')} /> : null;
+       case 'action-plan':
+       case 'projects':
+       case 'rescan':
+-        return <Projects key={`projects-${refreshKey}`} onBack={goBack} onNavigateToAnalysis={() => navigateTo('new-analysis')} user={user} history={history} onViewAnalysis={handleViewAnalysis} projectCount={monthlyProjectCount} maxProjects={user ? PLAN_LIMITS[user.plan] : 1} onNavigateToPlan={() => { setInitialAccountTab('subscription'); navigateTo('account'); }} onDeductCredits={handleDeductCredits} onSaveSolution={handleSaveSolution} onNewAnalysis={() => navigateTo('new-analysis')} onNavigateToRecharge={() => navigateTo('credits')} initialUrl={analysisData?.url} initialTab={resultsTab} />;
++        return <Projects onBack={goBack} onNavigateToAnalysis={() => navigateTo('new-analysis')} user={user} history={history} onViewAnalysis={handleViewAnalysis} projectCount={monthlyProjectCount} maxProjects={user ? PLAN_LIMITS[user.plan] : 1} onNavigateToPlan={() => { setInitialAccountTab('subscription'); navigateTo('account'); }} onDeductCredits={handleDeductCredits} onSaveSolution={handleSaveSolution} onNewAnalysis={() => navigateTo('new-analysis')} onNavigateToRecharge={() => navigateTo('credits')} initialUrl={analysisData?.url} initialTab={resultsTab} />;
+       case 'history':
+-        return <HistoryView key={`history-${refreshKey}`} onBack={goBack} history={history} onView={handleViewAnalysis} />;
++        return <HistoryView onBack={goBack} history={history} onView={handleViewAnalysis} />;
+       case 'citation-dashboard':
+       case 'ai-monitoring':
+-        return <AiMonitoring key={`ai-monitoring-${refreshKey}`} onBack={goBack} onNavigate={navigateTo} onDeductCredits={handleDeductCredits} user={user} />;
++        return <AiMonitoring onBack={goBack} onNavigate={navigateTo} onDeductCredits={handleDeductCredits} user={user} />;
+       case 'tracked-queries':
+       case 'benchmark':
+       case 'monthly-report':
+         return <PlaceholderPage title={currentView === 'tracked-queries' ? 'Requêtes cibles' : currentView === 'benchmark' ? 'Benchmark' : 'Rapports mensuels'} />;
+       case 'multilingual':
+-        return <MultilingualCitations key={`multilingual-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
++        return <MultilingualCitations onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+       case 'alerts':
+       case 'alerts-aeo':
+-        return <AlertsAEO key={`alerts-aeo-${refreshKey}`} onBack={goBack} user={user} onNavigate={(view) => navigateTo(view)} />;
++        return <AlertsAEO onBack={goBack} user={user} onNavigate={navigateTo} />;
+       case 'smc-studio':
+-        return <SMCStudio key={`smc-studio-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} library={smcLibrary} onAddToLibrary={handleAddToSmcLibrary} onNavigateToPublisher={handleNavigateToPublisher} onNavigateToDirectory={handleNavigateToDirectory} />;
++        return <SMCStudio onBack={goBack} user={user} onDeductCredits={handleDeductCredits} library={smcLibrary} onAddToLibrary={handleAddToSmcLibrary} onNavigateToPublisher={handleNavigateToPublisher} onNavigateToDirectory={handleNavigateToDirectory} />;
+       case 'blog-optimizer':
+-        return <BlogOptimizer key={`blog-optimizer-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} onNavigateToPublisher={handleNavigateToPublisher} />;
++        return <BlogOptimizer onBack={goBack} user={user} onDeductCredits={handleDeductCredits} onNavigateToPublisher={handleNavigateToPublisher} />;
+       case 'schema-org':
+-        return <SchemaOrg key={`schema-org-${refreshKey}`} onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} savedFiles={schemaLibrary} onSaveFile={handleAddToSchemaLibrary} />;
++        return <SchemaOrg onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} savedFiles={schemaLibrary} onSaveFile={handleAddToSchemaLibrary} />;
+       case 'robots-txt':
+-        return <RobotsTxt key={`robots-txt-${refreshKey}`} onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} onUpdateAnalysis={handleUpdateAnalysis} savedFiles={robotsLibrary} onSaveFile={handleAddToRobotsLibrary} />;
++        return <RobotsTxt onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} onUpdateAnalysis={handleUpdateAnalysis} savedFiles={robotsLibrary} onSaveFile={handleAddToRobotsLibrary} />;
+       case 'source-of-truth':
+-        return <SourceOfTruth key={`source-of-truth-${refreshKey}`} onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} savedFiles={truthLibrary} onSaveFile={handleAddToTruthLibrary} />;
++        return <SourceOfTruth onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} savedFiles={truthLibrary} onSaveFile={handleAddToTruthLibrary} />;
+       case 'llms-txt':
+-        return <LlmsTxtGenerator key={`llms-txt-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
++        return <LlmsTxtGenerator onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
+       case 'content-writer':
+-        return <ContentWriter key={`content-writer-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
++        return <ContentWriter onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+       case 'ai-response-layer':
+-        return <AiResponseLayer key={`ai-response-layer-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
++        return <AiResponseLayer onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+       case 'answer-first':
+       case 'answer-first-audit':
+-        return <AnswerFirstAudit key={`answer-first-audit-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
++        return <AnswerFirstAudit onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
+       case 'ai-citation-simulator':
+-        return <AiCitationSimulator key={`ai-citation-simulator-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
++        return <AiCitationSimulator onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+       case 'eeat-builder':
+-        return <EeatBuilder key={`eeat-builder-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
++        return <EeatBuilder onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
+       case 'reputation':
+-        return <Reputation key={`reputation-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
++        return <Reputation onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+       case 'bot-tracking':
+-        return <BotTracking key={`bot-tracking-${refreshKey}`} onBack={goBack} user={user} />;
++        return <BotTracking onBack={goBack} user={user} />;
+       case 'publisher-search':
+       case 'publisher-request':
+-        return <PublisherRequest key={`publisher-request-${refreshKey}`} onBack={goBack} user={user} data={publisherRequestData} />;
++        return <PublisherRequest onBack={goBack} user={user} data={publisherRequestData} />;
+       case 'my-orders':
+       case 'publisher-dashboard':
+         return <PlaceholderPage title={currentView === 'my-orders' ? 'Mes commandes' : 'Espace publisher'} />;
+       case 'directory':
+-        return <Directory key={`directory-${refreshKey}`} onBack={goBack} onViewEntity={handleViewDirectoryEntity} onNavigateToPlan={() => { setInitialAccountTab('subscription'); navigateTo('account'); }} user={user} directClientCount={monthlyProjectCount} maxClients={user ? PLAN_LIMITS[user.plan] : 1} actionPlanComplete={actionPlanStatus.complete} actionPlanProgress={actionPlanStatus} onNavigateToActionPlan={() => { setResultsTab('recommendations'); navigateTo('projects'); }} />;
++        return <Directory onBack={goBack} onViewEntity={handleViewDirectoryEntity} onNavigateToPlan={() => { setInitialAccountTab('subscription'); navigateTo('account'); }} user={user} directClientCount={monthlyProjectCount} maxClients={user ? PLAN_LIMITS[user.plan] : 1} actionPlanComplete={actionPlanStatus.complete} actionPlanProgress={actionPlanStatus} onNavigateToActionPlan={() => { setResultsTab('recommendations'); navigateTo('projects'); }} />;
+       case 'directory-entity':
+-        return analysisData ? <DirectoryEntity key={`directory-entity-${refreshKey}`} data={analysisData} onBack={goBack} /> : null;
++        return analysisData ? <DirectoryEntity data={analysisData} onBack={goBack} /> : null;
+       case 'profile':
+       case 'subscription':
+       case 'account':
+-        return <Account key={`account-${refreshKey}`} user={user} onLogout={handleLogout} onNavigate={navigateTo} onUpgrade={handleUpgradePlan} projectCount={monthlyProjectCount} maxProjects={user ? PLAN_LIMITS[user.plan] : 1} initialTab={currentView === 'subscription' ? 'subscription' : initialAccountTab} />;
++        return <Account user={user} onLogout={handleLogout} onNavigate={navigateTo} onUpgrade={handleUpgradePlan} projectCount={monthlyProjectCount} maxProjects={user ? PLAN_LIMITS[user.plan] : 1} initialTab={currentView === 'subscription' ? 'subscription' : initialAccountTab} />;
+       case 'plan':
+-        return <Plan key={`plan-${refreshKey}`} onBack={goBack} user={user} onUpgrade={handleUpgradePlan} />;
++        return <Plan onBack={goBack} user={user} onUpgrade={handleUpgradePlan} />;
+       case 'credits':
+       case 'recharge':
+-        return <Recharge key={`recharge-${refreshKey}`} onBack={goBack} onRecharge={handleRecharge} user={user} onNavigate={(view) => navigateTo(view)} initialPackId={initialRechargePackId} />;
++        return <Recharge onBack={goBack} onRecharge={handleRecharge} user={user} onNavigate={navigateTo} initialPackId={initialRechargePackId} />;
+       case 'invoices':
+         return <PlaceholderPage title="Facturation" />;
+       case 'api-keys':
+       case 'api-developer':
+-        return <ApiDeveloper key={`api-developer-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
++        return <ApiDeveloper onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+       case 'affiliation':
+-        return <Affiliation key={`affiliation-${refreshKey}`} onBack={goBack} user={user} />;
++        return <Affiliation onBack={goBack} user={user} />;
+       case 'integrations':
+-        return <Integrations key={`integrations-${refreshKey}`} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
++        return <Integrations onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+       case 'analytics-integrations':
+-        return <AnalyticsIntegrations key={`analytics-integrations-${refreshKey}`} onBack={goBack} user={user} />;
++        return <AnalyticsIntegrations onBack={goBack} user={user} />;
+       case 'clients':
+-        return <Clients key={`clients-${refreshKey}`} onBack={goBack} onNavigate={(view) => navigateTo(view)} user={user} directClientCount={monthlyProjectCount} maxClients={user ? PLAN_LIMITS[user.plan] : 1} />;
++        return <Clients onBack={goBack} onNavigate={navigateTo} user={user} directClientCount={monthlyProjectCount} maxClients={user ? PLAN_LIMITS[user.plan] : 1} />;
+       case 'mission-orders':
+-        return <MissionOrders key={`mission-orders-${refreshKey}`} onBack={goBack} user={user} onNavigate={(view) => navigateTo(view)} />;
++        return <MissionOrders onBack={goBack} user={user} onNavigate={navigateTo} />;
+       case 'messages':
+-        return <Messages key={`messages-${refreshKey}`} onBack={goBack} user={user} />;
++        return <Messages onBack={goBack} user={user} />;
+       default:
+         return <PlaceholderPage title="Page introuvable" />;
+     }
+@@ -643,7 +634,9 @@ const AppContent: React.FC = () => {
+       {isPublicPage ? (
+         // Public pages — raw, no AppShell
+         <div className="bg-black min-h-screen">
+-          {renderPage()}
++          <Suspense fallback={<div className="min-h-screen bg-black" />}>
++            {renderPage()}
++          </Suspense>
+         </div>
+       ) : (
+         // Authenticated pages — wrapped in AppShell
+@@ -679,7 +672,7 @@ const AppContent: React.FC = () => {
+               <div className="h-64 skeleton-shimmer rounded-2xl border border-white/[0.04]" />
+             </div>
+           }>
+-            <div key={pageKey} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
++            <div key={currentView} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+               {renderPage()}
+             </div>
+           </Suspense>
+diff --git a/components/layout/AppShell.tsx b/components/layout/AppShell.tsx
+index 2049368..ef5319c 100644
+--- a/components/layout/AppShell.tsx
++++ b/components/layout/AppShell.tsx
+@@ -19,7 +19,7 @@ interface AppShellProps {
+   children: React.ReactNode;
+ }
+ 
+-export default function AppShell({
++function AppShell({
+   activeSection,
+   onSectionChange,
+   activePage,
+@@ -70,3 +70,5 @@ export default function AppShell({
+     </div>
+   );
+ }
++
++export default React.memo(AppShell);
+diff --git a/components/layout/Sidebar.tsx b/components/layout/Sidebar.tsx
+index f5557b1..470f208 100644
+--- a/components/layout/Sidebar.tsx
++++ b/components/layout/Sidebar.tsx
+@@ -133,7 +133,7 @@ interface SidebarProps {
+   onLogoClick?: () => void;
+ }
+ 
+-export default function Sidebar({
++function Sidebar({
+   section,
+   activePage,
+   onPageChange,
+@@ -285,3 +285,5 @@ export default function Sidebar({
+     </>
+   );
+ }
++
++export default React.memo(Sidebar);
+diff --git a/components/layout/TopNav.tsx b/components/layout/TopNav.tsx
+index 3c219c5..9341f28 100644
+--- a/components/layout/TopNav.tsx
++++ b/components/layout/TopNav.tsx
+@@ -27,7 +27,7 @@ interface TopNavProps {
+   onLogoClick?: () => void;
+ }
+ 
+-export default function TopNav({
++function TopNav({
+   activeSection,
+   onSectionChange,
+   credits,
+@@ -94,3 +94,5 @@ export default function TopNav({
+     </header>
+   );
+ }
++
++export default React.memo(TopNav);
+diff --git a/index.html b/index.html
+index d637ede..db74c7f 100644
+--- a/index.html
++++ b/index.html
+@@ -7,9 +7,15 @@
+     <title>CitedBy.ai — AEO Intelligence Platform</title>
+     <link rel="preconnect" href="https://fonts.googleapis.com" />
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+-    <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet" />
+-    <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet" />
++    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
++    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
++    <link rel="preload" href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" as="style" />
++    <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet" media="print" onload="this.media='all'" />
++    <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet" media="print" onload="this.media='all'" />
++    <noscript>
++      <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.min.css" rel="stylesheet" />
++      <link href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-mono/style.min.css" rel="stylesheet" />
++    </noscript>
+   </head>
+   <body class="bg-black text-gray-100">
+     <div id="scroll-progress" style="width:0%"></div>
+diff --git a/package.json b/package.json
+index e54d876..7af2e42 100644
+--- a/package.json
++++ b/package.json
+@@ -27,7 +27,6 @@
+     "@supabase/ssr": "^0.3.0",
+     "@supabase/supabase-js": "^2.43.4",
+     "clsx": "^2.1.1",
+-    "date-fns": "^3.6.0",
+     "html2canvas": "^1.4.1",
+     "jspdf": "^4.1.0",
+     "lucide-react": "^0.378.0",
+@@ -35,7 +34,6 @@
+     "react": "^18",
+     "react-dom": "^18",
+     "react-hook-form": "^7.51.4",
+-    "react-router-dom": "^6.30.1",
+     "recharts": "^2.12.7",
+     "sonner": "^1.4.41",
+     "stripe": "^15.6.0",
+diff --git a/pages/Account.tsx b/pages/Account.tsx
+index ac2cb85..048300c 100644
+--- a/pages/Account.tsx
++++ b/pages/Account.tsx
+@@ -7,7 +7,7 @@ import {
+   Download, Loader2, Sparkles, FolderOpen, TrendingUp, Zap, ArrowUpRight,
+   Palette, Eye, Globe, Lock
+ } from 'lucide-react';
+-import jsPDF from 'jspdf';
++// jsPDF loaded dynamically on PDF generation (saves ~350 KB from initial bundle)
+ import PageHeader from '../components/layout/PageHeader';
+ import StripeCheckout from '../components/StripeCheckout';
+ 
+@@ -49,7 +49,8 @@ const Account: React.FC<AccountProps> = ({ user, onLogout, onNavigate, onUpgrade
+     setTimeout(() => setWlSaved(false), 2000);
+   };
+ 
+-  const generateBrandedPdf = () => {
++  const generateBrandedPdf = async () => {
++    const { default: jsPDF } = await import('jspdf');
+     const doc = new jsPDF();
+     doc.setFillColor(whiteLabel.primaryColor || '#a855f7');
+     doc.rect(0, 0, 210, 40, 'F');
+@@ -176,7 +177,8 @@ const Account: React.FC<AccountProps> = ({ user, onLogout, onNavigate, onUpgrade
+ 
+   // ── Invoice PDF ──
+ 
+-  const generateInvoice = (payment: { id: string; date: string; amount: number; desc: string; status: string }) => {
++  const generateInvoice = async (payment: { id: string; date: string; amount: number; desc: string; status: string }) => {
++    const { default: jsPDF } = await import('jspdf');
+     const doc = new jsPDF();
+     doc.setFontSize(22);
+     doc.setFont('helvetica', 'bold');
+diff --git a/pages/Plan.tsx b/pages/Plan.tsx
+index 96d1c41..a1f29bd 100644
+--- a/pages/Plan.tsx
++++ b/pages/Plan.tsx
+@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
+ import { createPortal } from 'react-dom';
+ import { User } from '../types';
+ import { Check, Download, ArrowLeft, ShieldCheck, LayoutList, History, FileText, Zap, Database, Fuel, Droplet, CreditCard, Star, Loader2, Sparkles, ArrowUpRight } from 'lucide-react';
+-import jsPDF from 'jspdf';
++// jsPDF loaded dynamically on PDF generation
+ import StripeCheckout from '../components/StripeCheckout';
+ import PageHeader from '../components/layout/PageHeader';
+ 
+@@ -108,8 +108,9 @@ const Plan: React.FC<PlanProps> = ({ onBack, user, onUpgrade, initialTab = 'my-p
+     setPaidAmount(0);
+   };
+ 
+-  const generateInvoice = (payment: { id: string; date: string; amount: number; desc: string; status: string }) => {
++  const generateInvoice = async (payment: { id: string; date: string; amount: number; desc: string; status: string }) => {
+     if (!user) return;
++    const { default: jsPDF } = await import('jspdf');
+     const doc = new jsPDF();
+     
+     // Header
+diff --git a/pages/Recharge.tsx b/pages/Recharge.tsx
+index a062435..9433390 100644
+--- a/pages/Recharge.tsx
++++ b/pages/Recharge.tsx
+@@ -1,7 +1,7 @@
+ import React, { useState, useEffect } from 'react';
+ import { User } from '../types';
+ import { Fuel, Check, CreditCard, Loader2, Droplet, Database, ArrowLeft, ShieldCheck, Lock, Infinity, CheckCircle2, FileText, Download, XCircle, LayoutDashboard, RefreshCcw, Wrench } from 'lucide-react';
+-import jsPDF from 'jspdf';
++// jsPDF loaded dynamically on PDF generation
+ import StripeCheckout from '../components/StripeCheckout';
+ import PageHeader from '../components/layout/PageHeader';
+ 
+@@ -94,9 +94,10 @@ const Recharge: React.FC<Props> = ({ onBack, onRecharge, user, onNavigate, initi
+     }, 2000);
+   };
+ 
+-  const generateInvoicePDF = () => {
++  const generateInvoicePDF = async () => {
+     if (!selectedPack || !user) return;
+ 
++    const { default: jsPDF } = await import('jspdf');
+     const doc = new jsPDF();
+     const priceHT = selectedPack.price;
+     const tva = priceHT * 0.20;
+diff --git a/pages/Results.tsx b/pages/Results.tsx
+index c8a0f0b..e999127 100644
+--- a/pages/Results.tsx
++++ b/pages/Results.tsx
+@@ -2,8 +2,7 @@ import React, { useState } from 'react';
+ import { AnalysisResult, CategoryScore, GeneratedSolution, User } from '../types';
+ import CategoryCard from '../components/CategoryCard';
+ import { Info, Download, Share2, ScanLine, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+-import html2canvas from 'html2canvas';
+-import jsPDF from 'jspdf';
++// jsPDF + html2canvas loaded dynamically on PDF export (saves ~586 KB from initial bundle)
+ import PageHeader from '../components/layout/PageHeader';
+ 
+ interface Props {
+@@ -30,6 +29,11 @@ const Results: React.FC<Props> = ({ data, onBack, user, onDeductCredits, onSaveS
+       // Wait a moment for the hidden div to render properly
+       await new Promise(resolve => setTimeout(resolve, 500));
+ 
++      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
++        import('html2canvas'),
++        import('jspdf'),
++      ]);
++
+       const canvas = await html2canvas(element, {
+         scale: 2,
+         useCORS: true,
+diff --git a/vercel.json b/vercel.json
+index 159fa49..fb32a6f 100644
+--- a/vercel.json
++++ b/vercel.json
+@@ -2,6 +2,18 @@
+   "cleanUrls": true,
+   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+   "headers": [
++    {
++      "source": "/assets/(.*)",
++      "headers": [
++        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
++      ]
++    },
++    {
++      "source": "/(.*).html",
++      "headers": [
++        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
++      ]
++    },
+     {
+       "source": "/(.*)",
+       "headers": [
+@@ -12,7 +24,7 @@
+         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(self)" },
+         {
+           "key": "Content-Security-Policy",
+-          "value": "default-src 'self'; connect-src 'self' https://*.supabase.co https://api.stripe.com https://generativelanguage.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
++          "value": "default-src 'self'; connect-src 'self' https://*.supabase.co https://api.stripe.com https://generativelanguage.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; script-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+         }
+       ]
+     }
+diff --git a/vite.config.ts b/vite.config.ts
+index e6f9f2a..edc18aa 100644
+--- a/vite.config.ts
++++ b/vite.config.ts
+@@ -12,6 +12,17 @@ export default defineConfig({
+   build: {
+     target: 'es2020',
+     chunkSizeWarningLimit: 500,
++    rollupOptions: {
++      output: {
++        manualChunks(id) {
++          if (id.includes('node_modules')) {
++            if (id.includes('jspdf') || id.includes('html2canvas')) return 'vendor-pdf';
++            if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts';
++            if (id.includes('@google/genai')) return 'vendor-ai';
++          }
++        },
++      },
++    },
+   },
+   test: {
+     globals: true,

@@ -1,0 +1,87 @@
+[
+  {
+    "content": "Fix PushContext.tsx (web) - two useEffects: user -> user?.id",
+    "status": "in_progress",
+    "activeForm": "Fixing PushContext.tsx (web) useEffect deps"
+  },
+  {
+    "content": "Fix useCounterQR.ts - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing useCounterQR.ts useEffect dep"
+  },
+  {
+    "content": "Fix useCustomerStats.ts - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing useCustomerStats.ts useEffect dep"
+  },
+  {
+    "content": "Fix useCustomerOffers.ts - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing useCustomerOffers.ts useEffect dep"
+  },
+  {
+    "content": "Fix useMerchantStats.ts - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing useMerchantStats.ts useEffect dep"
+  },
+  {
+    "content": "Fix useNotificationPreferences.ts - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing useNotificationPreferences.ts useEffect dep"
+  },
+  {
+    "content": "Fix useMerchantClientDetail.ts - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing useMerchantClientDetail.ts useEffect dep"
+  },
+  {
+    "content": "Fix useMerchantChartData.ts - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing useMerchantChartData.ts useEffect dep"
+  },
+  {
+    "content": "Fix CustomerCardDetail.tsx - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing CustomerCardDetail.tsx useEffect dep"
+  },
+  {
+    "content": "Fix QRCodeManagement.tsx - user -> user?.id",
+    "status": "pending",
+    "activeForm": "Fixing QRCodeManagement.tsx useEffect dep"
+  },
+  {
+    "content": "Fix useWorkflowLogs.ts - profile -> profile?.id",
+    "status": "pending",
+    "activeForm": "Fixing useWorkflowLogs.ts useEffect dep"
+  },
+  {
+    "content": "Fix usePlanLimits.ts - profile -> profile?.id",
+    "status": "pending",
+    "activeForm": "Fixing usePlanLimits.ts useEffect dep"
+  },
+  {
+    "content": "Fix CampaignEdit.tsx - profile -> profile?.id",
+    "status": "pending",
+    "activeForm": "Fixing CampaignEdit.tsx useEffect dep"
+  },
+  {
+    "content": "Fix CampaignRedirect.tsx - profile -> profile?.id",
+    "status": "pending",
+    "activeForm": "Fixing CampaignRedirect.tsx useEffect dep"
+  },
+  {
+    "content": "Fix AudienceSelector.tsx - remove counts from deps",
+    "status": "pending",
+    "activeForm": "Fixing AudienceSelector.tsx useEffect dep"
+  },
+  {
+    "content": "Fix SearchInput.tsx - add timer cleanup useEffect",
+    "status": "pending",
+    "activeForm": "Fixing SearchInput.tsx timer cleanup"
+  },
+  {
+    "content": "Fix mobile PushContext.tsx - profile -> profile?.id",
+    "status": "pending",
+    "activeForm": "Fixing mobile PushContext.tsx useEffect dep"
+  }
+]

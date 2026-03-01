@@ -1,0 +1,61 @@
+// ============================================
+// CitedBy.ai - API Developer Types
+// ============================================
+
+export interface ApiKey {
+  id: string
+  name: string
+  key: string
+  createdAt: string
+  status: 'active' | 'revoked'
+  lastUsed: string | null
+}
+
+export interface EndpointParam {
+  name: string
+  type: string
+  required: boolean
+  description: string
+}
+
+export interface ApiEndpoint {
+  method: 'GET' | 'POST'
+  path: string
+  description: string
+  gasCost: number
+  params: EndpointParam[]
+  exampleResponse: string
+}
+
+export type WebhookEvent =
+  | 'audit.completed'
+  | 'monitoring.scan_completed'
+  | 'monitoring.alert'
+  | 'credits.low'
+  | 'citations.new'
+
+export interface Webhook {
+  id: string
+  url: string
+  events: WebhookEvent[]
+  active: boolean
+  lastDelivery: string | null
+  createdAt: string
+}
+
+export interface ApiUsageDay {
+  date: string
+  success: number
+  errors: number
+}
+
+export interface ApiUsageKPI {
+  requestsPerDay: number
+  errorRate: number
+  avgLatency: number
+}
+
+export interface RateLimit {
+  tier: string
+  limit: number
+}

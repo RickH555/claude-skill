@@ -1,0 +1,288 @@
+import React, { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { User, AnalysisResult } from './types';
+import { analyzeUrl } from './services/analyzer';
+import { db } from './services/database';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Analyze from './pages/Analyze';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Results = lazy(() => import('./pages/Results'));
+const AiMonitoring = lazy(() => import('./pages/AiMonitoring'));
+const AlertsAEO = lazy(() => import('./pages/AlertsAEO'));
+const MarketplaceAgence = lazy(() => import('./pages/MarketplaceAgence'));
+const Recharge = lazy(() => import('./pages/Recharge'));
+const Account = lazy(() => import('./pages/Account'));
+const Affiliation = lazy(() => import('./pages/Affiliation'));
+
+import { Plus, AlertTriangle, X, ArrowUp, ChevronRight } from 'lucide-react';
+import { I18nProvider, useTranslation } from './i18n';
+import { Toast, ToastContext, ToastContainer } from './components/ToastSystem';
+export { useToast } from './components/ToastSystem';
+import CommandPalettePanel from './components/CommandPalette';
+import ShortcutsModal from './components/ShortcutsModal';
+import OnboardingModal from './components/OnboardingModal';
+import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+import MobileBottomNav from './components/MobileBottomNav';
+import AppFooter from './components/AppFooter';
+
+const useAnimatedNumber = (value: number, duration = 600) => {
+  const [display, setDisplay] = useState(value);
+  const prevValue = useRef(value);
+  useEffect(() => {
+    if (prevValue.current === value) return;
+    const start = prevValue.current;
+    const diff = value - start;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(start + diff * eased));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+    prevValue.current = value;
+  }, [value, duration]);
+  return display;
+};
+
+type ViewType = 'home' | 'login' | 'analyze' | 'results' | 'dashboard' | 'monitoring' | 'alerts' | 'marketplace' | 'recharge' | 'affiliation' | 'account';
+
+const App: React.FC = () => (
+  <I18nProvider>
+    <AppContent />
+  </I18nProvider>
+);
+
+const AppContent: React.FC = () => {
+  const { t } = useTranslation();
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const showToast = useCallback((type: Toast['type'], message: string) => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, type, message }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+  }, []);
+  const removeToast = useCallback((id: string) => { setToasts(prev => prev.filter(t => t.id !== id)); }, []);
+
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (profileRef.current && !profileRef.current.contains(e.target as Node)) setIsProfileOpen(false); };
+    if (isProfileOpen) document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [isProfileOpen]);
+
+  const [pageKey, setPageKey] = useState(0);
+  const [navbarVisible, setNavbarVisible] = useState(true);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const lastScrollY = useRef(0);
+  useEffect(() => {
+    const h = () => {
+      const y = window.scrollY;
+      if (y < 60) setNavbarVisible(true);
+      else if (y > lastScrollY.current + 10) setNavbarVisible(false);
+      else if (y < lastScrollY.current - 10) setNavbarVisible(true);
+      lastScrollY.current = y;
+      setShowBackToTop(y > 400);
+      const sh = document.documentElement.scrollHeight - window.innerHeight;
+      const bar = document.getElementById('scroll-progress');
+      if (bar) bar.style.width = `${sh > 0 ? (y / sh) * 100 : 0}%`;
+    };
+    window.addEventListener('scroll', h, { passive: true });
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+
+  const [sessionMinutes, setSessionMinutes] = useState(0);
+  const sessionStartRef = useRef(Date.now());
+  useEffect(() => {
+    const i = setInterval(() => setSessionMinutes(Math.floor((Date.now() - sessionStartRef.current) / 60000)), 60000);
+    return () => clearInterval(i);
+  }, []);
+
+  const [currentView, setCurrentView] = useState<ViewType>('home');
+  const [viewHistory, setViewHistory] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+  const [history, setHistory] = useState<AnalysisResult[]>([]);
+  useEffect(() => { setHistory(db.getAll()); }, []);
+
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [initialRechargePackId, setInitialRechargePackId] = useState<number | null>(null);
+  const [initialAccountTab, setInitialAccountTab] = useState<'profile' | 'subscription' | 'billing'>('profile');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const notifications = [
+    { id: 1, type: 'critical' as const, title: 'Chute de visibilit\u00e9 d\u00e9tect\u00e9e', time: 'Il y a 12min', unread: true },
+    { id: 2, type: 'warning' as const, title: 'Quota GTO Gas bient\u00f4t \u00e9puis\u00e9', time: 'Il y a 2h', unread: true },
+    { id: 3, type: 'info' as const, title: 'Nouveau rapport monitoring disponible', time: 'Il y a 5h', unread: true },
+  ];
+
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (notifRef.current && !notifRef.current.contains(e.target as Node)) setIsNotifOpen(false); };
+    if (isNotifOpen) document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [isNotifOpen]);
+
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [lowCreditsDismissed, setLowCreditsDismissed] = useState(false);
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setIsCommandPaletteOpen(p => !p); }
+      if (e.key === 'Escape') { setIsCommandPaletteOpen(false); setIsShortcutsOpen(false); }
+      if (e.key === '?' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) setIsShortcutsOpen(p => !p);
+    };
+    document.addEventListener('keydown', h);
+    return () => document.removeEventListener('keydown', h);
+  }, []);
+
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const animatedCredits = useAnimatedNumber(user?.credits ?? 0);
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  useEffect(() => { if (user && !localStorage.getItem('citedby_public_onboarded')) setShowOnboarding(true); }, [user]);
+
+  const navigateTo = (view: ViewType) => {
+    setIsMobileMenuOpen(false);
+    if (view !== 'recharge') setInitialRechargePackId(null);
+    if (view !== 'account') setInitialAccountTab('profile');
+    setViewHistory(prev => [...prev, currentView]);
+    setCurrentView(view);
+    setRefreshKey(p => p + 1);
+    setPageKey(p => p + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goBack = () => {
+    setIsMobileMenuOpen(false);
+    if (viewHistory.length > 0) {
+      const nh = [...viewHistory]; const pv = nh.pop();
+      setViewHistory(nh);
+      if (pv) { setCurrentView(pv as ViewType); setRefreshKey(p => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    } else { setCurrentView('home'); setRefreshKey(p => p + 1); }
+  };
+
+  const handleDirectRecharge = (packId: number) => { setInitialRechargePackId(packId); navigateTo('recharge'); };
+
+  const handleAnalyze = async (url: string) => {
+    setIsAnalyzing(true);
+    try {
+      const result = await analyzeUrl(url);
+      setAnalysisData(result);
+      const uh = db.add(result);
+      setHistory(uh);
+      if (history.length === 0) { setShowCelebration(true); setTimeout(() => setShowCelebration(false), 3000); }
+      showToast('success', 'Audit termin\u00e9 avec succ\u00e8s !');
+      navigateTo('results');
+    } catch (error) {
+      console.error("Analysis failed", error);
+      showToast('error', "Erreur lors de l'analyse.");
+    } finally { setIsAnalyzing(false); }
+  };
+
+  const handleDeductCredits = (amount: number): boolean => {
+    if (!user) { navigateTo('login'); return false; }
+    if (user.credits < amount) { showToast('warning', `Solde insuffisant. Il manque ${amount - user.credits} cr\u00e9dits.`); navigateTo('recharge'); return false; }
+    setUser(prev => prev ? { ...prev, credits: prev.credits - amount } : null);
+    return true;
+  };
+
+  const handleRecharge = (amount: number, planLevel: 'free' | 'pro' | 'enterprise') => {
+    if (!user) return;
+    setUser({ ...user, credits: user.credits + amount, plan: planLevel });
+  };
+
+  const handleUpgradePlan = (newPlan: 'free' | 'pro' | 'enterprise') => { if (!user) return; setUser({ ...user, plan: newPlan }); };
+
+  const handleLogin = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    setViewHistory(['home']);
+    setCurrentView('analyze');
+    setRefreshKey(p => p + 1);
+  };
+
+  const handleLogout = () => { setIsMobileMenuOpen(false); setUser(null); setCurrentView('home'); setViewHistory([]); setRefreshKey(p => p + 1); };
+
+  useEffect(() => { if (!user && isMobileMenuOpen) setIsMobileMenuOpen(false); }, [user, isMobileMenuOpen]);
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [isMobileMenuOpen]);
+
+  return (
+    <ToastContext.Provider value={{ showToast }}>
+    <div className="min-h-screen flex flex-col font-sans text-gray-100 selection:bg-gold-400/30 bg-[#0a0a0a]">
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      {showCelebration && (
+        <div className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center">
+          <div className="text-center animate-in fade-in zoom-in duration-500">
+            <div className="text-6xl mb-4 animate-bounce">{'\u{1F389}'}</div>
+            <div className="bg-[#111111]/90 backdrop-blur-xl border border-amber-500/30 rounded-2xl px-8 py-5 shadow-2xl">
+              <h3 className="text-xl font-bold text-white mb-1">Premier audit r&eacute;ussi !</h3>
+              <p className="text-sm text-amber-300">Votre parcours AEO commence maintenant</p>
+            </div>
+          </div>
+        </div>
+      )}
+      <OnboardingModal show={showOnboarding} onClose={() => setShowOnboarding(false)} onNavigate={(view: string) => navigateTo(view as ViewType)} />
+      {user && isCommandPaletteOpen && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={() => setIsCommandPaletteOpen(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <CommandPalettePanel onClose={() => setIsCommandPaletteOpen(false)} onNavigate={(view: string) => { navigateTo(view as ViewType); setIsCommandPaletteOpen(false); }} />
+        </div>
+      )}
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
+      <Navbar user={user} navbarVisible={navbarVisible} animatedCredits={animatedCredits} sessionMinutes={sessionMinutes} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed} navigateTo={(v: string) => navigateTo(v as ViewType)} onLogout={handleLogout} onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} notifications={notifications} isNotifOpen={isNotifOpen} setIsNotifOpen={setIsNotifOpen} notifRef={notifRef as React.RefObject<HTMLDivElement>} isProfileOpen={isProfileOpen} setIsProfileOpen={setIsProfileOpen} profileRef={profileRef as React.RefObject<HTMLDivElement>} />
+      <div className="h-14 shrink-0" />
+      <div className="flex-grow flex flex-col md:flex-row w-full relative">
+        {user && <Sidebar currentView={currentView} navigateTo={(v: string) => navigateTo(v as ViewType)} isSidebarCollapsed={isSidebarCollapsed} isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />}
+        <main className="flex-1 w-full min-w-0 pb-20 md:pb-0">
+          {user && user.credits <= 10 && !lowCreditsDismissed && currentView !== 'recharge' && (
+            <div className="mx-4 mt-3 mb-1 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
+              <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+              <p className="text-sm text-amber-300 flex-1">Cr&eacute;dits bient&ocirc;t &eacute;puis&eacute;s ({user.credits} restants). <button onClick={() => navigateTo('recharge')} className="underline font-semibold hover:text-amber-200">Recharger</button></p>
+              <button onClick={() => setLowCreditsDismissed(true)} className="text-amber-400/60 hover:text-amber-300"><X size={14} /></button>
+            </div>
+          )}
+          {user && !['home', 'analyze', 'login'].includes(currentView) && (() => {
+            const labels: Record<string, string> = { dashboard: 'Dashboard', results: 'R\u00e9sultats', monitoring: 'Monitoring IA', alerts: 'Alertes AEO', marketplace: 'Marketplace', recharge: 'GTO Gas', account: 'Compte & Plan', affiliation: 'Affiliation' };
+            return (<div className="px-6 pt-3 pb-0 flex items-center gap-1.5 text-xs text-gray-600"><button onClick={() => navigateTo('analyze')} className="hover:text-gray-400 transition-colors">Accueil</button><ChevronRight size={10} /><span className="text-gray-400">{labels[currentView] || currentView}</span></div>);
+          })()}
+          <Suspense fallback={<div className="p-6 space-y-6"><div className="flex items-center justify-between"><div className="h-8 w-48 skeleton-shimmer rounded-xl" /><div className="h-10 w-36 skeleton-shimmer rounded-full" /></div><div className="grid grid-cols-1 md:grid-cols-4 gap-4">{[1,2,3,4].map(i => <div key={i} className="h-28 skeleton-shimmer rounded-2xl border border-white/[0.04]" />)}</div><div className="h-64 skeleton-shimmer rounded-2xl border border-white/[0.04]" /></div>}>
+          <div key={pageKey} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {currentView === 'home' && <Home key={`home-${refreshKey}`} onNavigate={(v) => navigateTo(v as ViewType)} user={user} onDirectRecharge={handleDirectRecharge} />}
+            {currentView === 'login' && <Login key={`login-${refreshKey}`} onLogin={handleLogin} onBack={goBack} />}
+            {currentView === 'analyze' && <Analyze key={`analyze-${refreshKey}`} onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />}
+            {currentView === 'dashboard' && <Dashboard key={`dashboard-${refreshKey}`} onBack={goBack} history={history} onView={(a) => { setAnalysisData(a); navigateTo('results'); }} onNavigate={(v: any) => navigateTo(v)} />}
+            {currentView === 'results' && analysisData && <Results key={`results-${refreshKey}`} data={analysisData} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} onNewAnalysis={() => navigateTo('analyze')} />}
+            {currentView === 'monitoring' && <AiMonitoring key={`monitoring-${refreshKey}`} onBack={goBack} onNavigate={(v: any) => navigateTo(v)} onDeductCredits={handleDeductCredits} user={user} />}
+            {currentView === 'alerts' && <AlertsAEO key={`alerts-${refreshKey}`} onBack={goBack} user={user} onNavigate={(v) => navigateTo(v as ViewType)} />}
+            {currentView === 'marketplace' && <MarketplaceAgence key={`marketplace-${refreshKey}`} onBack={goBack} user={user} />}
+            {currentView === 'recharge' && <Recharge key={`recharge-${refreshKey}`} onBack={goBack} onRecharge={handleRecharge} user={user} onNavigate={(v) => navigateTo(v as ViewType)} initialPackId={initialRechargePackId} />}
+            {currentView === 'affiliation' && <Affiliation key={`affiliation-${refreshKey}`} onBack={goBack} user={user} />}
+            {currentView === 'account' && <Account key={`account-${refreshKey}`} user={user} onLogout={handleLogout} onNavigate={(v: any) => navigateTo(v)} onUpgrade={handleUpgradePlan} initialTab={initialAccountTab} />}
+          </div>
+          </Suspense>
+        </main>
+      </div>
+      {user && !['analyze', 'login', 'home'].includes(currentView) && (
+        <button onClick={() => navigateTo('analyze')} className="fixed bottom-24 md:bottom-8 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 shadow-xl shadow-amber-900/40 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 group" title="Nouvel Audit"><Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" /></button>
+      )}
+      {showBackToTop && (
+        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="fixed bottom-24 md:bottom-8 right-[5.5rem] z-40 w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.1] backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.12] transition-all" title="Retour en haut"><ArrowUp size={16} /></button>
+      )}
+      {user && <MobileBottomNav currentView={currentView} navigateTo={(v: string) => navigateTo(v as ViewType)} isMobileMenuOpen={isMobileMenuOpen} />}
+      <AppFooter user={user} navigateTo={(v: string) => navigateTo(v as ViewType)} />
+    </div>
+    </ToastContext.Provider>
+  );
+};
+
+export default App;

@@ -1,0 +1,25 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import PlanSelector from '@/components/merchant/PlanSelector';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function SubscriptionPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('plan')
+    .eq('user_id', user!.id)
+    .single();
+
+  const currentPlan = merchant?.plan || 'free';
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Abonnement" description="Gerez votre plan et votre facturation." />
+      <PlanSelector currentPlan={currentPlan} />
+    </div>
+  );
+}

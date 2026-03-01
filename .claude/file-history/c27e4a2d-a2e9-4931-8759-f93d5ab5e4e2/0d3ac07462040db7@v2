@@ -1,0 +1,147 @@
+export const dynamic = 'force-dynamic';
+
+import { createServerSupabase } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { ArrowLeft, TrendingUp, TrendingDown, Gift } from 'lucide-react';
+import Link from 'next/link';
+
+export default async function CardDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Fetch the card with program info
+  const { data: card } = await supabase
+    .from('customer_cards')
+    .select('*, loyalty_programs(*, merchants(business_name, logo_url))')
+    .eq('id', id)
+    .eq('customer_id', user!.id)
+    .single();
+
+  if (!card) notFound();
+
+  const program = card.loyalty_programs;
+  const merchant = program.merchants;
+  const progress = Math.min(100, (card.balance / program.target) * 100);
+  const tierVariant = card.tier === 'vip' ? 'accent' : card.tier === 'gold' ? 'warning' : card.tier === 'silver' ? 'blue' : 'default';
+
+  // Fetch recent transactions
+  const { data: transactions } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('card_id', id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  // Fetch available rewards for this program
+  const { data: rewards } = await supabase
+    .from('rewards')
+    .select('*')
+    .eq('program_id', program.id)
+    .eq('is_active', true);
+
+  return (
+    <div className="space-y-4 py-4">
+      <Link
+        href="/customer"
+        className="inline-flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" /> Retour
+      </Link>
+
+      {/* Program header */}
+      <Card padding="lg" className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-bold text-[var(--text-primary)]">{program.name}</h1>
+            <p className="text-[13px] text-[var(--text-secondary)]">{merchant.business_name}</p>
+          </div>
+          <Badge variant={tierVariant}>{card.tier.toUpperCase()}</Badge>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-[var(--text-secondary)]">
+              {card.balance} / {program.target} {program.type === 'stamp' ? 'tampons' : 'points'}
+            </span>
+            <span className="font-semibold text-[var(--accent)]">{Math.round(progress)}%</span>
+          </div>
+          <div className="h-3 w-full rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+            <div
+              className="h-full bg-[var(--accent)] rounded-full transition-all duration-700"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          {progress >= 100 && (
+            <p className="text-[12px] text-[var(--success)] font-medium">
+              Objectif atteint ! Demandez votre recompense au marchand.
+            </p>
+          )}
+        </div>
+      </Card>
+
+      {/* Available rewards */}
+      {rewards && rewards.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">Recompenses disponibles</h2>
+          {rewards.map((reward: any) => (
+            <Card key={reward.id} padding="sm" className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-[var(--accent)]/10 flex items-center justify-center shrink-0">
+                <Gift className="w-4 h-4 text-[var(--accent)]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-medium text-[var(--text-primary)] truncate">{reward.name}</p>
+                <p className="text-[11px] text-[var(--text-tertiary)]">
+                  {reward.discount_type === 'freebie' ? 'Gratuit' :
+                   reward.discount_type === 'percentage' ? `-${reward.discount_value}%` :
+                   `-${reward.discount_value}€`}
+                </p>
+              </div>
+              <Badge variant={card.balance >= program.target ? 'success' : 'default'}>
+                {card.balance >= program.target ? 'Disponible' : `${program.target - card.balance} restant(s)`}
+              </Badge>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Transaction history */}
+      <div className="space-y-2">
+        <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">Historique</h2>
+        {transactions && transactions.length > 0 ? (
+          transactions.map((txn: any, i: number) => (
+            <Card key={txn.id} padding="sm" className={`flex items-center gap-3 stagger-enter stagger-${Math.min(i + 1, 6)}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                txn.type === 'earn' ? 'bg-[var(--success)]/10' : 'bg-[var(--error)]/10'
+              }`}>
+                {txn.type === 'earn' ? (
+                  <TrendingUp className="w-4 h-4 text-[var(--success)]" />
+                ) : (
+                  <TrendingDown className="w-4 h-4 text-[var(--error)]" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-medium text-[var(--text-primary)]">
+                  {txn.type === 'earn' ? `+${txn.amount}` : `-${txn.amount}`}
+                  {' '}{program.type === 'stamp' ? 'tampon(s)' : 'point(s)'}
+                </p>
+                <p className="text-[11px] text-[var(--text-tertiary)]">
+                  {new Date(txn.created_at).toLocaleDateString('fr-FR', {
+                    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                  })}
+                  {' '}• {txn.source}
+                </p>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <Card className="text-center py-8">
+            <p className="text-[var(--text-tertiary)] text-sm">Aucune transaction.</p>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

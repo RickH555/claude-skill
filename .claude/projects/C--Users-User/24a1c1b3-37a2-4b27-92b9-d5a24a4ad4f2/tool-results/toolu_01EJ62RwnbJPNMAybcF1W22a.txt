@@ -1,0 +1,110 @@
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\ActionPlan.tsx:140:            <div className="mb-12 animate-in slide-in-from-bottom-2">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\ActionPlan.tsx:162:            <div className="animate-in slide-in-from-bottom-4 delay-100">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\ActionPlan.tsx:184:        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 w-[90%] md:w-auto z-40">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\ActionPlan.tsx:187:                className="p-4 rounded-xl border border-white/10 bg-[#0f1115]/90 backdrop-blur-md shadow-2xl flex items-center gap-6 animate-in fade-in slide-in-from-bottom-6 w-full md:w-auto hover:border-primary/50 hover:bg-[#0f1115] transition-all cursor-pointer text-left group"
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Clients.tsx:212:              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Clients.tsx:237:              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Clients.tsx:319:                  <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Prochaine Facture</h3>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:146:                                            <span className="text-xs font-bold text-primary uppercase tracking-wider mb-1 block">{email.title}</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:204:                                            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:262:            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">Commissions Totales</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:273:            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">En attente</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:284:            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">Filleuls Actifs</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:295:            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">Taux de Conversion</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:329:        <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:338:                                    className="absolute bottom-0 left-0 right-0 bg-primary/20 group-hover:bg-primary/40 transition-colors rounded-t-lg"
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:396:                        <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-white/10"></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:440:                            <tr className="bg-[#0f1115] text-xs text-gray-500 uppercase tracking-wider">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Affiliation.tsx:542:                                <tr className="bg-[#0f1115] text-xs text-gray-500 uppercase tracking-wider">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\BlogOptimizer.tsx:3:import { ArrowLeft, PenTool, Link as LinkIcon, Download, Copy, Check, Sparkles, Loader2, FileText, AlignLeft, Bot, ExternalLink, Award } from 'lucide-react';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\BlogOptimizer.tsx:182:                    {mode === 'article' ? <Bot size={16} className="text-emerald-400" /> : <FileText size={16} className="text-pink-400" />} 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\BlogOptimizer.tsx:225:             <div className="grid md:grid-cols-1 gap-4 animate-in slide-in-from-bottom-4 duration-500">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Account.tsx:81:                <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wide transition-all ${planDetails.style}`}>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Account.tsx:120:                        <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider">Clé Publique</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SourceOfTruth.tsx:272:                                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2 border-b border-white/5 pb-2">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SourceOfTruth.tsx:324:                                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SourceOfTruth.tsx:359:                                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SourceOfTruth.tsx:385:                        <div className="p-6 border-t border-white/10 bg-[#0a0a0f] sticky bottom-0 z-10 flex justify-end">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SourceOfTruth.tsx:461:                        Le fichier doit impérativement être accessible à la racine de votre domaine pour être découvert par les bots respectant le standard <code>llm.txt</code>.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SourceOfTruth.tsx:510:                            <span>Ne pas bloquer via <strong>robots.txt</strong></span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SourceOfTruth.tsx:540:                            <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#0a0a0f] to-transparent"></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\GenerativeTools.tsx:42:    { id: 'robots-txt', label: t.generativeTools.robotsTxt, icon: FileCode, color: 'text-emerald-400', bg: 'bg-emerald-500/10', desc: t.generativeTools.robotsTxtDesc },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SMCStudio.tsx:4:import { ArrowLeft, FileText, HelpCircle, PenTool, Sparkles, Copy, Download, Check, Loader2, Layout, MessageSquare, BookOpen, Library, Clock, AlignLeft, Link as LinkIcon, Bot, Archive, ChevronRight, Award, Globe, ArrowRight, Eye } from 'lucide-react';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SMCStudio.tsx:273:        <div className="border-t border-white/10 pt-10 animate-in fade-in slide-in-from-bottom-8">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SMCStudio.tsx:286:                            <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SMCStudio.tsx:301:                            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[#0a0a0f] to-transparent"></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SMCStudio.tsx:487:                          <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-500">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SMCStudio.tsx:638:                            <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SMCStudio.tsx:653:                            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[#0a0a0f] to-transparent"></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:3:import { generateOptimizedRobotsTxt, parseCurrentRobotsTxt, getDetectedPlatformName } from '../services/robots_service';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:4:import { ArrowLeft, FileCode, Download, Copy, Check, Bot, ShieldCheck, AlertTriangle, RefreshCw, ChevronDown, History, Server, Eye, Settings, FileJson, Globe, Terminal, Lock, Zap, Archive } from 'lucide-react';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:16:const RobotsTxt: React.FC<Props> = ({ onBack, history, user, onDeductCredits, onUpdateAnalysis, savedFiles, onSaveFile }) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:32:            setCurrentContent(parseCurrentRobotsTxt(demoUrl));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:33:            setOptimizedContent(generateOptimizedRobotsTxt(demoUrl));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:40:        setCurrentContent(parseCurrentRobotsTxt(url));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:44:        if (analysis.robotsTxtData && analysis.robotsTxtData.isUnlocked) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:45:            setOptimizedContent(analysis.robotsTxtData.content);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:49:            setOptimizedContent(generateOptimizedRobotsTxt(url));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:69:                robotsTxtData: {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:80:            id: `robots_${Date.now()}`,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:82:            title: `Robots.txt - ${history[selectedAnalysisIndex]?.url || 'Demo'}`,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:94:    a.download = filename || 'robots.txt';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:115:          "Si vous utilisez RankMath : Allez dans 'Rank Math' → 'Réglages généraux' → 'Modifier robots.txt'.",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:129:          "Dans la barre de recherche de fichiers, tapez 'robots'.",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:130:          "Cliquez sur 'Ajouter un nouveau modèle' → sélectionnez 'robots.txt' si robots.txt.liquid n'existe pas.",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:142:          "Créez ou modifiez le fichier nommé 'robots.txt'.",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:144:          "Pour Next.js (App Router) : Vous pouvez alternativement créer un fichier `app/robots.ts` et retourner cet objet.",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:156:        "Cherchez le fichier 'robots.txt'. S'il n'existe pas, créez-le.",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:159:        "Vérifiez l'accès en allant sur votre-site.com/robots.txt"
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:185:            Robots.txt Optimizer
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:187:          <p className="text-gray-400">Ouvrez les portes aux bots IA (GPTBot, Claude, Gemini) tout en sécurisant votre site.</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:230:                    Nous avons adapté les règles <code>Disallow</code> pour masquer les routes sensibles spécifiques à votre technologie ({platformName}), tout en ouvrant les routes de contenu public aux bots IA.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:243:                        <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center shrink-0 text-green-400"><Bot size={16} /></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:247:                                GPTBot, CCBot et Google-Extended sont souvent bloqués par défaut par les pare-feux. Ce fichier force leur autorisation pour garantir votre citation.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:256:                                En bloquant les dossiers <code>/api/</code> ou <code>/search/</code>, nous évitons que les bots IA ne consomment vos ressources serveur inutilement.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:271:                        <span className="text-sm font-bold text-white">robots.txt (Optimisé AEO)</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:273:                        {isUnlocked && history.length > 0 && history[selectedAnalysisIndex]?.robotsTxtData && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:305:                                {`User-agent: GPTBot\nAllow: /\nUser-agent: CCBot\nAllow: /\n\n# Secure Admin Paths\nDisallow: /wp-admin/\nDisallow: /private/\n\n# Sitemap Declaration\nSitemap: https://...`}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:315:                                    Débloquez votre fichier <code>robots.txt</code> configuré pour GPT-4, Claude et Gemini.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:371:                        Une erreur dans le fichier <code>robots.txt</code> peut désindexer totalement votre site de Google. 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:372:                        Avant de mettre en production, testez toujours votre fichier avec l'outil de test du fichier robots.txt de la Google Search Console.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:383:                            Accédez à <code>{history.length > 0 ? new URL(history[selectedAnalysisIndex].url).origin : 'votre-site.com'}/robots.txt</code> pour confirmer que le nouveau contenu est bien en ligne.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:404:                                robots.txt
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:413:                            <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#0a0a0f] to-transparent"></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:424:                                onClick={() => handleDownload(`robots_archive_${file.id}.txt`, file.content)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\RobotsTxt.tsx:440:export default RobotsTxt;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Plan.tsx:185:                        <p className="text-sm text-gray-400 uppercase tracking-wider mb-1">Plan Actuel</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Plan.tsx:275:                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-black font-bold text-xs px-4 py-1 rounded-full uppercase tracking-wider">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Plan.tsx:334:        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Plan.tsx:348:                            <tr className="bg-[#0a0a0f] text-xs text-gray-500 uppercase tracking-wider">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Reputation.tsx:5:import { ArrowLeft, Shield, Loader2, AlertTriangle, AlertCircle, Info, TrendingUp, TrendingDown, Minus, Copy, Check, Download, ChevronDown, ChevronRight, Sparkles, Search, X, Plus, Bot, Eye, MessageSquare, BarChart3, Target } from 'lucide-react';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Reputation.tsx:127:          <div className="absolute top-0 bottom-0 w-1 bg-white rounded-full shadow-lg" style={{ left: `${normalized * 100}%`, transform: 'translateX(-50%)' }} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Reputation.tsx:387:            <h3 className="text-sm font-bold text-gray-200 mb-4 flex items-center gap-2"><Bot size={16} className="text-amber-400" /> {t.reputation.simulatedMentions}</h3>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:2:import { Sparkles, TrendingUp, Target, Award, MousePointerClick, ArrowRight, ScanLine, Code2, Globe2, Fuel, Zap, Star, Check, Search, Bot, BrainCircuit, Database, Share2, Layers, Infinity, Radio, Globe, Droplet } from 'lucide-react';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:80:           <h1 className="text-5xl md:text-7xl font-serif tracking-tight text-white leading-tight">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:101:            desc: "Générez automatiquement les données structurées (JSON-LD) que les robots préfèrent." 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:167:                        <Bot size={24} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:237:                        Une IA confirme une information en la croisant. Nous multiplions les signaux de corroboration via notre <strong>Annuaire AEO</strong> et optimisons vos fichiers techniques (Robots.txt) pour faciliter le crawl IA.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:275:                            <p className="text-sm text-gray-400 mt-1">Nous créons les fichiers <code>llm.txt</code> et <code>llm.json</code> qui serviront de référence canonique pour les robots d'indexation.</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:299:            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold uppercase tracking-wider mb-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Home.tsx:320:                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-black font-bold text-xs px-4 py-1 rounded-full uppercase tracking-wider shadow-lg">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\SchemaOrg.tsx:356:                            <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#0a0a0f] to-transparent"></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Dashboard.tsx:173:                                className="absolute bottom-0 left-0 right-0 bg-primary rounded-t-sm transition-all duration-1000 group-hover:opacity-80" 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\PublisherRequest.tsx:222:                        Nous planifions une mise à jour mineure (dates, chiffres) dans 6 mois pour signaler aux bots que le contenu est toujours d'actualité.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Login.tsx:142:        <div className="fixed bottom-4 left-4 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded border border-gray-300">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Results.tsx:180:                      <h1 className="text-5xl font-serif font-bold text-gray-900 mb-6 tracking-tight">Audit de Visibilité Générative</h1>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Results.tsx:203:                              <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">Score Global</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Results.tsx:284:                                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">{rec.category}</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\DirectoryEntity.tsx:41:                    <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full flex items-center gap-1.5 uppercase tracking-wider">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\DirectoryEntity.tsx:68:                  <h3 className="text-gray-400 font-medium uppercase tracking-wider text-sm mb-8">Score AEO / GEO</h3>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\DirectoryEntity.tsx:72:                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-[#0a0a0f] px-4 py-1 rounded-full border border-white/10 text-xs font-bold text-gray-300 whitespace-nowrap">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\DirectoryEntity.tsx:113:                          <span className="font-bold text-sm uppercase tracking-wide">Citations</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\DirectoryEntity.tsx:121:                          <span className="font-bold text-sm uppercase tracking-wide">Knowledge Graph</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Recharge.tsx:182:                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-black font-bold text-xs px-4 py-1 rounded-full uppercase tracking-wider">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Recharge.tsx:337:                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Recommandé pour vous</h3>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\History.tsx:3:import { ArrowLeft, ExternalLink, Calendar, Search, LayoutDashboard, FileText, Zap, Bot, ArrowRight, Trash2, Archive } from 'lucide-react';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Directory.tsx:202:                            <div className="text-[10px] text-gray-500 uppercase tracking-wider">AEO Score</div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Projects.tsx:3:import { Plus, Search, Globe, TrendingUp, Calendar, ArrowUpRight, BarChart3, ChevronDown, Zap, Activity, ArrowRight, Wrench, FileText, Shield, ExternalLink, Clock, LayoutDashboard, Bot, Lock, ChevronLeft, ChevronRight, Eye, RefreshCw, ClipboardList, ArrowLeft, ClipboardCheck, Archive, Code } from 'lucide-react';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Projects.tsx:292:                                  <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${solution.type === 'code' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-pink-500/10 text-pink-400 border border-pink-500/20'}`}>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Projects.tsx:478:               <h3 className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-6">Score de Visibilité Globale</h3>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Test\pages\Projects.tsx:606:                  <tr className="bg-[#0a0a0f] text-xs text-gray-500 uppercase tracking-wider">

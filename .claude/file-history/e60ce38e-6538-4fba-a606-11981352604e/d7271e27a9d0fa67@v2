@@ -1,0 +1,191 @@
+import { authenticateRequest, corsHeaders, createAdminClient, enforceRateLimit, escapeHtml, jsonResponse, logAutomationEvent, parseJsonBody } from '../_shared/common.ts';
+
+type NotificationType =
+  | 'new_prospect'
+  | 'burning_alert'
+  | 'weekly_report'
+  | 'credit_warning'
+  | 'credit_purchase';
+
+interface NotifyPayload {
+  user_id: string;
+  prospect_id: string | null;
+  type: NotificationType;
+}
+
+interface ProfileRow {
+  id: string;
+  email: string;
+  full_name: string | null;
+  notification_email: boolean;
+  notification_push: boolean;
+}
+
+interface ProspectRow {
+  id: string;
+  name: string;
+  signal: string;
+  score: number;
+  heat: 'burning' | 'hot' | 'warm' | 'cold';
+}
+
+const buildContent = (
+  type: NotificationType,
+  prospect: ProspectRow | null,
+): { title: string; body: string; subject: string } => {
+  if (type === 'burning_alert') {
+    return {
+      title: 'Prospect brulant detecte',
+      body: prospect
+        ? `${prospect.name} (${prospect.score}/100) - ${prospect.signal}`
+        : 'Un prospect brulant a ete detecte.',
+      subject: '[LeadRadar] 🔴 Prospect brulant detecte',
+    };
+  }
+  if (type === 'credit_warning') {
+    return {
+      title: 'Credits presque epuises',
+      body: 'Votre solde de credits est faible. Rechargez pour continuer a recevoir des fiches prospects.',
+      subject: '[LeadRadar] Credits bas',
+    };
+  }
+  if (type === 'credit_purchase') {
+    return {
+      title: 'Credits ajoutes',
+      body: 'Votre achat de credits a ete confirme et votre solde a ete mis a jour.',
+      subject: '[LeadRadar] Achat credits confirme',
+    };
+  }
+  if (type === 'weekly_report') {
+    return {
+      title: 'Rapport hebdomadaire',
+      body: 'Votre recapitulatif hebdomadaire LeadRadar est disponible.',
+      subject: '[LeadRadar] Rapport hebdomadaire',
+    };
+  }
+  return {
+    title: 'Nouveau prospect detecte',
+    body: prospect ? `${prospect.name} (${prospect.score}/100) - ${prospect.signal}` : 'Un nouveau prospect est disponible.',
+    subject: '[LeadRadar] Nouveau prospect',
+  };
+};
+
+/**
+ * Envoi email via Resend si configure.
+ */
+const sendEmailIfEnabled = async (
+  to: string,
+  subject: string,
+  title: string,
+  body: string,
+  prospectId: string | null,
+): Promise<void> => {
+  const resendApiKey = Deno.env.get('RESEND_API_KEY');
+  const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') ?? 'LeadRadar <alerts@leadradar.io>';
+  const appUrl = Deno.env.get('APP_URL') ?? 'https://leadradar.io';
+  if (!resendApiKey) {
+    return;
+  }
+  const ctaUrl = prospectId ? `${appUrl}/prospect/${prospectId}` : `${appUrl}/reglages`;
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;background:#0B0F1A;padding:24px;color:#E2E8F0;">
+    <table role="presentation" width="100%" style="max-width:640px;margin:0 auto;background:#111827;border:1px solid #1E293B;border-radius:12px;">
+      <tr><td style="padding:24px;">
+        <h1 style="margin:0 0 8px 0;color:#10B981;font-size:22px;">LeadRadar</h1>
+        <h2 style="margin:0 0 12px 0;color:#F8FAFC;font-size:18px;">${escapeHtml(title)}</h2>
+        <p style="margin:0 0 18px 0;line-height:1.5;color:#CBD5E1;">${escapeHtml(body)}</p>
+        <a href="${ctaUrl}" style="display:inline-block;background:#10B981;color:#052E16;padding:10px 16px;border-radius:8px;font-weight:700;text-decoration:none;">Ouvrir LeadRadar</a>
+      </td></tr>
+    </table>
+  </div>`;
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: fromEmail,
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+};
+
+/**
+ * Notification in-app/email.
+ */
+Deno.serve(async (request: Request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+  try {
+    enforceRateLimit(`notify:${ip}`, 100);
+    if (request.method !== 'POST') {
+      return jsonResponse({ error: 'Method not allowed' }, 405);
+    }
+
+    // Auth: service role (appel interne depuis distribute) ou JWT utilisateur
+    const auth = await authenticateRequest(request);
+    if (auth.error) return auth.error;
+
+    const payload = await parseJsonBody<NotifyPayload>(request);
+    if (!payload.user_id || !payload.type) {
+      return jsonResponse({ error: 'Payload invalide' }, 400);
+    }
+
+    const admin = createAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from('profiles')
+      .select('id, email, full_name, notification_email, notification_push')
+      .eq('id', payload.user_id)
+      .single<ProfileRow>();
+    if (profileError || !profile) {
+      throw new Error('Utilisateur introuvable');
+    }
+
+    let prospect: ProspectRow | null = null;
+    if (payload.prospect_id) {
+      const { data } = await admin
+        .from('prospects')
+        .select('id, name, signal, score, heat')
+        .eq('id', payload.prospect_id)
+        .maybeSingle<ProspectRow>();
+      prospect = data ?? null;
+    }
+
+    const content = buildContent(payload.type, prospect);
+    await admin.from('notifications').insert({
+      user_id: payload.user_id,
+      prospect_id: payload.prospect_id,
+      type: payload.type,
+      title: content.title,
+      body: content.body,
+    });
+
+    if (
+      profile.notification_email &&
+      (payload.type === 'burning_alert' || payload.type === 'credit_warning' || payload.type === 'credit_purchase')
+    ) {
+      await sendEmailIfEnabled(profile.email, content.subject, content.title, content.body, payload.prospect_id);
+    }
+
+    await logAutomationEvent('notification_sent', {
+      user_id: payload.user_id,
+      prospect_id: payload.prospect_id,
+      type: payload.type,
+    });
+
+    return jsonResponse({ success: true });
+  } catch (error) {
+    await logAutomationEvent('error', {
+      stage: 'notify',
+      reason: error instanceof Error ? error.message : 'unknown',
+    });
+    return jsonResponse({ error: error instanceof Error ? error.message : 'Erreur notify' }, 500);
+  }
+});

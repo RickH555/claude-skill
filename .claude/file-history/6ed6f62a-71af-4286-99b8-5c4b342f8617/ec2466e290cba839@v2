@@ -1,0 +1,190 @@
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  credits: number;
+  plan: 'free' | 'pro' | 'enterprise';
+  workspaceId?: string;
+  role?: 'owner' | 'admin' | 'analyst' | 'viewer';
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  domain: string;
+  logo?: string;
+  status: 'active' | 'paused';
+  lastRun?: string; // ISO Date
+  visibilityScore: number;
+  trend: number; // Percentage variation
+  nextRun?: string;
+}
+
+export interface Recommendation {
+  id: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  action: string;
+  effort: 'low' | 'medium' | 'high';
+  impact: 'low' | 'medium' | 'high';
+  category: string;
+}
+
+export interface CategoryScore {
+  name: string;
+  score: number;
+  weight: number;
+  items: Array<{
+    status: 'success' | 'warning' | 'error';
+    message: string;
+    recommendation?: string;
+  }>;
+}
+
+export interface RobotsTxtData {
+  content: string;
+  isUnlocked: boolean;
+  platform: string;
+  generatedAt: string;
+}
+
+export interface GeneratedSolution {
+  title: string;
+  explanation: string;
+  content: string; // Code or Text
+  type: 'code' | 'text';
+  language?: 'html' | 'json' | 'text';
+  implementationSteps: string[]; 
+}
+
+export interface AnalysisResult {
+  url: string;
+  timestamp: string;
+  globalScore: number;
+  categories: Record<string, CategoryScore>; 
+  recommendations: Recommendation[];
+  aiCitation: {
+    before: string;
+    after: string;
+    probability: number; 
+  };
+  robotsTxtData?: RobotsTxtData;
+  generatedSolutions?: Record<string, GeneratedSolution & { timestamp: string }>;
+  preGenerated?: PreGeneratedSolutions;
+}
+
+export interface HistoryItem {
+  id: string;
+  url: string;
+  score: number;
+  date: string;
+}
+
+export interface SourceOfTruthData {
+  description: string;
+  type: string;
+  founded: string;
+  location: string;
+  services: Array<{ name: string; description: string; category: string }>;
+  faqs: Array<{ question: string; answer: string }>;
+}
+
+export interface SMCContent {
+  id: string;
+  type: 'fiche' | 'faq' | 'brief' | 'article';
+  title: string;
+  content: string;
+  timestamp: string;
+  meta?: any; // Pour stocker des infos sup comme le brief parent
+}
+
+// === MODULE #3 : CONTENT WRITER ===
+export type ContentVertical = 'ecommerce' | 'saas' | 'immobilier' | 'restauration' | 'sante' | 'finance' | 'juridique' | 'education' | 'general';
+export type ContentType = 'product_description' | 'landing_page' | 'sales_email' | 'meta_tags' | 'social_post' | 'press_release' | 'case_study' | 'newsletter';
+
+export interface ContentWriterInput {
+  vertical: ContentVertical;
+  contentType: ContentType;
+  brandName: string;
+  brandUrl?: string;
+  productOrService: string;
+  targetAudience: string;
+  tone: 'professionnel' | 'decontracte' | 'autoritaire' | 'empathique' | 'technique';
+  language: 'fr' | 'en' | 'es';
+  additionalContext?: string;
+}
+
+export interface GeneratedContent {
+  title: string;
+  content: string;
+  metaDescription?: string;
+  aeoScore: number;
+  aeoTips: string[];
+  schemaMarkup?: string;
+  alternativeVersions?: string[];
+}
+
+// === MODULE #4 : REPUTATION ===
+export interface ReputationScanInput {
+  brandName: string;
+  brandUrl?: string;
+  competitors?: string[];
+  industry: string;
+  keywords?: string[];
+}
+
+export interface AIMention {
+  id: string;
+  aiEngine: 'ChatGPT' | 'Perplexity' | 'Claude' | 'Gemini' | 'Copilot' | 'AI Overviews';
+  prompt: string;
+  mentionType: 'direct' | 'indirect' | 'comparison' | 'recommendation' | 'negative' | 'absent';
+  sentiment: 'positive' | 'neutral' | 'negative';
+  sentimentScore: number;
+  excerpt: string;
+  context: string;
+  date: string;
+  competitorsMentioned?: string[];
+}
+
+export interface ReputationReport {
+  brandName: string;
+  overallSentiment: number;
+  visibilityScore: number;
+  totalMentions: number;
+  sentimentBreakdown: { positive: number; neutral: number; negative: number };
+  topThemes: Array<{ theme: string; count: number; sentiment: 'positive' | 'neutral' | 'negative' }>;
+  competitorComparison?: Array<{ name: string; mentions: number; sentiment: number }>;
+  alerts: Array<{ severity: 'critical' | 'warning' | 'info'; message: string; action: string }>;
+  recommendations: string[];
+  mentions: AIMention[];
+  generatedAt: string;
+}
+
+// === MEGA-GENERATION (Pre-generation en arriere-plan) ===
+
+export type MegaGenerationStatus = 'idle' | 'generating' | 'completed' | 'failed';
+
+export interface PreGeneratedSolutions {
+  status: MegaGenerationStatus;
+  generatedAt?: string;
+  robotsTxt?: { content: string; platformDetected: string; aiBotsCount: number; rulesCount: number };
+  schemaOrg?: { content: string; typesCount: number; byteSize: number };
+  llmsTxt?: { content: string; sections: number; wordCount: number };
+  llmJson?: { content: string; fieldCount: number; byteSize: number };
+  answerFirstAudit?: {
+    globalScore: number;
+    url: string;
+    categories: Record<string, { score: number; label: string; details: string; tips: string[] }>;
+    summary: string;
+    topRecommendations: string[];
+  };
+  eeatAudit?: {
+    url: string;
+    scores: { overall: number; experience: number; expertise: number; authoritativeness: number; trustworthiness: number };
+    findings: Array<{ category: string; status: string; element: string; impact: string; recommendation?: string }>;
+    priorityActions: Array<{ action: string; impact: number; effort: string; tool: string }>;
+    summary: string;
+  };
+}

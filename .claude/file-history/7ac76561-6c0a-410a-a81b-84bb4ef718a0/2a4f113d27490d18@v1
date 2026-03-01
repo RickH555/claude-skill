@@ -1,0 +1,127 @@
+# Plan : Interface de paiement Stripe unifiée
+
+## Contexte
+Tous les boutons CTA de paiement (abonnements ET recharges GTO Gas) doivent rediriger vers une interface de paiement "Stripe" cohérente, prête pour une future intégration Stripe réelle avant déploiement.
+
+Actuellement :
+- **Account.tsx & Plan.tsx** : modal 3 étapes (recap → paiement → succès). L'étape "paiement" affiche juste une carte enregistrée (•••• 4242) — pas de vrai formulaire.
+- **Recharge.tsx** : checkout avec un faux formulaire carte (titulaire, numéro, expiration, CVC) mais non cohérent avec le reste.
+
+## Fichiers à modifier
+
+### 1. CRÉER `components/StripeCheckout.tsx` (~150 lignes)
+
+Composant réutilisable avec interface de paiement Stripe-like.
+
+**Props** :
+```tsx
+interface StripeCheckoutProps {
+  mode: 'subscription' | 'one-time';
+  productName: string;
+  productDescription: string;
+  productIcon?: React.ReactNode;
+  amount: number; // Total TTC en euros
+  amountDetails?: { label: string; value: string; highlight?: boolean; separator?: boolean }[];
+  userEmail?: string;
+  onConfirm: () => void;
+  onBack: () => void;
+  isProcessing: boolean;
+  ctaLabel?: string; // Override "Payer X €"
+}
+```
+
+**Structure visuelle** :
+1. Header : "Paiement sécurisé" + logo "stripe" (`text-[#635bff]`)
+2. Résumé commande : icône produit + nom + description + badge "Abonnement mensuel" si subscription
+3. Détail montants : lignes `amountDetails` avec séparateurs
+4. Formulaire carte (faux inputs, marqués `STRIPE_INTEGRATION_POINT` pour futur remplacement par `<CardElement>`) :
+   - Email (pour le reçu)
+   - Titulaire de la carte
+   - Numéro de carte (avec icône CreditCard)
+   - Expiration + CVC (sur une ligne)
+5. Bouton CTA : "Payer X.XX €" (ou `ctaLabel`) — gradient purple, spinner quand `isProcessing`
+6. Badges confiance : SSL 256-bit · Powered by stripe · Chiffré
+7. Mentions légales CGV
+
+**Icons Lucide** : `ArrowLeft, Lock, CreditCard, Loader2, ShieldCheck`
+
+### 2. MODIFIER `pages/Account.tsx`
+
+Remplacer l'étape 2 "payment" du modal upgrade par `<StripeCheckout>`.
+
+- **Import** : `import StripeCheckout from '../components/StripeCheckout';`
+- **Step 2 (`paymentStep === 'payment'`)** : remplacer le contenu inline par :
+```tsx
+<StripeCheckout
+  mode="subscription"
+  productName={`Plan ${upgradeModal.planName}`}
+  productDescription={`Upgrade ${planDetails.name} → ${upgradeModal.planName}`}
+  amount={upgradeModal.newPrice - currentPlanPrice}
+  amountDetails={[
+    { label: `Nouveau plan (${upgradeModal.planName})`, value: `${upgradeModal.newPrice.toFixed(2)} €` },
+    { label: `Crédit plan ${planDetails.name}`, value: `- ${currentPlanPrice.toFixed(2)} €` },
+    { label: 'À payer aujourd\'hui', value: `${(upgradeModal.newPrice - currentPlanPrice).toFixed(2)} €`, highlight: true, separator: true },
+  ]}
+  userEmail={user.email}
+  onConfirm={handleProcessPayment}
+  onBack={() => setPaymentStep('recap')}
+  isProcessing={isProcessing}
+/>
+```
+- Le modal garde les étapes recap et success inchangées
+- Supprimer les imports inutilisés si nécessaire (ShieldCheck si plus utilisé ailleurs)
+
+### 3. MODIFIER `pages/Plan.tsx`
+
+Même remplacement de l'étape 2 du modal upgrade.
+
+- **Import** : `import StripeCheckout from '../components/StripeCheckout';`
+- **Step 2 (`paymentStep === 'payment'`)** : même pattern que Account.tsx
+- Steps recap et success inchangées
+
+### 4. MODIFIER `pages/Recharge.tsx`
+
+Remplacer le faux formulaire de checkout par `<StripeCheckout>`.
+
+- **Import** : `import StripeCheckout from '../components/StripeCheckout';`
+- **Dans `renderCheckout()`** : colonne gauche (`lg:col-span-8`) — remplacer le heading + les 2 cartes (recap pack + fake form) par :
+```tsx
+<StripeCheckout
+  mode="one-time"
+  productName={selectedPack.name}
+  productDescription={`Pack de ${selectedPack.amount} crédits GTO Gas`}
+  productIcon={selectedPack.icon}
+  amount={totalTTC}
+  amountDetails={[
+    { label: 'Prix Unitaire HT', value: `${priceHT.toFixed(2)} €` },
+    { label: 'Frais de service', value: '0.00 €' },
+    { label: 'TVA (20%)', value: `${tva.toFixed(2)} €` },
+    { label: 'Total TTC', value: `${totalTTC.toFixed(2)} €`, highlight: true, separator: true },
+  ]}
+  userEmail={user?.email}
+  onConfirm={handleConfirmPayment}
+  onBack={() => setViewMode('list')}
+  isProcessing={isProcessing}
+/>
+```
+- Supprimer le heading "Finaliser votre commande" et le bouton "Retour aux offres" (StripeCheckout a son propre back)
+- Colonne droite (upsells) **inchangée**
+- `handleConfirmPayment()`, `renderPaymentResult()`, `renderList()` **inchangés**
+
+## Séquence d'implémentation
+
+| Étape | Fichier | Action |
+|-------|---------|--------|
+| 1 | `components/StripeCheckout.tsx` | Créer le composant (~150 lignes) |
+| 2 | `pages/Account.tsx` | Remplacer step 2 du modal par StripeCheckout |
+| 3 | `pages/Plan.tsx` | Idem |
+| 4 | `pages/Recharge.tsx` | Remplacer checkout form par StripeCheckout |
+| 5 | Build | `npm run build` — vérifier 0 erreurs |
+
+## Vérification
+1. `npm run build` — doit passer sans erreur
+2. Account.tsx : clic Upgrade → recap → **formulaire Stripe** → succès → facture dans historique
+3. Plan.tsx : clic Passer Pro/Agency → recap → **formulaire Stripe** → succès → facture
+4. Recharge.tsx : clic Acheter sur un pack → **formulaire Stripe** avec détail TVA → succès/erreur
+5. Design cohérent : même formulaire Stripe partout, dark theme, badges confiance
+6. Future-proof : commentaires `STRIPE_INTEGRATION_POINT` pour remplacement facile

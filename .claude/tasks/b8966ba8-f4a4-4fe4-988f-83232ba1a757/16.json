@@ -1,0 +1,9 @@
+{
+  "id": "16",
+  "subject": "Create next.config.ts, tsconfig.json, and update package.json scripts",
+  "description": "Create the Next.js config with strict mode and Supabase image patterns, create tsconfig.json with bundler module resolution and path aliases, update package.json with dev/build/start/lint/typecheck scripts",
+  "activeForm": "Creating Next.js configuration files",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

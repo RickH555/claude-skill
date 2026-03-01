@@ -1,0 +1,8 @@
+'use client';
+import { useAppContext } from '@/lib/app-context';
+import BenchmarkPage from '@/views/v3/BenchmarkPage';
+
+export default function BenchmarkPageWrapper() {
+  const { goBack, user } = useAppContext();
+  return <BenchmarkPage onBack={goBack} user={user} />;
+}

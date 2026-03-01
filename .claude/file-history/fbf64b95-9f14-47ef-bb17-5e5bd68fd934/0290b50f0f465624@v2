@@ -1,0 +1,135 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getStripe } from '@/lib/stripe';
+import { createClient } from '@supabase/supabase-js';
+import Stripe from 'stripe';
+import { PLANS } from '@/lib/constants';
+
+// Use service role client for webhook (no user session)
+function getAdminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.text();
+  const signature = request.headers.get('stripe-signature');
+
+  if (!signature) {
+    return NextResponse.json({ error: 'No signature' }, { status: 400 });
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    event = getStripe().webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Webhook verification failed';
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+
+  const supabase = getAdminClient();
+
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const organizationId = session.metadata?.organizationId;
+        const subscriptionId = session.subscription as string;
+        const customerId = session.customer as string;
+
+        if (organizationId && subscriptionId) {
+          const subResponse = await getStripe().subscriptions.retrieve(subscriptionId);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const subscription = subResponse as any;
+          const priceId = subscription.items?.data?.[0]?.price?.id;
+
+          // Determine plan from price ID
+          let plan = 'pro';
+          for (const [key, config] of Object.entries(PLANS)) {
+            if (config.stripe_price_id_monthly === priceId || config.stripe_price_id_yearly === priceId) {
+              plan = key;
+              break;
+            }
+          }
+
+          const planLimits = PLANS[plan]?.limits;
+          const periodEnd = subscription.current_period_end
+            ? new Date(subscription.current_period_end * 1000).toISOString()
+            : null;
+
+          await supabase
+            .from('organizations')
+            .update({
+              stripe_customer_id: customerId,
+              stripe_subscription_id: subscriptionId,
+              plan,
+              plan_period_end: periodEnd,
+              doc_quota: planLimits?.documents_per_month === Infinity ? 999999 : planLimits?.documents_per_month || 10,
+              survey_quota: planLimits?.surveys === Infinity ? 999999 : planLimits?.surveys || 5,
+            })
+            .eq('id', organizationId);
+        }
+        break;
+      }
+
+      case 'customer.subscription.updated': {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const subscription = event.data.object as any;
+        const customerId = subscription.customer as string;
+
+        const { data: org } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('stripe_customer_id', customerId)
+          .single();
+
+        if (org && subscription.current_period_end) {
+          await supabase
+            .from('organizations')
+            .update({
+              plan_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            })
+            .eq('id', org.id);
+        }
+        break;
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = subscription.customer as string;
+
+        const { data: org } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('stripe_customer_id', customerId)
+          .single();
+
+        if (org) {
+          const freeLimits = PLANS.free.limits;
+          await supabase
+            .from('organizations')
+            .update({
+              plan: 'free',
+              stripe_subscription_id: null,
+              plan_period_end: null,
+              doc_quota: freeLimits.documents_per_month,
+              survey_quota: freeLimits.surveys,
+            })
+            .eq('id', org.id);
+        }
+        break;
+      }
+    }
+  } catch (error) {
+    console.error('Webhook handler error:', error);
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
+  }
+
+  return NextResponse.json({ received: true });
+}

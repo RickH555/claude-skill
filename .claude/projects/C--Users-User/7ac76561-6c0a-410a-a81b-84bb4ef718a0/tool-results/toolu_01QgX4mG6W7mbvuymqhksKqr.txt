@@ -1,0 +1,736 @@
+-rw-r--r-- 1 User 197121   42805 févr. 15 09:31 capture_audit.png
+-rw-r--r-- 1 User 197121       0 févr. 14 18:25 nul
+-rw-r--r-- 1 User 197121     775 févr. 14 17:54 backup.ps1
+-rw-r--r-- 1 User 197121    6394 févr. 11 10:25 CLAUDE.md
+-rw-r--r-- 1 User 197121 3932160 févr.  9 23:35 NTUSER.DAT
+-rw-r--r-- 1 User 197121       0 févr.  9 20:01 publish)
+-rw-r--r-- 1 User 197121   81512 févr.  7 20:46 package-lock.json
+-rw-r--r-- 1 User 197121     259 févr.  7 20:46 package.json
+-rw-r--r-- 1 User 197121    6438 janv. 30 14:50 install.cmd
+-rw-r--r-- 1 User 197121   32624 janv. 18 00:27 page.html
+-rw-r--r-- 1 User 197121   65536 mai    5  2022 NTUSER.DAT{53b39e88-18c4-11ea-a811-000d3aa4692b}.TM.blf
+lrwxrwxrwx 1 User 197121      29 mai    5  2022 Application Data -> /c/Users/User/AppData/Roaming
+lrwxrwxrwx 1 User 197121      57 mai    5  2022 Cookies -> /c/Users/User/AppData/Local/Microsoft/Windows/INetCookies
+lrwxrwxrwx 1 User 197121      27 mai    5  2022 Local Settings -> /c/Users/User/AppData/Local
+lrwxrwxrwx 1 User 197121      58 mai    5  2022 Menu Démarrer -> /c/Users/User/AppData/Roaming/Microsoft/Windows/Start Menu
+lrwxrwxrwx 1 User 197121      23 mai    5  2022 Mes documents -> /c/Users/User/Documents
+lrwxrwxrwx 1 User 197121      57 mai    5  2022 Modèles -> /c/Users/User/AppData/Roaming/Microsoft/Windows/Templates
+-rw-r--r-- 1 User 197121      20 mai    5  2022 ntuser.ini
+lrwxrwxrwx 1 User 197121      54 mai    5  2022 Recent -> /c/Users/User/AppData/Roaming/Microsoft/Windows/Recent
+lrwxrwxrwx 1 User 197121      54 mai    5  2022 SendTo -> /c/Users/User/AppData/Roaming/Microsoft/Windows/SendTo
+lrwxrwxrwx 1 User 197121      65 mai    5  2022 Voisinage d'impression -> /c/Users/User/AppData/Roaming/Microsoft/Windows/Printer Shortcuts
+lrwxrwxrwx 1 User 197121      65 mai    5  2022 Voisinage réseau -> /c/Users/User/AppData/Roaming/Microsoft/Windows/Network Shortcuts
+-rw-r--r-- 1 User 197121  524288 mai    5  2022 NTUSER.DAT{53b39e88-18c4-11ea-a811-000d3aa4692b}.TMContainer00000000000000000001.regtrans-ms
+-rw-r--r-- 1 User 197121 1060864 mai    5  2022 ntuser.dat.LOG1
+-rw-r--r-- 1 User 197121  524288 mai    5  2022 ntuser.dat.LOG2
+-rw-r--r-- 1 User 197121  524288 mai    5  2022 NTUSER.DAT{53b39e88-18c4-11ea-a811-000d3aa4692b}.TMContainer00000000000000000002.regtrans-ms
+
+Downloads:
+total 8703094
+-rw-r--r-- 1 User 197121    2978621 févr. 15 09:41 Audit_AEO_example.com_2026-02-15.pdf
+drwxr-xr-x 1 User 197121          0 févr. 15 09:37 SaaS X-Final-Rick-Test - Test Copie
+-rw-r--r-- 1 User 197121      42805 févr. 15 09:22 Capture d’écran 2026-02-15 092241.png
+-rw-r--r-- 1 User 197121       5324 févr. 15 02:33 Facture_INV-2026-5858.pdf
+-rw-r--r-- 1 User 197121       3005 févr. 14 23:34 citedby-clients-2026-02-14.csv
+drwxr-xr-x 1 User 197121          0 févr. 14 18:01 SaaS X-Final-Rick-Test
+drwxr-xr-x 1 User 197121          0 févr. 14 17:56 SaaS-Backup-NinjaPromo-2026-02-12
+-rw-r--r-- 1 User 197121    3180485 févr. 14 13:24 Audit_AEO_www.amazon.fr_2026-02-14.pdf
+drwxr-xr-x 1 User 197121          0 févr. 14 02:13 Saas ProSector
+drwxr-xr-x 1 User 197121          0 févr. 14 01:49 saas-prosector-temp-1921567169
+drwxr-xr-x 1 User 197121          0 févr. 13 11:28 nouveau-projet
+-rw-r--r-- 1 User 197121    1709932 févr. 13 02:18 stitch_homemade_pizza_cooking_elite_class.zip
+-rw-r--r-- 1 User 197121  109223295 févr. 13 02:06 SaaS X-Final-Rick - Copie.zip
+drwxr-xr-x 1 User 197121          0 févr. 13 01:53 SaaS X-Final-Rick - Copie
+drwxr-xr-x 1 User 197121          0 févr. 12 17:30 CodexSaaS
+drwxr-xr-x 1 User 197121          0 févr. 12 16:19 codexsaastemp
+-rw-r--r-- 1 User 197121  129037697 févr. 12 12:04 SaaS X-Final-Rick-Test - Test Copie.zip
+-rw-r--r-- 1 User 197121     133649 févr. 12 09:39 Facture_Free_202203.pdf
+-rw-r--r-- 1 User 197121     951951 févr. 12 09:37 Facture_Free_202203.jpg
+drwxr-xr-x 1 User 197121          0 févr. 12 02:09 SaaS-Backup-2026-02-12
+drwxr-xr-x 1 User 197121          0 févr. 12 02:06 SaaS X-Final-Rick-Test-BACKUP-2026-02-12
+-rw-r--r-- 1 User 197121       5317 févr. 12 00:46 Facture_INV-2026-2336.pdf
+-rw-r--r-- 1 User 197121      48273 févr. 11 23:14 screenshot-landing5.png
+-rw-r--r-- 1 User 197121       1464 févr. 11 23:14 take-screenshot.js
+-rw-r--r-- 1 User 197121      48351 févr. 11 23:14 screenshot-landing4.png
+-rw-r--r-- 1 User 197121      47587 févr. 11 23:13 screenshot-landing3.png
+-rw-r--r-- 1 User 197121     213189 févr. 11 23:09 screenshot-landing2.png
+-rw-r--r-- 1 User 197121      47587 févr. 11 23:09 screenshot-landing.png
+drwxr-xr-x 1 User 197121          0 févr.  9 23:02 SaaSV13 - Rick
+drwxr-xr-x 1 User 197121          0 févr.  9 18:41 SaaS X-Final-Rick
+drwxr-xr-x 1 User 197121          0 févr.  9 16:40 SMC TRADING SAAS
+-rwxr-xr-x 1 User 197121  172440544 févr.  8 12:04 Antigravity.exe
+drwxr-xr-x 1 User 197121          0 févr.  8 10:36 citedby.ai xxxxx)
+-rw-r--r-- 1 User 197121      28269 févr.  8 08:14 Copie de 200+ Ways to Make Money with AI (Mindstream x HubSpot).xlsx
+-rw-r--r-- 1 User 197121      45804 févr.  8 08:13 SaasV12
+-rw-r--r-- 1 User 197121     162776 févr.  8 07:54 citedby.ai xxxxx).zip
+drwxr-xr-x 1 User 197121          0 févr.  8 00:15 citedby-saasv12-audited
+drwxr-xr-x 1 User 197121          0 févr.  7 23:53 citedby.ai X2
+drwxr-xr-x 1 User 197121          0 févr.  7 20:16 supabasefiles
+-rw-r--r-- 1 User 197121       7512 févr.  7 20:16 supabasefiles.zip
+-rw-r--r-- 1 User 197121     314898 févr.  6 22:41 citedby.ai X2.zip
+-rw-r--r-- 1 User 197121       5741 févr.  6 18:35 Facture_INV-376072.pdf
+-rw-r--r-- 1 User 197121    3289248 févr.  5 18:21 Audit_AEO_mecanique-et-passion.com_2026-02-05.pdf
+-rw-r--r-- 1 User 197121       1616 févr.  5 17:50 robots.txt
+-rw-r--r-- 1 User 197121       2191 févr.  5 17:24 llm_archive_truth_1770308627536.txt
+-rw-r--r-- 1 User 197121       2168 févr.  5 16:16 solution-code-1770304589691.txt
+drwxr-xr-x 1 User 197121          0 févr.  5 15:42 citedby.ai---full-aeo-suite
+-rw-r--r-- 1 User 197121      88027 févr.  5 15:42 citedby.ai---full-aeo-suite.zip
+drwxr-xr-x 1 User 197121          0 févr.  5 15:32 saasv12 (1)
+-rw-r--r-- 1 User 197121    1936973 févr.  3 15:06 Audit_AEO_www.amazon.fr_2026-02-03.pdf
+-rw-r--r-- 1 User 197121     450978 févr.  2 15:57 citedby.ai 3.zip
+-rw-r--r-- 1 User 197121     349181 févr.  2 15:54 citedby-saasv12-audited.zip
+-rw-r--r-- 1 User 197121     496610 févr.  1 19:02 citedby.ai---aeo-platform.zip
+drwxr-xr-x 1 User 197121          0 févr.  1 16:05 Callkiller-6ef8cff08f35fe9e1f89d454a23bfb4d2a2bba5b
+-rw-r--r-- 1 User 197121      86780 févr.  1 15:30 Callkiller-6ef8cff08f35fe9e1f89d454a23bfb4d2a2bba5b.zip
+-rw-r--r-- 1 User 197121      86940 févr.  1 14:54 Callkiller-claude-analyze-citedby-architecture-Br1CD.zip
+-rw-r--r-- 1 User 197121          0 févr.  1 00:14 Nouveau document texte.txt
+-rw-r--r-- 1 User 197121      50741 févr.  1 00:11 google_ai_studio_prompt_citedby_1.txt
+-rw-r--r-- 1 User 197121      50741 févr.  1 00:05 google_ai_studio_prompt_citedby.md
+-rw-r--r-- 1 User 197121     808833 janv. 31 23:21 saasv12 (1).zip
+-rw-r--r-- 1 User 197121    3100656 janv. 31 03:21 Audit_AEO_www.oreca-store.com_2026-01-31.pdf
+-rw-r--r-- 1 User 197121     625311 janv. 30 14:38 SaaSV13 - Rick.zip
+-rw-r--r-- 1 User 197121     625311 janv. 30 14:38 SaaSV13.zip
+-rw-r--r-- 1 User 197121       5328 janv. 30 14:14 Facture_INV-2026-8314.pdf
+-rw-r--r-- 1 User 197121    2812512 janv. 30 12:05 Audit_AEO_postopus.com_2026-01-30.pdf
+-rw-r--r-- 1 User 197121     565349 janv. 30 03:49 SaaSV12.zip
+-rw-r--r-- 1 User 197121    3122432 janv. 30 03:44 Audit_AEO_www.oreca-store.com_2026-01-30.pdf
+-rw-r--r-- 1 User 197121      44162 janv. 30 03:39 Rapport_AEO_Complet_www.oreca-store.com.pdf
+-rw-r--r-- 1 User 197121        886 janv. 30 02:11 solution_aeo.html
+-rw-r--r-- 1 User 197121     554558 janv. 29 15:11 SaaSV11.zip
+-rw-r--r-- 1 User 197121     508807 janv. 29 03:33 SaaSV10.zip
+-rw-r--r-- 1 User 197121       2128 janv. 29 03:12 llm_archive_truth_1769652714199.txt
+-rw-r--r-- 1 User 197121     491530 janv. 28 00:54 SaaSV9.zip
+-rw-r--r-- 1 User 197121     493731 janv. 28 00:28 SaaSV8.zip
+-rw-r--r-- 1 User 197121       8978 janv. 28 00:25 article_art_1769556124662.md
+-rw-r--r-- 1 User 197121       8754 janv. 28 00:24 brief_brief_1769556078497.md
+drwxr-xr-x 1 User 197121          0 janv. 27 22:48 SMC-claude-smc-trading-engine-tPDBw
+-rw-r--r-- 1 User 197121      73056 janv. 27 22:47 SMC-claude-smc-trading-engine-tPDBw.zip
+-rw-r--r-- 1 User 197121     451109 janv. 27 02:07 SaaSV7.zip
+-rw-r--r-- 1 User 197121     421940 janv. 26 22:40 SaaSV6.zip
+-rw-r--r-- 1 User 197121     381690 janv. 26 03:15 SaaSV5.zip
+-rw-r--r-- 1 User 197121    3347852 janv. 26 03:06 Rapport_AEO_Complet_up-concept.be (1).pdf
+-rw-r--r-- 1 User 197121     353399 janv. 26 01:29 SaaSV4.zip
+-rw-r--r-- 1 User 197121    3346173 janv. 25 23:51 Rapport_AEO_Complet_up-concept.be.pdf
+-rw-r--r-- 1 User 197121    7315018 janv. 25 23:47 citedby-details-up-concept.be.pdf
+-rw-r--r-- 1 User 197121   43299938 janv. 25 23:39 citedby-report-up-concept.be (1).pdf
+drwxr-xr-x 1 User 197121          0 janv. 25 23:16 SaaSV3
+-rw-r--r-- 1 User 197121     343962 janv. 25 23:13 SaaSV3.zip
+-rw-r--r-- 1 User 197121   43299938 janv. 25 22:51 citedby-report-up-concept.be.pdf
+-rw-r--r-- 1 User 197121   43299938 janv. 25 22:15 citedby-report-www.reddit.com (2).pdf
+-rw-r--r-- 1 User 197121   43299938 janv. 25 22:14 citedby-report-www.reddit.com (1).pdf
+-rw-r--r-- 1 User 197121   94239005 janv. 25 22:08 citedby-report-www.reddit.com.pdf
+-rw-r--r-- 1 User 197121       2030 janv. 25 21:13 llm.txt
+-rw-r--r-- 1 User 197121      67633 janv. 25 20:30 MEGA-PROMPT-GOOGLE-AI-STUDIO-GTO-LLM-UNIFIED.md
+-rw-r--r-- 1 User 197121      15674 janv. 25 18:54 Citedbyultime-claude-citedby-aeo-saas-01QopsNQgyAKAoy9JgjJ5TG4.zip
+-rw-r--r-- 1 User 197121   11742779 janv. 25 18:37 ngrok-v3-stable-windows-amd64.zip
+-rwxr-xr-x 1 User 197121  181592536 janv. 25 14:36 GitHubDesktopSetup-x64.exe
+-rwxr-xr-x 1 User 197121   66292520 janv. 24 16:22 Git-2.52.0-64-bit.exe
+-rw-r--r-- 1 User 197121      51102 janv. 24 15:53 GUIDE-COMPLET-CITEDBY-CLAUDE-CODE-VERCEL.md
+drwxr-xr-x 1 User 197121          0 janv. 24 15:06 GTOscore
+-rw-r--r-- 1 User 197121      14647 janv. 24 15:05 GTOscore.zip
+-rwxr-xr-x 1 User 197121      18640 janv. 24 14:47 gto_score_analyzer.py
+-rwxr-xr-x 1 User 197121  136660128 janv. 24 14:34 Claude Setup.exe
+drwxr-xr-x 1 User 197121          0 janv. 21 02:24 SaaSV1
+drwxr-xr-x 1 User 197121          0 janv. 21 02:19 SaaSV2
+-rw-r--r-- 1 User 197121     253324 janv. 20 04:16 citedby.ai (2).zip
+-rw-r--r-- 1 User 197121     245211 janv. 20 03:32 SaaSV2.zip
+-rw-r--r-- 1 User 197121   30685956 janv. 20 03:07 citedby-report-tangerinezest.com (1).pdf
+-rw-r--r-- 1 User 197121      15588 janv. 20 03:00 ai_studio_code.sql
+-rw-r--r-- 1 User 197121     144803 janv. 19 14:03 SaaSV1.zip
+-rw-r--r-- 1 User 197121     144803 janv. 19 14:03 citedby.ai (1).zip
+-rw-r--r-- 1 User 197121       1258 janv. 19 13:39 aeo-entity-passport-gffqgfq.jsonld
+-rw-r--r-- 1 User 197121   30685956 janv. 19 13:08 citedby-report-tangerinezest.com.pdf
+-rw-r--r-- 1 User 197121       1970 janv. 19 13:04 aeo-entity-passport-le-pilote-automobile.jsonld
+-rw-r--r-- 1 User 197121   20484009 janv. 19 12:15 citedby-report-www.amazon.fr (2).pdf
+-rw-r--r-- 1 User 197121   20484009 janv. 19 10:56 citedby-report-www.amazon.fr (1).pdf
+-rw-r--r-- 1 User 197121   20484009 janv. 19 10:52 citedby-report-www.amazon.fr.pdf
+-rw-r--r-- 1 User 197121      59694 janv. 19 01:38 citedby.ai.zip
+-rw-r--r-- 1 User 197121      48871 janv. 19 01:31 Prompt AI studio.txt
+drwxr-xr-x 1 User 197121          0 janv. 19 00:23 Ultimate-Citedbyai-claude-citedby-claude-code-framework-01PvKShK4WrVi83boSmGbJcf
+-rw-r--r-- 1 User 197121     115064 janv. 19 00:15 Ultimate-Citedbyai-claude-citedby-claude-code-framework-01PvKShK4WrVi83boSmGbJcf.zip
+-rwxr-xr-x 1 User 197121  124405496 janv. 19 00:15 VSCodeUserSetup-x64-1.108.1.exe
+drwxr-xr-x 1 User 197121          0 janv. 18 22:13 saas-gto-claude-refactor-complex-mkibdg2m60kwgfu0-IBYlM
+-rw-r--r-- 1 User 197121      25958 janv. 18 14:51 server (1).js
+-rw-r--r-- 1 User 197121      26473 janv. 18 00:16 server_corrected.js
+-rw-r--r-- 1 User 197121      59240 janv. 18 00:02 Capture d’écran 39.png
+-rwxr-xr-x 1 User 197121  613572528 janv. 17 21:25 Docker Desktop Installer(1).exe
+-rwxr-xr-x 1 User 197121  518011824 janv. 17 21:22 Docker Desktop Installer.exe
+-rw-r--r-- 1 User 197121   26890240 janv. 17 20:50 node-v20.20.0-x64.msi
+-rwxr-xr-x 1 User 197121    4418704 janv. 17 19:55 VisualStudioSetup.exe
+-rw-r--r-- 1 User 197121   46000864 janv. 17 19:52 python-manager-25.2.msix
+-rw-r--r-- 1 User 197121   32235520 janv. 17 19:24 node-v24.13.0-x64(1).msi
+-rw-r--r-- 1 User 197121      70365 janv. 17 19:18 saas-gto-claude-refactor-complex-mkibdg2m60kwgfu0-IBYlM.zip
+-rw-r--r-- 1 User 197121   32235520 janv. 17 19:14 node-v24.13.0-x64.msi
+-rw-r--r-- 1 User 197121      14282 janv. 14 13:59 PROMPT-CLAUDE-CODE-CITEDBY.txt
+-rw-r--r-- 1 User 197121       6449 janv. 14 13:33 Gamma_GOAT_WashingMachines_Prompt_EN_Output_FR.txt
+-rw-r--r-- 1 User 197121      52734 janv. 14 04:20 citedby-analyzer(1).jsx
+-rw-r--r-- 1 User 197121      52734 janv. 14 03:10 citedby-analyzer.jsx
+-rw-r--r-- 1 User 197121      41019 janv. 12 13:37 Génération Articles Comparatifs AEO_GEO - Affiliation Amazon(2).json
+-rw-r--r-- 1 User 197121      41019 janv. 12 13:36 Génération Articles Comparatifs AEO_GEO - Affiliation Amazon(1).json
+-rw-r--r-- 1 User 197121      41019 janv. 12 13:35 Génération Articles Comparatifs AEO_GEO - Affiliation Amazon.json
+-rw-r--r-- 1 User 197121      10223 janv. 12 11:41 PROMPT_FINAL_GAMMA_ANTI_DUMP_V2(1).txt
+-rw-r--r-- 1 User 197121      10223 janv. 12 11:39 PROMPT_FINAL_GAMMA_ANTI_DUMP_V2.md
+-rw-r--r-- 1 User 197121        116 janv. 11 12:21 hostinger-recovery-codes.txt
+-rw-r--r-- 1 User 197121      21049 janv. 11 10:43 techexpert(2).zip
+-rw-r--r-- 1 User 197121     102650 janv. 11 10:31 techexpert(1).zip
+-rw-r--r-- 1 User 197121     102292 janv. 11 10:26 _techexpert.zip
+-rw-r--r-- 1 User 197121      21049 janv. 11 09:24 techexpert.zip
+-rw-r--r-- 1 User 197121    2983349 janv. 10 13:08 seo-by-rank-math.1.0.261.zip
+-rw-r--r-- 1 User 197121      38194 déc.  25 11:49 Affiliation Content Automation v1.json
+-rw-r--r-- 1 User 197121      20085 déc.  25 11:46 N8N affiliation.json
+-rw-r--r-- 1 User 197121        282 déc.  25 11:01 My workflow.json
+-rw-r--r-- 1 User 197121    2052897 déc.  24 19:16 100f-2024.pdf
+-rw-r--r-- 1 User 197121     332262 août   2  2025 reponseB3.pdf
+-rw-r--r-- 1 User 197121      50402 août   2  2025 CurriculumCFL.pdf
+-rw-r--r-- 1 User 197121      16827 juin   9  2025 plainte_penale_luxembourg-bigonville.docx
+-rw-r--r-- 1 User 197121     655463 juin   9  2025 plainte_penale_luxembourg bigonville.pdf
+-rw-r--r-- 1 User 197121      15604 juin   9  2025 plainte_penale_luxembourg1.docx
+-rw-r--r-- 1 User 197121     655529 juin   9  2025 plainte_penale_luxembourg1.pdf
+-rw-r--r-- 1 User 197121      21517 juin   9  2025 plainte_penale_luxembourg.docx
+-rw-r--r-- 1 User 197121     139158 juin   9  2025 plainte_penale_luxembourg.pdf
+-rw-r--r-- 1 User 197121      25011 juin   9  2025 plainte_penale_luxembourg.md
+drwxr-xr-x 1 User 197121          0 juin   9  2025 Plainte_au_procureur_Diekirch_corrige.jpg
+-rw-r--r-- 1 User 197121    1921178 juin   9  2025 Plainte_au_procureur_Diekirch_corrige.jpg.zip
+-rw-r--r-- 1 User 197121      39539 juin   9  2025 Plainte_au_procureur_Diekirch_corrige.docx
+-rw-r--r-- 1 User 197121       7905 mai    1  2025 OpenAI assistant with custom tools.txt
+-rw-r--r-- 1 User 197121      34180 mai    1  2025 Notion AI Assistant Generator.txt
+-rw-r--r-- 1 User 197121    2594018 mai    1  2025 D45DA5EE-6B58-4C2D-96CA-298A93FC7D95.PNG
+-rw-r--r-- 1 User 197121    2424571 mai    1  2025 05E6C7C4-0134-4EA6-ABB9-5D31B77F8CBD (1).PNG
+-rw-r--r-- 1 User 197121    2669335 mai    1  2025 CC0BA56F-297A-4FC6-861B-6A88C2F635F8 (1).PNG
+-rw-r--r-- 1 User 197121    2424571 mai    1  2025 05E6C7C4-0134-4EA6-ABB9-5D31B77F8CBD.PNG
+-rw-r--r-- 1 User 197121    2669335 mai    1  2025 CC0BA56F-297A-4FC6-861B-6A88C2F635F8.PNG
+-rw-r--r-- 1 User 197121     109484 avr.   8  2025 CHAFIK Jamal.cv.pdf
+-rw-r--r-- 1 User 197121     733749 avr.   8  2025 CHAFIK Jamal.cv-1_page-0001.jpg
+-rw-r--r-- 1 User 197121    2256631 mars  24  2025 BaufasCampingGas.mp4
+-rw-r--r-- 1 User 197121     198704 mars  24  2025 AC92A60F-D00B-4F16-A9BE-E7192066C5CC.JPG
+-rw-r--r-- 1 User 197121     114690 mars  24  2025 A9A478CA-142C-4F30-A38E-3D28038A0609.JPG
+-rw-r--r-- 1 User 197121     162230 mars  24  2025 B0D2A984-EABC-4A76-9C01-DD4B4C66F7FA.JPG
+-rw-r--r-- 1 User 197121      64651 mars  24  2025 C8B49686-F1A4-48EE-A83F-D65A223907FD.JPG
+-rw-r--r-- 1 User 197121      91842 mars  24  2025 09A09625-349D-46E3-8E18-E611193CE9E3.JPG
+-rw-r--r-- 1 User 197121      97917 mars  24  2025 E3DD9F8E-F2DC-45C6-A46C-C0A714F91499.JPG
+-rw-r--r-- 1 User 197121     561350 mars  24  2025 E3394B09-40C1-499C-A427-C9C96FD13E99.JPG
+-rw-r--r-- 1 User 197121     227050 mars  24  2025 E0F666A0-0610-4D2C-97F4-2A47E4D3FE70.JPG
+-rw-r--r-- 1 User 197121     165322 mars  24  2025 A71A2691-C794-43DF-86E0-2D1496E02C19.JPG
+-rw-r--r-- 1 User 197121     156876 mars  24  2025 5644CA78-B9BD-4AB4-A56E-B5AECDF3C060.JPG
+-rw-r--r-- 1 User 197121      73229 mars  24  2025 6891CA91-809B-47A2-BF18-BA5B9FF9E0A6.JPG
+-rw-r--r-- 1 User 197121     567930 mars  21  2025 9F10F595-B79E-4610-AA1A-02180F3714CC.JPG
+-rw-r--r-- 1 User 197121     875734 mars  21  2025 C7CBC454-2405-43BF-B1E5-FB20BB9E83A4.JPG
+-rw-r--r-- 1 User 197121     542156 mars  21  2025 487821DB-3F56-4070-AED9-DF1986FD6773.JPG
+-rw-r--r-- 1 User 197121     451279 mars  21  2025 1A699922-C6F6-49B6-945A-F4A6A394F26E.JPG
+-rw-r--r-- 1 User 197121     434598 mars  21  2025 726DF1F5-306E-475F-8A99-8E11255ACCFD.JPG
+-rw-r--r-- 1 User 197121     127660 mars  21  2025 unna5med.jpg
+-rw-r--r-- 1 User 197121     928911 mars  21  2025 7F807135-B134-4255-8E97-D0F716A896DB.JPG
+-rw-r--r-- 1 User 197121    1069425 mars  21  2025 44743FDC-2527-4E50-BA16-7674464B861F.JPG
+-rw-r--r-- 1 User 197121     727307 mars  21  2025 DF319035-6650-4888-9847-B4A7EBDE55BD.JPG
+-rw-r--r-- 1 User 197121     791801 mars  21  2025 C42DC83B-5C79-48EE-8536-15536532D3E6.JPG
+-rw-r--r-- 1 User 197121    1061916 mars  21  2025 E9D4CA0A-C625-4613-AC97-315E20DF2300.JPG
+-rw-r--r-- 1 User 197121    1188636 mars  21  2025 8A5CA37F-7EB1-46BE-B70E-E28F82BB174A.JPG
+-rw-r--r-- 1 User 197121     867457 mars  21  2025 7393DFB4-628B-4D6D-854F-011EACFCD871.JPG
+-rw-r--r-- 1 User 197121     815967 mars  21  2025 D1030FA9-6225-425B-B827-072C01BB0685.JPG
+-rw-r--r-- 1 User 197121     794960 mars  21  2025 8FD81268-765F-4E7C-9AB5-F904DDB502B9.JPG
+-rw-r--r-- 1 User 197121     589578 mars  21  2025 B7FA235B-15B7-490C-8C0C-8A3A0A092908.JPG
+-rw-r--r-- 1 User 197121     615712 mars  21  2025 1E8A783F-B8DD-40EE-BE1E-E4EBD29290BF.JPG
+-rw-r--r-- 1 User 197121     713180 mars  21  2025 D8FE654E-9473-48B8-BCED-0C289BD97373.JPG
+-rw-r--r-- 1 User 197121     736929 mars  21  2025 9723FD02-81DF-4C95-8DAC-7FA3E43526CD.JPG
+-rw-r--r-- 1 User 197121     472032 mars  21  2025 CE3A5BF3-CAA0-4076-8B80-DBED016ABF3A.JPG
+-rw-r--r-- 1 User 197121     481324 mars  21  2025 C3186A7E-9E78-49CB-B6FD-F7D9714CBD6D.JPG
+-rw-r--r-- 1 User 197121     360724 mars  21  2025 unmed.jpg
+-rw-r--r-- 1 User 197121     539603 mars  21  2025 2F5456A8-04C9-400D-A741-E739355ACBB3(1).JPG
+-rw-r--r-- 1 User 197121     539603 mars  21  2025 2F5456A8-04C9-400D-A741-E739355ACBB3.JPG
+-rw-r--r-- 1 User 197121     631685 mars  21  2025 2C87AC2C-EAE0-4D45-9443-18DF4682A8F3.JPG
+-rw-r--r-- 1 User 197121     340801 mars  21  2025 doged.jpg
+-rw-r--r-- 1 User 197121     149599 mars  21  2025 DogRacing.jpg
+-rw-r--r-- 1 User 197121   11655816 mars  21  2025 9C97B621-8D0A-4EEC-A7D5-D7E7CC7D8B94.MP4
+-rw-r--r-- 1 User 197121      70792 mars  21  2025 unnamed.jpg
+-rw-r--r-- 1 User 197121     158955 mars  21  2025 2954ACFF-3D22-4184-9587-28E68EFD3104.JPG
+-rw-r--r-- 1 User 197121     112202 mars  21  2025 DD4FD8BA-BFCA-4753-9ACC-32EE72B25A7D.JPG
+-rw-r--r-- 1 User 197121     223103 mars  21  2025 C2117805-2104-4AE0-9DF7-D244F2B9C008.JPG
+-rw-r--r-- 1 User 197121     178544 mars  21  2025 69F61620-CF9C-4F14-B27B-633FF1A6334D.JPG
+-rw-r--r-- 1 User 197121     114368 mars  21  2025 A834E4FB-5B50-429C-BB8C-2CEA892B0F79.JPG
+-rw-r--r-- 1 User 197121      99625 mars  21  2025 720B147F-DEAC-483C-9598-1C906C948452.JPG
+-rw-r--r-- 1 User 197121      14836 mars  20  2025 Micro-entreprise création K-bis -1.pdf
+-rw-r--r-- 1 User 197121     434344 mars  19  2025 i1593238677_3889_8.jpg
+-rw-r--r-- 1 User 197121     479513 mars  19  2025 i1593238677_4561_5.jpg
+-rw-r--r-- 1 User 197121     504790 mars  19  2025 i1593238677_3639_2.jpg
+-rw-r--r-- 1 User 197121     443517 mars  19  2025 i1593238677_5161_0.jpg
+-rw-r--r-- 1 User 197121     141118 mars  19  2025 dog2.jpg
+-rw-r--r-- 1 User 197121     141118 mars  19  2025 dog.jpg
+-rw-r--r-- 1 User 197121   11498940 mars  19  2025 9BA18E54-C532-44C7-A8DE-422AF705A7C5.MP4
+-rw-r--r-- 1 User 197121     151127 mars  19  2025 69694544-0B76-4631-872E-1A4771029173.JPG
+-rw-r--r-- 1 User 197121     247384 mars  19  2025 0242797B-2924-4C6F-81E0-38205B613C9F.JPG
+-rw-r--r-- 1 User 197121     139739 mars  19  2025 D341BDA5-4488-447D-B200-DD080E6649E2.JPG
+-rw-r--r-- 1 User 197121      79830 mars  19  2025 5B93D760-7556-4055-BBDF-4B3900D531EB.JPG
+-rw-r--r-- 1 User 197121     183632 mars  19  2025 04E708B3-E0D0-4637-8EDE-7F032EDBEBB1.JPG
+-rwxr-xr-x 1 User 197121  467026848 mars  19  2025 391.35-desktop-win10-64bit-international-whql.exe
+-rwxr-xr-x 1 User 197121    2313024 mars  19  2025 capcut_capcutpc_0_1.2.6_installer.exe
+-rw-r--r-- 1 User 197121    5277302 mars  19  2025 tiktok_rollingpetsball_7178887592644037893.mp4
+-rw-r--r-- 1 User 197121      80981 mars  19  2025 attestation_adhesion.pdf
+-rw-r--r-- 1 User 197121     113233 mars  19  2025 FF927F7E-19A4-4EA2-9412-BD5EA8162A49.JPG
+-rw-r--r-- 1 User 197121     185941 mars  19  2025 3CEC7A89-79E1-45D7-870F-F0A49AD449F1.JPG
+-rw-r--r-- 1 User 197121     149578 mars  19  2025 97E6AC4F-3A39-4280-B3FF-25D958E27618.JPG
+-rw-r--r-- 1 User 197121     179080 mars  19  2025 083E3CAA-B5DE-4BD3-81AD-1AB519CDC741.JPG
+-rw-r--r-- 1 User 197121     143539 mars  19  2025 EFF3CB15-E6F8-4D4E-A9D2-C4EE7C88B229.JPG
+-rw-r--r-- 1 User 197121     141954 mars  19  2025 BD89A017-743A-4FB4-957C-00F907526188.JPG
+-rw-r--r-- 1 User 197121    1592666 mars  19  2025 tiktok_homehomeplus_7030885702531435781.mp4
+-rw-r--r-- 1 User 197121      15219 mars  19  2025 RIB_M__CHAFIK_ISMAIL_2840.pdf
+-rw-r--r-- 1 User 197121     305881 mars  18  2025 06C53827-A981-46FE-A607-6BB09309CC67.JPG
+-rw-r--r-- 1 User 197121     404223 mars  18  2025 6A546CF5-E80F-4151-9689-8CE418DB107C.JPG
+-rw-r--r-- 1 User 197121     304434 mars  18  2025 FE9E4D39-48CD-40CE-9F9D-CF15D8EDD670.JPG
+-rw-r--r-- 1 User 197121        176 mars  18  2025 texte 2222.txt
+-rw-r--r-- 1 User 197121     650347 mars  18  2025 Facture_Free_Mars_2025-1.pdf
+-rw-r--r-- 1 User 197121     551164 mars  18  2025 passeport Adobe Scan 18 mars 2025.pdf
+-rw-r--r-- 1 User 197121     144437 mars  18  2025 8CF7AF17-A4C8-45AF-B80B-EA68AF7E3181.JPG
+-rw-r--r-- 1 User 197121     411494 mars  18  2025 BBAD726D-CD7D-476F-AE7A-4B0CBD12CBB9.JPG
+-rw-r--r-- 1 User 197121     316963 mars  18  2025 65514B5D-5ACB-4FD6-B986-EAC0C24775DA.JPG
+-rw-r--r-- 1 User 197121     143328 mars  18  2025 0563C09B-C3F2-46F9-9D5C-F77F779C5E5C.JPG
+-rw-r--r-- 1 User 197121      77496 mars  17  2025 Relevé-revolut.jpg
+-rw-r--r-- 1 User 197121        176 mars  17  2025 Relevé revolut.txt
+-rw-r--r-- 1 User 197121     324623 mars  17  2025 7C48AE05-62A4-4487-864C-E32EC21538F7.JPG
+-rw-r--r-- 1 User 197121     649515 mars  17  2025 5BB89B77-C97F-4441-809E-04674045A219.JPG
+-rw-r--r-- 1 User 197121     302933 mars  17  2025 3F89FCE1-63C2-4626-A3D3-9817EE7B28B9.JPG
+-rw-r--r-- 1 User 197121     247637 mars  17  2025 E13DACE4-D496-41AE-9302-B6723F3AC7E4.JPG
+-rw-r--r-- 1 User 197121     686634 mars  17  2025 56B996C5-1CDC-4140-9E64-FB253511C826.JPG
+-rw-r--r-- 1 User 197121     649525 mars  17  2025 EE964FB2-8ECB-408E-AFB2-667727275216.JPG
+-rw-r--r-- 1 User 197121     148234 mars  17  2025 1E42263A-1E1A-455F-9D34-10A27E76DFD1.JPG
+-rw-r--r-- 1 User 197121     165135 mars  17  2025 9E96229B-FB7D-4B85-89C7-3AE92C3E10E4.JPG
+-rw-r--r-- 1 User 197121      60718 mars  17  2025 4F5FF3F5-8FC6-4D0A-8556-E8AA8196ACD8.JPG
+-rw-r--r-- 1 User 197121     540892 mars  17  2025 30180.jpg
+-rw-r--r-- 1 User 197121     202606 mars  17  2025 FABCF2CA-E200-41D1-B582-F68F0B5640F3.JPG
+-rw-r--r-- 1 User 197121     285667 mars  17  2025 B3C701D7-733B-459E-9974-BCFA0B273B85.JPG
+-rw-r--r-- 1 User 197121     190473 mars  17  2025 D8827E23-BBC7-4BFE-AFEF-DB322ACC0488.JPG
+-rw-r--r-- 1 User 197121      97472 mars  17  2025 8B0E88A3-DD1D-459A-BFDB-4F6A62CE0F40.JPG
+-rw-r--r-- 1 User 197121     260544 mars  17  2025 C7FDDBB0-E0DA-4164-9702-E2C4008EB9D5.JPG
+-rw-r--r-- 1 User 197121      81239 mars  17  2025 8F14B4F4-1F00-4A50-B116-B3D81D914B74.JPG
+-rw-r--r-- 1 User 197121     136863 mars  17  2025 CCCF06EC-C511-4DCC-986A-E0B53CDD1390.JPG
+-rw-r--r-- 1 User 197121     124543 mars  17  2025 EAD67A44-5B01-48C9-9BF6-CEA1B7304D64.JPG
+-rw-r--r-- 1 User 197121     139546 mars  17  2025 8BEEDAD1-019E-407D-8951-93F07F08A918.JPG
+-rw-r--r-- 1 User 197121      76906 mars  17  2025 62E217E9-B915-43D5-82B9-FC99CFE7578F.JPG
+-rw-r--r-- 1 User 197121     110815 mars  17  2025 81CA7FAC-FF2D-44AE-A2D1-5CC3E36AA05E.JPG
+-rw-r--r-- 1 User 197121     127030 mars  17  2025 F5718FA5-F9C2-468D-9B03-7AB60F74157C.JPG
+-rw-r--r-- 1 User 197121     134794 mars  17  2025 37FB214C-4B33-44A4-82E1-7F742EFFF4A4.JPG
+-rw-r--r-- 1 User 197121     135418 mars  17  2025 55BA965D-F56D-4C3E-B539-0B8962FDD63E.JPG
+-rw-r--r-- 1 User 197121     105189 mars  17  2025 ADBFA332-877B-40C5-84EC-9304C214C284.JPG
+-rw-r--r-- 1 User 197121      84838 mars  17  2025 459BAC65-E37C-48FA-BCC7-527166D1B381.JPG
+-rw-r--r-- 1 User 197121      92615 mars  17  2025 95A6FA8F-5C9F-48D7-B49B-089CF0F73EF1.JPG
+-rw-r--r-- 1 User 197121     842189 mars  17  2025 8207CAED-F580-45C1-AD84-158F036DD2E7.PNG
+-rwxr-xr-x 1 User 197121   10697088 mars  17  2025 ChromeSetup(6).exe
+-rwxr-xr-x 1 User 197121   10697088 mars  17  2025 ChromeSetup(5).exe
+-rwxr-xr-x 1 User 197121   10697088 mars  17  2025 ChromeSetup(4).exe
+-rw-r--r-- 1 User 197121      96279 mars  16  2025 C09388D2-035B-4989-99D3-21DD943A3086.JPG
+-rw-r--r-- 1 User 197121      79649 mars  16  2025 5D2398C8-9CE4-481E-9960-1DB08F7EA854.JPG
+-rw-r--r-- 1 User 197121     122719 mars  16  2025 60366B24-FE85-4AD4-B294-E96E479B73F1.JPG
+-rw-r--r-- 1 User 197121      45034 mars  16  2025 09AADB3F-F678-46CE-9F96-3A63E1721519.JPG
+-rw-r--r-- 1 User 197121     175288 mars  16  2025 AB084735-3802-4FCF-AB8A-A72A310EEFFD.JPG
+-rw-r--r-- 1 User 197121     139193 mars  16  2025 60BE2909-D2AA-49E8-8B07-AD30E310D79E.JPG
+-rw-r--r-- 1 User 197121     496832 mars  15  2025 contractName.pdf
+-rw-r--r-- 1 User 197121     563146 mars  15  2025 25D7E058-1A03-4F80-BC69-6760D32F5053.PNG
+-rw-r--r-- 1 User 197121     560119 mars  15  2025 BB9A81E6-93A6-4309-BD55-860CDF8CF0E4.PNG
+-rw-r--r-- 1 User 197121     222525 mars  15  2025 D8692828-F527-4518-B0DF-3E0C496EE750.JPG
+-rw-r--r-- 1 User 197121     152323 mars  15  2025 00E1FCD4-42BA-4CD4-A204-1B69AF731235.JPG
+-rw-r--r-- 1 User 197121     148912 mars  15  2025 D479E4A0-700D-44F7-BC3C-DFBF3C2D31EB.JPG
+-rw-r--r-- 1 User 197121     115937 mars  15  2025 44C7A36A-02B3-4688-A17B-9F113F94AF96.JPG
+-rw-r--r-- 1 User 197121     121777 mars  15  2025 332AE141-DC5F-44A2-8A0B-6D78E8BF937F.JPG
+-rw-r--r-- 1 User 197121      93684 mars  15  2025 0F0A9704-C590-453E-B814-5910A82D8D52.JPG
+-rw-r--r-- 1 User 197121     142898 mars  15  2025 Adobe Scan 15 mars 2025.pdf
+-rw-r--r-- 1 User 197121      14836 mars  15  2025 Micro-entreprise création K-bis .pdf
+-rw-r--r-- 1 User 197121    2166557 mars  10  2025 C24DA7CC-B0B1-46F8-9CD3-74B934E33116.pdf
+-rw-r--r-- 1 User 197121    4601373 mars  10  2025 C24DA7CC-B0B1-46F8-9CD3-74B934E33116.JPG
+-rw-r--r-- 1 User 197121     650347 mars  10  2025 Facture_Free_Mars_2025.pdf
+-rw-r--r-- 1 User 197121      30475 mars  10  2025 Facture_Free_202203_25689168_1101262694.pdf
+-rw-r--r-- 1 User 197121     610351 mars  10  2025 FactureFreeDÃ©cembre2023Chafik-page-001.jpg
+-rw-r--r-- 1 User 197121     112564 mars  10  2025 FactureFreeDÃ©cembre2023Chafik.pdf
+-rwxr-xr-x 1 User 197121   10384768 janv.  1  2025 ChromeSetup(3).exe
+-rwxr-xr-x 1 User 197121   10384768 janv.  1  2025 ChromeSetup(2).exe
+-rwxr-xr-x 1 User 197121   10384768 janv.  1  2025 ChromeSetup(1).exe
+-rw-r--r-- 1 User 197121     166835 déc.   9  2024 rib1.jpg
+-rw-r--r-- 1 User 197121        329 déc.   9  2024 RIB.txt
+-rw-r--r-- 1 User 197121    1114748 déc.   9  2024 passport.jpg
+-rw-r--r-- 1 User 197121      43760 sept. 12  2024 CHAFIK Jamal cv.pdf
+-rw-r--r-- 1 User 197121     733170 août  31  2024 CONVENTION DCM - CHAFIK - V15032021.pdf
+-rw-r--r-- 1 User 197121     671360 août  31  2024 Avis_d_impot_2023_sur_les_revenus_2022.pdf
+-rw-r--r-- 1 User 197121     817667 août  31  2024 CONVENTION DE DIVORCE MR CHAFIK.pdf
+-rw-r--r-- 1 User 197121     878936 août  31  2024 Divorce.png
+-rw-r--r-- 1 User 197121     992387 août  31  2024 Avis_d_impot_2024_sur_les_revenus_2023-page-001.jpg
+-rw-r--r-- 1 User 197121     288217 août  31  2024 Avis_d_impot_2024_sur_les_revenus_2023-page-003.jpg
+-rw-r--r-- 1 User 197121     648348 août  31  2024 Avis_d_impot_2024_sur_les_revenus_2023-page-002.jpg
+-rw-r--r-- 1 User 197121     160695 août  31  2024 Avis_d_impot_2024_sur_les_revenus_2023.pdf
+-rw-r--r-- 1 User 197121     142475 août  31  2024 Declaration_automatique_des_revenus_2023.pdf
+-rw-r--r-- 1 User 197121      42816 juil. 29  2024 attestation d'hebergement.pdf
+-rw-r--r-- 1 User 197121      39981 juil. 16  2024 CHAFIK Jamal.pdf
+-rw-r--r-- 1 User 197121     489443 juil. 16  2024 CHAFIK Jamal - A4.html
+drwxr-xr-x 1 User 197121          0 juil. 16  2024 CHAFIK Jamal - A4_fichiers
+-rw-r--r-- 1 User 197121     293439 mai    3  2024 CNI.pdf
+-rw-r--r-- 1 User 197121     235205 mai    3  2024 CNI.jpg
+-rw-r--r-- 1 User 197121     368716 mai    3  2024 Année 2022.pdf
+-rw-r--r-- 1 User 197121     269016 mai    3  2024 Attestation-sur-lhonneur-composition-de-menage.pdf
+-rw-r--r-- 1 User 197121     351885 mai    3  2024 Attestation-sur-lhonneur-composition-de-menage-1-1.jpg
+-rw-r--r-- 1 User 197121     420513 mai    3  2024 attestation periodes indemnisees.pdf
+-rw-r--r-- 1 User 197121     602472 mai    3  2024 attestation periodes indemnisees-page-001.jpg
+-rw-r--r-- 1 User 197121     175084 mai    3  2024 attestation periodes indemnisees 02.pdf
+-rw-r--r-- 1 User 197121     613440 avr.   4  2024 Contrat de travail - BADER  Mohamed-3-.pdf
+-rw-r--r-- 1 User 197121     878598 avr.   4  2024 Contrat de travail - BADER Mohamed-2-.pdf
+-rw-r--r-- 1 User 197121     576383 avr.   4  2024 Contrat de travail - BADER Mohamed-1-.pdf
+-rw-r--r-- 1 User 197121     899084 avr.   4  2024 Contrat de travail - AMMARI Mohamed-1-page-003.jpg
+-rw-r--r-- 1 User 197121    1321936 avr.   4  2024 Contrat de travail - AMMARI Mohamed-1-page-002.jpg
+-rw-r--r-- 1 User 197121     852156 avr.   4  2024 Contrat de travail - AMMARI Mohamed-1-page-001.jpg
+-rw-r--r-- 1 User 197121    1391814 avr.   4  2024 Contrat de travail - AMMARI Mohamed-1.pdf
+-rw-r--r-- 1 User 197121     572120 nov.  19  2023 CV_2023-10-11_Mohamed_BADER.pdf
+-rw-r--r-- 1 User 197121     856547 nov.  19  2023 CV_2023-10-11_Mohamed_BADER-page-001.jpg
+-rw-r--r-- 1 User 197121     905548 nov.  19  2023 fichedepaieDECEMBRE2023deKEVIN - Copie.jpg
+-rw-r--r-- 1 User 197121     905548 nov.  19  2023 fichedepaieDECEMBRE2023deKEVIN.jpg
+-rw-r--r-- 1 User 197121     905656 nov.  19  2023 fichedepaieOCTOBRE2023deKEVIN.jpg
+-rw-r--r-- 1 User 197121      23357 nov.  19  2023 fichedepaieNOVEMBRE2022deKEVIN.pdf
+-rw-r--r-- 1 User 197121      23073 nov.  19  2023 fichedepaieJANVIER2023deKEVIN.pdf
+-rwxr-xr-x 1 User 197121   31002888 nov.  11  2023 tenorshare-samsung-data-recovery-trial.exe
+-rwxr-xr-x 1 User 197121    3521312 nov.  11  2023 OperaGXSetup.exe
+-rwxr-xr-x 1 User 197121   40758048 nov.  11  2023 Kies3Setup.exe
+-rw-r--r-- 1 User 197121     776348 juil. 24  2023 HONDA.pdf
+-rw-r--r-- 1 User 197121     670440 juil. 24  2023 HONDA2.pdf
+-rw-r--r-- 1 User 197121    1022639 juil. 24  2023 HONDA2.jpg
+-rw-r--r-- 1 User 197121    1203852 juil. 24  2023 HONDA.jpg
+-rw-r--r-- 1 User 197121     566648 juil. 24  2023 Adobe Scan 24 juil. 2023.pdf
+-rw-r--r-- 1 User 197121     410834 juil. 24  2023 Adobe Scan 24 juil. 2023 (1).pdf
+-rw-r--r-- 1 User 197121     415009 juil.  7  2023 Acte de décès Ahmed Tarik-2.pdf
+-rw-r--r-- 1 User 197121     415009 juil.  7  2023 Acte de décès Ahmed Tarik-1.pdf
+-rw-r--r-- 1 User 197121     415009 juil.  7  2023 Acte de décès Ahmed Tarik.pdf
+-rw-r--r-- 1 User 197121     398435 juil.  7  2023 Acte de décès Ahmed Tarik002.pdf
+-rw-r--r-- 1 User 197121     617776 juil.  7  2023 IMG-2345-page-001.jpg
+-rw-r--r-- 1 User 197121      89601 juil.  7  2023 IMG-2345.pdf
+-rw-r--r-- 1 User 197121     475561 juin  14  2023 FactureAppleChafik.pdf
+-rw-r--r-- 1 User 197121     692560 juin  14  2023 FactureAppleChafik.jpg
+-rw-r--r-- 1 User 197121      30216 juin  14  2023 AD82221772.pdf
+-rw-r--r-- 1 User 197121      70951 sept. 22  2022 Receipt_20220922_RU999512395NL.pdf
+-rw-r--r-- 1 User 197121     578034 sept. 22  2022 relevé d information 09 2022-page-001.pdf
+-rw-r--r-- 1 User 197121     834686 sept. 22  2022 relevé d information 09 2022-page-001.jpg
+-rw-r--r-- 1 User 197121     376810 sept.  9  2022 CERTIFICAT MEDICAL MODIFIER MR CHAFIK.pdf
+-rw-r--r-- 1 User 197121     563457 sept.  9  2022 CERTIFICAT MEDICAL CHAFIK ISMAEL-page-001.jpg
+-rw-r--r-- 1 User 197121     333103 sept.  5  2022 Adobe Scan 20 juil. 2022.pdf
+-rw-r--r-- 1 User 197121      37996 sept.  5  2022 courrier résiliation.pdf
+-rw-r--r-- 1 User 197121     568962 sept.  5  2022 Contrat de Travail Sales Lentz-page-003(1).jpg
+-rw-r--r-- 1 User 197121    1356572 sept.  5  2022 Contrat de Travail Sales Lentz.pdf
+-rw-r--r-- 1 User 197121     461526 sept.  5  2022 CHAFIK ISMAEL802-page-001.jpg
+-rw-r--r-- 1 User 197121     348304 sept.  1  2022 CHAFIK ISMAEL807.pdf
+-rw-r--r-- 1 User 197121     674083 sept.  1  2022 PRE RAP DR GOUJON 02 07 18-1.pdf
+-rw-r--r-- 1 User 197121     674083 sept.  1  2022 PRE RAP DR GOUJON 02 07 18.pdf
+-rw-r--r-- 1 User 197121     492940 août  19  2022 Contrat de travail - Benfarhat-001.pdf
+-rw-r--r-- 1 User 197121     878539 août  19  2022 Contrat de travail - Benfarhat-002.pdf
+-rw-r--r-- 1 User 197121     614544 août  19  2022 Contrat de travail - Benfarhat-003.pdf
+-rw-r--r-- 1 User 197121     899732 août  19  2022 Contrat de travail - Benfarhat-003.jpg
+-rw-r--r-- 1 User 197121    1321828 août  19  2022 Contrat de travail - Benfarhat-002.jpg
+-rw-r--r-- 1 User 197121     729748 août  19  2022 Contrat de travail - Benfarhat-001.jpg
+-rw-r--r-- 1 User 197121     474035 juil. 17  2022 Contrat de travail - AMMARI Mohamed-page-001.pdf
+-rw-r--r-- 1 User 197121     886499 juil. 17  2022 Contrat de travail - AMMARI Mohamed-page-002.pdf
+-rw-r--r-- 1 User 197121     632691 juil. 17  2022 Contrat de travail - AMMARI Mohamed-page-003.pdf
+-rw-r--r-- 1 User 197121    1391814 juil. 17  2022 Contrat de travail - AMMARI Mohamed.pdf
+-rw-r--r-- 1 User 197121    1391814 juil. 17  2022 SalesLentz.htm
+-rw-r--r-- 1 User 197121     782257 juil. 15  2022 notif licenciement.jpg
+-rw-r--r-- 1 User 197121     575890 juil. 13  2022 Contrat de Travail Sales Lentz-page-003-page-001.pdf
+-rw-r--r-- 1 User 197121     577365 juil. 13  2022 Contrat de Travail Sales Lentz-page-001-page-001.pdf
+-rw-r--r-- 1 User 197121     765133 juil. 13  2022 Contrat de Travail Sales Lentz-page-002.pdf
+-rw-r--r-- 1 User 197121     891038 juil. 13  2022 Contrat de Travail Sales Lentz-page-001.jpg
+-rw-r--r-- 1 User 197121     726265 juil. 13  2022 Contrat de Travail Sales Lentz-page-002(1).jpg
+-rw-r--r-- 1 User 197121     541780 juil. 13  2022 Contrat de Travail Sales Lentz-page-001(1).jpg
+-rw-r--r-- 1 User 197121     568962 juil. 13  2022 Contrat de Travail Sales Lentz-page-003.jpg
+-rw-r--r-- 1 User 197121     726265 juil. 13  2022 Contrat de Travail Sales Lentz-page-002.jpg
+-rw-r--r-- 1 User 197121     222910 mai   25  2022 cerfa_11527-03.pdf
+-rwxr-xr-x 1 User 197121   52051504 mai   25  2022 win-mg6400-1_1-mcd.exe
+-rw-r--r-- 1 User 197121     515735 mai   24  2022 CV Ism.pdf
+-rw-r--r-- 1 User 197121     766338 mai   24  2022 CV Ism-page-001.jpg
+-rw-r--r-- 1 User 197121       5455 mai   23  2022 TransactionHistory-(23-04-2022)-(23-05-2022).csv
+-rw-r--r-- 1 User 197121      66615 mai   22  2022 CV Ism 1.pdf
+-rw-r--r-- 1 User 197121     281987 mai   22  2022 Ajouter un titre.png
+-rw-r--r-- 1 User 197121      66301 mai   22  2022 Ajouter un titre.pdf
+-rw-r--r-- 1 User 197121      88186 mai   22  2022 chauffeur-de-bus-cv-sample.jpg
+-rw-r--r-- 1 User 197121      31340 mai   22  2022 CV-de-Conducteur-de-Bus-FR-Chicago.webp
+-rwxr-xr-x 1 User 197121    3400928 mai   21  2022 mt5setup.exe
+-rw-r--r-- 1 User 197121       4096 mai   17  2022 TradingView.appinstaller
+-rwxr-xr-x 1 User 197121  181128656 mai   17  2022 binance-setup.exe
+-rwxr-xr-x 1 User 197121    6314392 mai   15  2022 Installer-ProRealTime-win64.exe
+-rwxr-xr-x 1 User 197121     336512 mai   13  2022 Firefox Installer.exe
+-rw-r--r-- 1 User 197121 4644864000 mai   12  2022 windowsfx-11.1.1109-plasma-win11-theme.iso
+-rwxr-xr-x 1 User 197121  612591192 mai   11  2022 VMware-player-full-16.2.3-19376536.exe
+-rwxr-xr-x 1 User 197121    2766672 mai    6  2022 kis21.3.10.391abfr_26186.exe
+-rwxr-xr-x 1 User 197121    1414600 mai    5  2022 ChromeSetup.exe
+-rw-r--r-- 1 User 197121        282 mai    5  2022 desktop.ini
+
+SaaSV2:
+total 1234
+-rw-r--r-- 1 User 197121 252095 févr. 14 19:05 package-lock.json
+-rw-r--r-- 1 User 197121    988 févr. 14 19:05 package.json
+drwxr-xr-x 1 User 197121      0 févr. 14 19:05 node_modules
+-rw-r--r-- 1 User 197121     83 févr. 14 19:03 postcss.config.js
+drwxr-xr-x 1 User 197121      0 févr. 14 19:02 app
+-rw-r--r-- 1 User 197121 806169 févr. 14 18:59 tsconfig.tsbuildinfo
+-rw-r--r-- 1 User 197121    591 févr. 14 18:58 tsconfig.json
+drwxr-xr-x 1 User 197121      0 févr. 14 18:57 components
+-rw-r--r-- 1 User 197121    273 févr. 14 18:55 next-env.d.ts
+drwxr-xr-x 1 User 197121      0 févr. 14 18:47 pages
+drwxr-xr-x 1 User 197121      0 janv. 21 02:38 services
+drwxr-xr-x 1 User 197121      0 janv. 21 02:38 lib
+-rw-r--r-- 1 User 197121   7344 janv. 21 02:32 App.tsx
+-rw-r--r-- 1 User 197121    580 janv. 21 02:19 vite.config.ts
+-rw-r--r-- 1 User 197121    349 janv. 21 02:19 index.tsx
+-rw-r--r-- 1 User 197121   3410 janv. 21 02:19 index.html
+-rw-r--r-- 1 User 197121   1169 janv. 21 02:19 README.md
+-rw-r--r-- 1 User 197121    316 janv. 21 02:19 middleware.ts
+-rw-r--r-- 1 User 197121   1641 janv. 21 02:19 tailwind.config.ts
+-rw-r--r-- 1 User 197121    229 janv. 21 02:19 next.config.mjs
+-rw-r--r-- 1 User 197121  15379 janv. 21 02:19 CitedBy_AOE_Criteria_50.json
+-rw-r--r-- 1 User 197121   1487 janv. 21 02:19 types.ts
+-rw-r--r-- 1 User 197121    171 janv. 21 02:19 metadata.json
+
+Desktop:
+total 6441
+-rw-r--r-- 1 User 197121    1356 févr. 13 13:46 Nouveau document texte.txt
+-rw-r--r-- 1 User 197121  229261 févr. 13 13:12 creatorsuite-02-13 131227.png
+-rw-r--r-- 1 User 197121  227518 févr. 13 13:11 créatorstudio2026-02-13 131117.png
+-rw-r--r-- 1 User 197121   15247 févr. 13 12:33 prosector.txt
+-rw-r--r-- 1 User 197121     128 févr. 13 12:33 serveur citedby.txt
+-rwxr-xr-x 1 User 197121    2319 févr. 13 00:53 Claude.lnk
+-rwxr-xr-x 1 User 197121    2655 févr. 12 01:38 Claude (1).lnk
+-rw-r--r-- 1 User 197121    4095 févr. 11 10:53 agent claude code.txt
+-rw-r--r-- 1 User 197121    2777 févr.  8 15:24 idee buisness.txt
+-rwxr-xr-x 1 User 197121    1384 févr.  8 12:07 Antigravity.lnk
+drwxr-xr-x 1 User 197121       0 févr.  8 07:54 serviceci
+drwxr-xr-x 1 User 197121       0 févr.  7 19:28 UltimateSaaSCitedbyai
+-rw-r--r-- 1 User 197121      80 févr.  7 18:55 clé supabase.txt
+-rw-r--r-- 1 User 197121     673 févr.  7 13:57 mpsupabse.txt
+-rw-r--r-- 1 User 197121    3637 févr.  4 15:52 files.zip
+drwxr-xr-x 1 User 197121       0 févr.  4 15:52 citedby-demo
+-rw-r--r-- 1 User 197121  636499 févr.  1 14:06 saasv12.txt
+-rw-r--r-- 1 User 197121    1959 janv. 31 02:52 robot.tx.txt
+-rw-r--r-- 1 User 197121     177 janv. 30 11:36 postopus.url
+-rw-r--r-- 1 User 197121   40204 janv. 29 12:22 Capture d’écran88888888888888888.png
+-rw-r--r-- 1 User 197121    8140 janv. 29 12:15 Capture d’écran000000000000.png
+-rw-r--r-- 1 User 197121  130385 janv. 29 01:51 Capture d’écran777777777777.png
+-rwxr-xr-x 1 User 197121    2368 janv. 25 14:37 GitHub Desktop.lnk
+-rw-r--r-- 1 User 197121   76404 janv. 21 03:23 Capture d’écran 2026-33333333333333330.png
+-rw-r--r-- 1 User 197121   73526 janv. 21 03:07 Capture d’écran222222222222.png
+-rw-r--r-- 1 User 197121   51205 janv. 21 02:51 Capture d’écran 1111111111111.png
+-rw-r--r-- 1 User 197121   15160 janv. 21 02:32 Nouveau document texte (2).txt
+-rw-r--r-- 1 User 197121  245211 janv. 20 03:32 SaaSV2.zip
+-rw-r--r-- 1 User 197121   15230 janv. 19 11:14 Capture d’écran 19.png
+-rwxr-xr-x 1 User 197121    1403 janv. 19 00:16 Visual Studio Code.lnk
+-rw-r--r-- 1 User 197121  141992 janv. 18 17:26 Capture d’écran47.png
+-rw-r--r-- 1 User 197121   92009 janv. 18 17:12 Capture d’écran04.png
+-rw-r--r-- 1 User 197121   95343 janv. 18 16:55 Capture d’écran 529.png
+-rw-r--r-- 1 User 197121  123786 janv. 18 16:50 Capture d’écran3.png
+-rw-r--r-- 1 User 197121   95797 janv. 18 16:45 Capture d’écran 02.png
+-rw-r--r-- 1 User 197121  102523 janv. 18 06:47 Capture d’écran19.png
+-rw-r--r-- 1 User 197121   96295 janv. 18 02:13 Capture d’écran 18.png
+-rw-r--r-- 1 User 197121   39024 janv. 18 02:00 Capture d’écran 0007.png
+-rw-r--r-- 1 User 197121   54195 janv. 18 01:59 Capture d’écran 904.png
+-rw-r--r-- 1 User 197121   39450 janv. 18 01:36 Capture d’écran39.png
+-rw-r--r-- 1 User 197121   39871 janv. 18 01:35 Capture d’écran37.png
+-rw-r--r-- 1 User 197121  131299 janv. 18 01:08 Capture d’écran757.png
+-rw-r--r-- 1 User 197121   84840 janv. 18 00:26 Capture d’écran548.png
+-rw-r--r-- 1 User 197121   70734 janv. 18 00:22 Capture d’écran248.png
+-rw-r--r-- 1 User 197121   97407 janv. 18 00:10 Capture d’écran 903.png
+-rw-r--r-- 1 User 197121  101400 janv. 18 00:10 Capture d’écran902.png
+-rw-r--r-- 1 User 197121   65512 janv. 18 00:09 Capture d’écran901.png
+-rw-r--r-- 1 User 197121   58477 janv. 18 00:03 Capture d’écran 349.png
+-rw-r--r-- 1 User 197121   41568 janv. 17 23:41 Capture d’écran7.png
+-rw-r--r-- 1 User 197121   38399 janv. 17 23:22 Capture d’écran 2026-01-17 232132.png
+-rwxr-xr-x 1 User 197121    2142 janv. 17 22:39 Docker Desktop.lnk
+-rw-r--r-- 1 User 197121   32244 janv. 17 18:55 Nouveau document texte (2).html
+-rw-r--r-- 1 User 197121   20754 janv. 17 18:52 citedby-demo.html
+-rw-r--r-- 1 User 197121   54041 janv. 17 15:00 unnamed.jpg
+-rw-r--r-- 1 User 197121    2464 janv. 14 13:24 url+IMAGES.txt
+-rw-r--r-- 1 User 197121     795 janv. 14 13:06 instruction supplementaire Gamma.txt
+-rw-r--r-- 1 User 197121    4030 janv. 14 13:01 1 CHTGPT FRAMEWORK EXTRACTION URL → ANNEXES PRODUIT → PROMPT GAMMA “THE GOAT”.txt
+-rw-r--r-- 1 User 197121     352 janv. 14 13:00 PROMPT “MODE AUTOMATIQUE”GOAT.txt
+-rw-r--r-- 1 User 197121    7928 janv. 14 12:11 🐐 PROMPT GAMMA “THE GOAT” — VERSION ULTIME.txt
+-rw-r--r-- 1 User 197121   38906 janv. 12 13:48 botpress.txt
+-rw-r--r-- 1 User 197121  644879 janv. 12 11:51 67d3b63f-b9a7-403e-9977-ff3c2c201399.__CR0,0,1464,600_PT0_SX1464_V1___.jpg
+-rw-r--r-- 1 User 197121    6809 janv. 12 11:16 caracteristes produit.txt
+-rw-r--r-- 1 User 197121   73588 janv. 12 11:12 71oAgSyyeCL._AC_SX679_.jpg
+-rw-r--r-- 1 User 197121     243 janv. 12 10:55 liste info prompt pinterest.txt
+drwxr-xr-x 1 User 197121       0 janv. 12 09:52 Gamma-Pinterest-Pages
+-rw-r--r-- 1 User 197121     154 déc.   9  2024 Amazon.url
+drwxr-xr-x 1 User 197121       0 juin  14  2023 Anciennes données de Firefox
+-rw-r--r-- 1 User 197121  407337 juil. 15  2022 Adobe Scan 15 juil. 2022.pdf
+-rw-r--r-- 1 User 197121  407337 juil. 15  2022 lette licenciement.htm
+-rw-r--r-- 1 User 197121 1356572 juil. 13  2022 Contrat de Travail Sales Lentz.pdf
+-rw-r--r-- 1 User 197121     154 mai   23  2022 Andil.url
+-rw-r--r-- 1 User 197121     163 mai   13  2022 IG.url
+-rwxr-xr-x 1 User 197121     424 mai   11  2022 Ce PC.lnk
+-rw-r--r-- 1 User 197121     282 mai    5  2022 desktop.ini
+
+node_modules:
+total 196
+drwxr-xr-x 1 User 197121 0 févr. 11 23:11 @esbuild
+drwxr-xr-x 1 User 197121 0 févr. 11 23:11 @rollup
+drwxr-xr-x 1 User 197121 0 févr. 11 23:11 @tailwindcss
+drwxr-xr-x 1 User 197121 0 févr. 11 23:11 playwright-core
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 es-toolkit
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 recharts
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 motion-dom
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 victory-vendor
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 framer-motion
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 react-dom
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 react-router
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-format
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-shape
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-array
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 rollup
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 vite
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 enhanced-resolve
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 undici-types
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 tailwindcss
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-time-format
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 motion-utils
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 postcss
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-interpolate
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 jiti
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-scale
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 react
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 react-redux
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 nanoid
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 immer
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 ws
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 tapable
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 reselect
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 source-map-js
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 use-sync-external-store
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-ease
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-time
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 scheduler
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 tslib
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 redux
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 magic-string
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 lightningcss
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 decimal.js-light
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 eventemitter3
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-color
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 picomatch
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 tiny-invariant
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 clsx
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-timer
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 iceberg-js
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 detect-libc
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 esbuild
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 redux-thunk
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 react-router-dom
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 d3-path
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 graceful-fs
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 picocolors
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 internmap
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 react-is
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 cookie
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 fdir
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 tinyglobby
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 set-cookie-parser
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 lightningcss-win32-x64-msvc
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 @reduxjs
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 @jridgewell
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 @standard-schema
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 @supabase
+drwxr-xr-x 1 User 197121 0 févr.  7 20:46 @types
+drwxr-xr-x 1 User 197121 0 janv. 21 02:36 lucide-react
+
+Documents:
+total 129
+drwxr-xr-x 1 User 197121      0 févr.  7 23:18 citedby-v3
+drwxr-xr-x 1 User 197121      0 févr.  7 20:52 src
+drwxr-xr-x 1 User 197121      0 févr.  1 16:06 GitHub
+drwxr-xr-x 1 User 197121      0 janv. 25 19:26 Citedbyultime
+drwxr-xr-x 1 User 197121      0 janv. 25 19:03 Citedbyultime-claude-citedby-aeo-saas-01QopsNQgyAKAoy9JgjJ5TG4
+drwxr-xr-x 1 User 197121      0 janv. 17 21:18 Visual Studio 18
+drwxr-xr-x 1 User 197121      0 janv. 17 20:55 WindowsPowerShell
+drwxr-xr-x 1 User 197121      0 nov.  11  2023 samsung
+drwxr-xr-x 1 User 197121      0 mai   25  2022 Fax
+drwxr-xr-x 1 User 197121      0 mai   25  2022 Scanned Documents
+-rw-r--r-- 1 User 197121 116291 mai   22  2022 cv ism 1.pdf
+drwxr-xr-x 1 User 197121      0 mai   17  2022 HiSuite
+drwxr-xr-x 1 User 197121      0 mai   12  2022 Virtual Machines
+-rw-r--r-- 1 User 197121    402 mai    5  2022 desktop.ini
+lrwxrwxrwx 1 User 197121     19 mai    5  2022 Ma musique -> /c/Users/User/Music
+lrwxrwxrwx 1 User 197121     22 mai    5  2022 Mes images -> /c/Users/User/Pictures
+lrwxrwxrwx 1 User 197121     20 mai    5  2022 Mes vidéos -> /c/Users/User/Videos
+
+mon-saas:
+total 205
+-rw-r--r-- 1 User 197121     72 janv. 21 03:26 postcss.config.js
+-rw-r--r-- 1 User 197121 134778 janv. 21 03:09 package-lock.json
+-rw-r--r-- 1 User 197121    912 janv. 21 03:09 package.json
+drwxr-xr-x 1 User 197121      0 janv. 21 03:09 node_modules
+-rw-r--r-- 1 User 197121    191 janv. 21 03:02 tailwind.config.js
+-rw-r--r-- 1 User 197121   2553 janv. 21 02:41 README.md
+-rw-r--r-- 1 User 197121    253 janv. 21 02:41 vite.config.ts
+drwxr-xr-x 1 User 197121      0 janv. 21 02:41 src
+drwxr-xr-x 1 User 197121      0 janv. 21 02:41 public
+-rw-r--r-- 1 User 197121    357 janv. 21 02:41 index.html
+-rw-r--r-- 1 User 197121    653 janv. 18 02:26 tsconfig.node.json
+-rw-r--r-- 1 User 197121    119 janv. 18 02:26 tsconfig.json
+-rw-r--r-- 1 User 197121    732 janv. 18 02:26 tsconfig.app.json
+-rw-r--r-- 1 User 197121    616 janv. 18 02:26 eslint.config.js
+
+source:
+total 0
+drwxr-xr-x 1 User 197121 0 févr.  1 16:03 repos
+
+Videos:
+total 1
+drwxr-xr-x 1 User 197121   0 mars  19  2025 HD Movie Maker
+drwxr-xr-x 1 User 197121   0 mai   10  2022 Captures
+-rw-r--r-- 1 User 197121 504 mai    5  2022 desktop.ini
+
+OneDrive:
+total 41
+-rw-r--r-- 1 User 197121 40113 juil. 16  2024 CHAFIK Jamal-6.pdf
+-rw-r--r-- 1 User 197121    95 mai    5  2022 desktop.ini
+
+Pictures:
+total 257
+drwxr-xr-x 1 User 197121   0 mai   25  2022 Screenshots
+drwxr-xr-x 1 User 197121   0 mai    9  2022 [Set 1]
+drwxr-xr-x 1 User 197121   0 mai    5  2022 Saved Pictures
+drwxr-xr-x 1 User 197121   0 mai    5  2022 Camera Roll
+-rw-r--r-- 1 User 197121 504 mai    5  2022 desktop.ini
+
+Music:
+total 5
+drwxr-xr-x 1 User 197121   0 oct.  13  2022 iTunes
+-rw-r--r-- 1 User 197121 504 mai    5  2022 desktop.ini
+
+Searches:
+total 7
+-rw-r--r-- 1 User 197121 848 mai    5  2022 winrt--{S-1-5-21-53305337-255970662-3036705116-1001}-.searchconnector-ms
+-rw-r--r-- 1 User 197121 524 mai    5  2022 desktop.ini
+-r--r--r-- 1 User 197121 248 mai    5  2022 Everywhere.search-ms
+-r--r--r-- 1 User 197121 248 mai    5  2022 Indexed Locations.search-ms
+
+Links:
+total 6
+-rw-r--r-- 1 User 197121 504 mai    5  2022 desktop.ini
+-rwxr-xr-x 1 User 197121 938 mai    5  2022 Downloads.lnk
+-rwxr-xr-x 1 User 197121 489 mai    5  2022 Desktop.lnk
+
+Saved Games:
+total 1
+-rw-r--r-- 1 User 197121 282 mai    5  2022 desktop.ini
+
+Contacts:
+total 1
+-rw-r--r-- 1 User 197121 412 mai    5  2022 desktop.ini
+
+Favorites:
+total 2
+drwxr-xr-x 1 User 197121   0 janv.  9 13:46 Links
+-rw-r--r-- 1 User 197121 208 janv.  9 13:46 Bing.url
+-rw-r--r-- 1 User 197121 402 mai    5  2022 desktop.ini
+
+3D Objects:
+total 1
+-rw-r--r-- 1 User 197121 298 mai    5  2022 desktop.ini
+
+AppData:
+total 16
+drwxr-xr-x 1 User 197121 0 févr. 12 16:16 Roaming
+drwxr-xr-x 1 User 197121 0 févr. 12 09:23 Local
+drwxr-xr-x 1 User 197121 0 févr. 12 08:53 LocalLow
+total 8703094
+-rw-r--r-- 1 User 197121    2978621 févr. 15 09:41 Audit_AEO_example.com_2026-02-15.pdf
+drwxr-xr-x 1 User 197121          0 févr. 15 09:37 SaaS X-Final-Rick-Test - Test Copie
+-rw-r--r-- 1 User 197121      42805 févr. 15 09:22 Capture d’écran 2026-02-15 092241.png
+-rw-r--r-- 1 User 197121       5324 févr. 15 02:33 Facture_INV-2026-5858.pdf

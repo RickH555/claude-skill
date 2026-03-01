@@ -1,0 +1,27 @@
+import { useLocation } from 'react-router-dom'
+import Button from '../ui/Button.tsx'
+import { useAuth } from '../../hooks/useAuth.tsx'
+
+const pageTitles: Record<string, string> = {
+  '/app': 'Tableau de bord',
+  '/app/monitoring': 'Monitoring',
+  '/app/analytics': 'Analytiques',
+  '/app/integrations': 'Integrations',
+  '/app/settings': 'Parametres',
+  '/app/api-developer': 'API Developer Hub',
+}
+
+export default function Header() {
+  const location = useLocation()
+  const { signOut } = useAuth()
+  const title = pageTitles[location.pathname] ?? 'CitedBy.ai'
+
+  return (
+    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+      <Button variant="ghost" size="sm" onClick={signOut}>
+        Deconnexion
+      </Button>
+    </header>
+  )
+}

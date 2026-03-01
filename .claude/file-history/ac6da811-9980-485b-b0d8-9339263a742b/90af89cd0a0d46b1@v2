@@ -1,0 +1,8 @@
+// ================================================================
+// AI RESPONSE LAYER — Barrel Export
+// ================================================================
+
+export { generateHub } from './hub-generator';
+export { generateQueryPage } from './query-page-generator';
+export { generateRecommendJson } from './recommend-json-generator';
+export { generateSitemapAi } from './sitemap-ai-generator';

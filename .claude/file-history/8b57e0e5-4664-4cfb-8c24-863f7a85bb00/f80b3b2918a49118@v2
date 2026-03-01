@@ -1,0 +1,19 @@
+'use client';
+import dynamicImport from 'next/dynamic';
+import { useAppContext } from '@/lib/app-context';
+
+const AlertsPage = dynamicImport(
+  () => import('@/views/v3/AlertsPage'),
+  { ssr: false }
+);
+
+export default function V3AlertsPageWrapper() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return (
+    <AlertsPage
+      onBack={goBack}
+      user={user}
+      onNavigate={navigateTo}
+    />
+  );
+}

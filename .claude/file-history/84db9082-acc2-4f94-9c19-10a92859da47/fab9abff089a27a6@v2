@@ -1,0 +1,40 @@
+import { chromium } from 'playwright';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const DOC_ID = '561a63ad-4e5b-4b98-a61e-47eedf4f704a';
+const SS = (name) => path.join(__dirname, 'tour', `${name}.png`);
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+
+  // Login
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+
+  // Document detail
+  await page.goto(`${APP}/dashboard/documents/${DOC_ID}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000);
+  await page.screenshot({ path: SS('14-document-detail') });
+  console.log('  14 - Document detail');
+
+  await page.evaluate(() => window.scrollBy(0, 500));
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: SS('15-document-extraction') });
+  console.log('  15 - Document extraction data');
+
+  await page.evaluate(() => window.scrollBy(0, 500));
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: SS('16-document-extraction-more') });
+  console.log('  16 - Document extraction more');
+
+  await browser.close();
+  console.log('Done!');
+})();

@@ -1,0 +1,868 @@
+
+================================================================================
+PHASE 1: Navigate to Login Page
+================================================================================
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/signup?_rsc=17yrj - net::ERR_ABORTED
+Login page status: 200
+Login page URL: https://nexus-ai-silk-six.vercel.app/login
+
+Filling login form...
+Filled Email: "testuser@nexusai-test.com"
+Filled Password: "TestPassword123!"
+
+================================================================================
+PHASE 2: Click Login and capture network traffic
+================================================================================
+Clicked Sign In button
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=970e3 - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1usnx - net::ERR_ABORTED
+Successfully navigated to: https://nexus-ai-silk-six.vercel.app/dashboard
+
+================================================================================
+PHASE 3: Wait for dashboard to fully load
+================================================================================
+Waiting for network to settle...
+Network is idle
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=18t7j - net::ERR_ABORTED
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 500 ()
+
+[FAILED REQUEST] GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=15moa - net::ERR_ABORTED
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 500 ()
+
+[FAILED REQUEST] GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=15moa - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=15moa - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=15moa - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=15moa - net::ERR_ABORTED
+Current URL after dashboard load: https://nexus-ai-silk-six.vercel.app/dashboard
+
+================================================================================
+PHASE 4: Inspect dashboard page content
+================================================================================
+Page title: NexusAI - AI-Powered Document Processing & Feedback Analysis
+H1 elements: ["Dashboard"]
+H2 elements: [""]
+Page body text (first 3000 chars):
+N
+NexusAI
+OVERVIEW
+Dashboard
+DOCAI
+Documents
+Upload
+Templates
+FEEDBACKAI
+Surveys
+Create Survey
+SETTINGS
+General
+Team
+Billing
+API Keys
+Documents used
+3/10
+Toggle theme
+Notifications
+T
+Dashboard
+
+Overview of your NexusAI workspace
+
+Documents Processed
+0
+
+This month
+
+Active Surveys
+0
+
+Currently running
+
+Responses Collected
+0
+
+This month
+
+AI Analyses
+0
+
+This month
+
+Recent Documents
+Your latest processed documents
+
+No documents yet
+
+Upload your first document to get started
+
+Recent Surveys
+Your latest surveys and responses
+
+No surveys yet
+
+Create your first survey to start collecting feedback
+
+================================================================================
+PHASE 5: Direct navigation to /dashboard (fresh load)
+================================================================================
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=18t7j - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=18t7j - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=15moa - net::ERR_ABORTED
+Dashboard direct navigation status: 200
+Dashboard URL after navigation: https://nexus-ai-silk-six.vercel.app/dashboard
+
+================================================================================
+PHASE 6: Check other dashboard sub-pages
+================================================================================
+
+--- Navigating to /dashboard/documents ---
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1fv8n - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1chpt - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1chpt - net::ERR_ABORTED
+  Status: 200
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/documents
+
+--- Navigating to /dashboard/surveys ---
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1a7wp - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=gjec1 - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=gjec1 - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=gjec1 - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=gjec1 - net::ERR_ABORTED
+  Status: 200
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys
+
+--- Navigating to /dashboard/settings ---
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 500 ()
+
+[FAILED REQUEST] GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 500 ()
+
+[FAILED REQUEST] GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 500 ()
+
+[FAILED REQUEST] GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1c9xt - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1r8oa - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1r8oa - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1r8oa - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1r8oa - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1r8oa - net::ERR_ABORTED
+  Status: 200
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings
+
+--- Navigating to /dashboard/templates ---
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 404 ()
+
+[FAILED REQUEST] GET https://nexus-ai-silk-six.vercel.app/dashboard/templates/new?_rsc=1grla
+  Status: 404 
+  Response Body: <!DOCTYPE html><!--eCyJev9ddjJ8p6hLbGw_b--><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/chunks/64a804c972bc9713.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/d59f830a2b8e768c.js"/><script src="/_next/static/chunks/d1a5cb67ca8b0be8.js" async=""></script><script src="/_next/static/chunks/f2f58a7e93290fbb.js" async=""></script><script src="/_next/static/chunks/1cd3b032796cb373.js" async=""></script><script src="/_next/static/chunks/82abf2d65f5428ae.js" async=""></script><script src="/_next/static/chunks/turbopack-1fdf83d15eea6a34.js" async=""></script><script src="/_next/static/chunks/655c4d8daaa5d793.js" async=""></script><script src="/_next/static/chunks/45bcd10dc6761a81.js" async=""></script><script src="/_next/static/chunks/ff1a16fafef87110.js" async=""></script><script src="/_next/static/chunks/a2dfb6fc5208ab9b.js" async=""></script><meta name="robots" content="noindex"/><meta name="next-size-adjust" content=""/><title>404: This page could not be found.</title><title>NexusAI - AI-Powered Document Processing &amp; Feedback Analysis</title><meta name="description" content="Process documents with AI-powered OCR and analyze customer feedback with intelligent survey tools."/><meta name="keywords" content="AI,document processing,OCR,feedback analysis,surveys,SaaS"/><link rel="icon" href="/favicon.ico?favicon.0b3bf435.ico" sizes="256x256" type="image/x-icon"/><script src="/_next/static/chunks/a6dad97d9634a72d.js" noModule=""></script></head><body class="inter_b2991b2-module__9mH_6q__variable font-sans antialiased"><div hidden=""><!--$--><!--/$--></div><script>((a,b,c,d,e,f,g,h)=>{let i=document.documentElement,j=["light","dark"];function k(b){var c;(Array.isArray(a)?a:[a]).forEach(a=>{let c="class"===a,d=c&&f?e.map(a=>f[a]||a):e;c?(i.classList.remove(...d),i.classList.add(f&&f[b]?f[b]:b)):i.setAttrib
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1de2h - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1de2h - net::ERR_ABORTED
+[REQUEST FAILED] GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1de2h - net::ERR_ABORTED
+  Status: 200
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/templates
+
+================================================================================
+PHASE 7: Direct API endpoint tests
+================================================================================
+
+--- Testing API: /api/health ---
+  Status: 200
+  Body: {"status":"ok","timestamp":"2026-02-25T09:43:31.207Z","version":"1.0.0"}
+
+--- Testing API: /api/surveys ---
+  Status: 200
+  Body: {"data":[]}
+
+--- Testing API: /api/documents/upload ---
+[CONSOLE ERROR] Failed to load resource: the server responded with a status of 405 ()
+
+[FAILED REQUEST] GET https://nexus-ai-silk-six.vercel.app/api/documents/upload
+  Status: 405 
+  Response Body: 
+  Status: 405
+  Body: 
+
+================================================================================
+SUMMARY OF ALL FINDINGS
+================================================================================
+
+--- Total network requests captured: 257 ---
+--- Total FAILED requests (4xx/5xx): 36 ---
+--- Total console errors: 7 ---
+--- Total page errors: 0 ---
+
+
+========== DETAILED FAILED REQUESTS ==========
+
+--- Failed Request #1 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/signup?_rsc=17yrj
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #2 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=970e3
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #3 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1usnx
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #4 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=18t7j
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #5 ---
+  Method: GET
+  URL: https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+  Response Headers: {
+  "access-control-allow-origin": "https://nexus-ai-silk-six.vercel.app",
+  "access-control-expose-headers": "Content-Encoding, Content-Location, Content-Range, Content-Type, Date, Location, Server, Transfer-Encoding, Range-Unit",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "9d36416009193d67-BRU",
+  "content-encoding": "gzip",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Wed, 25 Feb 2026 09:42:55 GMT",
+  "priority": "u=1,i",
+  "proxy-status": "PostgREST; error=42P17",
+  "sb-gateway-version": "1",
+  "sb-project-ref": "yoaxcxlnnkrezwwkfphs",
+  "sb-request-id": "019c942e-1810-79bb-b81e-16008ccc74c2",
+  "server": "cloudflare",
+  "server-timing": "cfExtPri",
+  "set-cookie": "__cf_bm=5ZS60oNhrU2otFUuFeohJQ_1s56AzXSZsLMzNlcMuRE-1772012575-1.0.1.1-onPKVhIHn.NhYs0CNZy.7yoxqoLrPI3vc16yy37rOvO6pO4bmi3xUJrNTMwcVVdoM.eEPc.1VH8nhB2_7jqIj59Ox9QX.6yKQ_RZwCUToKI; path=/; expires=Wed, 25-Feb-26 10:12:55 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "vary": "Accept-Encoding",
+  "x-content-type-options": "nosniff",
+  "x-envoy-attempt-count": "1",
+  "x-envoy-upstream-service-time": "492"
+}
+
+--- Failed Request #6 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=15moa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #7 ---
+  Method: GET
+  URL: https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+  Response Headers: {
+  "access-control-allow-origin": "https://nexus-ai-silk-six.vercel.app",
+  "access-control-expose-headers": "Content-Encoding, Content-Location, Content-Range, Content-Type, Date, Location, Server, Transfer-Encoding, Range-Unit",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "9d3641638b473d67-BRU",
+  "content-encoding": "gzip",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Wed, 25 Feb 2026 09:42:55 GMT",
+  "priority": "u=1,i",
+  "proxy-status": "PostgREST; error=42P17",
+  "sb-gateway-version": "1",
+  "sb-project-ref": "yoaxcxlnnkrezwwkfphs",
+  "sb-request-id": "019c942e-1a3c-7811-9898-c7a76f2e8ca1",
+  "server": "cloudflare",
+  "server-timing": "cfExtPri",
+  "set-cookie": "__cf_bm=jxtQO4lqYYF_lGjWJWfk6Vf0qAyBZwMXNExc.KksKdQ-1772012575-1.0.1.1-6b7CCevOICLNJlOKnDxCdfidHwXZaArSm9lmIxpRtzkqzEQ6kKNWSmBuyDa_b7HbUiEniESbAkZL68cfNIGl0OsgdQFfCv.i_czuxql8r2c; path=/; expires=Wed, 25-Feb-26 10:12:55 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "vary": "Accept-Encoding",
+  "x-content-type-options": "nosniff",
+  "x-envoy-attempt-count": "1",
+  "x-envoy-upstream-service-time": "48"
+}
+
+--- Failed Request #8 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=15moa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #9 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=15moa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #10 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=15moa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #11 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=15moa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #12 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=18t7j
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #13 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=18t7j
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #14 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=15moa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #15 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1fv8n
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #16 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1chpt
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #17 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1chpt
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #18 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1a7wp
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #19 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=gjec1
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #20 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=gjec1
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #21 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=gjec1
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #22 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=gjec1
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #23 ---
+  Method: GET
+  URL: https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+  Response Headers: {
+  "access-control-allow-origin": "https://nexus-ai-silk-six.vercel.app",
+  "access-control-expose-headers": "Content-Encoding, Content-Location, Content-Range, Content-Type, Date, Location, Server, Transfer-Encoding, Range-Unit",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "9d3641fcae903d67-BRU",
+  "content-encoding": "gzip",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Wed, 25 Feb 2026 09:43:19 GMT",
+  "priority": "u=1,i",
+  "proxy-status": "PostgREST; error=42P17",
+  "sb-gateway-version": "1",
+  "sb-project-ref": "yoaxcxlnnkrezwwkfphs",
+  "sb-request-id": "019c942e-79f5-706a-a8bb-78ae5261bd25",
+  "server": "cloudflare",
+  "server-timing": "cfExtPri",
+  "set-cookie": "__cf_bm=tDzbs0VWP9mjpnU76AiP8DxBOwshES7M26JYIzrvHIU-1772012599-1.0.1.1-3gGaP.z8PSKrCN1E5NQ9uAqhbFRUW7D9NSPycLP2OwoP6a4E1iul7GUyOE3dcNhyWuGhKEeF_2qLFCZKLoRTOCpJf9Tul_aKjXX8iZOnLW4; path=/; expires=Wed, 25-Feb-26 10:13:19 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "vary": "Accept-Encoding",
+  "x-content-type-options": "nosniff",
+  "x-envoy-attempt-count": "1",
+  "x-envoy-upstream-service-time": "50"
+}
+
+--- Failed Request #24 ---
+  Method: GET
+  URL: https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+  Response Headers: {
+  "access-control-allow-origin": "https://nexus-ai-silk-six.vercel.app",
+  "access-control-expose-headers": "Content-Encoding, Content-Location, Content-Range, Content-Type, Date, Location, Server, Transfer-Encoding, Range-Unit",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "9d3641fd4ff03d67-BRU",
+  "content-encoding": "gzip",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Wed, 25 Feb 2026 09:43:19 GMT",
+  "priority": "u=1,i",
+  "proxy-status": "PostgREST; error=42P17",
+  "sb-gateway-version": "1",
+  "sb-project-ref": "yoaxcxlnnkrezwwkfphs",
+  "sb-request-id": "019c942e-7a58-7623-a056-c9cec3101d64",
+  "server": "cloudflare",
+  "server-timing": "cfExtPri",
+  "set-cookie": "__cf_bm=s1Na.vd62PaEuA9rlgqJzwj.UBy3xtAhQAm4hBYgF2A-1772012599-1.0.1.1-jXO9C8zHm0HfE6tm5Sgj8ToJ4xR7NLR._ov3HsW9U5_g0qFKRmlYTVDSGQ2EJGZHnsMQIZZ.Tkkd7NM2hqRddI68AcY_lche76WJ8rB_9qk; path=/; expires=Wed, 25-Feb-26 10:13:19 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "vary": "Accept-Encoding",
+  "x-content-type-options": "nosniff",
+  "x-envoy-attempt-count": "1",
+  "x-envoy-upstream-service-time": "34"
+}
+
+--- Failed Request #25 ---
+  Method: GET
+  URL: https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  Status: 500 
+  Response Body: {"code":"42P17","details":null,"hint":null,"message":"infinite recursion detected in policy for relation \"profiles\""}
+  Response Headers: {
+  "access-control-allow-origin": "https://nexus-ai-silk-six.vercel.app",
+  "access-control-expose-headers": "Content-Encoding, Content-Location, Content-Range, Content-Type, Date, Location, Server, Transfer-Encoding, Range-Unit",
+  "alt-svc": "h3=\":443\"; ma=86400",
+  "cf-cache-status": "DYNAMIC",
+  "cf-ray": "9d3641fdc91b3d67-BRU",
+  "content-encoding": "gzip",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Wed, 25 Feb 2026 09:43:20 GMT",
+  "priority": "u=1,i",
+  "proxy-status": "PostgREST; error=42P17",
+  "sb-gateway-version": "1",
+  "sb-project-ref": "yoaxcxlnnkrezwwkfphs",
+  "sb-request-id": "019c942e-7aae-72fb-981e-7d73b6da3adc",
+  "server": "cloudflare",
+  "server-timing": "cfExtPri",
+  "set-cookie": "__cf_bm=MScp0Y1XW8SiBSJeQsDWriDo94dpuogyldB571Sd8hQ-1772012600-1.0.1.1-MrGdlvwPCTNWCRbzc3MUxnubgx_4ZKjGQeNNa1.E.ZtPGJBYhvbnl.8GMIBn8FlDco3pNhIEVbKlKWsFen68PGBVivpU9ucQqN1sqVRGzBc; path=/; expires=Wed, 25-Feb-26 10:13:20 GMT; domain=.supabase.co; HttpOnly; Secure; SameSite=None",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "vary": "Accept-Encoding",
+  "x-content-type-options": "nosniff",
+  "x-envoy-attempt-count": "1",
+  "x-envoy-upstream-service-time": "64"
+}
+
+--- Failed Request #26 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1c9xt
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #27 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1r8oa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #28 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1r8oa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #29 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1r8oa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #30 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1r8oa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #31 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1r8oa
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #32 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/templates/new?_rsc=1grla
+  Status: 404 
+  Response Body: <!DOCTYPE html><!--eCyJev9ddjJ8p6hLbGw_b--><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/chunks/64a804c972bc9713.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/d59f830a2b8e768c.js"/><script src="/_next/static/chunks/d1a5cb67ca8b0be8.js" async=""></script><script src="/_next/static/chunks/f2f58a7e93290fbb.js" async=""></script><script src="/_next/static/chunks/1cd3b032796cb373.js" async=""></script><script src="/_next/static/chunks/82abf2d65f5428ae.js" async=""></script><script src="/_next/static/chunks/turbopack-1fdf83d15eea6a34.js" async=""></script><script src="/_next/static/chunks/655c4d8daaa5d793.js" async=""></script><script src="/_next/static/chunks/45bcd10dc6761a81.js" async=""></script><script src="/_next/static/chunks/ff1a16fafef87110.js" async=""></script><script src="/_next/static/chunks/a2dfb6fc5208ab9b.js" async=""></script><meta name="robots" content="noindex"/><meta name="next-size-adjust" content=""/><title>404: This page could not be found.</title><title>NexusAI - AI-Powered Document Processing &amp; Feedback Analysis</title><meta name="description" content="Process documents with AI-powered OCR and analyze customer feedback with intelligent survey tools."/><meta name="keywords" content="AI,document processing,OCR,feedback analysis,surveys,SaaS"/><link rel="icon" href="/favicon.ico?favicon.0b3bf435.ico" sizes="256x256" type="image/x-icon"/><script src="/_next/static/chunks/a6dad97d9634a72d.js" noModule=""></script></head><body class="inter_b2991b2-module__9mH_6q__variable font-sans antialiased"><div hidden=""><!--$--><!--/$--></div><script>((a,b,c,d,e,f,g,h)=>{let i=document.documentElement,j=["light","dark"];function k(b){var c;(Array.isArray(a)?a:[a]).forEach(a=>{let c="class"===a,d=c&&f?e.map(a=>f[a]||a):e;c?(i.classList.remove(...d),i.classList.add(f&&f[b]?f[b]:b)):i.setAttribute(a,b)}),c=b,h&&j.includes(c)&&(i.style.colorScheme=c)}if(d)k(d);else try{let a=localStorage.getItem(b)||c,d=g&&"system"===a?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":a;k(d)}catch(a){}})("class","theme","system",null,["light","dark"],null,true,true)</script><div style="font-family:system-ui,&quot;Segoe UI&quot;,Roboto,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;;height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center"><div><style>body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}</style><h1 class="next-error-h1" style="display:inline-block;margin:0 20px 0 0;padding:0 23px 0 0;font-size:24px;font-weight:500;vertical-align:top;line-height:49px">404</h1><div style="display:inline-block"><h2 style="f
+  Response Headers: {
+  "accept-ranges": "bytes",
+  "access-control-allow-origin": "*",
+  "age": "0",
+  "cache-control": "public, max-age=0, must-revalidate",
+  "content-disposition": "inline; filename=\"404\"",
+  "content-encoding": "br",
+  "content-length": "3013",
+  "content-type": "text/html; charset=utf-8",
+  "date": "Wed, 25 Feb 2026 09:43:25 GMT",
+  "etag": "\"11305229a613547341226b7687d8912a\"",
+  "last-modified": "Wed, 25 Feb 2026 09:43:25 GMT",
+  "server": "Vercel",
+  "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+  "x-matched-path": "/404",
+  "x-next-error-status": "404",
+  "x-vercel-cache": "HIT",
+  "x-vercel-id": "cdg1::84xnm-1772012605373-c2db23bdeade"
+}
+
+--- Failed Request #33 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1de2h
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #34 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1de2h
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #35 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1de2h
+  Status: 0 REQUEST_FAILED
+  Response Body: net::ERR_ABORTED
+
+--- Failed Request #36 ---
+  Method: GET
+  URL: https://nexus-ai-silk-six.vercel.app/api/documents/upload
+  Status: 405 
+  Response Headers: {
+  "age": "0",
+  "cache-control": "public, max-age=0, must-revalidate",
+  "content-length": "0",
+  "date": "Wed, 25 Feb 2026 09:43:33 GMT",
+  "server": "Vercel",
+  "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+  "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+  "x-matched-path": "/api/documents/upload",
+  "x-vercel-cache": "MISS",
+  "x-vercel-id": "cdg1::iad1::9hnjd-1772012613247-6bed9c015c1e"
+}
+
+
+========== CONSOLE ERRORS ==========
+
+--- Console Error #1 ---
+  Type: error
+  Text: Failed to load resource: the server responded with a status of 500 ()
+  Page URL: https://nexus-ai-silk-six.vercel.app/dashboard
+
+--- Console Error #2 ---
+  Type: error
+  Text: Failed to load resource: the server responded with a status of 500 ()
+  Page URL: https://nexus-ai-silk-six.vercel.app/dashboard
+
+--- Console Error #3 ---
+  Type: error
+  Text: Failed to load resource: the server responded with a status of 500 ()
+  Page URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings
+
+--- Console Error #4 ---
+  Type: error
+  Text: Failed to load resource: the server responded with a status of 500 ()
+  Page URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings
+
+--- Console Error #5 ---
+  Type: error
+  Text: Failed to load resource: the server responded with a status of 500 ()
+  Page URL: https://nexus-ai-silk-six.vercel.app/dashboard/settings
+
+--- Console Error #6 ---
+  Type: error
+  Text: Failed to load resource: the server responded with a status of 404 ()
+  Page URL: https://nexus-ai-silk-six.vercel.app/dashboard/templates
+
+--- Console Error #7 ---
+  Type: error
+  Text: Failed to load resource: the server responded with a status of 405 ()
+  Page URL: https://nexus-ai-silk-six.vercel.app/api/documents/upload
+
+
+========== ALL NETWORK REQUESTS (sorted by status) ==========
+  [*** FAIL ***] 500 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  [*** FAIL ***] 500 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  [*** FAIL ***] 500 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  [*** FAIL ***] 500 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  [*** FAIL ***] 500 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/rest/v1/profiles?select=*&id=eq.e0b51dd3-3a13-4a3a-84c7-c4d94bcb4aa8
+  [*** FAIL ***] 405 GET https://nexus-ai-silk-six.vercel.app/api/documents/upload
+  [*** FAIL ***] 404 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates/new?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/login
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/64a804c972bc9713.css
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ff1a16fafef87110.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d59f830a2b8e768c.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/655c4d8daaa5d793.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/f2f58a7e93290fbb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/1cd3b032796cb373.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/05d93794d9b2e5e2.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/82abf2d65f5428ae.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d1a5cb67ca8b0be8.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/5e99b533ada671fd.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/45bcd10dc6761a81.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/turbopack-1fdf83d15eea6a34.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/a2dfb6fc5208ab9b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/fe2c9c4f6534d14a.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/bb6186e589f5de4b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/forgot-password?_rsc=17yrj
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/signup?_rsc=17yrj
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/forgot-password?_rsc=to9i9
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/signup?_rsc=to9i9
+  [    OK     ] 200 POST https://yoaxcxlnnkrezwwkfphs.supabase.co/auth/v1/token?grant_type=password
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=970e3
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/13fb8a5fd11b5771.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/e8d87f519efb39e0.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/9a9e78a290d022bb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ac8a275ecd052afa.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/fe7caf59147c8dc9.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1usnx
+  [    OK     ] 200 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/auth/v1/user
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/64a804c972bc9713.css
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d59f830a2b8e768c.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d1a5cb67ca8b0be8.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/f2f58a7e93290fbb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/1cd3b032796cb373.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/82abf2d65f5428ae.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/turbopack-1fdf83d15eea6a34.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/655c4d8daaa5d793.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/45bcd10dc6761a81.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ff1a16fafef87110.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/a2dfb6fc5208ab9b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/fe7caf59147c8dc9.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/9a9e78a290d022bb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/13fb8a5fd11b5771.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/bb6186e589f5de4b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ac8a275ecd052afa.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/e8d87f519efb39e0.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=18t7j
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=15moa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/64a804c972bc9713.css
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d59f830a2b8e768c.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d1a5cb67ca8b0be8.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/f2f58a7e93290fbb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/1cd3b032796cb373.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/82abf2d65f5428ae.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/turbopack-1fdf83d15eea6a34.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/655c4d8daaa5d793.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/45bcd10dc6761a81.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ff1a16fafef87110.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/a2dfb6fc5208ab9b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/fe7caf59147c8dc9.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/9a9e78a290d022bb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/13fb8a5fd11b5771.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/bb6186e589f5de4b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ac8a275ecd052afa.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/e8d87f519efb39e0.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1fv8n
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1chpt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/64a804c972bc9713.css
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d59f830a2b8e768c.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d1a5cb67ca8b0be8.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/f2f58a7e93290fbb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/1cd3b032796cb373.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/82abf2d65f5428ae.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/turbopack-1fdf83d15eea6a34.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/655c4d8daaa5d793.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/45bcd10dc6761a81.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ff1a16fafef87110.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/a2dfb6fc5208ab9b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/fe7caf59147c8dc9.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/9a9e78a290d022bb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/13fb8a5fd11b5771.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/bb6186e589f5de4b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ac8a275ecd052afa.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/e8d87f519efb39e0.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1a7wp
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=gjec1
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/64a804c972bc9713.css
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d59f830a2b8e768c.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d1a5cb67ca8b0be8.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/f2f58a7e93290fbb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/1cd3b032796cb373.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/82abf2d65f5428ae.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/turbopack-1fdf83d15eea6a34.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/655c4d8daaa5d793.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/45bcd10dc6761a81.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ff1a16fafef87110.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/a2dfb6fc5208ab9b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/fe7caf59147c8dc9.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/9a9e78a290d022bb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/13fb8a5fd11b5771.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/bb6186e589f5de4b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ac8a275ecd052afa.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/e8d87f519efb39e0.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/f7fd7c363b78408f.js
+  [    OK     ] 200 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/auth/v1/user
+  [    OK     ] 200 GET https://yoaxcxlnnkrezwwkfphs.supabase.co/auth/v1/user
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=1c9xt
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1r8oa
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/64a804c972bc9713.css
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d59f830a2b8e768c.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/d1a5cb67ca8b0be8.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/f2f58a7e93290fbb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/1cd3b032796cb373.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/82abf2d65f5428ae.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/turbopack-1fdf83d15eea6a34.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/655c4d8daaa5d793.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/45bcd10dc6761a81.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ff1a16fafef87110.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/a2dfb6fc5208ab9b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/fe7caf59147c8dc9.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/9a9e78a290d022bb.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/13fb8a5fd11b5771.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/bb6186e589f5de4b.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/ac8a275ecd052afa.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/_next/static/chunks/e8d87f519efb39e0.js
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1grla
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/api-keys?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/billing?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings/team?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/settings?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys/create?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/surveys?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/documents/upload?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard/templates?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/dashboard?_rsc=1de2h
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/api/health
+  [    OK     ] 200 GET https://nexus-ai-silk-six.vercel.app/api/surveys
+
+All findings saved to: C:\Users\User\nexus-ai\test-screenshots\debug-500.txt

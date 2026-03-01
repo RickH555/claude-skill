@@ -1,0 +1,1522 @@
+# PROMPT CLAUDE CODE — SYSTÈME "GENERATE ALL, REVEAL ON CREDIT"
+# Optimisation des coûts API : tout générer en 1 appel, débloquer par crédit
+# ⚠️ MODE ADDITIF — LIRE LES RÈGLES AVANT DE CODER
+
+---
+
+## ⛔ RÈGLE #1 — PROTECTION DU CODE EXISTANT
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║   CE PROMPT CRÉE DE NOUVEAUX FICHIERS ET MODIFIE LÉGÈREMENT    ║
+║   LE FLUX APRÈS ANALYSE. IL NE RÉÉCRIT PAS LE MOTEUR.         ║
+║                                                                  ║
+║   FICHIERS 100% INTERDITS DE MODIFICATION :                     ║
+║   - services/analyzer.ts          (moteur d'analyse — INTACT)   ║
+║   - services/criteria.ts          (50 critères — INTACT)        ║
+║   - services/schema_service.ts    (Schema.org — INTACT)         ║
+║   - services/robots_service.ts    (robots.txt — INTACT)         ║
+║   - services/blog_prompt_db.ts    (blog — INTACT)               ║
+║   - services/smc.ts               (SMC Studio — INTACT)         ║
+║   - services/llm_templates.ts     (Source of Truth — INTACT)    ║
+║   - config/engine-weights.ts      (pondérations V2 — INTACT)   ║
+║   - services/engine-score-calculator.ts (scoring V2 — INTACT)  ║
+║   - services/criteria-mapper.ts   (mapper V2 — INTACT)         ║
+║   - types.ts                      (NE PAS MODIFIER)             ║
+║   - components/*                  (TOUS — INTACT)               ║
+║   - pages/SMCStudio.tsx           (INTACT)                      ║
+║   - pages/SourceOfTruth.tsx       (INTACT)                      ║
+║   - pages/SchemaOrg.tsx           (INTACT)                      ║
+║   - pages/RobotsTxt.tsx           (INTACT)                      ║
+║   - pages/BlogOptimizer.tsx       (INTACT)                      ║
+║                                                                  ║
+║   FICHIERS MODIFIABLES (AJOUT/MODIFICATION CIBLÉE) :            ║
+║   - services/generator.ts  → Ajouter 1 nouvelle fonction       ║
+║     (NE PAS modifier les fonctions existantes)                   ║
+║   - pages/AuditAEOPage.tsx → Ajouter appel post-analyse        ║
+║   - pages/ActionPlanPage.tsx → Remplacer les boutons "Générer" ║
+║     par le système de déblocage par crédit                       ║
+║   - App.tsx → Ajout minimal si nécessaire                       ║
+║                                                                  ║
+║   PROCÉDURE OBLIGATOIRE :                                       ║
+║   1. cp services/generator.ts services/generator.ts.backup      ║
+║   2. cp pages/AuditAEOPage.tsx pages/AuditAEOPage.tsx.backup   ║
+║   3. cp pages/ActionPlanPage.tsx pages/ActionPlanPage.tsx.backup║
+║   4. Après modifications : diff chaque fichier avec son backup  ║
+║   5. Les diffs ne doivent montrer QUE des ajouts ciblés        ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## CONCEPT GLOBAL
+
+### Avant (coûteux, lent) :
+```
+Audit          → 1 appel Gemini    → Score affiché
+Clic solution  → 1 appel Gemini    → Solution générée
+Clic solution  → 1 appel Gemini    → Solution générée
+Clic FAQ       → 1 appel Gemini    → FAQ générée
+Clic Schema    → 1 appel Gemini    → Schema généré
+Clic Article   → 1 appel Gemini    → Article généré
+                                    
+TOTAL : 6 appels API, 6 temps d'attente, 6× le coût
+```
+
+### Après (optimisé) :
+```
+Audit          → 1 appel Gemini    → Score + TOUTES les solutions générées
+                                      et stockées en mémoire
+                                    
+Clic solution  → 0 appel API       → Déblocage instantané (1 crédit)
+Clic solution  → 0 appel API       → Déblocage instantané (1 crédit)
+Clic FAQ       → 0 appel API       → Déblocage instantané (1 crédit)
+Clic Schema    → 0 appel API       → Déblocage instantané (1 crédit)
+Clic Article   → 0 appel API       → Déblocage instantané (1 crédit)
+                                    
+TOTAL : 1 appel API, 1 temps d'attente, 1× le coût
+Revenus : 5 crédits dépensés pour les déblocages
+```
+
+---
+
+## PHASE 1 — LE MÉGA-PROMPT (cœur du système)
+
+### 1.1 — Créer `services/mega-generator.ts` (NOUVEAU FICHIER)
+
+Ce service envoie UN SEUL prompt à Gemini qui génère TOUTES les solutions d'un coup.
+
+```typescript
+// services/mega-generator.ts
+// 
+// MÉGA-GÉNÉRATEUR : Un appel API = toutes les solutions pré-générées
+//
+// ⚠️ Ce fichier ne remplace PAS services/generator.ts
+// Il le complète avec une fonction qui génère tout en batch.
+// Les fonctions existantes de generator.ts restent intactes
+// et peuvent toujours être appelées individuellement si besoin.
+
+import { GoogleGenAI } from '@google/genai';
+
+// ═══════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════
+
+export interface PreGeneratedSolution {
+  id: string;
+  category: 'faq' | 'schema' | 'meta' | 'content' | 'structure' | 'technical' | 'authority' | 'geo';
+  title: string;
+  description: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  estimatedImpact: number;
+  fixesCriteria: string[];
+  mostImpactedEngines: string[];
+  
+  // Le contenu généré (ce qui est verrouillé)
+  generatedContent: {
+    code: string;
+    language: 'html' | 'json' | 'json-ld' | 'text' | 'css' | 'markdown';
+    explanation: string;
+    implementationSteps: string[];
+  };
+}
+
+export interface MegaGenerationResult {
+  // Métadonnées
+  generatedAt: string;
+  url: string;
+  apiModel: string;
+  tokenCount: number;
+  
+  // Solutions pré-générées (toutes verrouillées par défaut)
+  solutions: PreGeneratedSolution[];
+  
+  // Contenus complets pré-générés
+  fullFAQ: {
+    html: string;
+    schemaJsonLd: string;
+    questionsCount: number;
+  };
+  
+  fullSchemaOrg: {
+    jsonLd: string;
+    types: string[];
+  };
+  
+  fullMetaTags: {
+    title: string;
+    description: string;
+    openGraph: string;
+    canonical: string;
+  };
+  
+  fullIntroduction: {
+    html: string;
+    wordCount: number;
+  };
+  
+  fullComparativeTable: {
+    html: string;
+    columnsCount: number;
+    rowsCount: number;
+  };
+  
+  fullArticleOutline: {
+    markdown: string;
+    sections: string[];
+    estimatedWordCount: number;
+  };
+  
+  // Score de complétion
+  solutionsCount: number;
+  totalEstimatedImpact: number;
+}
+
+// ═══════════════════════════════════════════════
+// LE MÉGA-PROMPT
+// ═══════════════════════════════════════════════
+
+const MEGA_SYSTEM_PROMPT = `Tu es un expert en AEO (Answer Engine Optimization) et en optimisation de contenu pour les moteurs de réponse IA (ChatGPT, Perplexity, Gemini).
+
+Tu reçois les résultats d'un audit AEO d'une page web. Pour chaque critère ÉCHOUÉ, tu dois générer une solution COMPLÈTE et IMMÉDIATEMENT IMPLÉMENTABLE.
+
+RÈGLES ABSOLUES :
+- Chaque solution doit contenir du CODE RÉEL prêt à copier-coller, PAS des placeholders
+- Le code HTML doit être valide et complet
+- Le JSON-LD doit être valide (vérifie les guillemets, virgules, accolades)
+- Les textes doivent être rédigés en français, naturels, pas de "Lorem ipsum"
+- Adapte CHAQUE solution au contexte RÉEL de la page analysée (URL, titre, contenu détecté)
+- Priorise par impact sur la citabilité IA
+
+RÉPONDS UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans texte avant ou après.`;
+
+function buildMegaPrompt(
+  url: string,
+  pageTitle: string,
+  pageContent: string,
+  failedCriteria: Array<{ id: string; name: string; category: string; maxPoints: number }>,
+  detectedProducts: string[],
+  detectedBrand: string,
+  language: string = 'fr'
+): string {
+  return `AUDIT AEO — Génération complète de solutions
+
+URL : ${url}
+Titre détecté : ${pageTitle}
+Marque détectée : ${detectedBrand}
+Produits/services détectés : ${detectedProducts.join(', ') || 'Non détectés'}
+Langue : ${language}
+
+CONTENU EXTRAIT (résumé) :
+${pageContent.slice(0, 3000)}
+
+CRITÈRES ÉCHOUÉS À CORRIGER (${failedCriteria.length} critères) :
+${failedCriteria.map((c, i) => `${i + 1}. [${c.id}] ${c.name} (catégorie: ${c.category}, impact: ${c.maxPoints} pts)`).join('\n')}
+
+GÉNÈRE UN JSON avec cette structure EXACTE :
+{
+  "solutions": [
+    {
+      "id": "sol_001",
+      "category": "faq|schema|meta|content|structure|technical|authority|geo",
+      "title": "Titre court de la solution",
+      "description": "Description en 1-2 phrases de ce que fait cette solution",
+      "priority": "critical|high|medium|low",
+      "estimatedImpact": 12,
+      "fixesCriteria": ["criterion_id_1", "criterion_id_2"],
+      "mostImpactedEngines": ["perplexity", "chatgpt"],
+      "generatedContent": {
+        "code": "Le code HTML/JSON-LD/CSS complet prêt à copier",
+        "language": "html|json|json-ld|text|css|markdown",
+        "explanation": "Explication de pourquoi cette solution améliore la citabilité IA",
+        "implementationSteps": [
+          "Étape 1 : ...",
+          "Étape 2 : ...",
+          "Étape 3 : ..."
+        ]
+      }
+    }
+  ],
+  "fullFAQ": {
+    "html": "Section FAQ HTML complète avec 6-8 questions/réponses pertinentes",
+    "schemaJsonLd": "Le script JSON-LD FAQPage complet correspondant",
+    "questionsCount": 6
+  },
+  "fullSchemaOrg": {
+    "jsonLd": "Le script JSON-LD complet (WebPage + Article/Product + Organization + BreadcrumbList)",
+    "types": ["WebPage", "FAQPage", "Organization"]
+  },
+  "fullMetaTags": {
+    "title": "Title tag optimisé (<60 chars)",
+    "description": "Meta description optimisée (<155 chars)",
+    "openGraph": "Balises Open Graph complètes (og:title, og:description, og:image, og:type, og:locale)",
+    "canonical": "URL canonique"
+  },
+  "fullIntroduction": {
+    "html": "Paragraphe d'introduction TL;DR answer-first (3-5 phrases, répond directement à l'intention)",
+    "wordCount": 80
+  },
+  "fullComparativeTable": {
+    "html": "Tableau HTML comparatif complet avec données réelles (ex: produits, prix, specs)",
+    "columnsCount": 4,
+    "rowsCount": 5
+  },
+  "fullArticleOutline": {
+    "markdown": "Plan d'article AEO complet en markdown avec titres H2/H3 sous forme de questions",
+    "sections": ["Section 1", "Section 2"],
+    "estimatedWordCount": 1500
+  }
+}
+
+IMPORTANT :
+- Génère UNE solution par critère échoué (ou combine les critères liés dans une même solution)
+- Les solutions "critical" sont celles qui impactent les critères avec coefficient ≥ 1.5 chez au moins 2 moteurs
+- Le fullFAQ doit contenir des VRAIES questions que les utilisateurs posent sur ce sujet
+- Le fullSchemaOrg doit être adapté au TYPE de page (produit, article, catégorie, etc.)
+- Le fullComparativeTable doit utiliser les VRAIS produits/données détectés sur la page
+- Le fullIntroduction doit commencer par la réponse directe (inverted pyramid)
+- Trie les solutions par estimatedImpact décroissant`;
+}
+
+// ═══════════════════════════════════════════════
+// FONCTION PRINCIPALE
+// ═══════════════════════════════════════════════
+
+const getApiKey = (): string => {
+  const key = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!key) throw new Error('VITE_GEMINI_API_KEY non configurée');
+  return key;
+};
+
+/**
+ * Génère TOUTES les solutions en UN SEUL appel API.
+ * 
+ * @param url - URL analysée
+ * @param pageTitle - Titre de la page détecté par l'analyseur
+ * @param pageContent - Contenu textuel extrait (sera tronqué à 3000 chars)
+ * @param failedCriteria - Liste des critères échoués issus de l'audit
+ * @param detectedProducts - Produits/services détectés sur la page
+ * @param detectedBrand - Nom de marque détecté
+ * @returns Toutes les solutions pré-générées
+ */
+export async function generateAllSolutions(
+  url: string,
+  pageTitle: string,
+  pageContent: string,
+  failedCriteria: Array<{ id: string; name: string; category: string; maxPoints: number }>,
+  detectedProducts: string[] = [],
+  detectedBrand: string = '',
+  language: string = 'fr'
+): Promise<MegaGenerationResult> {
+
+  const apiKey = getApiKey();
+  
+  const prompt = buildMegaPrompt(
+    url, pageTitle, pageContent,
+    failedCriteria, detectedProducts, detectedBrand, language
+  );
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: MEGA_SYSTEM_PROMPT,
+        maxOutputTokens: 16000,  // On veut une réponse longue et complète
+        temperature: 0.3,         // Basse température = plus factuel et structuré
+      },
+    });
+
+    const text = response.text || '';
+    
+    // Nettoyer le JSON (supprimer backticks markdown si présents)
+    const cleanJson = text
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+    
+    const parsed = JSON.parse(cleanJson);
+
+    // Valider et enrichir le résultat
+    const result: MegaGenerationResult = {
+      generatedAt: new Date().toISOString(),
+      url,
+      apiModel: 'gemini-2.0-flash',
+      tokenCount: text.length, // approximation
+      
+      solutions: (parsed.solutions || []).map((sol: any, index: number) => ({
+        id: sol.id || `sol_${String(index + 1).padStart(3, '0')}`,
+        category: sol.category || 'content',
+        title: sol.title || `Solution ${index + 1}`,
+        description: sol.description || '',
+        priority: sol.priority || 'medium',
+        estimatedImpact: sol.estimatedImpact || 2,
+        fixesCriteria: sol.fixesCriteria || [],
+        mostImpactedEngines: sol.mostImpactedEngines || [],
+        generatedContent: {
+          code: sol.generatedContent?.code || '',
+          language: sol.generatedContent?.language || 'html',
+          explanation: sol.generatedContent?.explanation || '',
+          implementationSteps: sol.generatedContent?.implementationSteps || [],
+        },
+      })),
+      
+      fullFAQ: parsed.fullFAQ || { html: '', schemaJsonLd: '', questionsCount: 0 },
+      fullSchemaOrg: parsed.fullSchemaOrg || { jsonLd: '', types: [] },
+      fullMetaTags: parsed.fullMetaTags || { title: '', description: '', openGraph: '', canonical: '' },
+      fullIntroduction: parsed.fullIntroduction || { html: '', wordCount: 0 },
+      fullComparativeTable: parsed.fullComparativeTable || { html: '', columnsCount: 0, rowsCount: 0 },
+      fullArticleOutline: parsed.fullArticleOutline || { markdown: '', sections: [], estimatedWordCount: 0 },
+      
+      solutionsCount: (parsed.solutions || []).length,
+      totalEstimatedImpact: (parsed.solutions || []).reduce(
+        (sum: number, s: any) => sum + (s.estimatedImpact || 0), 0
+      ),
+    };
+
+    return result;
+    
+  } catch (error) {
+    console.error('Erreur méga-génération:', error);
+    // Fallback : retourner un résultat vide mais valide
+    return generateFallbackResult(url, failedCriteria);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// FALLBACK (si pas d'API key ou erreur)
+// ═══════════════════════════════════════════════
+
+function generateFallbackResult(
+  url: string,
+  failedCriteria: Array<{ id: string; name: string; category: string; maxPoints: number }>
+): MegaGenerationResult {
+  
+  const solutions: PreGeneratedSolution[] = failedCriteria.map((c, i) => ({
+    id: `sol_${String(i + 1).padStart(3, '0')}`,
+    category: mapCriteriaCategory(c.category),
+    title: `Corriger : ${c.name}`,
+    description: `[Simulation] Solution pour le critère "${c.name}". Connectez votre clé API Gemini pour obtenir du code réel.`,
+    priority: c.maxPoints >= 4 ? 'critical' : c.maxPoints >= 3 ? 'high' : 'medium',
+    estimatedImpact: c.maxPoints,
+    fixesCriteria: [c.id],
+    mostImpactedEngines: ['perplexity', 'chatgpt'],
+    generatedContent: {
+      code: `<!-- [Simulation] Code pour "${c.name}" - Connectez votre clé API Gemini -->`,
+      language: 'html' as const,
+      explanation: `[Simulation] Ce critère impacte votre score de ${c.maxPoints} points.`,
+      implementationSteps: [
+        'Connectez votre clé API Gemini dans .env.local',
+        'Relancez l\'audit pour obtenir les solutions réelles',
+      ],
+    },
+  }));
+
+  return {
+    generatedAt: new Date().toISOString(),
+    url,
+    apiModel: 'fallback-simulation',
+    tokenCount: 0,
+    solutions,
+    fullFAQ: { html: '<!-- Simulation -->', schemaJsonLd: '{}', questionsCount: 0 },
+    fullSchemaOrg: { jsonLd: '{}', types: [] },
+    fullMetaTags: { title: '', description: '', openGraph: '', canonical: '' },
+    fullIntroduction: { html: '<!-- Simulation -->', wordCount: 0 },
+    fullComparativeTable: { html: '<!-- Simulation -->', columnsCount: 0, rowsCount: 0 },
+    fullArticleOutline: { markdown: '', sections: [], estimatedWordCount: 0 },
+    solutionsCount: solutions.length,
+    totalEstimatedImpact: solutions.reduce((s, sol) => s + sol.estimatedImpact, 0),
+  };
+}
+
+function mapCriteriaCategory(cat: string): PreGeneratedSolution['category'] {
+  const mapping: Record<string, PreGeneratedSolution['category']> = {
+    'structure': 'structure',
+    'structured_data': 'schema',
+    'authority': 'authority',
+    'clarity': 'content',
+    'technical': 'technical',
+    'geo': 'geo',
+  };
+  return mapping[cat.toLowerCase()] || 'content';
+}
+```
+
+---
+
+## PHASE 2 — STOCKAGE ET GESTION DES CRÉDITS
+
+### 2.1 — Créer `services/solution-vault.ts` (NOUVEAU FICHIER)
+
+Ce service stocke les solutions pré-générées et gère le verrouillage/déblocage par crédit.
+
+```typescript
+// services/solution-vault.ts
+//
+// VAULT = Coffre-fort des solutions pré-générées.
+// Tout est stocké, rien n'est visible sans dépense de crédit.
+//
+// Architecture :
+// - MegaGenerationResult stocké en localStorage (→ Supabase plus tard)
+// - Un Set<string> de solutionIds débloqués
+// - Quand on débloque : on décompte 1 crédit, on ajoute l'ID au Set
+// - Quand on affiche : on vérifie si l'ID est dans le Set
+
+import type { MegaGenerationResult, PreGeneratedSolution } from './mega-generator';
+
+const VAULT_PREFIX = 'citedby_vault_';
+const UNLOCKED_PREFIX = 'citedby_unlocked_';
+
+// ═══════════════════════════════════════════════
+// TYPES PUBLICS
+// ═══════════════════════════════════════════════
+
+export type ContentBlockType = 
+  | 'solution'       // Solution individuelle du plan d'action
+  | 'fullFAQ'        // FAQ complète
+  | 'fullSchemaOrg'  // Schema.org complet
+  | 'fullMetaTags'   // Meta tags optimisés
+  | 'fullIntro'      // Introduction réécrite
+  | 'fullTable'      // Tableau comparatif
+  | 'fullOutline';   // Plan d'article
+
+export interface ContentBlock {
+  id: string;
+  type: ContentBlockType;
+  title: string;
+  description: string;
+  category: string;
+  priority: string;
+  estimatedImpact: number;
+  isUnlocked: boolean;
+  
+  // Prévisualisation (toujours visible)
+  preview: {
+    firstLine: string;       // Première ligne du code (teaser)
+    language: string;
+    linesCount: number;
+    wordCount: number;
+  };
+  
+  // Contenu complet (null si verrouillé)
+  content: string | null;
+  contentLanguage: string | null;
+  explanation: string | null;
+  implementationSteps: string[] | null;
+}
+
+export interface VaultSummary {
+  totalBlocks: number;
+  unlockedBlocks: number;
+  lockedBlocks: number;
+  totalImpact: number;
+  unlockedImpact: number;
+  remainingImpact: number;
+  creditCostToUnlockAll: number;
+}
+
+// ═══════════════════════════════════════════════
+// STOCKAGE
+// ═══════════════════════════════════════════════
+
+/**
+ * Stocke le résultat du méga-prompt dans le vault.
+ * Appelé UNE FOIS après l'audit, automatiquement.
+ */
+export function storeInVault(auditId: string, result: MegaGenerationResult): void {
+  localStorage.setItem(
+    `${VAULT_PREFIX}${auditId}`,
+    JSON.stringify(result)
+  );
+  // Initialiser le set des IDs débloqués (vide)
+  if (!localStorage.getItem(`${UNLOCKED_PREFIX}${auditId}`)) {
+    localStorage.setItem(`${UNLOCKED_PREFIX}${auditId}`, JSON.stringify([]));
+  }
+}
+
+/**
+ * Récupère le résultat stocké pour un audit.
+ */
+export function getFromVault(auditId: string): MegaGenerationResult | null {
+  const data = localStorage.getItem(`${VAULT_PREFIX}${auditId}`);
+  return data ? JSON.parse(data) : null;
+}
+
+/**
+ * Vérifie si un vault existe pour cet audit.
+ */
+export function hasVault(auditId: string): boolean {
+  return localStorage.getItem(`${VAULT_PREFIX}${auditId}`) !== null;
+}
+
+// ═══════════════════════════════════════════════
+// DÉBLOCAGE PAR CRÉDIT
+// ═══════════════════════════════════════════════
+
+/**
+ * Récupère la liste des IDs débloqués pour un audit.
+ */
+function getUnlockedIds(auditId: string): string[] {
+  const data = localStorage.getItem(`${UNLOCKED_PREFIX}${auditId}`);
+  return data ? JSON.parse(data) : [];
+}
+
+/**
+ * Débloque un contenu par son ID.
+ * NE GÈRE PAS la déduction de crédits — c'est le rôle du composant appelant
+ * qui doit vérifier les crédits AVANT d'appeler cette fonction.
+ * 
+ * @returns true si le déblocage a réussi, false si déjà débloqué
+ */
+export function unlockContent(auditId: string, contentId: string): boolean {
+  const unlocked = getUnlockedIds(auditId);
+  if (unlocked.includes(contentId)) return false; // Déjà débloqué
+  unlocked.push(contentId);
+  localStorage.setItem(`${UNLOCKED_PREFIX}${auditId}`, JSON.stringify(unlocked));
+  return true;
+}
+
+/**
+ * Vérifie si un contenu est débloqué.
+ */
+export function isUnlocked(auditId: string, contentId: string): boolean {
+  return getUnlockedIds(auditId).includes(contentId);
+}
+
+/**
+ * Débloque TOUT d'un coup (pack complet).
+ * @returns nombre de contenus nouvellement débloqués
+ */
+export function unlockAll(auditId: string): number {
+  const vault = getFromVault(auditId);
+  if (!vault) return 0;
+  
+  const allIds = getAllContentIds(vault);
+  const currentUnlocked = getUnlockedIds(auditId);
+  const newlyUnlocked = allIds.filter(id => !currentUnlocked.includes(id));
+  
+  localStorage.setItem(
+    `${UNLOCKED_PREFIX}${auditId}`,
+    JSON.stringify(allIds)
+  );
+  
+  return newlyUnlocked.length;
+}
+
+// ═══════════════════════════════════════════════
+// CONSTRUCTION DES BLOCS POUR L'AFFICHAGE
+// ═══════════════════════════════════════════════
+
+/**
+ * Transforme le vault en liste de ContentBlocks prêts à afficher.
+ * Chaque bloc sait s'il est verrouillé ou non.
+ * Le contenu est null si verrouillé.
+ */
+export function getContentBlocks(auditId: string): ContentBlock[] {
+  const vault = getFromVault(auditId);
+  if (!vault) return [];
+  
+  const unlockedIds = getUnlockedIds(auditId);
+  const blocks: ContentBlock[] = [];
+
+  // 1. Solutions individuelles
+  for (const sol of vault.solutions) {
+    const unlocked = unlockedIds.includes(sol.id);
+    blocks.push({
+      id: sol.id,
+      type: 'solution',
+      title: sol.title,
+      description: sol.description,
+      category: sol.category,
+      priority: sol.priority,
+      estimatedImpact: sol.estimatedImpact,
+      isUnlocked: unlocked,
+      preview: {
+        firstLine: sol.generatedContent.code.split('\n')[0]?.slice(0, 80) + '...' || '...',
+        language: sol.generatedContent.language,
+        linesCount: sol.generatedContent.code.split('\n').length,
+        wordCount: sol.generatedContent.code.split(/\s+/).length,
+      },
+      content: unlocked ? sol.generatedContent.code : null,
+      contentLanguage: unlocked ? sol.generatedContent.language : null,
+      explanation: unlocked ? sol.generatedContent.explanation : null,
+      implementationSteps: unlocked ? sol.generatedContent.implementationSteps : null,
+    });
+  }
+
+  // 2. FAQ complète
+  if (vault.fullFAQ.html) {
+    const faqId = 'full_faq';
+    const unlocked = unlockedIds.includes(faqId);
+    blocks.push({
+      id: faqId,
+      type: 'fullFAQ',
+      title: `FAQ complète (${vault.fullFAQ.questionsCount} questions)`,
+      description: 'Section FAQ HTML + Schema.org FAQPage prêts à copier-coller',
+      category: 'faq',
+      priority: 'critical',
+      estimatedImpact: 15,
+      isUnlocked: unlocked,
+      preview: {
+        firstLine: vault.fullFAQ.html.split('\n')[0]?.slice(0, 80) + '...' || '...',
+        language: 'html',
+        linesCount: vault.fullFAQ.html.split('\n').length,
+        wordCount: vault.fullFAQ.html.split(/\s+/).length,
+      },
+      content: unlocked ? `${vault.fullFAQ.html}\n\n<!-- Schema.org FAQPage -->\n<script type="application/ld+json">\n${vault.fullFAQ.schemaJsonLd}\n</script>` : null,
+      contentLanguage: unlocked ? 'html' : null,
+      explanation: unlocked ? 'FAQ avec Schema.org intégré. Impacte fortement Perplexity (×1.8) et ChatGPT (×1.3).' : null,
+      implementationSteps: unlocked ? [
+        'Copiez le code HTML dans votre page, avant la section commentaires ou le footer',
+        'Copiez le script JSON-LD dans le <head> de votre page',
+        'Vérifiez avec le test des résultats enrichis Google',
+      ] : null,
+    });
+  }
+
+  // 3. Schema.org complet
+  if (vault.fullSchemaOrg.jsonLd) {
+    const schemaId = 'full_schema';
+    const unlocked = unlockedIds.includes(schemaId);
+    blocks.push({
+      id: schemaId,
+      type: 'fullSchemaOrg',
+      title: `Schema.org complet (${vault.fullSchemaOrg.types.join(' + ')})`,
+      description: 'Script JSON-LD complet avec tous les types Schema.org pertinents',
+      category: 'schema',
+      priority: 'high',
+      estimatedImpact: 10,
+      isUnlocked: unlocked,
+      preview: {
+        firstLine: '<script type="application/ld+json">...',
+        language: 'json-ld',
+        linesCount: vault.fullSchemaOrg.jsonLd.split('\n').length,
+        wordCount: vault.fullSchemaOrg.jsonLd.split(/\s+/).length,
+      },
+      content: unlocked ? vault.fullSchemaOrg.jsonLd : null,
+      contentLanguage: unlocked ? 'json' : null,
+      explanation: unlocked ? `Types Schema.org : ${vault.fullSchemaOrg.types.join(', ')}. Impacte Gemini (×1.5) et Perplexity (×1.3).` : null,
+      implementationSteps: unlocked ? [
+        'Copiez le script dans le <head> de votre page',
+        'Remplacez les valeurs placeholder si nécessaire',
+        'Testez avec schema.org/validator',
+      ] : null,
+    });
+  }
+
+  // 4. Meta tags optimisés
+  if (vault.fullMetaTags.title || vault.fullMetaTags.description) {
+    const metaId = 'full_meta';
+    const unlocked = unlockedIds.includes(metaId);
+    const metaCode = [
+      `<title>${vault.fullMetaTags.title}</title>`,
+      `<meta name="description" content="${vault.fullMetaTags.description}">`,
+      vault.fullMetaTags.openGraph,
+      vault.fullMetaTags.canonical ? `<link rel="canonical" href="${vault.fullMetaTags.canonical}">` : '',
+    ].filter(Boolean).join('\n');
+    
+    blocks.push({
+      id: metaId,
+      type: 'fullMetaTags',
+      title: 'Meta tags optimisés (title + description + Open Graph)',
+      description: 'Toutes les balises meta optimisées pour les moteurs IA',
+      category: 'meta',
+      priority: 'medium',
+      estimatedImpact: 5,
+      isUnlocked: unlocked,
+      preview: {
+        firstLine: `<title>${vault.fullMetaTags.title?.slice(0, 50)}...</title>`,
+        language: 'html',
+        linesCount: metaCode.split('\n').length,
+        wordCount: metaCode.split(/\s+/).length,
+      },
+      content: unlocked ? metaCode : null,
+      contentLanguage: unlocked ? 'html' : null,
+      explanation: unlocked ? 'Meta tags complets incluant Open Graph pour le partage social.' : null,
+      implementationSteps: unlocked ? [
+        'Remplacez les balises existantes dans le <head>',
+        'Ajoutez les balises Open Graph si absentes',
+      ] : null,
+    });
+  }
+
+  // 5. Introduction AEO
+  if (vault.fullIntroduction.html) {
+    const introId = 'full_intro';
+    const unlocked = unlockedIds.includes(introId);
+    blocks.push({
+      id: introId,
+      type: 'fullIntro',
+      title: `Introduction AEO (${vault.fullIntroduction.wordCount} mots)`,
+      description: 'Paragraphe d\'introduction answer-first optimisé pour les citations IA',
+      category: 'content',
+      priority: 'high',
+      estimatedImpact: 8,
+      isUnlocked: unlocked,
+      preview: {
+        firstLine: vault.fullIntroduction.html.replace(/<[^>]+>/g, '').slice(0, 80) + '...',
+        language: 'html',
+        linesCount: vault.fullIntroduction.html.split('\n').length,
+        wordCount: vault.fullIntroduction.wordCount,
+      },
+      content: unlocked ? vault.fullIntroduction.html : null,
+      contentLanguage: unlocked ? 'html' : null,
+      explanation: unlocked ? 'Introduction avec réponse directe en premier (inverted pyramid). Fort impact sur ChatGPT (×1.8).' : null,
+      implementationSteps: unlocked ? [
+        'Placez ce paragraphe juste après le H1 de votre page',
+        'Remplacez l\'introduction existante si elle ne répond pas directement à la question',
+      ] : null,
+    });
+  }
+
+  // 6. Tableau comparatif
+  if (vault.fullComparativeTable.html) {
+    const tableId = 'full_table';
+    const unlocked = unlockedIds.includes(tableId);
+    blocks.push({
+      id: tableId,
+      type: 'fullTable',
+      title: `Tableau comparatif (${vault.fullComparativeTable.rowsCount} lignes × ${vault.fullComparativeTable.columnsCount} colonnes)`,
+      description: 'Tableau de données comparatives prêt à intégrer',
+      category: 'content',
+      priority: 'high',
+      estimatedImpact: 8,
+      isUnlocked: unlocked,
+      preview: {
+        firstLine: '<table>...',
+        language: 'html',
+        linesCount: vault.fullComparativeTable.html.split('\n').length,
+        wordCount: vault.fullComparativeTable.html.split(/\s+/).length,
+      },
+      content: unlocked ? vault.fullComparativeTable.html : null,
+      contentLanguage: unlocked ? 'html' : null,
+      explanation: unlocked ? 'Tableau structuré avec données chiffrées. Perplexity (×1.5) et ChatGPT (×1.3) adorent les tableaux.' : null,
+      implementationSteps: unlocked ? [
+        'Intégrez le tableau dans la section appropriée de votre page',
+        'Vérifiez que les données sont à jour',
+        'Ajoutez un titre descriptif au-dessus du tableau',
+      ] : null,
+    });
+  }
+
+  // 7. Plan d'article
+  if (vault.fullArticleOutline.markdown) {
+    const outlineId = 'full_outline';
+    const unlocked = unlockedIds.includes(outlineId);
+    blocks.push({
+      id: outlineId,
+      type: 'fullOutline',
+      title: `Plan d'article AEO (~${vault.fullArticleOutline.estimatedWordCount} mots)`,
+      description: 'Structure d\'article complète avec titres-questions optimisés',
+      category: 'content',
+      priority: 'medium',
+      estimatedImpact: 6,
+      isUnlocked: unlocked,
+      preview: {
+        firstLine: vault.fullArticleOutline.sections[0]?.slice(0, 80) + '...' || '...',
+        language: 'markdown',
+        linesCount: vault.fullArticleOutline.markdown.split('\n').length,
+        wordCount: vault.fullArticleOutline.markdown.split(/\s+/).length,
+      },
+      content: unlocked ? vault.fullArticleOutline.markdown : null,
+      contentLanguage: unlocked ? 'markdown' : null,
+      explanation: unlocked ? `Plan en ${vault.fullArticleOutline.sections.length} sections avec titres sous forme de questions.` : null,
+      implementationSteps: unlocked ? [
+        'Utilisez ce plan comme brief de rédaction',
+        'Rédigez chaque section en 150-200 mots',
+        'Gardez les titres sous forme de questions (optimisé IA)',
+      ] : null,
+    });
+  }
+
+  // Trier par impact décroissant
+  blocks.sort((a, b) => b.estimatedImpact - a.estimatedImpact);
+
+  return blocks;
+}
+
+/**
+ * Résumé du vault pour affichage.
+ */
+export function getVaultSummary(auditId: string): VaultSummary {
+  const blocks = getContentBlocks(auditId);
+  const unlocked = blocks.filter(b => b.isUnlocked);
+  const locked = blocks.filter(b => !b.isUnlocked);
+
+  return {
+    totalBlocks: blocks.length,
+    unlockedBlocks: unlocked.length,
+    lockedBlocks: locked.length,
+    totalImpact: blocks.reduce((s, b) => s + b.estimatedImpact, 0),
+    unlockedImpact: unlocked.reduce((s, b) => s + b.estimatedImpact, 0),
+    remainingImpact: locked.reduce((s, b) => s + b.estimatedImpact, 0),
+    creditCostToUnlockAll: locked.length,
+  };
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS INTERNES
+// ═══════════════════════════════════════════════
+
+function getAllContentIds(vault: MegaGenerationResult): string[] {
+  const ids: string[] = [];
+  for (const sol of vault.solutions) ids.push(sol.id);
+  if (vault.fullFAQ.html) ids.push('full_faq');
+  if (vault.fullSchemaOrg.jsonLd) ids.push('full_schema');
+  if (vault.fullMetaTags.title) ids.push('full_meta');
+  if (vault.fullIntroduction.html) ids.push('full_intro');
+  if (vault.fullComparativeTable.html) ids.push('full_table');
+  if (vault.fullArticleOutline.markdown) ids.push('full_outline');
+  return ids;
+}
+```
+
+---
+
+## PHASE 3 — COMPOSANT UI DE DÉBLOCAGE
+
+### 3.1 — Créer `components/LockedContentCard.tsx` (NOUVEAU FICHIER)
+
+Le composant qui affiche un bloc de contenu verrouillé ou débloqué.
+
+```typescript
+// components/LockedContentCard.tsx
+//
+// Affiche un bloc de contenu avec 2 états :
+// - VERROUILLÉ : titre, description, preview floutée, bouton "Débloquer (1 crédit)"
+// - DÉBLOQUÉ : contenu complet avec syntaxe colorée, bouton copier, étapes
+
+import { useState } from 'react';
+import { Lock, Unlock, Copy, Check, ChevronDown, ChevronUp, Zap, Star } from 'lucide-react';
+import type { ContentBlock } from '../services/solution-vault';
+
+interface LockedContentCardProps {
+  block: ContentBlock;
+  onUnlock: (blockId: string) => void;  // Appelé quand l'utilisateur clique "Débloquer"
+  creditsRemaining: number;
+}
+
+export default function LockedContentCard({ block, onUnlock, creditsRemaining }: LockedContentCardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (block.content) {
+      await navigator.clipboard.writeText(block.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const priorityConfig = {
+    critical: { label: '🔴 Critique', bg: 'bg-red-500/20', text: 'text-red-400' },
+    high: { label: '🟠 Haute', bg: 'bg-orange-500/20', text: 'text-orange-400' },
+    medium: { label: '🟡 Moyenne', bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
+    low: { label: '🟢 Basse', bg: 'bg-green-500/20', text: 'text-green-400' },
+  };
+
+  const prio = priorityConfig[block.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+
+  return (
+    <div className={`rounded-xl border ${block.isUnlocked ? 'border-slate-700 bg-slate-800/50' : 'border-slate-600/50 bg-slate-800/30'} overflow-hidden`}>
+      
+      {/* Header : toujours visible */}
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            {block.isUnlocked ? (
+              <Unlock className="w-4 h-4 text-green-400" />
+            ) : (
+              <Lock className="w-4 h-4 text-slate-500" />
+            )}
+            <span className={`text-xs px-2 py-0.5 rounded-full ${prio.bg} ${prio.text}`}>
+              {prio.label}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400">
+              +{block.estimatedImpact} pts
+            </span>
+          </div>
+          <span className="text-xs text-slate-500">
+            {block.preview.linesCount} lignes • {block.preview.language}
+          </span>
+        </div>
+
+        <h3 className="text-white font-medium mb-1">{block.title}</h3>
+        <p className="text-sm text-slate-400">{block.description}</p>
+      </div>
+
+      {/* Zone de contenu */}
+      {block.isUnlocked ? (
+        // ═══ DÉBLOQUÉ : contenu visible ═══
+        <div className="border-t border-slate-700">
+          {/* Boutons d'action */}
+          <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/50">
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors"
+            >
+              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? 'Copié !' : 'Copier le code'}
+            </button>
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-slate-700/50 text-slate-300 hover:bg-slate-700 transition-colors"
+            >
+              {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {expanded ? 'Réduire' : 'Voir le code'}
+            </button>
+          </div>
+
+          {/* Code (dépliable) */}
+          {expanded && block.content && (
+            <div className="px-4 pb-4">
+              <pre className="mt-2 p-4 rounded-lg bg-slate-950 border border-slate-700 overflow-x-auto text-sm text-slate-300 font-mono">
+                <code>{block.content}</code>
+              </pre>
+              
+              {/* Explication */}
+              {block.explanation && (
+                <p className="mt-3 text-sm text-slate-400 italic">
+                  💡 {block.explanation}
+                </p>
+              )}
+
+              {/* Étapes d'implémentation */}
+              {block.implementationSteps && block.implementationSteps.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs text-slate-500 font-medium mb-1">Comment implémenter :</p>
+                  <ol className="list-decimal list-inside text-sm text-slate-400 space-y-1">
+                    {block.implementationSteps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        // ═══ VERROUILLÉ : preview floutée + bouton déblocage ═══
+        <div className="border-t border-slate-700/50">
+          {/* Preview floutée */}
+          <div className="relative px-4 py-3">
+            <pre className="p-3 rounded-lg bg-slate-950/50 text-sm text-slate-600 font-mono select-none blur-[3px]">
+              {block.preview.firstLine}
+              {'\n'}...
+              {'\n'}{'  '.repeat(4)}...
+              {'\n'}{'  '.repeat(2)}...
+            </pre>
+            
+            {/* Overlay de verrouillage */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <button
+                onClick={() => onUnlock(block.id)}
+                disabled={creditsRemaining < 1}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all
+                  ${creditsRemaining >= 1
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-lg shadow-blue-500/25'
+                    : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                  }`}
+              >
+                <Zap className="w-4 h-4" />
+                {creditsRemaining >= 1
+                  ? 'Débloquer (1 crédit)'
+                  : 'Crédits insuffisants'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### 3.2 — Créer `components/UnlockAllBanner.tsx` (NOUVEAU FICHIER)
+
+Bannière pour débloquer toutes les solutions d'un coup (pack).
+
+```typescript
+// components/UnlockAllBanner.tsx
+
+import { Zap, Star, Package } from 'lucide-react';
+import type { VaultSummary } from '../services/solution-vault';
+
+interface UnlockAllBannerProps {
+  summary: VaultSummary;
+  onUnlockAll: () => void;
+  creditsRemaining: number;
+}
+
+export default function UnlockAllBanner({ summary, onUnlockAll, creditsRemaining }: UnlockAllBannerProps) {
+  if (summary.lockedBlocks === 0) return null; // Tout est déjà débloqué
+
+  // Réduction pour pack complet : -30% arrondi
+  const packCost = Math.max(1, Math.ceil(summary.lockedBlocks * 0.7));
+  const savings = summary.lockedBlocks - packCost;
+  const canAfford = creditsRemaining >= packCost;
+
+  return (
+    <div className="rounded-xl border border-blue-500/30 bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Package className="w-5 h-5 text-blue-400" />
+            <h3 className="text-white font-semibold">
+              Débloquer toutes les solutions ({summary.lockedBlocks} restantes)
+            </h3>
+          </div>
+          <p className="text-sm text-slate-400">
+            Impact total : +{summary.remainingImpact} points sur votre score AEO
+          </p>
+          {savings > 0 && (
+            <p className="text-sm text-green-400 mt-1">
+              <Star className="w-3.5 h-3.5 inline mr-1" />
+              Économisez {savings} crédit{savings > 1 ? 's' : ''} avec le pack complet
+            </p>
+          )}
+        </div>
+
+        <button
+          onClick={onUnlockAll}
+          disabled={!canAfford}
+          className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all whitespace-nowrap
+            ${canAfford
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-lg shadow-blue-500/25'
+              : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+            }`}
+        >
+          <Zap className="w-4 h-4" />
+          {canAfford
+            ? `Tout débloquer (${packCost} crédits)`
+            : `${packCost} crédits requis`}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## PHASE 4 — INTÉGRATION DANS LE FLUX EXISTANT
+
+### 4.1 — Modifier `pages/AuditAEOPage.tsx` (AJOUT CIBLÉ)
+
+**Ce qui change :** Après que l'audit affiche les résultats, lancer automatiquement le méga-prompt en arrière-plan.
+
+**Ce qui ne change PAS :** L'affichage du score, le breakdown par moteur, les critères.
+
+```
+CHERCHE dans AuditAEOPage.tsx le moment où les résultats d'analyse sont disponibles
+(probablement un useEffect ou un state qui reçoit analysisResult).
+
+AJOUTE un useEffect qui :
+1. Vérifie si un vault existe déjà pour cet audit (hasVault)
+2. Si non → appelle generateAllSolutions() en arrière-plan
+3. Stocke le résultat dans le vault (storeInVault)
+4. Affiche un indicateur discret "Solutions pré-générées ✓"
+
+NE MODIFIE PAS le reste de la page.
+```
+
+**Code à AJOUTER (pas à remplacer) :**
+
+```typescript
+// AJOUTER ces imports EN HAUT du fichier (après les imports existants)
+import { generateAllSolutions } from '../services/mega-generator';
+import { storeInVault, hasVault } from '../services/solution-vault';
+
+// AJOUTER ce state dans le composant
+const [solutionsGenerated, setSolutionsGenerated] = useState(false);
+const [generatingInBackground, setGeneratingInBackground] = useState(false);
+
+// AJOUTER ce useEffect (après les useEffect existants)
+useEffect(() => {
+  // Ne lancer que si on a des résultats d'analyse ET pas encore de vault
+  if (!analysisResult || hasVault(analysisResult.id || 'current')) {
+    setSolutionsGenerated(true);
+    return;
+  }
+
+  const generateInBackground = async () => {
+    setGeneratingInBackground(true);
+    try {
+      // Extraire les critères échoués depuis les résultats
+      // ⚠️ ADAPTER au format réel de analysisResult
+      const failedCriteria = extractFailedCriteria(analysisResult);
+      
+      const result = await generateAllSolutions(
+        analysisResult.url || '',
+        analysisResult.title || '',
+        analysisResult.content || '',
+        failedCriteria,
+        analysisResult.detectedProducts || [],
+        analysisResult.detectedBrand || '',
+        'fr'
+      );
+
+      storeInVault(analysisResult.id || 'current', result);
+      setSolutionsGenerated(true);
+    } catch (error) {
+      console.error('Erreur génération en arrière-plan:', error);
+    } finally {
+      setGeneratingInBackground(false);
+    }
+  };
+
+  generateInBackground();
+}, [analysisResult]);
+
+// AJOUTER cette fonction helper dans le même fichier
+function extractFailedCriteria(result: any): Array<{ id: string; name: string; category: string; maxPoints: number }> {
+  // ⚠️ ADAPTER au format réel de services/analyzer.ts
+  // Lis le format des résultats existants et mappe vers cette structure
+  const failed: Array<{ id: string; name: string; category: string; maxPoints: number }> = [];
+  
+  // Option A : si result.recommendations existe
+  if (result.recommendations) {
+    for (const rec of result.recommendations) {
+      if (rec.status === 'fail' || rec.passed === false) {
+        failed.push({
+          id: rec.criterionId || rec.id || rec.key,
+          name: rec.title || rec.name || rec.id,
+          category: rec.category || 'general',
+          maxPoints: rec.maxPoints || rec.points || 2,
+        });
+      }
+    }
+  }
+  
+  // Option B : si result.categoryScores existe avec des critères
+  if (result.categoryScores) {
+    for (const cat of result.categoryScores) {
+      if (cat.criteria) {
+        for (const c of cat.criteria) {
+          if (!c.passed && c.status !== 'pass') {
+            failed.push({
+              id: c.id || c.key,
+              name: c.name || c.title || c.id,
+              category: cat.name || cat.id || 'general',
+              maxPoints: c.maxPoints || c.max || 2,
+            });
+          }
+        }
+      }
+    }
+  }
+  
+  return failed;
+}
+
+// AJOUTER dans le JSX (là où c'est pertinent, par exemple près du bouton "Voir le plan d'action")
+{generatingInBackground && (
+  <div className="flex items-center gap-2 text-sm text-blue-400">
+    <div className="w-4 h-4 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
+    Pré-génération des solutions en cours...
+  </div>
+)}
+{solutionsGenerated && !generatingInBackground && (
+  <div className="flex items-center gap-2 text-sm text-green-400">
+    <span>✓</span> Solutions prêtes — consultez le plan d'action
+  </div>
+)}
+```
+
+### 4.2 — Modifier `pages/ActionPlanPage.tsx` (REMPLACEMENT PARTIEL)
+
+**Ce qui change :** Au lieu de boutons "Générer la solution" qui font un appel API chacun, afficher les ContentBlocks du vault avec le système verrouillé/débloqué.
+
+**Ce qui ne change PAS :** Le score projeté temps réel (V2), le header, la navigation.
+
+```
+STRATÉGIE DE MODIFICATION :
+
+1. LIS le code actuel de ActionPlanPage.tsx en entier
+2. IDENTIFIE la section qui affiche les solutions (probablement une liste/map)
+3. REMPLACE UNIQUEMENT cette section par le système de ContentBlocks
+4. GARDE le score projeté, le header, et toute autre logique intacte
+5. Le score projeté doit toujours fonctionner :
+   - Quand un bloc est coché (pour le score projeté), pas besoin qu'il soit débloqué
+   - Le déblocage concerne le CONTENU (code), pas le calcul du score
+```
+
+**Logique à implémenter dans ActionPlanPage.tsx :**
+
+```typescript
+// AJOUTER ces imports
+import { getContentBlocks, getVaultSummary, unlockContent, unlockAll, isUnlocked } from '../services/solution-vault';
+import LockedContentCard from '../components/LockedContentCard';
+import UnlockAllBanner from '../components/UnlockAllBanner';
+
+// Dans le composant, AJOUTER :
+const auditId = analysisResult?.id || 'current';
+const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+const [vaultSummary, setVaultSummary] = useState<VaultSummary | null>(null);
+
+// Charger les blocs depuis le vault
+useEffect(() => {
+  const loadedBlocks = getContentBlocks(auditId);
+  setBlocks(loadedBlocks);
+  setVaultSummary(getVaultSummary(auditId));
+}, [auditId]);
+
+// Gérer le déblocage d'un bloc individuel
+const handleUnlock = (blockId: string) => {
+  // 1. Vérifier les crédits (utiliser le hook/state de crédits existant)
+  if (creditsRemaining < 1) return;
+  
+  // 2. Déduire le crédit
+  // ⚠️ ADAPTER à la logique de crédits existante dans le SaaS
+  // Ex: deductCredit(1) ou updateCredits(creditsRemaining - 1)
+  
+  // 3. Débloquer dans le vault
+  unlockContent(auditId, blockId);
+  
+  // 4. Recharger les blocs
+  setBlocks(getContentBlocks(auditId));
+  setVaultSummary(getVaultSummary(auditId));
+};
+
+// Gérer le déblocage de tout
+const handleUnlockAll = () => {
+  const summary = getVaultSummary(auditId);
+  if (!summary) return;
+  const packCost = Math.max(1, Math.ceil(summary.lockedBlocks * 0.7));
+  if (creditsRemaining < packCost) return;
+  
+  // Déduire les crédits du pack
+  // ⚠️ ADAPTER
+  
+  unlockAll(auditId);
+  setBlocks(getContentBlocks(auditId));
+  setVaultSummary(getVaultSummary(auditId));
+};
+
+// Dans le JSX, REMPLACER la liste de solutions par :
+// (garder le score projeté et le header au-dessus)
+
+{vaultSummary && (
+  <UnlockAllBanner
+    summary={vaultSummary}
+    onUnlockAll={handleUnlockAll}
+    creditsRemaining={creditsRemaining}
+  />
+)}
+
+<div className="mt-6 space-y-4">
+  {blocks.map(block => (
+    <LockedContentCard
+      key={block.id}
+      block={block}
+      onUnlock={handleUnlock}
+      creditsRemaining={creditsRemaining}
+    />
+  ))}
+</div>
+
+{blocks.length === 0 && (
+  <div className="text-center py-12 text-slate-500">
+    <p>Lancez un audit pour générer les solutions.</p>
+  </div>
+)}
+```
+
+---
+
+## PHASE 5 — TARIFICATION DES CRÉDITS
+
+### 5.1 — Créer `config/credit-costs.ts` (NOUVEAU FICHIER)
+
+```typescript
+// config/credit-costs.ts
+//
+// Définition du coût en crédits de chaque action du SaaS.
+// Un seul fichier de référence pour toute la tarification.
+
+export const CREDIT_COSTS = {
+  // ═══ AUDIT ═══
+  runAudit: 1,                    // Lancer un audit AEO (inclut le méga-prompt)
+  
+  // ═══ DÉBLOCAGE DE SOLUTIONS (plan d'action) ═══
+  unlockSolution: 1,              // Débloquer 1 solution individuelle
+  unlockFullFAQ: 2,               // Débloquer la FAQ complète (plus de valeur)
+  unlockFullSchema: 1,            // Débloquer le Schema.org complet
+  unlockFullMeta: 1,              // Débloquer les meta tags
+  unlockFullIntro: 1,             // Débloquer l'introduction
+  unlockFullTable: 1,             // Débloquer le tableau comparatif
+  unlockFullOutline: 1,           // Débloquer le plan d'article
+  
+  // ═══ PACK COMPLET ═══
+  // Le pack = 70% du coût total (30% de réduction)
+  unlockAllDiscount: 0.7,
+  
+  // ═══ AEO STUDIO (outils individuels) ═══
+  generateFAQ: 1,                 // Générer une FAQ depuis le studio
+  generateSchema: 1,              // Générer un Schema.org
+  generateArticle: 2,             // Générer un article complet
+  generateProductSheet: 1,        // Générer une fiche produit
+  
+  // ═══ CITATIONS V3 ═══
+  runCitationCheck: 2,            // Lancer une vérification de citations
+  // (1 vérification = toutes les requêtes × 3 moteurs)
+  
+  // ═══ RE-SCAN ═══
+  rescan: 1,                      // Re-scanner une URL
+} as const;
+
+/**
+ * Calcule le coût du pack "tout débloquer".
+ */
+export function calculatePackCost(lockedCount: number): number {
+  return Math.max(1, Math.ceil(lockedCount * CREDIT_COSTS.unlockAllDiscount));
+}
+
+/**
+ * Retourne le coût d'un déblocage par type de contenu.
+ */
+export function getUnlockCost(contentType: string): number {
+  switch (contentType) {
+    case 'fullFAQ': return CREDIT_COSTS.unlockFullFAQ;
+    case 'fullSchemaOrg': return CREDIT_COSTS.unlockFullSchema;
+    case 'fullMetaTags': return CREDIT_COSTS.unlockFullMeta;
+    case 'fullIntro': return CREDIT_COSTS.unlockFullIntro;
+    case 'fullTable': return CREDIT_COSTS.unlockFullTable;
+    case 'fullOutline': return CREDIT_COSTS.unlockFullOutline;
+    default: return CREDIT_COSTS.unlockSolution;
+  }
+}
+```
+
+---
+
+## PHASE 6 — STRUCTURE DE FICHIERS FINALE
+
+```
+TOUS CES FICHIERS SONT NOUVEAUX (sauf les 3 modifiés) :
+
+NOUVEAUX FICHIERS :
+├── services/
+│   ├── mega-generator.ts              ← Méga-prompt : génère tout en 1 appel
+│   └── solution-vault.ts              ← Stockage + verrouillage/déblocage
+│
+├── components/
+│   ├── LockedContentCard.tsx           ← Carte contenu verrouillé/débloqué
+│   └── UnlockAllBanner.tsx             ← Bannière "tout débloquer"
+│
+├── config/
+│   └── credit-costs.ts                ← Tarification centralisée des crédits
+│
+FICHIERS MODIFIÉS (AJOUT CIBLÉ) :
+├── pages/AuditAEOPage.tsx             ← +1 useEffect (génération background)
+└── pages/ActionPlanPage.tsx           ← Remplacement section solutions
+                                         par système ContentBlocks
+```
+
+---
+
+## PHASE 7 — VÉRIFICATION FINALE
+
+```bash
+# 1. Build sans erreur
+npm run build
+
+# 2. Vérifier les fichiers modifiés vs backups
+diff pages/AuditAEOPage.tsx pages/AuditAEOPage.tsx.backup
+diff pages/ActionPlanPage.tsx pages/ActionPlanPage.tsx.backup
+# AuditAEOPage : diff doit montrer ~30 lignes ajoutées (imports + useEffect + JSX indicateur)
+# ActionPlanPage : diff montre le remplacement de la section solutions
+
+# 3. Vérifier les nouveaux fichiers
+ls -la services/mega-generator.ts
+ls -la services/solution-vault.ts
+ls -la components/LockedContentCard.tsx
+ls -la components/UnlockAllBanner.tsx
+ls -la config/credit-costs.ts
+
+# 4. Vérifier que les services existants sont INTACTS
+md5sum services/analyzer.ts    # Doit être identique à avant
+md5sum services/criteria.ts    # Doit être identique à avant
+md5sum services/generator.ts   # Doit être identique à avant
+
+# 5. Vérifier l'absence de any
+grep -rn ': any' services/mega-generator.ts services/solution-vault.ts components/LockedContentCard.tsx
+# Doit retourner 0 résultats (sauf les mapper de JSON qui nécessitent any pour le parsing)
+
+# 6. Tester le flux complet
+# - Lancer un audit → le méga-prompt tourne en arrière-plan
+# - Aller au plan d'action → voir les blocs verrouillés
+# - Cliquer "Débloquer" → le code apparaît instantanément
+# - Cliquer "Copier" → le code est dans le presse-papier
+# - Cliquer "Tout débloquer" → tout s'ouvre d'un coup
+```
+
+### Checklist de validation :
+
+- [ ] `npm run build` = 0 erreurs
+- [ ] Les fichiers `analyzer.ts`, `criteria.ts`, `generator.ts` sont INTACTS (md5 identique)
+- [ ] Le méga-prompt tourne en arrière-plan après un audit
+- [ ] Le plan d'action affiche des blocs verrouillés avec preview floutée
+- [ ] Le déblocage est INSTANTANÉ (0 appel API)
+- [ ] Le bouton "Copier" fonctionne sur les blocs débloqués
+- [ ] Le pack "Tout débloquer" applique la réduction de 30%
+- [ ] Le score projeté continue de fonctionner (indépendant du verrouillage)
+- [ ] Les crédits sont correctement décomptés
+- [ ] Aucun module existant n'a été cassé
+- [ ] Le thème sombre est cohérent
+
+---
+
+## IMPACT SUR LES COÛTS
+
+### Comparaison avant/après :
+
+```
+AVANT (appels séparés) :
+  Audit             → 1 appel Gemini (~4K tokens out)    = $0.003
+  Solution 1        → 1 appel Gemini (~1K tokens out)    = $0.001
+  Solution 2        → 1 appel Gemini (~1K tokens out)    = $0.001
+  Solution 3        → 1 appel Gemini (~1K tokens out)    = $0.001
+  FAQ               → 1 appel Gemini (~2K tokens out)    = $0.002
+  Schema            → 1 appel Gemini (~1K tokens out)    = $0.001
+  Meta              → 1 appel Gemini (~0.5K tokens out)  = $0.001
+  Introduction      → 1 appel Gemini (~1K tokens out)    = $0.001
+  Tableau           → 1 appel Gemini (~1K tokens out)    = $0.001
+  Article outline   → 1 appel Gemini (~1K tokens out)    = $0.001
+  ─────────────────────────────────────────────────────
+  TOTAL : 10 appels API                                  = ~$0.013
+
+APRÈS (méga-prompt) :
+  Audit + TOUT      → 1 appel Gemini (~12K tokens out)   = $0.005
+  Déblocages        → 0 appels                            = $0.000
+  ─────────────────────────────────────────────────────
+  TOTAL : 1 appel API                                    = ~$0.005
+
+ÉCONOMIE : ~62% de réduction des coûts API par audit
+  
+REVENUS : L'utilisateur dépense 1 crédit pour l'audit + 1 crédit par déblocage
+  Si 8 blocs générés → potentiellement 9 crédits dépensés au total
+  Au lieu de 10 crédits (1 par appel) → économie de 1 crédit pour l'utilisateur
+  MAIS les crédits sont consommés plus naturellement (engagement)
+  ET le coût API réel est 62% plus bas → marge augmente significativement
+```
+
+### ROI par plan :
+
+```
+Plan Starter (50 crédits, 19€/mois) :
+  - Coût API si tous les crédits sont utilisés : ~50 × $0.005 = $0.25
+  - Marge API : 98.7%
+
+Plan Pro (200 crédits, 49€/mois) :
+  - Coût API : ~200 × $0.005 = $1.00
+  - Marge API : 97.9%
+
+Plan Agency (1000 crédits, 149€/mois) :
+  - Coût API : ~1000 × $0.005 = $5.00
+  - Marge API : 96.6%
+```

@@ -1,0 +1,233 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import {
+  Building2,
+  Globe,
+  Users,
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  Check,
+  Rocket,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface OnboardingData {
+  companyName: string;
+  domain: string;
+  industry: string;
+  brandName: string;
+  competitors: string;
+  keywords: string;
+}
+
+const STEPS = [
+  { id: 1, title: "Votre entreprise", icon: Building2, description: "Parlez-nous de votre organisation" },
+  { id: 2, title: "Votre site web", icon: Globe, description: "Configurez votre premier projet" },
+  { id: 3, title: "Pret a demarrer", icon: Rocket, description: "Lancez votre premier audit AEO" },
+];
+
+const INDUSTRIES = [
+  { value: "saas", label: "SaaS / Technologie" },
+  { value: "ecommerce", label: "E-commerce / Retail" },
+  { value: "finance", label: "Finance / Assurance" },
+  { value: "sante", label: "Sante / Pharma" },
+  { value: "immobilier", label: "Immobilier" },
+  { value: "education", label: "Education / Formation" },
+  { value: "restauration", label: "Restauration / Hotellerie" },
+  { value: "juridique", label: "Juridique / Conseil" },
+  { value: "other", label: "Autre" },
+];
+
+export default function OnboardingPage() {
+  const router = useRouter();
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<OnboardingData>({
+    companyName: "",
+    domain: "",
+    industry: "",
+    brandName: "",
+    competitors: "",
+    keywords: "",
+  });
+
+  const updateField = (field: keyof OnboardingData, value: string) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const canProceed = () => {
+    if (step === 1) return data.companyName.trim() && data.industry;
+    if (step === 2) return data.domain.trim();
+    return true;
+  };
+
+  const handleFinish = async () => {
+    setLoading(true);
+    try {
+      // TODO: Create workspace + project in Supabase
+      // 1. createWorkspace(data.companyName, userId, data.industry)
+      // 2. createProject({ workspace_id, name: data.brandName || data.companyName, domain: data.domain, ... })
+      await new Promise((r) => setTimeout(r, 1000));
+      toast.success("Espace de travail cree !");
+      router.push("/app");
+    } catch {
+      toast.error("Erreur lors de la creation");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-2xl">
+        {/* Progress */}
+        <div className="flex items-center justify-center gap-2 mb-10">
+          {STEPS.map((s, i) => (
+            <div key={s.id} className="flex items-center">
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
+                  step > s.id
+                    ? "bg-primary text-black"
+                    : step === s.id
+                    ? "bg-primary/20 text-primary border-2 border-primary"
+                    : "bg-white/5 text-white/30"
+                )}
+              >
+                {step > s.id ? <Check size={18} /> : s.id}
+              </div>
+              {i < STEPS.length - 1 && (
+                <div
+                  className={cn(
+                    "w-16 h-0.5 mx-2 transition-colors",
+                    step > s.id ? "bg-primary" : "bg-white/10"
+                  )}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Step Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-serif font-bold text-white mb-2">
+            {STEPS[step - 1].title}
+          </h1>
+          <p className="text-white/50">{STEPS[step - 1].description}</p>
+        </div>
+
+        {/* Step Content */}
+        <Card variant="elevated" className="p-8">
+          {step === 1 && (
+            <div className="space-y-5">
+              <Input
+                label="Nom de votre entreprise"
+                placeholder="Ex: Mon Entreprise SAS"
+                value={data.companyName}
+                onChange={(e) => updateField("companyName", e.target.value)}
+                icon={<Building2 size={16} />}
+              />
+              <Select
+                label="Secteur d'activite"
+                placeholder="Choisir un secteur"
+                options={INDUSTRIES}
+                value={data.industry}
+                onChange={(e) => updateField("industry", e.target.value)}
+              />
+              <Input
+                label="Nom de marque (si different)"
+                placeholder="Ex: MonBrand"
+                value={data.brandName}
+                onChange={(e) => updateField("brandName", e.target.value)}
+              />
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-5">
+              <Input
+                label="Domaine de votre site web"
+                placeholder="Ex: monentreprise.com"
+                value={data.domain}
+                onChange={(e) => updateField("domain", e.target.value)}
+                icon={<Globe size={16} />}
+              />
+              <Textarea
+                label="Vos principaux concurrents (1 par ligne)"
+                placeholder={"concurrent1.com\nconcurrent2.com\nconcurrent3.com"}
+                value={data.competitors}
+                onChange={(e) => updateField("competitors", e.target.value)}
+                rows={3}
+              />
+              <Textarea
+                label="Mots-cles strategiques (1 par ligne)"
+                placeholder={"mot-cle principal\nmot-cle secondaire\nmot-cle longue traine"}
+                value={data.keywords}
+                onChange={(e) => updateField("keywords", e.target.value)}
+                rows={3}
+              />
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="text-center py-8">
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                <Sparkles size={40} className="text-primary" />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-3">Tout est pret !</h2>
+              <p className="text-white/50 max-w-md mx-auto mb-6">
+                Nous allons creer votre espace de travail et configurer votre premier
+                projet. Vous pourrez ensuite lancer votre premier audit AEO.
+              </p>
+
+              <div className="bg-white/5 rounded-xl p-4 text-left max-w-sm mx-auto space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/40">Entreprise</span>
+                  <span className="text-white font-medium">{data.companyName}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/40">Domaine</span>
+                  <span className="text-white font-medium">{data.domain}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/40">Secteur</span>
+                  <span className="text-white font-medium capitalize">{data.industry}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* Navigation */}
+        <div className="flex justify-between mt-6">
+          {step > 1 ? (
+            <Button variant="ghost" onClick={() => setStep(step - 1)}>
+              <ArrowLeft size={16} /> Retour
+            </Button>
+          ) : (
+            <div />
+          )}
+
+          {step < 3 ? (
+            <Button onClick={() => setStep(step + 1)} disabled={!canProceed()}>
+              Continuer <ArrowRight size={16} />
+            </Button>
+          ) : (
+            <Button onClick={handleFinish} isLoading={loading}>
+              <Rocket size={16} /> Lancer CitedBy.ai
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

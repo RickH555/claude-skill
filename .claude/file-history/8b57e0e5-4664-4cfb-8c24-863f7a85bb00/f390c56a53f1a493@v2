@@ -1,0 +1,88 @@
+import type { Section } from '@/components/layout/TopNav';
+
+export const VIEW_TO_PATH: Record<string, string> = {
+  // Public
+  'home': '/',
+  'login': '/login',
+
+  // Core
+  'dashboard': '/dashboard',
+  'analyze': '/analyze',
+  'projects': '/projects',
+  'results': '/results',
+  'history': '/history',
+
+  // Monitoring
+  'ai-monitoring': '/monitoring/ai',
+  'alerts': '/monitoring/alerts',
+  'bot-tracking': '/monitoring/bot-tracking',
+  'reputation': '/monitoring/reputation',
+
+  // Citations V3
+  'citation-dashboard': '/citations',
+  'tracked-queries': '/citations/tracked-queries',
+  'citation-detail': '/citations/detail',
+  'benchmark': '/citations/benchmark',
+  'v3-alerts': '/citations/alerts',
+  'alert-settings': '/citations/alert-settings',
+  'monthly-report': '/citations/monthly-report',
+  'calibration': '/citations/calibration',
+
+  // Tools
+  'generative-tools': '/tools',
+  'smc-studio': '/tools/smc-studio',
+  'content-writer': '/tools/content-writer',
+  'blog-optimizer': '/tools/blog-optimizer',
+  'source-of-truth': '/tools/source-of-truth',
+  'schema-org': '/tools/schema-org',
+  'robots-txt': '/tools/robots-txt',
+  'llms-txt': '/tools/llms-txt',
+  'ai-response-layer': '/tools/ai-response-layer',
+  'ai-citation-simulator': '/tools/citation-simulator',
+  'answer-first-audit': '/tools/answer-first',
+  'eeat-builder': '/tools/eeat-builder',
+
+  // Marketplace
+  'directory': '/marketplace',
+  'directory-entity': '/marketplace/entity',
+  'publisher-request': '/marketplace/publisher',
+  'clients': '/marketplace/clients',
+  'affiliation': '/marketplace/affiliation',
+  'mission-orders': '/marketplace/missions',
+  'messages': '/marketplace/messages',
+
+  // Settings
+  'account': '/settings',
+  'recharge': '/settings/recharge',
+  'integrations': '/settings/integrations',
+  'api-developer': '/settings/api-developer',
+};
+
+const PATH_TO_VIEW: Record<string, string> = {};
+for (const [view, path] of Object.entries(VIEW_TO_PATH)) {
+  PATH_TO_VIEW[path] = view;
+}
+
+export function getViewNameFromPath(pathname: string): string {
+  return PATH_TO_VIEW[pathname] || 'dashboard';
+}
+
+export function getSectionFromPath(pathname: string): Section {
+  if (pathname === '/' || pathname === '/login') return 'dashboard';
+  if (pathname.startsWith('/dashboard')) return 'dashboard';
+  if (pathname.startsWith('/analyze') || pathname.startsWith('/projects') || pathname.startsWith('/results') || pathname.startsWith('/history') || pathname.startsWith('/monitoring')) return 'analyse';
+  if (pathname.startsWith('/citations')) return 'citations';
+  if (pathname.startsWith('/tools')) return 'outils';
+  if (pathname.startsWith('/marketplace')) return 'marketplace';
+  if (pathname.startsWith('/settings')) return 'parametres';
+  return 'dashboard';
+}
+
+export const SECTION_DEFAULTS: Record<Section, string> = {
+  dashboard: '/dashboard',
+  analyse: '/analyze',
+  citations: '/citations',
+  outils: '/tools',
+  marketplace: '/marketplace',
+  parametres: '/settings',
+};

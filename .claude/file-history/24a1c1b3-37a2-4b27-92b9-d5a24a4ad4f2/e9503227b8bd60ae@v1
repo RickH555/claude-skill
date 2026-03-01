@@ -1,0 +1,382 @@
+import React, { useState, useEffect } from 'react';
+import { AnalysisResult, User, SMCContent } from '../types';
+import { generateJsonLd, SchemaInput } from '../services/schema_service';
+import { ArrowLeft, Code, Download, Copy, Check, ShieldCheck, Globe, Share2, Building2, Phone, Mail, Image as ImageIcon, ExternalLink, RefreshCw, Zap, Archive, Eye } from 'lucide-react';
+
+interface Props {
+  onBack: () => void;
+  history: AnalysisResult[];
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  savedFiles: SMCContent[];
+  onSaveFile: (item: SMCContent) => void;
+}
+
+const SchemaOrg: React.FC<Props> = ({ onBack, history, user, onDeductCredits, savedFiles, onSaveFile }) => {
+  const [copied, setCopied] = useState(false);
+  const [formData, setFormData] = useState<SchemaInput>({
+    name: '',
+    url: '',
+    logoUrl: '',
+    description: '',
+    socialProfiles: ['', '', ''],
+    contactPhone: '',
+    contactEmail: '',
+    alternateName: ''
+  });
+  
+  const [jsonOutput, setJsonOutput] = useState('');
+  const [isGenerated, setIsGenerated] = useState(false);
+
+  // Pré-remplissage basé sur l'historique
+  useEffect(() => {
+    if (history.length > 0) {
+      const latest = history[0];
+      const urlObj = new URL(latest.url);
+      const hostname = urlObj.hostname;
+      const name = hostname.replace('www.', '').split('.')[0];
+      const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+
+      setFormData(prev => ({
+        ...prev,
+        name: formattedName,
+        url: urlObj.origin,
+        logoUrl: `${urlObj.origin}/logo.png`,
+        description: `Site officiel de ${formattedName}.`,
+        contactEmail: `contact@${hostname}`
+      }));
+    }
+  }, [history]);
+
+  // Régénération automatique à chaque changement du formulaire
+  useEffect(() => {
+    if (isGenerated) {
+        setJsonOutput(generateJsonLd(formData));
+    }
+  }, [formData, isGenerated]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSocialChange = (index: number, value: string) => {
+    const newSocials = [...formData.socialProfiles];
+    newSocials[index] = value;
+    setFormData({ ...formData, socialProfiles: newSocials });
+  };
+
+  const handleGenerate = () => {
+    if (onDeductCredits(5)) {
+        const output = generateJsonLd(formData);
+        setJsonOutput(output);
+        setIsGenerated(true);
+        
+        // Sauvegarde dans l'historique
+        onSaveFile({
+            id: `schema_${Date.now()}`,
+            type: 'fiche', // Using Generic type
+            title: `Schema Organization - ${formData.name}`,
+            content: output,
+            timestamp: new Date().toISOString()
+        });
+    }
+  };
+
+  const handleCopy = (content?: string) => {
+    navigator.clipboard.writeText(content || jsonOutput);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = (filename?: string, content?: string) => {
+    const blob = new Blob([content || jsonOutput], { type: 'application/ld+json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'schema.jsonld';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleRestore = (content: string) => {
+      // Pour une restauration complète, il faudrait parser le JSON pour remplir le formulaire
+      // Ici on restaure juste le code de sortie pour la visualisation
+      setJsonOutput(content);
+      setIsGenerated(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-10 animate-in fade-in duration-500 min-h-screen">
+      <button onClick={onBack} className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors">
+        <ArrowLeft size={18} className="mr-2" /> Retour
+      </button>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+          <h1 className="text-3xl font-serif font-bold text-white mb-2 flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 border border-orange-500/30">
+              <Code size={24} />
+            </div>
+            Générateur Schema.org
+          </h1>
+          <p className="text-gray-400">Créez le JSON-LD "Organization" pour connecter votre marque au Knowledge Graph de Google et des IA.</p>
+        </div>
+        
+        {user && (
+            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-sm text-gray-300">
+                Solde : <span className="font-bold text-white">{user.credits}</span> Gas
+            </div>
+        )}
+      </div>
+
+      <div className="grid lg:grid-cols-12 gap-8">
+        
+        {/* Formulaire Gauche */}
+        <div className="lg:col-span-5 space-y-6">
+            <div className="glass-panel p-6 rounded-xl border border-white/10">
+                <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                    <Building2 size={18} className="text-orange-400" /> Identité de l'Organisation
+                </h3>
+                
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">Nom de l'organisation</label>
+                        <input 
+                            type="text" 
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none"
+                            placeholder="Ex: CitedBy Corp"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">Nom alternatif (Optionnel)</label>
+                        <input 
+                            type="text" 
+                            name="alternateName"
+                            value={formData.alternateName}
+                            onChange={handleInputChange}
+                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none"
+                            placeholder="Ex: CBC"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">URL du site Web</label>
+                        <div className="relative">
+                            <Globe size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                            <input 
+                                type="url" 
+                                name="url"
+                                value={formData.url}
+                                onChange={handleInputChange}
+                                className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none"
+                                placeholder="https://..."
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">URL du Logo</label>
+                        <div className="relative">
+                            <ImageIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                            <input 
+                                type="url" 
+                                name="logoUrl"
+                                value={formData.logoUrl}
+                                onChange={handleInputChange}
+                                className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none"
+                                placeholder="https://.../logo.png"
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">Description courte</label>
+                        <textarea 
+                            name="description"
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            rows={3}
+                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none resize-none"
+                            placeholder="Description pour le Knowledge Graph..."
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="glass-panel p-6 rounded-xl border border-white/10">
+                <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                    <Share2 size={18} className="text-orange-400" /> Réseaux & Contact
+                </h3>
+                
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">Profils Sociaux (sameAs)</label>
+                        <div className="space-y-2">
+                            {formData.socialProfiles.map((url, idx) => (
+                                <input 
+                                    key={idx}
+                                    type="url" 
+                                    value={url}
+                                    onChange={(e) => handleSocialChange(idx, e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none"
+                                    placeholder={`URL Profil social ${idx + 1}`}
+                                />
+                            ))}
+                        </div>
+                        <p className="text-[10px] text-gray-500 mt-1">Essentiel pour la désambiguïsation de l'entité.</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-400 mb-1">Téléphone</label>
+                            <div className="relative">
+                                <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                <input 
+                                    type="tel" 
+                                    name="contactPhone"
+                                    value={formData.contactPhone}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none"
+                                    placeholder="+33..."
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-400 mb-1">Email</label>
+                            <div className="relative">
+                                <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                <input 
+                                    type="email" 
+                                    name="contactEmail"
+                                    value={formData.contactEmail}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:border-orange-500/50 outline-none"
+                                    placeholder="contact@..."
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button 
+                onClick={handleGenerate}
+                className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
+            >
+                {isGenerated ? <RefreshCw size={18} /> : <Zap size={18} />}
+                {isGenerated ? 'Mettre à jour le code' : 'Générer le code JSON-LD (-5 crédits)'}
+            </button>
+        </div>
+
+        {/* Output Droite */}
+        <div className="lg:col-span-7 flex flex-col gap-6">
+            <div className="bg-[#0f1115] border border-white/10 rounded-xl flex flex-col shadow-2xl overflow-hidden h-full min-h-[500px]">
+                <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-white flex items-center gap-2">
+                            <Code size={16} className="text-orange-400" />
+                            <script type="application/ld+json">
+                        </span>
+                    </div>
+                    <div className="flex gap-2">
+                        <button onClick={() => handleCopy()} disabled={!isGenerated} className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-medium text-white border border-white/10 transition-colors disabled:opacity-50">
+                            {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                            {copied ? 'Copié' : 'Copier'}
+                        </button>
+                        <button onClick={() => handleDownload()} disabled={!isGenerated} className="flex items-center gap-2 px-3 py-1.5 bg-white text-black hover:bg-gray-200 rounded-lg text-xs font-bold transition-colors disabled:opacity-50">
+                            <Download size={14} /> Télécharger
+                        </button>
+                    </div>
+                </div>
+                
+                <div className="relative bg-[#0a0a0f] p-6 flex-1 group">
+                    {isGenerated ? (
+                        <pre className="font-mono text-sm text-orange-100/90 whitespace-pre-wrap leading-relaxed selection:bg-orange-500/30 overflow-auto h-full max-h-[600px]">
+                            {jsonOutput}
+                        </pre>
+                    ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 opacity-50">
+                            <Code size={64} className="mb-4" />
+                            <p>Remplissez le formulaire pour générer le code.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Implementation Guide */}
+            <div className="bg-white/5 rounded-xl border border-white/10 p-6">
+                <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                    <ShieldCheck size={18} className="text-emerald-400" /> Guide d'implémentation
+                </h3>
+                <div className="space-y-4 text-sm text-gray-300">
+                    <div className="flex gap-4">
+                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold shrink-0">1</div>
+                        <div>
+                            <strong className="text-white block mb-1">Insertion dans le Header</strong>
+                            Copiez le code et collez-le dans la section <code>&lt;head&gt;</code> de toutes vos pages (ou au moins la page d'accueil).
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold shrink-0">2</div>
+                        <div>
+                            <strong className="text-white block mb-1">Validation Google</strong>
+                            Testez le code avec l'outil <a href="https://search.google.com/test/rich-results" target="_blank" className="text-orange-400 hover:underline inline-flex items-center gap-1">Résultats enrichis <ExternalLink size={10} /></a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </div>
+
+      {/* HISTORIQUE DES FICHIERS */}
+      {savedFiles.length > 0 && (
+        <div className="mt-12 border-t border-white/10 pt-10">
+            <h3 className="text-xl font-serif font-bold text-white mb-6 flex items-center gap-2">
+                <Archive size={20} className="text-gray-400" />
+                Historique des versions
+            </h3>
+            
+            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {savedFiles.map((file) => (
+                    <div key={file.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-orange-500/30 transition-all flex flex-col">
+                        <div className="flex justify-between items-start mb-3">
+                            <span className="text-[10px] font-bold px-2 py-1 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20 uppercase">
+                                JSON-LD
+                            </span>
+                            <span className="text-xs text-gray-500">{new Date(file.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <h4 className="font-bold text-white mb-2 text-sm line-clamp-1">{file.title}</h4>
+                        
+                        <div className="bg-[#0a0a0f] p-3 rounded border border-white/5 mb-4 flex-1 overflow-hidden relative h-20">
+                            <p className="text-[10px] text-gray-500 font-mono line-clamp-3">{file.content}</p>
+                            <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#0a0a0f] to-transparent"></div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => handleRestore(file.content)}
+                                className="flex-1 py-1.5 bg-primary/10 hover:bg-primary/20 rounded text-[10px] font-bold text-primary transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Eye size={10} /> Voir
+                            </button>
+                            <button 
+                                onClick={() => handleDownload(`schema_archive_${file.id}.jsonld`, file.content)}
+                                className="flex-1 py-1.5 bg-white/5 hover:bg-white/10 rounded text-[10px] font-medium text-gray-300 transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Download size={10} /> DL
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SchemaOrg;

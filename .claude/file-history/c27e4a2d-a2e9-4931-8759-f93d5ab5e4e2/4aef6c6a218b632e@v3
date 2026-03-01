@@ -1,0 +1,24 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import ProgramForm from '@/components/merchant/ProgramForm';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function NewProgramPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Get merchant record via user_id
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('id')
+    .eq('user_id', user!.id)
+    .single();
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Nouveau programme" description="Créez un programme de fidélité." />
+      <ProgramForm merchantId={merchant!.id} />
+    </div>
+  );
+}

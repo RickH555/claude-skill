@@ -1,0 +1,57 @@
+import React from 'react';
+import Header from './Header';
+import Sidebar from './Sidebar';
+
+interface AppShellProps {
+  activePage: string;
+  onPageChange: (page: string) => void;
+  credits: number;
+  plan: string;
+  user: { name: string; email: string } | null;
+  onOpenCommandPalette?: () => void;
+  onLogoClick?: () => void;
+  children: React.ReactNode;
+}
+
+export default function AppShell({
+  activePage,
+  onPageChange,
+  credits,
+  plan,
+  user,
+  onOpenCommandPalette,
+  onLogoClick,
+  children,
+}: AppShellProps) {
+  return (
+    <div className="h-screen flex flex-col bg-[var(--bg-base)]">
+      {/* HEADER — minimal, 48px */}
+      <Header
+        credits={credits}
+        user={user}
+        onOpenCommandPalette={onOpenCommandPalette}
+        onLogoClick={onLogoClick}
+      />
+
+      {/* BODY — sidebar + main */}
+      <div className="flex flex-1 min-h-0">
+        {/* SIDEBAR — always visible on desktop */}
+        <Sidebar
+          activePage={activePage}
+          onPageChange={onPageChange}
+          credits={credits}
+          plan={plan}
+          onLogoClick={onLogoClick}
+          onNavigateToSettings={() => onPageChange('account')}
+        />
+
+        {/* MAIN CONTENT */}
+        <main className="flex-1 min-w-0 overflow-y-auto">
+          <div className="max-w-6xl mx-auto p-6 md:p-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

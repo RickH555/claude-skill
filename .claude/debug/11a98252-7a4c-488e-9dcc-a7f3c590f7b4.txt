@@ -1,0 +1,49 @@
+2026-02-07T21:06:42.459Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-07T21:06:42.460Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-07T21:06:42.460Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-07T21:06:42.461Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-07T21:06:42.542Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-07T21:06:42.579Z [DEBUG] Applying permission update: Adding 10 allow rule(s) to destination 'localSettings': ["Bash(dir:*)","Bash(powershell -Command:*)","Bash(node --version)","Bash(npm:*)","Bash(xcopy \"C:\\\\Users\\\\User\\\\Desktop\\\\citedbyai-temp\\\\*\" \"C:\\\\Users\\\\User\\\\Desktop\\\\UltimateSaaSCitedbyai\"\" /E /Y /Q 2>&1 && rmdir /S /Q \"C:UsersUserDesktopcitedbyai-temp \")","Bash(npx tailwindcss init -p)","Bash(npx tsc:*)","Bash(tree:*)","Bash(node -e:*)","Bash(wc:*)"]
+2026-02-07T21:06:42.579Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-07T21:06:42.589Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-02-07T21:06:42.591Z [DEBUG] [STARTUP] Running setup()...
+2026-02-07T21:06:42.591Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-07T21:06:42.598Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-07T21:06:42.598Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-02-07T21:06:42.598Z [DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)
+2026-02-07T21:06:42.605Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-07T21:06:42.607Z [DEBUG] Error log sink initialized
+2026-02-07T21:06:42.613Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-07T21:06:42.613Z [DEBUG] Total plugin skills loaded: 0
+2026-02-07T21:06:42.613Z [DEBUG] Total plugin commands loaded: 0
+2026-02-07T21:06:42.623Z [DEBUG] [STARTUP] setup() completed in 32ms
+2026-02-07T21:06:42.623Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-07T21:06:42.627Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-07T21:06:42.639Z [DEBUG] Total plugin agents loaded: 0
+2026-02-07T21:06:42.639Z [DEBUG] Loaded 0 unique skills (managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-02-07T21:06:42.645Z [DEBUG] getSkills returning: 0 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-02-07T21:06:42.650Z [DEBUG] [STARTUP] Commands and agents loaded in 27ms
+2026-02-07T21:06:42.650Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-07T21:06:42.650Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-07T21:06:42.650Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-07T21:06:42.651Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-07T21:06:42.651Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-07T21:06:42.655Z [DEBUG] Total LSP servers loaded: 0
+2026-02-07T21:06:42.655Z [DEBUG] [STARTUP] MCP configs loaded in 76ms
+2026-02-07T21:06:42.668Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-07T21:06:42.668Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-07T21:06:42.668Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-02-07T21:06:42.668Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-02-07T21:06:42.668Z [DEBUG] LSP server manager initialized successfully
+2026-02-07T21:06:42.668Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-07T21:06:42.800Z [DEBUG] Watching for changes in setting files C:\Users\User\.claude\settings.json, C:\Users\User\Desktop\UltimateSaaSCitedbyai\.claude\settings.json, C:\Users\User\Desktop\UltimateSaaSCitedbyai\.claude\settings.local.json...
+2026-02-07T21:06:42.815Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-07T21:06:42.896Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-07T21:06:42.912Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-02-07T21:06:42.914Z [DEBUG] Writing to temp file: C:\Users\User\.claude\todos\11a98252-7a4c-488e-9dcc-a7f3c590f7b4-agent-11a98252-7a4c-488e-9dcc-a7f3c590f7b4.json.tmp.22712.1770498402914
+2026-02-07T21:06:42.916Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-02-07T21:06:42.916Z [DEBUG] Renaming C:\Users\User\.claude\todos\11a98252-7a4c-488e-9dcc-a7f3c590f7b4-agent-11a98252-7a4c-488e-9dcc-a7f3c590f7b4.json.tmp.22712.1770498402914 to C:\Users\User\.claude\todos\11a98252-7a4c-488e-9dcc-a7f3c590f7b4-agent-11a98252-7a4c-488e-9dcc-a7f3c590f7b4.json
+2026-02-07T21:06:42.918Z [DEBUG] File C:\Users\User\.claude\todos\11a98252-7a4c-488e-9dcc-a7f3c590f7b4-agent-11a98252-7a4c-488e-9dcc-a7f3c590f7b4.json written atomically
+2026-02-07T21:06:42.988Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-02-07T21:06:42.988Z [DEBUG] Found 0 hook matchers in settings
+2026-02-07T21:06:42.989Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)

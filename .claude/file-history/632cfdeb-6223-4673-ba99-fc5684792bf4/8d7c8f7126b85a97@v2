@@ -1,0 +1,30 @@
+"use client"
+
+import { Toaster as SonnerToaster } from "sonner"
+
+function Toaster() {
+  return (
+    <SonnerToaster
+      position="bottom-right"
+      toastOptions={{
+        style: {
+          background: "#1a1d21",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          color: "#ffffff",
+        },
+        classNames: {
+          success: "!border-emerald-500/20",
+          error: "!border-red-500/20",
+          warning: "!border-amber-500/20",
+        },
+      }}
+    />
+  )
+}
+
+export { Toaster }
+
+// Re-export toast function for convenient usage:
+// import { toast } from "sonner"
+// toast.success("Done!")
+// toast.error("Error!")

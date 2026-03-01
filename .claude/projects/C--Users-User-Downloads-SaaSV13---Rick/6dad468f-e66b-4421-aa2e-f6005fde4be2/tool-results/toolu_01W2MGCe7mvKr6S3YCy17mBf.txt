@@ -1,0 +1,499 @@
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-484-          {currentView === 'home' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-485-            <Home 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:486:                key={`home-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-487-                onNavigate={(view) => navigateTo(view)} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-488-                user={user} 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-492-
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-493-          {currentView === 'login' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:494:            <Login key={`login-${refreshKey}`} onLogin={handleLogin} onBack={goBack} />
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-495-          )}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-496-
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-497-          {currentView === 'dashboard' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-498-            <Dashboard 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:499:                key={`dashboard-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-500-                onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-501-                history={history} 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-506-
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-507-          {currentView === 'generative-tools' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:508:            <GenerativeTools key={`generative-tools-${refreshKey}`} onNavigate={navigateTo} />
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-509-          )}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-510-
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-511-          {currentView === 'analyze' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:512:            <Analyze key={`analyze-${refreshKey}`} onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-513-          )}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-514-          
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-515-          {currentView === 'results' && analysisData && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-516-            <Results 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:517:              key={`results-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-518-              data={analysisData} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-519-              onBack={goBack} 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-528-          {currentView === 'history' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-529-            <HistoryView
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:530:              key={`history-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-531-              onBack={goBack}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-532-              history={history}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-537-          {currentView === 'smc-studio' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-538-            <SMCStudio 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:539:              key={`smc-studio-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-540-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-541-              user={user}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-550-          {currentView === 'source-of-truth' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-551-            <SourceOfTruth 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:552:              key={`source-of-truth-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-553-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-554-              history={history}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-562-          {currentView === 'schema-org' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-563-            <SchemaOrg 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:564:              key={`schema-org-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-565-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-566-              history={history}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-574-          {currentView === 'publisher-request' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-575-            <PublisherRequest 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:576:              key={`publisher-request-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-577-              onBack={goBack}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-578-              user={user}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-583-          {currentView === 'robots-txt' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-584-            <RobotsTxt 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:585:              key={`robots-txt-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-586-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-587-              history={history}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-596-          {currentView === 'directory' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-597-            <Directory 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:598:              key={`directory-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-599-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-600-              onViewEntity={handleViewDirectoryEntity}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-609-          {currentView === 'directory-entity' && analysisData && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-610-            <DirectoryEntity 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:611:              key={`directory-entity-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-612-              data={analysisData}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-613-              onBack={goBack}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-617-          {currentView === 'recharge' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-618-            <Recharge 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:619:              key={`recharge-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-620-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-621-              onRecharge={handleRecharge}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-628-          {currentView === 'plan' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-629-            <Plan 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:630:              key={`plan-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-631-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-632-              user={user}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-638-          {currentView === 'projects' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-639-            <Projects 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:640:              key={`projects-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-641-              onBack={goBack} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-642-              onNavigateToAnalysis={() => navigateTo('analyze')}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-658-          {currentView === 'account' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-659-            <Account 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:660:              key={`account-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-661-              user={user} 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-662-              onLogout={handleLogout}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-668-          {currentView === 'clients' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-669-            <Clients 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:670:              key={`clients-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-671-              onBack={goBack}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-672-              onNavigate={navigateTo}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-677-          {currentView === 'affiliation' && (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-678-            <Affiliation 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:679:              key={`affiliation-${refreshKey}`}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-680-              onBack={goBack}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-681-              user={user}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-699-            ].map((item) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-700-              <button
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:701:                key={item.view}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-702-                onClick={() => navigateTo(item.view as any)}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-703-                className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-164-                </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-165-                {data.services.map((service, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx:166:                  <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/5 group relative">
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-167-                    <button onClick={() => removeService(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-168-                    <div className="grid grid-cols-2 gap-4 mb-3">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-199-                </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-200-                {data.faqs.map((faq, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx:201:                  <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/5 group relative">
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-202-                    <button onClick={() => removeFaq(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
+C:\Users\User\Downloads\SaaSV13 - Rick\components\SourceOfTruthModal.tsx-203-                    <input 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\components\GenerationModal.tsx-147-                    <div className="space-y-0">
+C:\Users\User\Downloads\SaaSV13 - Rick\components\GenerationModal.tsx-148-                    {solution.implementationSteps.map((step, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\components\GenerationModal.tsx:149:                        <div key={idx} className="flex gap-4 pb-6 last:pb-0 relative group">
+C:\Users\User\Downloads\SaaSV13 - Rick\components\GenerationModal.tsx-150-                            {/* Vertical Line */}
+C:\Users\User\Downloads\SaaSV13 - Rick\components\GenerationModal.tsx-151-                            {idx !== solution.implementationSteps.length - 1 && (
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\components\CategoryCard.tsx-51-          <div className="mt-3 space-y-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\components\CategoryCard.tsx-52-            {category.items.map((item, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\components\CategoryCard.tsx:53:              <div key={idx} className="flex items-start gap-3 text-sm p-2 rounded hover:bg-white/5">
+C:\Users\User\Downloads\SaaSV13 - Rick\components\CategoryCard.tsx-54-                <span className="mt-0.5">{getStatusIcon(item.status)}</span>
+C:\Users\User\Downloads\SaaSV13 - Rick\components\CategoryCard.tsx-55-                <span className="text-gray-300">{item.message}</span>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\[id]\layout.tsx-36-             return (
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\[id]\layout.tsx-37-               <Link 
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\[id]\layout.tsx:38:                 key={tab.href}
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\[id]\layout.tsx-39-                 href={tab.href} 
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\[id]\layout.tsx-40-                 className={cn(
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-124-                {tableData.map((row, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-125-                  <tr 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx:126:                    key={idx} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-127-                    className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors cursor-pointer group"
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-128-                    onClick={() => row.original ? onView(row.original) : null}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-169-                <div className="w-full h-full flex items-end justify-between px-2 gap-2">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-170-                    {[40, 65, 55, 80, 75, 90, 85].map((h, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx:171:                        <div key={i} className="w-full bg-primary/20 rounded-t-sm relative group">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-172-                            <div 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-173-                                className="absolute bottom-0 left-0 right-0 bg-primary rounded-t-sm transition-all duration-1000 group-hover:opacity-80" 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\page.tsx-46-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\page.tsx-47-        {MOCK_PROJECTS.map((project) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\page.tsx:48:          <div key={project.id} className="glass-panel rounded-2xl border border-white/10 overflow-hidden hover:border-primary/30 transition-all group">
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\page.tsx-49-            <div className="p-6 border-b border-white/5">
+C:\Users\User\Downloads\SaaSV13 - Rick\app\(app)\app\projects\page.tsx-50-              <div className="flex justify-between items-start mb-4">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-404-            {['all', 'active', 'pending', 'churned'].map(status => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-405-               <button
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx:406:                  key={status}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-407-                  onClick={() => setStatusFilter(status)}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-408-                  className={`px-4 py-1.5 rounded-lg text-sm capitalize transition-colors whitespace-nowrap ${
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-434-                  {filteredClients.map((client) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-435-                     <tr 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx:436:                        key={client.id} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-437-                        className="hover:bg-white/[0.02] transition-colors cursor-pointer group"
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Clients.tsx-438-                        onClick={() => setSelectedClient(client)}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-217-                    >
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-218-                      {history.map((analysis, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:219:                        <option key={idx} value={idx} className="bg-[#1a1d24]">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-220-                            {new URL(analysis.url).hostname} - {new Date(analysis.timestamp).toLocaleDateString()}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-221-                        </option>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-328-                                </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-329-                                {data.services.map((service, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:330:                                <div key={idx} className="bg-white/[0.02] p-5 rounded-xl border border-white/5 hover:border-white/10 transition-colors group relative">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-331-                                    <button onClick={() => removeService(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1"><Trash2 size={16} /></button>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-332-                                    <div className="grid md:grid-cols-2 gap-4 mb-3">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-363-                                </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-364-                                {data.faqs.map((faq, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:365:                                <div key={idx} className="bg-white/[0.02] p-5 rounded-xl border border-white/5 hover:border-white/10 transition-colors group relative">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-366-                                    <button onClick={() => removeFaq(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1"><Trash2 size={16} /></button>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-367-                                    <input 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-526-            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-527-                {savedFiles.map((file) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:528:                    <div key={file.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-purple-500/30 transition-all flex flex-col">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-529-                        <div className="flex justify-between items-start mb-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-530-                            <span className="text-[10px] font-bold px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-146-                {criticalRecs.map(rec => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-147-                    <RecommendationCard 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx:148:                        key={rec.id} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-149-                        rec={rec} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-150-                        cost={getSolutionCost(rec.priority)}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-168-                {otherRecs.map(rec => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-169-                    <RecommendationCard 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx:170:                        key={rec.id} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-171-                        rec={rec} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-172-                        cost={getSolutionCost(rec.priority)}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-282-            <div className="grid md:grid-cols-3 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-283-                {archives.map((item) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx:284:                    <div key={item.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-primary/30 transition-all group flex flex-col">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-285-                        <div className="flex justify-between items-start mb-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-286-                            <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-634-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-635-                {library.map((item) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx:636:                    <div key={item.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-primary/30 transition-all group flex flex-col">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-637-                        <div className="flex justify-between items-start mb-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SMCStudio.tsx-638-                            <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-141-                        <div className="space-y-8">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-142-                            {MARKETING_ASSETS.emails.map((email) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx:143:                                <div key={email.id} className="glass-panel p-6 rounded-xl border border-white/10">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-144-                                    <div className="flex justify-between items-start mb-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-145-                                        <div>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-166-                        <div className="grid md:grid-cols-2 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-167-                            {MARKETING_ASSETS.social.map((post) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx:168:                                <div key={post.id} className="glass-panel p-6 rounded-xl border border-white/10 h-full flex flex-col">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-169-                                    <div className="flex justify-between items-center mb-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-170-                                        <div className="flex items-center gap-2">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-195-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-196-                                {MARKETING_ASSETS.banners.map((ban) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx:197:                                    <div key={ban.id} className="group cursor-pointer">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-198-                                        <div className={`aspect-video rounded-xl border border-white/10 flex flex-col items-center justify-center relative overflow-hidden transition-all group-hover:border-primary/50 ${ban.color}`}>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-199-                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-334-                    <div className="h-64 flex items-end justify-between gap-2">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-335-                        {[35, 45, 30, 60, 75, 50, 45, 65, 80, 70, 90, 85].map((h, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx:336:                            <div key={i} className="w-full bg-white/5 rounded-t-lg relative group">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-337-                                <div 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-338-                                    className="absolute bottom-0 left-0 right-0 bg-primary/20 group-hover:bg-primary/40 transition-colors rounded-t-lg"
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-359-                    <div className="space-y-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-360-                        {REFERRALS.slice(0, 3).map((ref) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx:361:                            <div key={ref.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-362-                                <div className="flex items-center gap-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-363-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-black flex items-center justify-center font-bold text-xs text-white">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-449-                        <tbody className="divide-y divide-white/5">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-450-                            {REFERRALS.map((ref) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx:451:                                <tr key={ref.id} className="hover:bg-white/[0.02] transition-colors">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-452-                                    <td className="px-6 py-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-453-                                        <div className="flex items-center gap-3">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-551-                            <tbody className="divide-y divide-white/5">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-552-                                {PAYOUTS.map((pay) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx:553:                                    <tr key={pay.id} className="hover:bg-white/[0.02] transition-colors">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-554-                                        <td className="px-6 py-4 text-sm text-gray-300 font-mono">{pay.id}</td>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Affiliation.tsx-555-                                        <td className="px-6 py-4 text-sm text-gray-400">{pay.date}</td>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Account.tsx-184-                        { label: "Offres & Nouveautés", desc: "Newsletters produit et mises à jour des algorithmes.", default: false },
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Account.tsx-185-                    ].map((pref, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Account.tsx:186:                        <div key={i} className="flex items-start justify-between pb-4 border-b border-white/5 last:border-0 last:pb-0">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Account.tsx-187-                            <div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Account.tsx-188-                                <p className="text-sm font-medium text-white">{pref.label}</p>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-218-                            {formData.socialProfiles.map((url, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-219-                                <input 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx:220:                                    key={idx}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-221-                                    type="url" 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-222-                                    value={url}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-342-            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-343-                {savedFiles.map((file) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx:344:                    <div key={file.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-orange-500/30 transition-all flex flex-col">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-345-                        <div className="flex justify-between items-start mb-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-346-                            <span className="text-[10px] font-bold px-2 py-1 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20 uppercase">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\GenerativeTools.tsx-67-        {tools.map((tool) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\GenerativeTools.tsx-68-            <ToolCard 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\GenerativeTools.tsx:69:                key={tool.id} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\GenerativeTools.tsx-70-                icon={tool.icon} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\GenerativeTools.tsx-71-                label={tool.label} 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-200-            >
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-201-                {history.map((analysis, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx:202:                <option key={idx} value={idx} className="bg-[#1a1d24]">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-203-                    {new URL(analysis.url).hostname}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-204-                </option>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-351-                <ol className="relative border-l border-white/10 ml-3 space-y-8">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-352-                    {guide.steps.map((step, index) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx:353:                        <li key={index} className="pl-8 relative group">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-354-                            <span className="absolute -left-[17px] top-0 flex items-center justify-center w-8 h-8 bg-[#0a0a0f] border border-white/20 rounded-full text-xs font-bold text-gray-400 group-hover:text-primary group-hover:border-primary transition-colors">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-355-                                {index + 1}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-399-            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-400-                {savedFiles.map((file) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx:401:                    <div key={file.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-blue-500/30 transition-all flex flex-col">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-402-                        <div className="flex justify-between items-start mb-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-403-                            <span className="text-[10px] font-bold px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-107-          }
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-108-        ].map((item, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx:109:          <div key={i} className="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors border border-white/5 group">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-110-            <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-4 text-primary font-bold shadow-inner group-hover:bg-primary group-hover:text-black transition-all duration-300">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-111-              {item.icon}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-310-            {plans.map((plan, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-311-                <div 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx:312:                    key={idx} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-313-                    className={`relative glass-panel rounded-2xl p-6 border flex flex-col h-full transition-all duration-300 hover:transform hover:-translate-y-2 ${
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-314-                        plan.popular 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-341-                    <ul className="space-y-3 mb-8 flex-1">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-342-                        {plan.features.map((feat, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx:343:                            <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-344-                                <Check size={16} className={`mt-0.5 ${plan.popular ? 'text-primary' : 'text-gray-500'}`} />
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Home.tsx-345-                                {feat}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-93-                  <div className="grid md:grid-cols-2 gap-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-94-                      {strengths.map((item, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx:95:                          <div key={idx} className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/20 transition-colors">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-96-                              <div className="mt-0.5">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-97-                                  <CheckCircle2 size={18} className="text-emerald-500" />
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-146-            <div className="grid md:grid-cols-2 gap-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-147-              {categoryScores.map((cat, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:148:                <CategoryCard key={i} category={cat} />
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-149-              ))}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-150-            </div>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-243-                  <div className="grid grid-cols-2 gap-6 mb-12">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-244-                      {categoryScores.map((cat, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:245:                          <div key={i} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-246-                              <div className="flex justify-between items-start mb-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-247-                                  <h4 className="font-bold text-gray-800 text-lg">{cat.name}</h4>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-252-                              <ul className="space-y-2">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-253-                                  {cat.items.slice(0, 4).map((item, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:254:                                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-255-                                          {item.status === 'success' ? (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-256-                                              <CheckCircle2 size={16} className="text-[#10b981] mt-0.5 shrink-0" />
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-273-                  <div className="space-y-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-274-                      {data.recommendations.map((rec, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:275:                          <div key={idx} className="flex gap-6 p-6 bg-gray-50 rounded-xl border border-gray-100">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-276-                              <div className="w-24 shrink-0 flex flex-col items-center justify-center border-r border-gray-200 pr-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-277-                                  <span className={`text-xs font-bold uppercase px-2 py-1 rounded mb-2 ${
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-296-                                  <div className="flex justify-end gap-1 mb-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-297-                                      {[1,2,3].map(n => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:298:                                          <div key={n} className={`w-2 h-2 rounded-full ${
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-299-                                              (rec.impact === 'high' && n <= 3) || (rec.impact === 'medium' && n <= 2) || (rec.impact === 'low' && n === 1) 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-300-                                              ? 'bg-[#10b981]' 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-156-                {uniqueSectors.map(sector => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-157-                    <button
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx:158:                        key={sector}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-159-                        onClick={() => setSelectedFilter(sector)}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-160-                        className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${selectedFilter === sector ? 'bg-white/20 text-white' : 'bg-transparent text-gray-400 hover:bg-white/5'}`}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-182-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-183-            {filteredDirectory.map((item) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx:184:                <div key={item.id} className="glass-panel p-6 rounded-2xl border border-white/10 group hover:border-primary/30 transition-all hover:-translate-y-1 flex flex-col">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-185-                    <div className="flex justify-between items-start mb-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Directory.tsx-186-                        <div className="flex items-center gap-3">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-66-            const hostname = new URL(item.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-67-            return (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx:68:              <div key={idx} className="glass-panel rounded-xl border border-white/10 overflow-hidden group hover:border-white/20 transition-all">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-69-                {/* Header Card */}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-70-                <div className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5">
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-172-            {packs.map((pack) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-173-            <div 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx:174:                key={pack.id} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-175-                className={`relative bg-[#0f1115] border rounded-2xl p-8 flex flex-col transition-all duration-300 hover:transform hover:-translate-y-2 ${
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-176-                pack.popular 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-197-                <ul className="space-y-3 mb-8 flex-1">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-198-                {pack.features.map((feat, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx:199:                    <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-200-                    <Check size={16} className={`mt-0.5 ${pack.popular ? 'text-accent' : 'text-gray-500'}`} />
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Recharge.tsx-201-                    {feat}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-288-                        const solution = sol as GeneratedSolution & { timestamp: string };
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-289-                        return (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx:290:                          <div key={recId} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-emerald-500/30 transition-all group cursor-pointer" onClick={() => handleOpenStoredSolution(solution)}>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-291-                              <div className="flex justify-between items-start mb-3">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-292-                                  <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${solution.type === 'code' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-pink-500/10 text-pink-400 border border-pink-500/20'}`}>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-352-                   {projects.map(p => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-353-                      <button 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx:354:                        key={p.id}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-355-                        onClick={() => setSelectedProjectId(p.id)}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-356-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm ${p.id === selectedProjectId ? 'bg-primary/10 text-primary' : 'text-gray-300 hover:bg-white/5'}`}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-615-               <tbody className="divide-y divide-white/5">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-616-                  {projectHistory.map((analysis, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx:617:                     <tr key={idx} className={`hover:bg-white/[0.02] transition-colors ${selectedAnalysisState === analysis ? 'bg-primary/5' : ''}`}>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-618-                        <td className="px-6 py-4 text-sm text-gray-300">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-619-                           {new Date(analysis.timestamp).toLocaleDateString()} <span className="text-gray-600 text-xs ml-1">{new Date(analysis.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-265-                {plans.map((plan) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-266-                    <div 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx:267:                        key={plan.id} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-268-                        className={`relative glass-panel rounded-2xl p-6 border flex flex-col transition-all ${
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-269-                            plan.popular 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-296-                            {plan.features.map((feat, i) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-297-                                <li 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx:298:                                    key={i} 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-299-                                    className={`flex items-start gap-3 text-sm ${
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-300-                                        feat === 'Indexation IA' 
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-357-                        <tbody className="divide-y divide-white/5">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-358-                            {payments.map((payment) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx:359:                                <tr key={payment.id} className="hover:bg-white/[0.02] transition-colors">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-360-                                    <td className="px-6 py-4 text-sm font-medium text-white">{payment.id}</td>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Plan.tsx-361-                                    <td className="px-6 py-4 text-sm text-gray-400">{payment.date}</td>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-79-                {niches.map((n) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-80-                    <button
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx:81:                        key={n.id}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-82-                        onClick={() => setSelectedNiche(n.id as NicheID)}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-83-                        className={`p-4 rounded-xl border text-left transition-all group ${
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-109-                ].map((s) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-110-                    <button
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx:111:                        key={s.id}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-112-                        onClick={() => setScope(s.id as Scope)}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-113-                        className={`px-4 py-3 rounded-lg border flex items-center gap-3 transition-all ${
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-158-                {authorityTiers.map((tier) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-159-                    <div 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx:160:                        key={tier.level}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-161-                        onClick={() => setAuthorityLevel(tier.level)}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\PublisherRequest.tsx-162-                        className={`p-5 rounded-xl border cursor-pointer transition-all flex items-center justify-between group ${
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\ai-provider.ts-3-// Initialize AI client only if API key is present to avoid build errors
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\ai-provider.ts-4-const getAiClient = () => {
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\ai-provider.ts:5:  const apiKey = process.env.API_KEY;
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\ai-provider.ts-6-  if (!apiKey) return null;
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\ai-provider.ts-7-  return new GoogleGenAI({ apiKey });
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-39-
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-40-export const generateSolution = async (rec: Recommendation, url: string): Promise<GeneratedSolution> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts:41:  const apiKey = getApiKey();
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-42-  
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-43-  // Check if API Key is available
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-133-
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-134-export const generateBlogArchitecture = async (topic: string, url: string): Promise<string> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts:135:  const apiKey = getApiKey();
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-136-  
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-137-  if (!apiKey) {
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-172-
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-173-export const generateFullArticle = async (briefContent: string, topic: string): Promise<string> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts:174:  const apiKey = getApiKey();
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-175-  
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-176-  if (!apiKey) {
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-21-  
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-22-  generateFiche: async (productName: string, features: string): Promise<string> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts:23:    const apiKey = getApiKey();
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-24-    if (!apiKey) return mockResponse('fiche');
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-25-
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-54-
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-55-  generateFAQ: async (topic: string, context: string): Promise<string> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts:56:    const apiKey = getApiKey();
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-57-    if (!apiKey) return mockResponse('faq');
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-58-
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-86-  // Étape 1 : Génération du Brief (Architecture)
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-87-  generateBrief: async (topic: string, url: string): Promise<string> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts:88:    const apiKey = getApiKey();
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-89-    if (!apiKey) return mockResponse('brief');
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-90-
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-119-  // Étape 2 : Rédaction complète basée sur le brief
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-120-  generateFullArticle: async (briefContent: string, topic: string): Promise<string> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts:121:    const apiKey = getApiKey();
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-122-    if (!apiKey) return mockResponse('article');
+C:\Users\User\Downloads\SaaSV13 - Rick\services\smc.ts-123-

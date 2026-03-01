@@ -1,0 +1,198 @@
+# CitedBy.io — Instructions Projet
+
+> **Derniere mise a jour** : 2026-02-24 — Refonte UI style Frase.io (light+dark mode, sidebar unique)
+
+## Architecture
+
+- **SPA Vite + React** avec routing custom dans App.tsx (pas de React Router)
+- **36 pages** dans `pages/` (3 direct imports + 33 lazy-loaded)
+- **20+ services** dans `services/` (15 racine + 2 sous-dossiers)
+- **15 composants** dans `components/`
+- **7 types** dans `types/`
+- **i18n** dans `i18n/` (FR/EN/ES)
+- **Backend Next.js** dans `app/`, `lib/`, `supabase/` (independant du SPA)
+- Design : dark theme Tailwind, accents purple/violet
+
+## Commandes
+
+- `npm run dev` → Vite dev server (port dynamique, souvent 5173+)
+- `npm run build` → Build production Vite (2451 modules, ~23s)
+- `npm run preview` → Preview production build
+
+## Stack technique
+
+- **Frontend** : React 18, Tailwind CSS (config locale, plus de CDN), Lucide Icons
+- **AI** : Google Gemini (@google/genai) avec fallback simulation
+- **Auth** : Supabase (Auth + PostgreSQL) — Login mock en local (email + mdp quelconque)
+- **Paiement** : Stripe (interface unifiee StripeCheckout, integration reelle a venir)
+- **i18n** : Systeme custom React Context (FR/EN/ES)
+- **Validation** : Zod + React Hook Form
+- **Charts** : Recharts
+- **PDF** : jsPDF (generation factures)
+
+## Regles importantes
+
+- NE PAS migrer vers Next.js. L'architecture frontend est Vite SPA.
+- NE PAS modifier services/analyzer.ts, services/criteria.ts, services/generator.ts
+- NE PAS supprimer de fichiers existants
+- NE PAS toucher au backend : `app/`, `lib/`, `supabase/`, `middleware.ts`, `next.config.mjs`
+- Toute generation IA utilise GoogleGenAI avec fallback simulation si API key absente
+- Le design est dark theme : bg-[#1a1d21], border-white/5, rounded-2xl
+- Palette accents : gradient purple-500 → violet-600, text-purple-400
+- AI Overviews utilise la couleur rose #f43f5e
+
+## Historique migration V3 (2026-02-17)
+
+Le frontend de citedby-v3 (Vite, `C:\Users\User\Documents\citedby-v3`) a ete porte vers ce projet V2 Next.js. Le backend V2 a ete preserve intact.
+
+### Ce qui a ete fait :
+1. **Phase 1** : 22 nouveaux fichiers copies (3 pages, 8 composants, 5 services, 5 types, 1 CSS)
+2. **Phase 2** : ~70 fichiers frontend existants ecrases par la version V3 (33 pages, 7 composants, 15 services, 2 types, i18n complet, App.tsx, types.ts, index.tsx, index.html)
+3. **Phase 3** : tailwind.config.ts merge (content paths V3 + V2, couleurs primary + leadradar, animations V2)
+4. **Phase 4** : Backend V2 preserve (app/, lib/, supabase/, middleware, configs)
+5. **Phase 5** : Build reussi 0 erreurs, dev server fonctionnel
+
+### Gains de la migration :
+- App.tsx refactorise : 44KB (V3) vs 87KB monolithe (ancien V2)
+- index.html propre : 17 lignes (V3) vs 105 lignes avec Tailwind CDN (ancien V2)
+- Support AI Overviews (rose #f43f5e) dans Monitoring, Simulator, Integrations, Reputation
+- 3 nouvelles pages : AiMonitoring, Integrations, ApiDeveloper
+- 8 nouveaux composants : Navbar, Sidebar, CommandPalette, AppFooter, MobileBottomNav, OnboardingModal, ShortcutsModal, ToastSystem
+
+## Pages (36 total)
+
+### Direct imports (3)
+- `Home` — Landing / Accueil
+- `Login` — Authentification
+- `Analyze` — Nouvel Audit (saisie URL)
+
+### Lazy-loaded (33)
+| Page | Fichier | Acces |
+|------|---------|-------|
+| Dashboard | Dashboard.tsx | Sidebar |
+| Monitoring IA | AiMonitoring.tsx | Sidebar (NOUVEAU) |
+| Monitoring AEO | AlertsAEO.tsx | Sidebar |
+| Outils Generatifs | GenerativeTools.tsx | Sidebar |
+| Annuaire Indexe | Directory.tsx | Sidebar |
+| Fiche Annuaire | DirectoryEntity.tsx | Clic sur entite |
+| API Developer | ApiDeveloper.tsx | Sidebar (NOUVEAU) |
+| Integrations | Integrations.tsx | Sidebar (NOUVEAU) |
+| GTO Gas (Credits) | Recharge.tsx | Sidebar |
+| Affiliation | Affiliation.tsx | Sidebar |
+| Base Clients | Clients.tsx | Sidebar |
+| Ordres de Mission | MissionOrders.tsx | Sidebar |
+| Alertes AEO | AlertsAEO.tsx | Sidebar |
+| Compte & Plan | Account.tsx | Sidebar |
+| Resultats | Results.tsx | Apres audit |
+| Historique | History.tsx | Depuis Dashboard |
+| Plan d'action | ActionPlan.tsx | Depuis Results |
+| Plan (standalone) | Plan.tsx | Via Account |
+| Projets | Projects.tsx | Via Account |
+| SMC Studio | SMCStudio.tsx | Via Outils Generatifs |
+| Source of Truth | SourceOfTruth.tsx | Via Outils Generatifs |
+| Schema.org | SchemaOrg.tsx | Via Outils Generatifs |
+| Robots.txt | RobotsTxt.tsx | Via Outils Generatifs |
+| Llms.txt | LlmsTxtGenerator.tsx | Via Outils Generatifs |
+| Blog Optimizer | BlogOptimizer.tsx | Via Outils Generatifs |
+| Content Writer | ContentWriter.tsx | Via Outils Generatifs |
+| Publisher Request | PublisherRequest.tsx | Via Outils Generatifs |
+| AI Citation Simulator | AiCitationSimulator.tsx | Via Outils Generatifs |
+| AI Response Layer | AiResponseLayer.tsx | Via Dashboard |
+| Answer First Audit | AnswerFirstAudit.tsx | Via Outils Generatifs |
+| E-E-A-T Builder | EeatBuilder.tsx | Via Outils Generatifs |
+| Bot Tracking | BotTracking.tsx | Via Dashboard |
+| Reputation | Reputation.tsx | Via Dashboard |
+| Messages | Messages.tsx | Sidebar / Navbar |
+
+## Composants (15)
+
+### Nouveaux (V3)
+- **Navbar.tsx** — Barre de navigation superieure (logo, credits, notifications, profil)
+- **Sidebar.tsx** — Navigation laterale avec sections (Principal, Outils, Gestion)
+- **CommandPalette.tsx** — Palette de commandes (Ctrl+K)
+- **AppFooter.tsx** — Pied de page
+- **MobileBottomNav.tsx** — Navigation mobile bas d'ecran
+- **OnboardingModal.tsx** — Modal de bienvenue (50 credits offerts)
+- **ShortcutsModal.tsx** — Modal raccourcis clavier
+- **ToastSystem.tsx** — Systeme de notifications toast
+
+### Existants (mis a jour depuis V3)
+- **StripeCheckout.tsx** — Interface paiement Stripe (abonnements + one-time)
+- **AICitationPreview.tsx** — Preview citations IA
+- **CategoryCard.tsx** — Carte categorie
+- **GenerationModal.tsx** — Modal generation contenu
+- **RecommendationCard.tsx** — Carte recommandation
+- **ScoreRing.tsx** — Anneau de score visuel
+- **SourceOfTruthModal.tsx** — Modal source of truth
+
+## Services (20+)
+
+### Racine (15)
+ai-citation-simulator, analyzer, answer-first-audit, blog_prompt_db, content_writer, criteria, database, generator, llms-txt-generator, llm_templates, pdf_prompt, reputation_service, robots_service, schema_service, smc
+
+### Nouveaux (5)
+ai-monitoring, api-developer, integrations, retargeting, scheduling
+
+### Sous-dossiers
+- `services/ai-response-layer/` (6 fichiers)
+- `services/eeat/` (8 fichiers)
+
+## Types (7)
+ai-monitoring, ai-response-layer, api-developer, eeat, integrations, retargeting, scheduling
+
+## Backend V2 (NE PAS TOUCHER)
+
+- `app/` — API routes Next.js (Stripe webhooks, auth, runs)
+- `lib/` — Supabase client, Stripe config, utils
+- `supabase/` — 10 edge functions, 8 migrations SQL
+- `middleware.ts` — Middleware Next.js
+- `next.config.mjs` — Config Next.js
+- `vercel.json` — Config deploiement
+- `src/` — Code Next.js additionnel
+- `scripts/`, `docs/`, `qa/`, `n8n/`, `tests/`
+- `app/globals.css` — CSS Next.js (separe du SPA globals.css)
+
+## Tailwind config (merge V3+V2)
+
+```
+content: index.html, App.tsx, index.tsx, pages/**, components/**, lib/**, i18n/**, src/**
+colors: primary (#7c3aed) + leadradar (bg, card, border, accent, etc.)
+fonts: Inter (sans), Playfair Display (serif), Outfit
+animations: pulse-live, slide-in
+```
+
+## Flux de paiement (etat actuel)
+
+### Abonnements (Account.tsx & Plan.tsx)
+- Modal 3 etapes : recap → **StripeCheckout** (formulaire Stripe) → succes
+- Plan upgrades : Starter (29€) → Pro (89€) → Agency (299€)
+
+### Recharges GTO Gas (Recharge.tsx)
+- 3 packs : Le Jerrican (50 Gas, 15€), La Pompe (200 Gas, 49€), La Citerne (1000 Gas, 199€)
+
+### Integration Stripe reelle (TODO)
+- Chercher `STRIPE_INTEGRATION_POINT` dans components/StripeCheckout.tsx (6 points)
+- Remplacer fake inputs par `<CardElement>` de @stripe/react-stripe-js
+
+## Navigation sidebar
+
+### Principal
+- Accueil → Home
+- Nouvel Audit → Analyze
+- Dashboard
+- Monitoring IA → AiMonitoring (NOUVEAU)
+- Monitoring AEO → AlertsAEO
+
+### Outils
+- Outils Generatifs → GenerativeTools (sous-pages : SMC, Schema, Robots, Llms, Blog, Content, Publisher, Citation Sim, Answer First, E-E-A-T)
+- Annuaire Indexe → Directory / DirectoryEntity
+- API Developer → ApiDeveloper (NOUVEAU)
+
+### Gestion
+- Integrations (NOUVEAU)
+- GTO Gas (Credits) → Recharge
+- Affiliation
+- Base Clients → Clients
+- Ordres de Mission → MissionOrders
+- Alertes AEO → AlertsAEO
+- Compte & Plan → Account (onglets Profil / Abonnement & Projets / Facturation)

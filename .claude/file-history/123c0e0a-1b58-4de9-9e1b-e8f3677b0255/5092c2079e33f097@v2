@@ -1,0 +1,54 @@
+// ============================================
+// CitedBy.ai - Integrations Types
+// ============================================
+
+export type IntegrationProvider = 'ga4' | 'search_console'
+export type IntegrationStatus = 'connected' | 'disconnected' | 'connecting'
+export type IntegrationPeriod = '7d' | '30d' | '90d'
+
+export interface IntegrationConnection {
+  provider: IntegrationProvider
+  status: IntegrationStatus
+  accountName: string | null
+  connectedAt: string | null
+}
+
+export interface IntegrationKPI {
+  aiVisits: number
+  aiConversions: number
+  aiTrafficShare: number
+  avgAiCTR: number
+}
+
+export interface TrafficDataPoint {
+  date: string
+  chatgpt: number
+  perplexity: number
+  claude: number
+  gemini: number
+  copilot: number
+}
+
+export interface AttributionRow {
+  source: string
+  visits: number
+  pageViews: number
+  avgDuration: string
+  bounceRate: number
+  conversions: number
+  trend: 'up' | 'down' | 'stable'
+}
+
+export interface AIQueryRow {
+  query: string
+  impressions: number
+  clicks: number
+  ctr: number
+  position: number
+  isAIReferral: boolean
+}
+
+export interface IntegrationState {
+  connections: IntegrationConnection[]
+  period: IntegrationPeriod
+}

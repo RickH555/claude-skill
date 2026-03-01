@@ -1,0 +1,30 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { generateHub, generateQueryPage, generateRecommendJson, generateSitemapAi } from '@/services/ai-response-layer';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { action, ...params } = body;
+
+    let result;
+    switch (action) {
+      case 'hub':
+        result = await generateHub(params);
+        break;
+      case 'queryPage':
+        result = await generateQueryPage(params);
+        break;
+      case 'recommendJson':
+        result = await generateRecommendJson(params);
+        break;
+      case 'sitemapAi':
+        result = await generateSitemapAi(params);
+        break;
+      default:
+        return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+    }
+    return NextResponse.json({ result });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Internal error' }, { status: 500 });
+  }
+}

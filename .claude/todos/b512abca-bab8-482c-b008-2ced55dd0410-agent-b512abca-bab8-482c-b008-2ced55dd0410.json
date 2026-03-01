@@ -1,0 +1,37 @@
+[
+  {
+    "content": "BACKUP + checksums fichiers sacrés",
+    "status": "completed",
+    "activeForm": "Creating backup and checksums"
+  },
+  {
+    "content": "COUCHE 1 — Contexte i18n fonctionnel",
+    "status": "completed",
+    "activeForm": "Implementing i18n context layer"
+  },
+  {
+    "content": "COUCHE 2 — Traductions statiques",
+    "status": "in_progress",
+    "activeForm": "Translating all static UI text"
+  },
+  {
+    "content": "COUCHE 3 — Traductions dynamiques (prompts IA + engine criteria)",
+    "status": "completed",
+    "activeForm": "Translating AI-generated content"
+  },
+  {
+    "content": "Attendre fin des 6 agents parallèles",
+    "status": "in_progress",
+    "activeForm": "Waiting for parallel agents to complete"
+  },
+  {
+    "content": "Build verification + checksums sacrés",
+    "status": "pending",
+    "activeForm": "Running build and verifying sacred files"
+  },
+  {
+    "content": "Commit final i18n-complete",
+    "status": "pending",
+    "activeForm": "Creating final commit"
+  }
+]

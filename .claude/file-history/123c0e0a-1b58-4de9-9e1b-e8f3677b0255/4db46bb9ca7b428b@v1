@@ -1,0 +1,52 @@
+import { Link, useLocation } from 'react-router-dom'
+
+interface NavItem {
+  label: string
+  path: string
+  icon: string
+}
+
+const navItems: NavItem[] = [
+  { label: 'Tableau de bord', path: '/app', icon: '##' },
+  { label: 'Monitoring', path: '/app/monitoring', icon: '~~' },
+  { label: 'Analytiques', path: '/app/analytics', icon: '&&' },
+  { label: 'Paramètres', path: '/app/settings', icon: '@@' },
+]
+
+export default function Sidebar() {
+  const location = useLocation()
+
+  function isActive(path: string): boolean {
+    if (path === '/app') {
+      return location.pathname === '/app'
+    }
+    return location.pathname.startsWith(path)
+  }
+
+  return (
+    <aside className="flex h-screen w-64 flex-col bg-gray-900 text-white">
+      {/* Logo */}
+      <div className="flex h-16 items-center px-6">
+        <span className="text-xl font-bold">CitedBy.ai</span>
+      </div>
+
+      {/* Navigation */}
+      <nav className="mt-4 flex-1 space-y-1 px-3">
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              isActive(item.path)
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+            }`}
+          >
+            <span className="font-mono text-xs">{item.icon}</span>
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+    </aside>
+  )
+}

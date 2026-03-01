@@ -1,0 +1,364 @@
+# Vite SPA → Next.js App Router Migration Plan
+
+## Context
+
+CitedBy.ai currently runs as a **dual-stack** project: a Vite React SPA (36 pages, custom routing in App.tsx) coexisting with a partially-implemented Next.js App Router (5 scaffold pages + 5 API routes). The SPA is the primary frontend. This migration consolidates everything into Next.js App Router, eliminating the Vite layer entirely.
+
+**User decisions:**
+- Keep localStorage as the data layer (no Supabase migration)
+- Keep custom React Context for i18n
+- Move Gemini API calls to server-side API routes
+- Big bang strategy — migrate all pages at once
+
+**Key challenge:** App.tsx is a 900-line monolith managing ALL state centrally and passing props to every page. This must be decomposed into a React Context provider.
+
+---
+
+## Phase 1: Foundation (Config & Shared Infrastructure)
+
+### Step 1 — Rename `pages/` → `views/`
+Next.js interprets a root `pages/` directory as the Pages Router, which conflicts with the App Router.
+
+- Move `pages/*.tsx` (36 files) → `views/*.tsx`
+- Move `pages/v3/*.tsx` (8 files) → `views/v3/*.tsx`
+- Update all imports in `App.tsx` to reference `./views/` (keeps the SPA runnable for comparison during development)
+
+**Files affected:** `App.tsx`, `pages/` directory (rename to `views/`)
+
+### Step 2 — Create `lib/route-map.ts`
+Maps old ViewName identifiers to Next.js URL paths. Used by sidebar, command palette, and navigation helpers.
+
+```
+lib/route-map.ts (NEW)
+```
+
+Contains:
+- `VIEW_TO_PATH: Record<string, string>` — maps all 41 view names to URL paths
+- `getSectionFromPath(pathname): Section` — determines sidebar section from URL
+- `getViewNameFromPath(pathname): string` — reverse lookup
+
+### Step 3 — Create `lib/app-context.tsx` (AppProvider)
+Extract ALL shared state from `App.tsx` lines 107-438 into a React Context. This is the single biggest piece of work.
+
+```
+lib/app-context.tsx (NEW, ~300 lines)
+```
+
+**State to extract:**
+- User: `user`, `animatedCredits`, `showOnboarding`, `showCelebration`
+- Data: `history`, `analysisData`, `smcLibrary`, `truthLibrary`, `schemaLibrary`, `robotsLibrary`
+- Status: `megaStatus`, `isAnalyzing`
+- Cross-page params: `resultsTab`, `publisherRequestData`, `initialRechargePackId`, `initialAccountTab`
+- Layout: `isSidebarCollapsed`, `lowCreditsDismissed`
+
+**Callbacks to extract:**
+- `handleAnalyze(url)` — runs `analyzeUrl()` + `megaGenerate()` + `generateAllSolutions()` pipeline
+- `handleDeductCredits(amount)` — credit check + deduction
+- `handleLogin(user)` / `handleLogout()`
+- `handleRecharge(amount, planLevel)`
+- `handleSaveSolution(analysisId, recId, solution)`
+- Library add handlers (smcLibrary, truthLibrary, etc.)
+- `navigateTo(viewName)` — wraps `router.push(VIEW_TO_PATH[viewName])`
+- `goBack()` — wraps `router.back()`
+
+**Critical source files to reference:**
+- `App.tsx:107-438` — all state declarations and handlers
+- `components/layout/AppSidebar.tsx` — `getSectionForPage()` function
+- `services/database.ts` — localStorage `db` API
+- `services/mega-generator.ts` — `megaGenerate()` pipeline
+- `services/solution-mega-generator.ts` — `generateAllSolutions()`
+- `services/solution-vault.ts` — `storeInVault()`, `hasVault()`
+
+### Step 4 — Create `lib/toast-context.tsx`
+Wrap the existing `ToastSystem.tsx` exports into a standalone provider.
+
+```
+lib/toast-context.tsx (NEW, ~40 lines)
+```
+
+Reuses `Toast`, `ToastContainer` from `components/ToastSystem.tsx`. Provides `showToast(type, message)` and `removeToast(id)` via context.
+
+### Step 5 — Merge CSS files
+Copy all utility classes from `globals.css` (SPA root) into `app/globals.css`. The SPA CSS has `.btn-gradient`, `.gradient-text`, `.ninja-card`, custom scrollbar styles, animation keyframes, `.skeleton-shimmer`, etc. The Next.js CSS has CSS variables and `.glass-panel`.
+
+**Files:** Merge `globals.css` → `app/globals.css`
+
+### Step 6 — Update `tsconfig.json`
+Switch from Vite-oriented to Next.js-oriented config.
+
+**Changes:**
+- `jsx`: `"react-jsx"` → `"preserve"` (Next.js handles JSX)
+- `include`: Replace explicit file list with `["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]`
+- `exclude`: `["node_modules", "dist", "src", "remotion"]`
+- Add `plugins: [{ "name": "next" }]`
+- Add `incremental: true`
+- Keep `@/*` path alias
+
+### Step 7 — Update `tailwind.config.ts`
+Update content paths:
+
+```diff
+- content: ["./index.html", "./App.tsx", "./index.tsx", "./pages/**/*.{ts,tsx}", ...]
++ content: ["./app/**/*.{ts,tsx}", "./views/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}", "./i18n/**/*.{ts,tsx}"]
+```
+
+---
+
+## Phase 2: Layout Architecture
+
+### Step 8 — Rewrite `app/layout.tsx` (root layout)
+Server component. Sets Inter font, dark theme class, metadata, imports merged `globals.css`.
+
+**File:** `app/layout.tsx` (REWRITE)
+
+### Step 9 — Create `components/layout/AppShellWrapper.tsx`
+Client component wrapping all UI chrome from App.tsx lines 469-893:
+- Keyboard listeners (Ctrl+K command palette, ? shortcuts, Escape)
+- `CommandPalette` rendering
+- `ShortcutsModal` rendering
+- `OnboardingModal` rendering
+- Low credits warning banner
+- Floating Action Button (new audit)
+- BackToTopButton
+- Celebration overlay
+- MobileBottomNav
+
+Uses `useAppContext()` for user/credits/navigation and `usePathname()` for active section detection.
+
+**File:** `components/layout/AppShellWrapper.tsx` (NEW, ~200 lines)
+
+### Step 10 — Modify `components/layout/TopNav.tsx`
+Replace callback props with `useRouter()` + `usePathname()`:
+- `onSectionChange(section)` → `router.push(sectionDefaults[section])`
+- `onNavigate(view)` → `router.push(VIEW_TO_PATH[view])`
+- `activeSection` prop → derive from `usePathname()` + `getSectionFromPath()`
+
+### Step 11 — Modify `components/layout/AppSidebar.tsx`
+Replace callback props with `useRouter()` + `usePathname()`:
+- `onNavigate(id)` → `router.push(VIEW_TO_PATH[id])`
+- `activePage` prop → derive from `usePathname()` + `getViewNameFromPath()`
+- Keep `getSectionForPage()` export (reused by route-map)
+
+### Step 12 — Modify `components/CommandPalette.tsx`
+Replace `onNavigate(cmd.id)` prop with internal `router.push(VIEW_TO_PATH[cmd.id])`.
+
+### Step 13 — Rewrite `app/(app)/layout.tsx`
+Client component. Provider hierarchy: `I18nProvider` → `AppProvider` → `ToastProvider` → `AppShellWrapper` → `{children}`
+
+**File:** `app/(app)/layout.tsx` (REWRITE — replaces old `app/(app)/app/layout.tsx`)
+
+Keep `app/(auth)/layout.tsx` and `app/(auth)/login/page.tsx`, `app/(auth)/register/page.tsx` as-is for Supabase auth (can coexist with localStorage mock login).
+
+### Step 14 — Update `middleware.ts`
+Expand matcher to cover new route structure:
+
+```typescript
+matcher: [
+  '/dashboard/:path*', '/analyze/:path*', '/projects/:path*',
+  '/results/:path*', '/history/:path*', '/monitoring/:path*',
+  '/citations/:path*', '/tools/:path*', '/marketplace/:path*',
+  '/settings/:path*', '/api/:path*', '/login', '/register',
+]
+```
+
+Since auth is localStorage-based, simplify to only handle Supabase session refresh for API routes.
+
+---
+
+## Phase 3: API Routes for AI Services
+
+### Step 15 — Update `getApiKey()` in services
+All services using Google Gemini read API keys. Update to check `process.env.GEMINI_API_KEY` (server-side):
+
+**Files affected:** `services/generator.ts`, `services/mega-generator.ts`, `services/solution-mega-generator.ts`, `services/smc.ts`, `services/content_writer.ts`, `services/schema_service.ts`, `services/robots_service.ts`, `services/llms-txt-generator.ts`, `services/llm-json-generator.ts`, `services/reputation_service.ts`, `services/ai-citation-simulator.ts`, `services/answer-first-audit.ts`, `services/ai-monitoring.ts`, `services/eeat/*.ts`, `services/ai-response-layer/*.ts`
+
+### Step 16 — Create AI API routes
+17 API routes wrapping the service functions:
+
+```
+app/api/ai/generate/route.ts           → services/generator.ts
+app/api/ai/mega-generate/route.ts      → services/mega-generator.ts
+app/api/ai/solution-mega/route.ts      → services/solution-mega-generator.ts
+app/api/ai/smc/route.ts               → services/smc.ts
+app/api/ai/content-writer/route.ts     → services/content_writer.ts
+app/api/ai/schema-org/route.ts         → services/schema_service.ts
+app/api/ai/robots-txt/route.ts         → services/robots_service.ts
+app/api/ai/llms-txt/route.ts          → services/llms-txt-generator.ts
+app/api/ai/llm-json/route.ts          → services/llm-json-generator.ts
+app/api/ai/reputation/route.ts         → services/reputation_service.ts
+app/api/ai/citation-simulator/route.ts → services/ai-citation-simulator.ts
+app/api/ai/answer-first/route.ts       → services/answer-first-audit.ts
+app/api/ai/monitoring/route.ts         → services/ai-monitoring.ts
+app/api/ai/eeat/route.ts              → services/eeat/*.ts
+app/api/ai/response-layer/route.ts     → services/ai-response-layer/*.ts
+app/api/ai/v3/citation/route.ts        → services/v3/citation-checker.ts
+app/api/ai/v3/query-gen/route.ts       → services/v3/query-generator.ts
+```
+
+Each route: `POST` handler, reads JSON body with `action` + params, calls service function, returns JSON result.
+
+### Step 17 — Create `lib/api-client.ts`
+Client-side wrappers that match original service function signatures but call `fetch('/api/ai/...')` internally.
+
+```
+lib/api-client.ts (NEW, ~200 lines)
+```
+
+Pages import from `@/lib/api-client` instead of `@/services/*` for any AI generation calls.
+
+---
+
+## Phase 4: Page Migration (43 pages)
+
+Each page wrapper follows this pattern:
+```typescript
+'use client';
+import { useAppContext } from '@/lib/app-context';
+import OriginalPage from '@/views/OriginalPage';
+
+export default function PageName() {
+  const { user, history, navigateTo, handleDeductCredits, ... } = useAppContext();
+  return <OriginalPage user={user} history={history} onNavigate={navigateTo} ... />;
+}
+```
+
+### Step 18 — Core pages (5)
+```
+app/(app)/dashboard/page.tsx        → views/Dashboard.tsx
+app/(app)/analyze/page.tsx          → views/Analyze.tsx
+app/(app)/projects/page.tsx         → views/Projects.tsx
+app/(app)/results/page.tsx          → views/Results.tsx
+app/(app)/history/page.tsx          → views/History.tsx
+```
+
+### Step 19 — Monitoring pages (4)
+```
+app/(app)/monitoring/ai/page.tsx          → views/AiMonitoring.tsx
+app/(app)/monitoring/alerts/page.tsx      → views/AlertsAEO.tsx
+app/(app)/monitoring/bot-tracking/page.tsx → views/BotTracking.tsx
+app/(app)/monitoring/reputation/page.tsx  → views/Reputation.tsx
+```
+
+### Step 20 — Citations V3 pages (8)
+```
+app/(app)/citations/page.tsx                → views/v3/CitationDashboardPage.tsx
+app/(app)/citations/tracked-queries/page.tsx → views/v3/TrackedQueriesPage.tsx
+app/(app)/citations/detail/page.tsx         → views/v3/CitationDetailPage.tsx
+app/(app)/citations/benchmark/page.tsx      → views/v3/BenchmarkPage.tsx
+app/(app)/citations/alerts/page.tsx         → views/v3/AlertsPage.tsx
+app/(app)/citations/alert-settings/page.tsx → views/v3/AlertSettingsPage.tsx
+app/(app)/citations/monthly-report/page.tsx → views/v3/MonthlyReportPage.tsx
+app/(app)/citations/calibration/page.tsx    → views/v3/CalibrationPage.tsx
+```
+
+### Step 21 — Tools pages (12)
+```
+app/(app)/tools/page.tsx                    → views/GenerativeTools.tsx
+app/(app)/tools/smc-studio/page.tsx         → views/SMCStudio.tsx
+app/(app)/tools/content-writer/page.tsx     → views/ContentWriter.tsx
+app/(app)/tools/blog-optimizer/page.tsx     → views/BlogOptimizer.tsx
+app/(app)/tools/source-of-truth/page.tsx    → views/SourceOfTruth.tsx
+app/(app)/tools/schema-org/page.tsx         → views/SchemaOrg.tsx
+app/(app)/tools/robots-txt/page.tsx         → views/RobotsTxt.tsx
+app/(app)/tools/llms-txt/page.tsx           → views/LlmsTxtGenerator.tsx
+app/(app)/tools/ai-response-layer/page.tsx  → views/AiResponseLayer.tsx
+app/(app)/tools/citation-simulator/page.tsx → views/AiCitationSimulator.tsx
+app/(app)/tools/answer-first/page.tsx       → views/AnswerFirstAudit.tsx
+app/(app)/tools/eeat-builder/page.tsx       → views/EeatBuilder.tsx
+```
+
+### Step 22 — Marketplace pages (7)
+```
+app/(app)/marketplace/page.tsx               → views/Directory.tsx
+app/(app)/marketplace/entity/page.tsx        → views/DirectoryEntity.tsx
+app/(app)/marketplace/publisher/page.tsx     → views/PublisherRequest.tsx
+app/(app)/marketplace/clients/page.tsx       → views/Clients.tsx
+app/(app)/marketplace/affiliation/page.tsx   → views/Affiliation.tsx
+app/(app)/marketplace/missions/page.tsx      → views/MissionOrders.tsx
+app/(app)/marketplace/messages/page.tsx      → views/Messages.tsx
+```
+
+### Step 23 — Settings pages (4)
+```
+app/(app)/settings/page.tsx              → views/Account.tsx
+app/(app)/settings/recharge/page.tsx     → views/Recharge.tsx
+app/(app)/settings/integrations/page.tsx → views/Integrations.tsx
+app/(app)/settings/api-developer/page.tsx → views/ApiDeveloper.tsx
+```
+
+### Step 24 — Public & auth pages (3)
+```
+app/(public)/page.tsx      → Rewrite to use views/Home.tsx (client component)
+app/(auth)/login/page.tsx  → Keep Supabase auth OR adapt to use views/Login.tsx
+app/(auth)/register/page.tsx → Keep as-is
+```
+
+---
+
+## Phase 5: Cleanup
+
+### Step 25 — Delete Vite artifacts
+```
+DELETE: App.tsx, App.tsx.backup, App.tsx.backup-ui-refonte
+DELETE: index.tsx, index.html
+DELETE: vite.config.ts
+DELETE: globals.css (SPA version, already merged into app/globals.css)
+DELETE: vercel.json (SPA rewrite rules, incompatible with Next.js)
+```
+
+### Step 26 — Delete old Next.js scaffold
+```
+DELETE: app/(app)/app/ (entire directory — old /app prefix routes)
+```
+
+### Step 27 — Update `package.json`
+- Rename scripts: `dev:next` → `dev`, `build:next` → `build`, `start:next` → `start`
+- Remove old scripts: `preview`, old `dev`/`build` (Vite)
+- Remove devDeps: `@vitejs/plugin-react`, `vite`
+- Keep: `vitest`, `jsdom`, `@testing-library/*`
+
+### Step 28 — Update `.env.example`
+- Remove `VITE_*` variables
+- Add `GEMINI_API_KEY`, `OPENAI_API_KEY`, `PERPLEXITY_API_KEY` (server-only, no `NEXT_PUBLIC_` prefix)
+- Keep `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### Step 29 — Update `CLAUDE.md`
+Remove "NE PAS migrer vers Next.js" instructions. Update architecture description to reflect Next.js App Router as the single frontend.
+
+---
+
+## Phase 6: Verification
+
+### Step 30 — Build check
+```bash
+npm run build
+```
+Must complete with 0 errors.
+
+### Step 31 — Core flow smoke test
+1. `npm run dev` → visit `/` (landing page)
+2. Navigate to `/login` → login with mock credentials → redirects to `/dashboard`
+3. Navigate to `/analyze` → submit URL → analysis runs → redirects to `/projects`
+4. Verify localStorage `citedby_analysis_db` contains the new analysis
+5. Sidebar navigation: click each section → correct page renders
+
+### Step 32 — AI API route test
+1. Set `GEMINI_API_KEY` in `.env.local`
+2. Use SMC Studio → generate content → verify `/api/ai/smc` is called
+3. Verify fallback simulation works without API key
+
+### Step 33 — Full page audit
+Visit all 43 routes, verify no crashes. Check browser console for errors.
+
+---
+
+## Summary
+
+| Metric | Count |
+|--------|-------|
+| New files to create | ~65 (43 page wrappers + 17 API routes + 5 utilities) |
+| Files to modify | ~8 (TopNav, AppSidebar, CommandPalette, tsconfig, tailwind, middleware, package.json, CLAUDE.md) |
+| Files to delete | ~10 (App.tsx, index.tsx, index.html, vite.config.ts, globals.css, vercel.json, old app/(app)/app/) |
+| Files to rename | `pages/` → `views/` (44 files moved) |
+
+**Critical path:** Steps 1-3-9-13 (rename pages → AppProvider context → AppShellWrapper → app layout). Everything else builds on these four pieces.

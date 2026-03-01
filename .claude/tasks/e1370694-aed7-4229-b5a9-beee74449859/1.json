@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Phase 0: Extract ZIP and verify project structure",
+  "description": "Extract SaaSV13 ZIP to CitedByV14 folder, install deps, verify all expected files exist (22 pages, 10 services, components, etc.), count baseline files.",
+  "activeForm": "Extracting ZIP and verifying structure",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

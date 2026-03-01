@@ -1,0 +1,71 @@
+export const dynamic = 'force-dynamic';
+
+import Link from 'next/link';
+import { PlusCircle } from 'lucide-react';
+import PageHeader from '@/components/layout/PageHeader';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function ProgramsPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Get merchant record via user_id
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('id')
+    .eq('user_id', user!.id)
+    .single();
+
+  const { data: programs } = await supabase
+    .from('loyalty_programs')
+    .select('*')
+    .eq('merchant_id', merchant!.id)
+    .order('created_at', { ascending: false });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between pb-6 mb-6 border-b border-[var(--border-subtle)]">
+        <div>
+          <h1 className="text-xl font-semibold text-[var(--text-primary)] tracking-tight">Programmes</h1>
+          <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">Gérez vos programmes de fidélité.</p>
+        </div>
+        <Link
+          href="/merchant/programs/new"
+          className="inline-flex items-center gap-2 bg-[var(--accent)] text-white rounded-lg px-4 py-2 text-[13px] font-medium hover:bg-[var(--accent-hover)] transition-all duration-150 press-effect"
+        >
+          <PlusCircle className="w-4 h-4" />
+          Nouveau
+        </Link>
+      </div>
+
+      {programs && programs.length > 0 ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {programs.map((p, i) => (
+            <Card key={p.id} hover className={`stagger-enter stagger-${Math.min(i + 1, 6)}`}>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">{p.name}</h3>
+                <Badge variant={p.is_active ? 'success' : 'default'}>
+                  {p.is_active ? 'Actif' : 'Inactif'}
+                </Badge>
+              </div>
+              <p className="text-[13px] text-[var(--text-tertiary)]">
+                {p.type === 'stamp' ? 'Tampons' : 'Points'} — Objectif: {p.type === 'stamp' ? p.stamp_goal : p.points_per_euro}
+              </p>
+              {((p.type === 'stamp' && p.welcome_bonus_stamps > 0) || (p.type === 'points' && p.welcome_bonus_points > 0)) && (
+                <p className="text-[12px] text-[var(--accent)] mt-1">
+                  Bonus: +{p.type === 'stamp' ? p.welcome_bonus_stamps : p.welcome_bonus_points} {p.type === 'stamp' ? 'tampon(s)' : 'point(s)'}
+                </p>
+              )}
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card className="text-center py-12">
+          <p className="text-[var(--text-tertiary)]">Aucun programme. Créez-en un pour commencer !</p>
+        </Card>
+      )}
+    </div>
+  );
+}

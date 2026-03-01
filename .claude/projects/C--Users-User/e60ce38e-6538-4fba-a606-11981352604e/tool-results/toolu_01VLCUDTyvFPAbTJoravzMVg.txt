@@ -1,0 +1,297 @@
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-228-    const location = String(payload.raw_data.location ?? payload.raw_data.city ?? '');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-229-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-230-    const { data: inserted, error: insertError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts:231:      .from('prospects')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts:232:      .insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-233-        sector_id: payload.sector,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-234-        source_id: payload.source_id ?? null,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-235-        score: analysis.score,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-252-        source_url: sourceUrl || null,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-253-        dedup_hash: dedupHash,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-254-      })
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts:255:      .select('id, heat, score')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-256-      .single<{ id: string; heat: Heat; score: number }>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-257-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-258-    if (insertError) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-95-  });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-96-  const fallback = listed.data[0]?.id ?? null;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-97-  if (fallback) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:98:    await stripe.customers.update(customerId, {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-99-      invoice_settings: {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-100-        default_payment_method: fallback,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-101-      },
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-129-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-130-    const admin = createAdminClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-131-    const { data: profile, error: profileError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:132:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:133:      .select(
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-134-        'id, stripe_customer_id, credits_balance, credits_total_purchased, auto_recharge_enabled, auto_recharge_pack_id, auto_recharge_trigger_threshold, auto_recharge_max_per_month, auto_recharge_count_month, auto_recharge_month_ref',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-135-      )
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-136-      .eq('id', payload.user_id)
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-172-    if (storedMonth !== currentMonth) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-173-      monthlyCount = 0;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-174-      await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:175:        .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:176:        .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-177-          auto_recharge_count_month: 0,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-178-          auto_recharge_month_ref: currentMonth,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-179-        })
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-219-    const nextCount = monthlyCount + 1;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-220-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-221-    const { error: updateError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:222:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:223:      .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-224-        credits_balance: nextBalance,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-225-        credits_total_purchased: nextPurchased,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-226-        auto_recharge_count_month: nextCount,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-233-      throw new Error(updateError.message);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-234-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-235-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:236:    await admin.from('credit_transactions').insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-237-      user_id: profile.id,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-238-      transaction_type: 'purchase',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-239-      credits_delta: pack.creditsTotal,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-249-      },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-250-    });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-251-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:252:    await admin.from('notifications').insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-253-      user_id: profile.id,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-254-      prospect_id: null,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-255-      type: 'credit_purchase',
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-83-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-84-    const admin = createAdminClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-85-    const { data: profile, error: profileError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts:86:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts:87:      .select('id, email, full_name, stripe_customer_id')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-88-      .eq('id', payload.user_id)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-89-      .single<{
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-90-        id: string;
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-105-      });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-106-      customerId = customer.id;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-107-      await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts:108:        .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts:109:        .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-110-          stripe_customer_id: customerId,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-111-          updated_at: new Date().toISOString(),
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-112-        })
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-34-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-35-    const admin = createAdminClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-36-    const { data: profile, error: profileError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts:37:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts:38:      .select('stripe_customer_id')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-39-      .eq('id', payload.user_id)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-40-      .single<{ stripe_customer_id: string | null }>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-41-    if (profileError || !profile?.stripe_customer_id) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-170-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-171-    const admin = createAdminClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-172-    const { data: prospect, error: prospectError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:173:      .from('prospects')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:174:      .select('id, sector_id, score, heat, signal, name, location, contact_email, approach_message, location_lat, location_lng')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-175-      .eq('id', payload.prospect_id)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-176-      .single<ProspectRow>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-177-    if (prospectError || !prospect) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-180-    const safeSectorFilterValue = prospect.sector_id.replaceAll(',', '').replaceAll('{', '').replaceAll('}', '');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-181-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-182-    const { data: profiles, error: profilesError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:183:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:184:      .select(
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-185-        'id, full_name, sector_id, target_sector_ids, min_score, location_lat, location_lng, geo_radius_km, credits_balance, credits_total_spent, credit_cost_per_prospect, low_credit_threshold, burning_only_alerts, auto_recharge_enabled, auto_recharge_trigger_threshold, automation_enabled, automation_send_email, automation_min_score, automation_daily_email_limit, automation_emails_sent_today, automation_email_day, automation_email_subject_template, automation_email_signature',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-186-      )
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-187-      .or(`sector_id.eq.${safeSectorFilterValue},target_sector_ids.cs.{${safeSectorFilterValue}}`);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-271-      }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-272-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-273-      const { data: insertedAssignment, error: assignmentError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:274:        .from('prospect_assignments')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:275:        .insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-276-          prospect_id: prospect.id,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-277-          user_id: profile.id,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-278-          status: 'new',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-279-          created_at: nowIso,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-280-          updated_at: nowIso,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-281-        })
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:282:        .select('id')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-283-        .maybeSingle<{ id: string }>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-284-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-285-      if (assignmentError) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-330-          });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-331-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-332-          await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:333:            .from('prospect_assignments')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:334:            .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-335-              status: 'contacted',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-336-              contacted_at: nowIso,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-337-              updated_at: nowIso,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-341-      }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-342-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-343-      const { error: debitError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:344:        .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:345:        .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-346-          credits_balance: nextBalance,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-347-          credits_total_spent: nextSpent,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-348-          automation_email_day: nextAutomationDay,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-358-          reason: debitError.message,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-359-        });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-360-      } else {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:361:        await admin.from('credit_transactions').insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-362-          user_id: profile.id,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-363-          transaction_type: 'consume',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-364-          credits_delta: -creditCost,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-37-    });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-38-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-39-    const { data: sourceRow } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts:40:      .from('sources')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts:41:      .select('id')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-42-      .eq('sector_id', payload.sector)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-43-      .ilike('name', `%${payload.source}%`)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-44-      .limit(1)
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-66-        const dedupHash = await sha256Hex(dedupBase);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-67-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-68-        const { data: existing } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts:69:          .from('prospects')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts:70:          .select('id')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-71-          .eq('dedup_hash', dedupHash)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-72-          .limit(1)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-73-          .maybeSingle<{ id: string }>();
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-72-export const sha256Hex = async (value: string): Promise<string> => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-73-  const data = new TextEncoder().encode(value);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-74-  const hash = await crypto.subtle.digest('SHA-256', data);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts:75:  const bytes = Array.from(new Uint8Array(hash));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-76-  return bytes.map((byte) => byte.toString(16).padStart(2, '0')).join('');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-77-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-78-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-111-  sourceId?: string | null,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-112-): Promise<void> => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-113-  const admin = createAdminClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts:114:  await admin.from('automation_logs').insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-115-    source_id: sourceId ?? null,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-116-    event_type: eventType,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-117-    details_json: details,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-56-      }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-57-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-58-      const { data: existingTx } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:59:        .from('credit_transactions')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:60:        .select('id')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-61-        .eq('stripe_checkout_session_id', checkoutSessionId)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-62-        .maybeSingle<{ id: string }>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-63-      if (existingTx?.id) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-82-      }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-83-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-84-      const { data: profile, error: profileError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:85:        .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:86:        .select('id, credits_balance, credits_total_purchased')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-87-        .eq('id', userId)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-88-        .single<{ id: string; credits_balance: number; credits_total_purchased: number }>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-89-      if (profileError || !profile) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-95-      const nowIso = new Date().toISOString();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-96-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-97-      await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:98:        .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:99:        .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-100-          stripe_customer_id: customerId,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-101-          credits_balance: nextBalance,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-102-          credits_total_purchased: nextPurchased,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-104-        })
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-105-        .eq('id', userId);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-106-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:107:      await admin.from('credit_transactions').insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-108-        user_id: userId,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-109-        transaction_type: 'purchase',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-110-        credits_delta: creditsToAdd,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-119-        },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-120-      });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-121-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts:122:      await admin.from('notifications').insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-123-        user_id: userId,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-124-        prospect_id: null,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\stripe-webhook\index.ts-125-        type: 'credit_purchase',
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-136-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-137-    const admin = createAdminClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-138-    const { data: profile, error: profileError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts:139:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts:140:      .select('id, email, full_name, notification_email, notification_push')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-141-      .eq('id', payload.user_id)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-142-      .single<ProfileRow>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-143-    if (profileError || !profile) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-147-    let prospect: ProspectRow | null = null;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-148-    if (payload.prospect_id) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-149-      const { data } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts:150:        .from('prospects')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts:151:        .select('id, name, signal, score, heat')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-152-        .eq('id', payload.prospect_id)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-153-        .maybeSingle<ProspectRow>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-154-      prospect = data ?? null;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-155-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-156-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-157-    const content = buildContent(payload.type, prospect);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts:158:    await admin.from('notifications').insert({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-159-      user_id: payload.user_id,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-160-      prospect_id: payload.prospect_id,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-161-      type: payload.type,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-16-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-17-    const admin = createAdminClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-18-    const { data, error } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts:19:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts:20:      .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-21-        credits_balance: 0,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-22-        updated_at: new Date().toISOString(),
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-23-      })
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-24-      .lt('credits_balance', 0)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts:25:      .select('id');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-26-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-27-    if (error) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-28-      throw error;
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-243-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-244-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-245-    const { data: profile, error: profileError } = await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:246:      .from('profiles')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:247:      .select('id, sector_id, target_sector_ids, location_label, min_score, scan_frequency_hours, sources_config')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-248-      .eq('id', requestedUserId)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-249-      .single<ProfileRow>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-250-    if (profileError || !profile) {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-258-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-259-    const sourceIdFilter = toStringArray(payload.source_ids);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-260-    const sourceQuery = admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:261:      .from('sources')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:262:      .select('id, sector_id, name, type, data_type, config_json, is_active')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-263-      .in('sector_id', sectorIds)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-264-      .eq('is_active', true)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-265-      .order('created_at', { ascending: true });
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-370-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-371-    if (triggeredSourceIds.length > 0) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-372-      await admin
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:373:        .from('sources')
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:374:        .update({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-375-          last_scan_at: startedAt,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-376-        })
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-377-        .in('id', triggeredSourceIds);

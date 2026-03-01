@@ -1,0 +1,19 @@
+"use client"
+
+import React, { useEffect, useState } from "react"
+import { Toaster } from "@/components/ui/toast"
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  return (
+    <>
+      {children}
+      {mounted && <Toaster />}
+    </>
+  )
+}

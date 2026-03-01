@@ -1,0 +1,363 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Eye,
+  Quote,
+  Users,
+  Target,
+  ArrowUpRight,
+  ArrowDownRight,
+  Download,
+  Calendar,
+  BarChart3,
+  Zap,
+} from "lucide-react";
+import { VisibilityTrendChart } from "@/components/charts/visibility-trend-chart";
+import { EngineBreakdownChart } from "@/components/charts/engine-breakdown-chart";
+import { CompetitorChart } from "@/components/charts/competitor-chart";
+
+// Mock executive data — aggregated from workspace analytics
+const MOCK_KPI = {
+  visibility: { value: 64, change: 12, trend: "up" as "up" | "down" },
+  citations: { value: 47, change: 18, trend: "up" as "up" | "down" },
+  mentions: { value: 134, change: -3, trend: "down" as "up" | "down" },
+  shareOfVoice: { value: 28, change: 5, trend: "up" as "up" | "down" },
+};
+
+const MOCK_ROI = {
+  estimatedReach: 45000,
+  costPerCitation: 12.5,
+  contentROI: 340,
+  timeToFirstCitation: 4.2,
+};
+
+const MOCK_MONTHLY_DATA = [
+  { date: "Oct", score: 35, citations: 8, mentions: 42 },
+  { date: "Nov", score: 41, citations: 15, mentions: 58 },
+  { date: "Dec", score: 48, citations: 22, mentions: 75 },
+  { date: "Jan", score: 55, citations: 31, mentions: 98 },
+  { date: "Fev", score: 64, citations: 47, mentions: 134 },
+];
+
+const MOCK_ENGINE_DATA = [
+  { engine: "ChatGPT", score: 72, mentions: 45, citations: 18 },
+  { engine: "Perplexity", score: 58, mentions: 32, citations: 12 },
+  { engine: "Gemini", score: 45, mentions: 22, citations: 6 },
+  { engine: "Claude", score: 61, mentions: 25, citations: 8 },
+  { engine: "Copilot", score: 33, mentions: 10, citations: 3 },
+];
+
+const MOCK_COMPETITORS = [
+  { name: "Notre marque", mentions: 134 },
+  { name: "Concurrent A", mentions: 198 },
+  { name: "Concurrent B", mentions: 87 },
+  { name: "Concurrent C", mentions: 56 },
+  { name: "Concurrent D", mentions: 42 },
+];
+
+const MOCK_TOP_PROMPTS = [
+  { prompt: "meilleur outil AEO", citations: 8, position: 1 },
+  { prompt: "optimiser visibilite IA", citations: 5, position: 2 },
+  { prompt: "comment etre cite par ChatGPT", citations: 4, position: 1 },
+  { prompt: "outil monitoring IA", citations: 3, position: 3 },
+  { prompt: "answer engine optimization", citations: 3, position: 2 },
+];
+
+type Period = "30d" | "90d" | "6m" | "12m";
+
+export default function ExecutiveDashboard() {
+  const [period, setPeriod] = useState<Period>("90d");
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-serif font-bold text-white mb-1">
+            Tableau de bord executif
+          </h1>
+          <p className="text-white/40">
+            Vue strategique de votre performance AEO
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex bg-white/5 rounded-xl p-1">
+            {(["30d", "90d", "6m", "12m"] as Period[]).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  period === p
+                    ? "bg-primary/20 text-primary"
+                    : "text-white/40 hover:text-white/60"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <Button variant="outline" size="sm">
+            <Download size={14} /> Exporter PDF
+          </Button>
+        </div>
+      </div>
+
+      {/* Executive KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2.5 bg-primary/10 rounded-xl">
+              <Eye size={20} className="text-primary" />
+            </div>
+            <Badge variant={MOCK_KPI.visibility.trend === "up" ? "success" : "destructive"}>
+              {MOCK_KPI.visibility.trend === "up" ? "+" : ""}{MOCK_KPI.visibility.change}%
+            </Badge>
+          </div>
+          <p className="text-xs text-white/40 uppercase mb-1">Score Visibilite IA</p>
+          <p className="text-4xl font-bold text-white">
+            {MOCK_KPI.visibility.value}
+            <span className="text-base text-white/30">/100</span>
+          </p>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2.5 bg-emerald-500/10 rounded-xl">
+              <Quote size={20} className="text-emerald-400" />
+            </div>
+            <Badge variant="success">+{MOCK_KPI.citations.change}</Badge>
+          </div>
+          <p className="text-xs text-white/40 uppercase mb-1">Citations URL</p>
+          <p className="text-4xl font-bold text-emerald-400">{MOCK_KPI.citations.value}</p>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2.5 bg-blue-500/10 rounded-xl">
+              <Users size={20} className="text-blue-400" />
+            </div>
+            <Badge variant={MOCK_KPI.mentions.trend === "up" ? "success" : "destructive"}>
+              {MOCK_KPI.mentions.change}%
+            </Badge>
+          </div>
+          <p className="text-xs text-white/40 uppercase mb-1">Mentions Marque</p>
+          <p className="text-4xl font-bold text-white">{MOCK_KPI.mentions.value}</p>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2.5 bg-amber-500/10 rounded-xl">
+              <Target size={20} className="text-amber-400" />
+            </div>
+            <Badge variant="success">+{MOCK_KPI.shareOfVoice.change}pts</Badge>
+          </div>
+          <p className="text-xs text-white/40 uppercase mb-1">Part de Voix</p>
+          <p className="text-4xl font-bold text-amber-400">
+            {MOCK_KPI.shareOfVoice.value}
+            <span className="text-base text-white/30">%</span>
+          </p>
+        </Card>
+      </div>
+
+      {/* ROI Metrics */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <DollarSign size={16} className="text-primary" />
+            Metriques ROI
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
+              <p className="text-xs text-white/40 uppercase mb-1">Portee estimee</p>
+              <p className="text-2xl font-bold text-white">
+                {(MOCK_ROI.estimatedReach / 1000).toFixed(0)}K
+              </p>
+              <p className="text-xs text-white/30 mt-0.5">utilisateurs touches via IA</p>
+            </div>
+            <div>
+              <p className="text-xs text-white/40 uppercase mb-1">Cout par citation</p>
+              <p className="text-2xl font-bold text-white">
+                {MOCK_ROI.costPerCitation.toFixed(1)}€
+              </p>
+              <p className="text-xs text-emerald-400 mt-0.5 flex items-center gap-0.5">
+                <ArrowDownRight size={10} /> -23% vs mois dernier
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-white/40 uppercase mb-1">ROI Contenu</p>
+              <p className="text-2xl font-bold text-emerald-400">{MOCK_ROI.contentROI}%</p>
+              <p className="text-xs text-white/30 mt-0.5">retour sur investissement contenu</p>
+            </div>
+            <div>
+              <p className="text-xs text-white/40 uppercase mb-1">Delai 1ere citation</p>
+              <p className="text-2xl font-bold text-white">{MOCK_ROI.timeToFirstCitation}j</p>
+              <p className="text-xs text-emerald-400 mt-0.5 flex items-center gap-0.5">
+                <ArrowDownRight size={10} /> -1.8j vs trimestre dernier
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Charts Row */}
+      <div className="grid lg:grid-cols-5 gap-6 mb-8">
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp size={16} className="text-primary" />
+              Evolution mensuelle
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <VisibilityTrendChart data={MOCK_MONTHLY_DATA} metric="score" />
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <BarChart3 size={16} className="text-primary" />
+              Performance par moteur IA
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EngineBreakdownChart data={MOCK_ENGINE_DATA} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Bottom Row */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Share of Voice */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Target size={16} className="text-primary" />
+              Part de voix vs concurrents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CompetitorChart data={MOCK_COMPETITORS} brandName="Notre marque" />
+          </CardContent>
+        </Card>
+
+        {/* Top Cited Prompts */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Zap size={16} className="text-primary" />
+              Prompts les plus cites
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {MOCK_TOP_PROMPTS.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold text-white/20 w-6">
+                      {i + 1}
+                    </span>
+                    <div>
+                      <p className="text-sm text-white/80">
+                        &ldquo;{item.prompt}&rdquo;
+                      </p>
+                      <p className="text-xs text-white/30 mt-0.5">
+                        Position moyenne : #{item.position}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-primary">{item.citations}</p>
+                    <p className="text-[10px] text-white/30">citations</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Executive Summary */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="text-base">Resume executif</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-emerald-400 flex items-center gap-1.5">
+                <TrendingUp size={14} /> Points forts
+              </h4>
+              <ul className="space-y-1.5 text-sm text-white/60">
+                <li className="flex items-start gap-2">
+                  <ArrowUpRight size={12} className="text-emerald-400 mt-1 shrink-0" />
+                  Score visibilite en hausse de +12% ce trimestre
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowUpRight size={12} className="text-emerald-400 mt-1 shrink-0" />
+                  47 citations URL (+18 ce mois)
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowUpRight size={12} className="text-emerald-400 mt-1 shrink-0" />
+                  Cout par citation en baisse de -23%
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-amber-400 flex items-center gap-1.5">
+                <Target size={14} /> Points d&apos;attention
+              </h4>
+              <ul className="space-y-1.5 text-sm text-white/60">
+                <li className="flex items-start gap-2">
+                  <ArrowDownRight size={12} className="text-amber-400 mt-1 shrink-0" />
+                  Mentions marque en legere baisse (-3%)
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowDownRight size={12} className="text-amber-400 mt-1 shrink-0" />
+                  Concurrent A depasse en part de voix
+                </li>
+                <li className="flex items-start gap-2">
+                  <ArrowDownRight size={12} className="text-amber-400 mt-1 shrink-0" />
+                  Couverture Copilot encore faible (33/100)
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-primary flex items-center gap-1.5">
+                <Zap size={14} /> Actions recommandees
+              </h4>
+              <ul className="space-y-1.5 text-sm text-white/60">
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5 shrink-0">1.</span>
+                  Creer du contenu cible pour Copilot/Bing
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5 shrink-0">2.</span>
+                  Analyser la strategie du Concurrent A
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5 shrink-0">3.</span>
+                  Renforcer le Schema.org sur les pages cles
+                </li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

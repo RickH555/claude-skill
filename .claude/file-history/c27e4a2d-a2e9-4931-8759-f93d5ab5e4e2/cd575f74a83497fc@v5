@@ -1,0 +1,36 @@
+export const dynamic = 'force-dynamic';
+
+import { createServerSupabase, createServiceSupabase } from '@/lib/supabase/server';
+import ScanHandler from './scan-handler';
+import ScanLanding from './scan-landing';
+
+export default async function ScanPage({ params }: { params: Promise<{ qr_id: string }> }) {
+  const { qr_id } = await params;
+
+  // Use service role to read QR code (public page, no user session)
+  const serviceSupabase = createServiceSupabase();
+  const { data: qrCode } = await serviceSupabase
+    .from('qr_codes')
+    .select('*, loyalty_programs(*, merchants(name, logo_url))')
+    .eq('id', qr_id)
+    .eq('is_active', true)
+    .single();
+
+  if (!qrCode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+        <p className="text-[var(--error)]">QR code invalide ou expire.</p>
+      </div>
+    );
+  }
+
+  // Check if user is logged in (uses session cookies)
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return <ScanLanding qrCode={qrCode} qrId={qr_id} />;
+  }
+
+  return <ScanHandler qrCode={qrCode} userId={user.id} />;
+}

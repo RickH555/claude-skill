@@ -1,0 +1,9 @@
+{
+  "id": "4",
+  "subject": "Phase 3: Create pages/ContentWriter.tsx",
+  "description": "Create full UI page for AI Content Writer with vertical selector, content type selector, form, generation, results display with ScoreRing, history. Dark theme style.",
+  "activeForm": "Creating ContentWriter page",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

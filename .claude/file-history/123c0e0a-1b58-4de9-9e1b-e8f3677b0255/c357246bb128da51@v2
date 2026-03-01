@@ -1,0 +1,35 @@
+// ============================================
+// CitedBy.ai - Retargeting Types
+// ============================================
+
+export type AdPlatform = 'google_ads' | 'meta_ads' | 'linkedin_ads'
+export type AdConnectionStatus = 'connected' | 'disconnected'
+
+export interface AdConnection {
+  platform: AdPlatform
+  status: AdConnectionStatus
+  accountName: string | null
+  connectedAt: string | null
+}
+
+export interface RetargetingOpportunity {
+  id: string
+  url: string
+  engine: string
+  estimatedAudience: number
+  pixelCode: string
+}
+
+export interface BudgetEstimate {
+  platform: AdPlatform
+  dailyBudget: number
+  estimatedReach: number
+  estimatedClicks: number
+  estimatedCPC: number
+  estimatedCPM: number
+}
+
+export interface RetargetingState {
+  adConnections: AdConnection[]
+  opportunities: RetargetingOpportunity[]
+}

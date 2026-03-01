@@ -1,0 +1,9 @@
+{
+  "id": "23",
+  "subject": "Create Supabase client files (client.ts, server.ts, types.ts)",
+  "description": "Create src/lib/supabase/client.ts, server.ts, and types.ts with all database type definitions",
+  "activeForm": "Creating Supabase client files",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,362 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+
+// Helper to safely get env var
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// ================================================================
+// TYPES
+// ================================================================
+
+export interface RobotRule {
+  agent: string;
+  allow: boolean;
+  comment: string;
+  category: 'ai' | 'seo' | 'standard';
+}
+
+interface PlatformConfig {
+  name: string;
+  disallow: string[];
+  sitemaps: string[];
+}
+
+export interface RobotsResult {
+  content: string;          // The full robots.txt content
+  platformDetected: string; // Detected platform name
+  aiBotsCount: number;      // Number of AI bots whitelisted
+  rulesCount: number;       // Total number of rules
+}
+
+// ================================================================
+// SYSTEM PROMPT — Expert AEO / Robots.txt Engineering
+// ================================================================
+
+const ROBOTS_SYSTEM_PROMPT = `
+# ROLE
+Tu es un Expert Senior en AEO (Answer Engine Optimization), Crawl Budget Management et Technical SEO chez CitedBy.ai.
+Tu maitrises les mecanismes de crawl des moteurs de recherche (Googlebot, Bingbot) ET des bots IA (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot) ainsi que leurs interactions avec le fichier robots.txt.
+
+# MISSION
+Genere un fichier robots.txt optimise selon la strategie "Open-AI, Closed-Admin" :
+- OUVRIR les portes aux bots IA pour maximiser la citation et la visibilite dans les reponses generees
+- FERMER les routes sensibles (admin, API, donnees privees) pour la securite et l'optimisation du crawl budget
+
+# EXPERTISE ROBOTS.TXT POUR L'AEO
+
+Les bots IA utilisent le robots.txt differemment des crawlers SEO classiques :
+
+## Bots IA critiques a autoriser (whitelist explicite)
+- **GPTBot** : Bot principal d'OpenAI pour alimenter ChatGPT — ESSENTIEL pour la citation
+- **ChatGPT-User** : Bot de navigation live de ChatGPT (Browse with Bing mode)
+- **Google-Extended** : Controle l'entrainement de Gemini/Vertex AI (separe de Googlebot)
+- **CCBot** : Common Crawl — dataset fondation de la majorite des LLMs (GPT, Claude, Llama)
+- **ClaudeBot** : Bot d'Anthropic pour Claude — crawl de verification factuelle
+- **anthropic-ai** : Nouvel agent Anthropic pour l'indexation proactive
+- **Applebot** : Apple Intelligence / Siri — reponses vocales et Apple Search
+- **PerplexityBot** : Perplexity AI — moteur de reponse avec citations en temps reel
+- **Amazonbot** : Amazon Alexa / Amazon Q — reponses e-commerce et entreprise
+- **FacebookBot** : Meta AI (Llama training) — alimentation du modele Meta
+- **Bytespider** : ByteDance/TikTok AI — en expansion rapide
+- **Cohere-ai** : Cohere — modeles de recherche semantique entreprise
+- **YouBot** : You.com AI — moteur de recherche IA
+
+## Pourquoi la whitelist explicite est cruciale
+- Certains WAF (Cloudflare, Sucuri) bloquent par defaut les bots non reconnus
+- Sans whitelist explicite, GPTBot et ClaudeBot sont souvent bloques silencieusement
+- Chaque bot autorise = un canal supplementaire de citation IA
+
+## Regles de securite par plateforme
+Adapter les Disallow en fonction de l'architecture detectee :
+- WordPress : /wp-admin/, /wp-includes/, /xmlrpc.php, /?s=
+- Shopify : /cart, /orders, /checkouts, /account
+- SaaS/Web App : /api/, /dashboard/, /settings/, /auth/
+- General : /admin/, /login/, /tmp/, /private/, /search
+
+## Bonnes pratiques
+- Declarer TOUS les Sitemaps (index + specifiques)
+- Ajouter un commentaire d'en-tete avec la date et la plateforme
+- Grouper les regles par categorie (IA, SEO, Securite)
+- Ajouter un Crawl-delay raisonnable pour les bots non-essentiels si necessaire
+- Pointer vers le llms.txt et llm.json si disponibles
+
+# REGLES DE FORMAT
+- Format robots.txt standard (pas de JSON)
+- Commentaires avec # pour documenter chaque section
+- User-agent en premiere ligne de chaque bloc
+- Allow/Disallow avec chemins absolus depuis la racine
+- Sitemap avec URLs completes (protocol + domaine)
+- Bien structure, lisible, avec sections clairement separees
+- Reponds UNIQUEMENT avec le contenu brut du robots.txt (pas de Markdown fences)
+`;
+
+// ================================================================
+// STATIC DATA — AI Bots List
+// ================================================================
+
+const AI_BOTS: RobotRule[] = [
+  { agent: 'GPTBot', allow: true, comment: 'OpenAI (ChatGPT) - Essential for citation', category: 'ai' },
+  { agent: 'ChatGPT-User', allow: true, comment: 'OpenAI (Live Browsing)', category: 'ai' },
+  { agent: 'Google-Extended', allow: true, comment: 'Google Gemini/Vertex AI training', category: 'ai' },
+  { agent: 'CCBot', allow: true, comment: 'Common Crawl - Used by most LLMs foundation', category: 'ai' },
+  { agent: 'ClaudeBot', allow: true, comment: 'Anthropic (Claude)', category: 'ai' },
+  { agent: 'anthropic-ai', allow: true, comment: 'Anthropic (New agent)', category: 'ai' },
+  { agent: 'Applebot', allow: true, comment: 'Apple Intelligence / Siri', category: 'ai' },
+  { agent: 'PerplexityBot', allow: true, comment: 'Perplexity AI (Answer Engine)', category: 'ai' },
+  { agent: 'Amazonbot', allow: true, comment: 'Amazon Alexa / Q answers', category: 'ai' },
+  { agent: 'FacebookBot', allow: true, comment: 'Meta AI (Llama training)', category: 'ai' }
+];
+
+// ================================================================
+// PLATFORM DETECTION
+// ================================================================
+
+const detectPlatform = (url: string): PlatformConfig => {
+  const lowerUrl = url.toLowerCase();
+
+  if (lowerUrl.includes('shopify') || lowerUrl.includes('store') || lowerUrl.includes('shop')) {
+    return {
+      name: 'Shopify / E-commerce',
+      disallow: ['/cart', '/orders', '/checkouts', '/account', '/collections/*+*', '/blogs/*+*', '/*design_theme_id'],
+      sitemaps: ['/sitemap.xml', '/sitemap_products_1.xml']
+    };
+  }
+
+  if (lowerUrl.includes('wordpress') || lowerUrl.includes('blog') || lowerUrl.includes('wp-')) {
+    return {
+      name: 'WordPress',
+      disallow: ['/wp-admin/', '/wp-includes/', '/wp-content/plugins/', '/xmlrpc.php', '/readme.html', '/?s='],
+      sitemaps: ['/sitemap_index.xml', '/post-sitemap.xml']
+    };
+  }
+
+  if (lowerUrl.includes('app.') || lowerUrl.includes('dashboard') || lowerUrl.includes('portal')) {
+    return {
+      name: 'SaaS / Web App',
+      disallow: ['/api/', '/dashboard/', '/settings/', '/user/', '/private/', '/auth/'],
+      sitemaps: ['/sitemap.xml']
+    };
+  }
+
+  // Default / Generic
+  return {
+    name: 'Site Général',
+    disallow: ['/admin/', '/login/', '/tmp/', '/private/', '/search'],
+    sitemaps: ['/sitemap.xml']
+  };
+};
+
+// ================================================================
+// FALLBACK — Local generation (existing logic preserved)
+// ================================================================
+
+const fallbackGeneration = (urlStr: string): RobotsResult => {
+  let hostname = urlStr;
+  let protocol = 'https';
+
+  try {
+    const urlObj = new URL(urlStr.startsWith('http') ? urlStr : `https://${urlStr}`);
+    hostname = urlObj.hostname;
+    protocol = urlObj.protocol.replace(':', '');
+  } catch (e) {
+    // Fallback if URL is invalid
+  }
+
+  const platform = detectPlatform(urlStr);
+  const date = new Date().toISOString().split('T')[0];
+
+  let content = `# Robots.txt Optimized for AEO (Answer Engine Optimization)
+# Generated by CitedBy.ai on ${date}
+# Domain: ${hostname}
+# Detected Architecture: ${platform.name}
+
+# ==========================================
+# PART 1: AI & LLM AGENTS (ALLOW LIST)
+# ==========================================
+# We explicitly allow these bots to ensure your content feeds
+# the knowledge graphs of ChatGPT, Gemini, Claude, and Perplexity.
+`;
+
+  AI_BOTS.forEach(bot => {
+    content += `\nUser-agent: ${bot.agent}\n`;
+    content += `Allow: /\n`;
+    content += `# Purpose: ${bot.comment}\n`;
+  });
+
+  content += `
+# ==========================================
+# PART 2: GENERAL CRAWLERS & SEO
+# ==========================================
+User-agent: *
+Allow: /
+
+# --- Security & Privacy Protection ---
+# Rules adapted for ${platform.name} structure
+`;
+
+  platform.disallow.forEach(path => {
+    content += `Disallow: ${path}\n`;
+  });
+
+  content += `
+# --- Sitemaps ---
+# Provide clear paths for deep indexing
+`;
+
+  platform.sitemaps.forEach(map => {
+    content += `Sitemap: ${protocol}://${hostname}${map}\n`;
+  });
+
+  content += `
+# End of file
+`;
+
+  const rulesCount = AI_BOTS.length + platform.disallow.length + 1; // +1 for Allow: /
+
+  return {
+    content,
+    platformDetected: platform.name,
+    aiBotsCount: AI_BOTS.length,
+    rulesCount,
+  };
+};
+
+// ================================================================
+// LEGACY EXPORTS — Synchronous local generation (kept for compatibility)
+// ================================================================
+
+export const generateOptimizedRobotsTxt = (urlStr: string): string => {
+  return fallbackGeneration(urlStr).content;
+};
+
+export const parseCurrentRobotsTxt = (url: string): string => {
+  const platform = detectPlatform(url);
+
+  let content = `User-agent: *\n`;
+
+  if (platform.name === 'WordPress') {
+    content += `Disallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n`;
+  } else if (platform.name.includes('Shopify')) {
+    content += `Disallow: /cart\nDisallow: /orders\n`;
+  } else {
+    content += `Disallow: /admin/\nDisallow: /tmp/\n`;
+  }
+
+  content += `\nSitemap: ${url}/sitemap.xml`;
+
+  return content;
+};
+
+export const getDetectedPlatformName = (url: string): string => {
+  return detectPlatform(url).name;
+};
+
+// ================================================================
+// MAIN EXPORT — GEMINI-POWERED GENERATION
+// ================================================================
+
+export const generateRobotsWithAI = async (urlStr: string): Promise<RobotsResult> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn("API_KEY not found, using local robots.txt generation.");
+    return fallbackGeneration(urlStr);
+  }
+
+  let hostname = urlStr;
+  let protocol = 'https';
+
+  try {
+    const urlObj = new URL(urlStr.startsWith('http') ? urlStr : `https://${urlStr}`);
+    hostname = urlObj.hostname;
+    protocol = urlObj.protocol.replace(':', '');
+  } catch (e) {
+    // Fallback
+  }
+
+  const platform = detectPlatform(urlStr);
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        robotsTxt: { type: Type.STRING, description: "The complete robots.txt file content optimized for AEO" },
+        platformDetected: { type: Type.STRING, description: "The detected platform/CMS name" },
+        aiBotsCount: { type: Type.NUMBER, description: "Number of AI bots explicitly whitelisted" },
+        rulesCount: { type: Type.NUMBER, description: "Total number of Allow/Disallow rules" },
+      },
+      required: ["robotsTxt", "platformDetected", "aiBotsCount", "rulesCount"],
+    };
+
+    const prompt = `
+      INFORMATIONS DU SITE :
+      - URL complete : ${urlStr}
+      - Hostname : ${hostname}
+      - Protocol : ${protocol}
+      - Architecture detectee : ${platform.name}
+      - Routes sensibles identifiees : ${platform.disallow.join(', ')}
+      - Sitemaps connus : ${platform.sitemaps.map(s => `${protocol}://${hostname}${s}`).join(', ')}
+
+      BOTS IA A AUTORISER (whitelist explicite obligatoire) :
+      ${AI_BOTS.map(bot => `- ${bot.agent} : ${bot.comment}`).join('\n')}
+
+      Bots supplementaires a considerer :
+      - Bytespider : ByteDance/TikTok AI
+      - Cohere-ai : Cohere (recherche semantique)
+      - YouBot : You.com AI search engine
+      - AI2Bot : Allen Institute for AI
+      - Diffbot : Knowledge Graph builder
+
+      MISSION :
+      Genere un fichier robots.txt complet optimise pour maximiser la citabilite de ce site par les moteurs de reponse IA, tout en protegeant les routes sensibles.
+
+      Exigences :
+      1. En-tete avec date de generation, domaine et architecture detectee
+      2. PARTIE 1 : Whitelist explicite de TOUS les bots IA avec Allow: / et commentaire explicatif
+      3. PARTIE 2 : Regles generales (User-agent: * avec Allow: /)
+      4. PARTIE 3 : Protection des routes sensibles adaptees a ${platform.name}
+      5. PARTIE 4 : Declaration de tous les Sitemaps
+      6. PARTIE 5 : References aux fichiers AEO (llms.txt, llm.json) si applicable
+      7. Commentaires clairs et pedagogiques dans chaque section
+      8. Format robots.txt standard uniquement (pas de JSON, pas de Markdown)
+
+      Le champ "robotsTxt" doit contenir le contenu brut du fichier robots.txt.
+      Calcule aiBotsCount (bots IA autorises) et rulesCount (total des regles Allow/Disallow).
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: ROBOTS_SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.2,
+      },
+    });
+
+    let output = response.text;
+    if (!output) {
+      throw new Error("Empty response from AI");
+    }
+
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    return {
+      content: parsed.robotsTxt,
+      platformDetected: parsed.platformDetected,
+      aiBotsCount: parsed.aiBotsCount,
+      rulesCount: parsed.rulesCount,
+    };
+  } catch (error) {
+    console.error("Robots.txt AI generation failed:", error);
+    return fallbackGeneration(urlStr);
+  }
+};

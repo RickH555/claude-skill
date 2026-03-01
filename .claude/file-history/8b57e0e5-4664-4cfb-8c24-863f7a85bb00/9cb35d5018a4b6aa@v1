@@ -1,0 +1,60 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  darkMode: ["class"],
+  content: [
+    "./index.html",
+    "./App.tsx",
+    "./index.tsx",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
+    "./i18n/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: "#7c3aed",
+        leadradar: {
+          bg: "#0B0F1A",
+          card: "#111827",
+          border: "#1E293B",
+          accent: "#10B981",
+          immobilier: "#FF6B35",
+          coaching: "#8B5CF6",
+          btp: "#10B981",
+          burning: "#EF4444",
+          hot: "#F97316",
+          warm: "#F59E0B",
+          cold: "#64748B",
+          text: "#F8FAFC",
+          muted: "#94A3B8",
+        },
+      },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        serif: ["Playfair Display", "Georgia", "serif"],
+        outfit: ["Outfit", "system-ui", "sans-serif"],
+      },
+      animation: {
+        "pulse-live": "pulseLive 1.6s ease-in-out infinite",
+        "slide-in": "slideIn 400ms ease-out",
+      },
+      keyframes: {
+        pulseLive: {
+          "0%": { opacity: "0.45", transform: "scale(0.95)" },
+          "50%": { opacity: "1", transform: "scale(1)" },
+          "100%": { opacity: "0.45", transform: "scale(0.95)" },
+        },
+        slideIn: {
+          "0%": { opacity: "0", transform: "translateY(-8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;

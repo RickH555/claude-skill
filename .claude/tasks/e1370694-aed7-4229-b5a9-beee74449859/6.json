@@ -1,0 +1,9 @@
+{
+  "id": "6",
+  "subject": "Phase 5: Modify existing files (types.ts, GenerativeTools.tsx, App.tsx)",
+  "description": "ONLY ADDITIONS: Add type re-exports to types.ts, add 2 tool entries to GenerativeTools.tsx, add imports/routing/menu entries to App.tsx for the 2 new modules.",
+  "activeForm": "Modifying existing files",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,106 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { OrganizationProfile, GeneratedAboutPage } from "../../types/eeat";
+import { PROMPT_ABOUT_PAGE } from "./prompts";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackSimulation = async (org: OrganizationProfile): Promise<GeneratedAboutPage> => {
+  await new Promise(resolve => setTimeout(resolve, 2500));
+
+  const yearFounded = new Date(org.foundingDate).getFullYear();
+  const years = new Date().getFullYear() - yearFounded;
+  const empRange = org.employeeCount ? `${org.employeeCount.min}-${org.employeeCount.max}` : '10-50';
+  const certsList = org.certifications.map(c => c.name).join(', ');
+  const awardsList = org.awards.map(a => `${a.name} (${a.issuer})`).join(', ');
+  const partnersList = org.partnerships.join(', ');
+
+  const hero = `<section class="text-center py-16"><h1 class="text-4xl font-bold text-white mb-4">${org.name}</h1><p class="text-xl text-gray-400 max-w-2xl mx-auto">Leader en ${org.industry} depuis ${yearFounded}. ${org.specializations[0] || 'Solutions innovantes'} pour les entreprises ambitieuses.</p></section>`;
+
+  const story = `<section class="py-12"><h2 class="text-2xl font-bold text-white mb-6">Notre Histoire</h2><p class="text-gray-400 leading-relaxed">Fondee en ${yearFounded}, ${org.name} est nee de la conviction que ${org.industry} pouvait etre transforme par l'innovation. Depuis ${years} ans, notre equipe de ${empRange} collaborateurs accompagne les entreprises dans leurs defis les plus ambitieux. Notre expertise en ${org.specializations.join(', ')} nous permet de proposer des solutions sur mesure, adaptees aux besoins specifiques de chaque client. Aujourd'hui, ${org.name} est reconnue comme un acteur cle de son secteur.</p></section>`;
+
+  const team = `<section class="py-12"><h2 class="text-2xl font-bold text-white mb-6">Notre Equipe</h2><p class="text-gray-400 leading-relaxed">${org.name} reunit une equipe pluridisciplinaire de ${empRange} experts passionnes. Chaque membre apporte une expertise unique en ${org.specializations.slice(0, 3).join(', ')}. Notre force : combiner experience terrain et innovation pour delivrer des resultats concrets.</p></section>`;
+
+  const values = `<section class="py-12"><h2 class="text-2xl font-bold text-white mb-6">Nos Valeurs</h2><div class="grid md:grid-cols-3 gap-6"><div class="p-6 bg-[#111] rounded-xl border border-white/5"><h3 class="text-lg font-bold text-purple-400 mb-2">Excellence</h3><p class="text-sm text-gray-500">Nous visons l'excellence dans chaque projet, avec des standards de qualite eleves et une attention au detail.</p></div><div class="p-6 bg-[#111] rounded-xl border border-white/5"><h3 class="text-lg font-bold text-purple-400 mb-2">Innovation</h3><p class="text-sm text-gray-500">L'innovation est au coeur de notre ADN. Nous explorons constamment de nouvelles approches pour nos clients.</p></div><div class="p-6 bg-[#111] rounded-xl border border-white/5"><h3 class="text-lg font-bold text-purple-400 mb-2">Confiance</h3><p class="text-sm text-gray-500">La transparence et l'integrite guident toutes nos relations. Nos clients nous font confiance depuis ${years} ans.</p></div></div></section>`;
+
+  const numbers = `<section class="py-12"><h2 class="text-2xl font-bold text-white mb-6">Chiffres Cles</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">${org.clients ? `<div><p class="text-3xl font-bold text-purple-400">${org.clients.length}+</p><p class="text-sm text-gray-500">Clients</p></div>` : ''}<div><p class="text-3xl font-bold text-purple-400">${years}</p><p class="text-sm text-gray-500">Annees d'experience</p></div><div><p class="text-3xl font-bold text-purple-400">${empRange}</p><p class="text-sm text-gray-500">Collaborateurs</p></div><div><p class="text-3xl font-bold text-purple-400">${org.servicesOffered.length}</p><p class="text-sm text-gray-500">Services</p></div></div></section>`;
+
+  const certifications = org.certifications.length > 0 ? `<section class="py-12"><h2 class="text-2xl font-bold text-white mb-6">Certifications & Recompenses</h2><div class="flex flex-wrap gap-4">${org.certifications.map(c => `<div class="px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm text-purple-300">${c.name} — ${c.issuer}</div>`).join('')}${org.awards.map(a => `<div class="px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-sm text-amber-300">${a.name}</div>`).join('')}</div></section>` : '';
+
+  const cta = `<section class="py-16 text-center"><h2 class="text-2xl font-bold text-white mb-4">Pret a collaborer ?</h2><p class="text-gray-400 mb-8">Decouvrez comment ${org.name} peut transformer votre ${org.industry}.</p><a href="mailto:${org.email}" class="inline-block px-8 py-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold rounded-full hover:brightness-110 transition-all">Nous contacter</a></section>`;
+
+  const html = `<div class="max-w-4xl mx-auto px-6">${hero}${story}${team}${values}${numbers}${certifications}${cta}</div>`;
+
+  const schemaOrg = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": org.type,
+    "name": org.name,
+    ...(org.legalName && { "legalName": org.legalName }),
+    "foundingDate": org.foundingDate,
+    "url": org.siteUrl,
+    ...(org.employeeCount && {
+      "numberOfEmployees": { "@type": "QuantitativeValue", "minValue": org.employeeCount.min, "maxValue": org.employeeCount.max }
+    }),
+    "address": { "@type": "PostalAddress", "streetAddress": org.address.street, "addressLocality": org.address.city, "postalCode": org.address.postalCode, "addressCountry": org.address.country },
+    ...(org.phone && { "telephone": org.phone }),
+    "email": org.email,
+    "sameAs": org.socialProfiles.map(s => s.url),
+    ...(org.awards.length > 0 && { "award": org.awards.map(a => a.name) }),
+    "knowsAbout": org.specializations,
+    ...(org.reviews.length > 0 && {
+      "aggregateRating": { "@type": "AggregateRating", "ratingValue": org.reviews[0].rating.toString(), "reviewCount": org.reviews[0].count.toString(), "bestRating": "5" }
+    }),
+  }, null, 2);
+
+  return { html, schemaOrg, sections: { hero, story, team, values, numbers, certifications, cta } };
+};
+
+export const generateAboutPage = async (org: OrganizationProfile): Promise<GeneratedAboutPage> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.warn("API_KEY not found, using simulation.");
+    return fallbackSimulation(org);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        html: { type: Type.STRING, description: "Page complete HTML" },
+        schemaOrg: { type: Type.STRING, description: "Schema.org Organization JSON-LD" },
+        sections: {
+          type: Type.OBJECT,
+          properties: {
+            hero: { type: Type.STRING }, story: { type: Type.STRING },
+            team: { type: Type.STRING }, values: { type: Type.STRING },
+            numbers: { type: Type.STRING }, certifications: { type: Type.STRING },
+            cta: { type: Type.STRING },
+          },
+          required: ["hero", "story", "team", "values", "numbers", "certifications", "cta"],
+        },
+      },
+      required: ["html", "schemaOrg", "sections"],
+    };
+
+    const prompt = `${PROMPT_ABOUT_PAGE}\n\n## DONNEES ORGANISATION\n${JSON.stringify(org, null, 2)}\n\nGenere la page complete.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.4 }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(output);
+  } catch (error) {
+    console.error("About Page generation failed:", error);
+    return fallbackSimulation(org);
+  }
+};

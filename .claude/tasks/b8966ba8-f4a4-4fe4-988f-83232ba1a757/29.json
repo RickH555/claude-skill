@@ -1,0 +1,9 @@
+{
+  "id": "29",
+  "subject": "Create PWA manifest, service worker, and Vercel config",
+  "description": "Create public/manifest.json, public/sw.js, vercel.json, and public/icons/ directory",
+  "activeForm": "Creating PWA and Vercel config files",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

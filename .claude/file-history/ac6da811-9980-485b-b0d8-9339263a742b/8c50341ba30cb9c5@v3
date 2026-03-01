@@ -1,0 +1,125 @@
+import React from 'react';
+import { PenTool, FileText, Code, FileCode, Search, Sparkles, AlertTriangle, Feather, Shield, Bot, BookOpen } from 'lucide-react';
+import { useTranslation } from '../i18n';
+
+interface GenerativeToolsProps {
+  onNavigate: (view: any) => void;
+}
+
+interface ToolCardProps {
+  icon: React.ElementType;
+  label: string;
+  desc: string;
+  color: string;
+  bg: string;
+  onClick: () => void;
+}
+
+const ToolCard: React.FC<ToolCardProps> = ({ icon: Icon, label, desc, color, bg, onClick }) => (
+  <button
+    onClick={onClick}
+    className="ninja-card p-8 flex flex-col items-center justify-center gap-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-purple-900/20 hover:border-purple-500/20 group h-full relative overflow-hidden active:scale-[0.98]"
+  >
+    {/* Ambient glow on hover */}
+    <div className="absolute inset-0 bg-gradient-to-b from-purple-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+    <div className={`relative p-5 rounded-2xl ${bg} group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-purple-500/10 transition-all duration-300`}>
+      <Icon size={48} className={`${color} group-hover:drop-shadow-[0_0_8px_rgba(168,85,247,0.4)] transition-all duration-300`} />
+    </div>
+    <div className="relative text-center space-y-2">
+      <span className="block text-xl font-bold text-gray-200 group-hover:text-white transition-colors duration-200">{label}</span>
+      <span className="block text-sm text-gray-500 group-hover:text-gray-400 transition-colors duration-200">{desc}</span>
+    </div>
+    {/* Bottom accent line */}
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-purple-500 to-violet-500 group-hover:w-2/3 transition-all duration-400 rounded-full" />
+  </button>
+);
+
+const GenerativeTools: React.FC<GenerativeToolsProps> = ({ onNavigate }) => {
+  const { t } = useTranslation();
+
+  const tools = [
+    { id: 'smc-studio', label: t.generativeTools.smcStudio, icon: PenTool, color: 'text-purple-400', bg: 'bg-purple-500/10', desc: t.generativeTools.smcStudioDesc },
+    { id: 'content-writer', label: t.generativeTools.contentWriter, icon: Feather, color: 'text-violet-400', bg: 'bg-violet-500/10', desc: t.generativeTools.contentWriterDesc },
+    { id: 'reputation', label: t.generativeTools.reputation, icon: Shield, color: 'text-purple-400', bg: 'bg-purple-500/10', desc: t.generativeTools.reputationDesc },
+    { id: 'source-of-truth', label: t.generativeTools.sourceOfTruth, icon: FileText, color: 'text-purple-400', bg: 'bg-purple-500/10', desc: t.generativeTools.sourceOfTruthDesc },
+    { id: 'schema-org', label: t.generativeTools.schemaOrg, icon: Code, color: 'text-blue-400', bg: 'bg-blue-500/10', desc: t.generativeTools.schemaOrgDesc },
+    { id: 'robots-txt', label: t.generativeTools.robotsTxt, icon: FileCode, color: 'text-purple-300', bg: 'bg-purple-500/10', desc: t.generativeTools.robotsTxtDesc },
+    { id: 'bot-tracking', label: t.generativeTools.botTracking || 'Suivi Bots IA', icon: Bot, color: 'text-cyan-400', bg: 'bg-cyan-500/10', desc: t.generativeTools.botTrackingDesc || 'Activation & suivi des crawlers' },
+    { id: 'blog-optimizer', label: t.generativeTools.blogOptimizer || 'Blog Optimiser', icon: BookOpen, color: 'text-pink-400', bg: 'bg-pink-500/10', desc: t.generativeTools.blogOptimizerDesc || 'Architecture & rédaction blog AEO' },
+  ];
+
+  return (
+    <div className="w-full px-6 py-8 animate-in fade-in duration-500">
+
+      {/* Header style Dashboard Pro */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-bold text-white">{t.generativeTools.title.split(' ').slice(0, -1).join(' ')} <span className="gradient-text">{t.generativeTools.title.split(' ').slice(-1)}</span></h1>
+          <span className="bg-purple-500/10 text-purple-400 text-xs font-bold px-3 py-1 rounded-full border border-primary/20 flex items-center gap-1">
+            <Sparkles size={12} /> {t.generativeTools.suitePro}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="relative flex-1 md:flex-none">
+            <input
+              type="text"
+              placeholder={t.generativeTools.searchPlaceholder}
+              className="bg-[#111111] border border-white/[0.08] rounded-2xl py-2.5 pl-4 pr-10 text-sm text-gray-300 focus:outline-none focus:border-purple-500/50 w-full md:w-80 transition-all"
+            />
+            <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          </div>
+        </div>
+      </div>
+
+      {/* Grid des Outils */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {tools.map((tool) => (
+            <ToolCard
+                key={tool.id}
+                icon={tool.icon}
+                label={tool.label}
+                desc={tool.desc}
+                color={tool.color}
+                bg={tool.bg}
+                onClick={() => onNavigate(tool.id)}
+            />
+        ))}
+      </div>
+
+      {/* Section Explicative */}
+      <div className="ninja-card p-8">
+        <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-purple-500/10 rounded-full">
+                <AlertTriangle size={20} className="text-yellow-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white">{t.generativeTools.whyUse}</h3>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+            <div className="space-y-3">
+                <h4 className="font-bold text-gray-200 text-lg">{t.generativeTools.structuredContent}</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                    {t.generativeTools.structuredContentDesc}
+                </p>
+            </div>
+            <div className="space-y-3">
+                <h4 className="font-bold text-gray-200 text-lg">{t.generativeTools.technicalData}</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                    {t.generativeTools.technicalDataDesc}
+                </p>
+            </div>
+            <div className="space-y-3">
+                <h4 className="font-bold text-gray-200 text-lg">{t.generativeTools.sourceAuthority}</h4>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                    {t.generativeTools.sourceAuthorityDesc}
+                </p>
+            </div>
+        </div>
+      </div>
+
+    </div>
+  );
+};
+
+export default GenerativeTools;

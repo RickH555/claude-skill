@@ -1,0 +1,108 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { db } from '../services/database';
+import { AnalysisResult } from '../types';
+
+const mockAnalysis: AnalysisResult = {
+  url: 'https://example.com/test',
+  timestamp: new Date().toISOString(),
+  globalScore: 75,
+  categories: {},
+  recommendations: [],
+  aiCitation: {
+    before: 'No mention',
+    after: 'Mentioned as source',
+    probability: 65,
+  },
+};
+
+const mockAnalysis2: AnalysisResult = {
+  url: 'https://other-site.com/page',
+  timestamp: new Date(Date.now() + 1000).toISOString(),
+  globalScore: 88,
+  categories: {},
+  recommendations: [],
+  aiCitation: {
+    before: 'Partially referenced',
+    after: 'Directly cited',
+    probability: 82,
+  },
+};
+
+describe('database service', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('getAll returns empty array when no data', () => {
+    const results = db.getAll();
+    expect(results).toEqual([]);
+  });
+
+  it('add stores an analysis and returns updated list', () => {
+    const result = db.add(mockAnalysis);
+    expect(result).toHaveLength(1);
+    expect(result[0].url).toBe('https://example.com/test');
+    expect(result[0].globalScore).toBe(75);
+  });
+
+  it('add prepends new items to the list', () => {
+    db.add(mockAnalysis);
+    const result = db.add(mockAnalysis2);
+    expect(result).toHaveLength(2);
+    expect(result[0].url).toBe('https://other-site.com/page');
+    expect(result[1].url).toBe('https://example.com/test');
+  });
+
+  it('getAll retrieves stored data', () => {
+    db.add(mockAnalysis);
+    db.add(mockAnalysis2);
+    const results = db.getAll();
+    expect(results).toHaveLength(2);
+  });
+
+  it('update modifies an existing record', () => {
+    db.add(mockAnalysis);
+    const updated = db.update(0, { globalScore: 95 });
+    expect(updated[0].globalScore).toBe(95);
+    expect(updated[0].url).toBe('https://example.com/test');
+  });
+
+  it('clear removes all data', () => {
+    db.add(mockAnalysis);
+    db.add(mockAnalysis2);
+    const result = db.clear();
+    expect(result).toEqual([]);
+    expect(db.getAll()).toEqual([]);
+  });
+
+  it('getProjectsFromHistory extracts unique domains', () => {
+    const history: AnalysisResult[] = [
+      { ...mockAnalysis, url: 'https://example.com/page1' },
+      { ...mockAnalysis, url: 'https://example.com/page2', globalScore: 80 },
+      { ...mockAnalysis2, url: 'https://other-site.com/about' },
+    ];
+    const projects = db.getProjectsFromHistory(history);
+    expect(projects).toHaveLength(2);
+    const domains = projects.map(p => p.name);
+    expect(domains).toContain('example.com');
+    expect(domains).toContain('other-site.com');
+  });
+
+  it('getProjectsFromHistory keeps latest analysis per domain', () => {
+    const older: AnalysisResult = {
+      ...mockAnalysis,
+      url: 'https://example.com/old',
+      timestamp: '2024-01-01T00:00:00Z',
+      globalScore: 50,
+    };
+    const newer: AnalysisResult = {
+      ...mockAnalysis,
+      url: 'https://example.com/new',
+      timestamp: '2025-06-01T00:00:00Z',
+      globalScore: 90,
+    };
+    const projects = db.getProjectsFromHistory([older, newer]);
+    expect(projects).toHaveLength(1);
+    expect(projects[0].visibilityScore).toBe(90);
+  });
+});

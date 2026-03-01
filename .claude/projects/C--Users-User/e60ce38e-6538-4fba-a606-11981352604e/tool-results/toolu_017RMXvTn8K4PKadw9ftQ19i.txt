@@ -1,0 +1,176 @@
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-366-        // Si c'est un tout nouveau projet et qu'on a atteint la limite MENSUELLE
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-367-        // Les anciens projets ne comptent pas dans cette limite
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-368-        if (!isExistingProject && monthlyProjectCount >= limit) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:369:            // Redirection vers l'onglet Abonnement
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-370-            alert(`Limite de nouveaux projets atteinte pour ce mois (${monthlyProjectCount}/${limit}). Passez au plan supérieur pour ajouter plus de projets.`);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-371-            setInitialAccountTab('subscription');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-372-            navigateTo('account');
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-391-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-392-      showToast('success', 'Audit terminé avec succès !');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-393-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:394:      // Redirection vers Monitoring AEO → onglet Rapport d'Audit
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-395-      setResultsTab('details');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-396-      navigateTo('projects');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-397-      setSectionsState({
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-410-  const handleViewAnalysis = (result: AnalysisResult, tab: any = 'overview') => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-411-    setAnalysisData(result);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-412-    setResultsTab(tab);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:413:    // Redirect to Projects (Monitoring AEO) instead of Results (Report)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-414-    navigateTo('projects');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-415-    setSectionsState({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-416-        optimization: true,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-491-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-492-    
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-493-    if (user.credits < amount) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:494:        // Redirection explicite vers la section GTO Gas (Recharge)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:495:        alert(`Solde GTO Gas insuffisant pour générer cette solution.\n\nIl vous manque ${amount - user.credits} crédits.\n\nRedirection vers la station de recharge...`);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-496-        navigateTo('recharge');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-497-        return false;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-498-    }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-523-    // On réinitialise l'historique pour éviter que le bouton retour ne renvoie au login
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-524-    // et on force la navigation vers le dashboard
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-525-    setViewHistory(['home']); 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:526:    setCurrentView('analyze'); // Redirection vers Nouvel Audit
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-527-    setRefreshKey(prev => prev + 1);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-528-  };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-529-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\types.ts-210-  alerts: {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\types.ts-211-    loginRequired: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\types.ts-212-    insufficientCredits: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\types.ts:213:    redirectToRecharge: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\types.ts-214-    analysisFirst: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\types.ts-215-  };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\types.ts-216-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts-219-  // === ERRORS & ALERTS ===
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts-220-  alerts: {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts-221-    loginRequired: 'Vous devez \u00eatre connect\u00e9 pour effectuer cette action. Se connecter maintenant ?',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts:222:    insufficientCredits: 'Solde GTO Gas insuffisant pour g\u00e9n\u00e9rer cette solution.\n\nIl vous manque {missing} cr\u00e9dits.\n\nRedirection vers la station de recharge...',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts:223:    redirectToRecharge: 'Redirection vers la station de recharge...',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts-224-    analysisFirst: 'Veuillez d\'abord lancer une analyse pour acc\u00e9der au plan d\'actions.',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts-225-  },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\fr.ts-226-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\es.ts-220-  alerts: {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\es.ts-221-    loginRequired: 'Debes iniciar sesi\u00f3n para realizar esta acci\u00f3n. \u00bfIniciar sesi\u00f3n ahora?',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\es.ts-222-    insufficientCredits: 'Saldo GTO Gas insuficiente para generar esta soluci\u00f3n.\n\nTe faltan {missing} cr\u00e9ditos.\n\nRedirigiendo a la estaci\u00f3n de recarga...',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\es.ts:223:    redirectToRecharge: 'Redirigiendo a la estaci\u00f3n de recarga...',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\es.ts-224-    analysisFirst: 'Por favor, ejecuta un an\u00e1lisis primero para acceder al plan de acciones.',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\es.ts-225-  },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\es.ts-226-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts-219-  // === ERRORS & ALERTS ===
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts-220-  alerts: {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts-221-    loginRequired: 'You must be logged in to perform this action. Log in now?',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts:222:    insufficientCredits: 'Insufficient GTO Gas balance to generate this solution.\n\nYou are missing {missing} credits.\n\nRedirecting to recharge station...',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts:223:    redirectToRecharge: 'Redirecting to recharge station...',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts-224-    analysisFirst: 'Please run an analysis first to access the action plan.',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts-225-  },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\locales\en.ts-226-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx-40-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx-41-  const handleContactExpert = () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx-42-    // In a real app, this would open a booking calendar or contact form
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx:43:    window.open('mailto:experts@citedby.ai?subject=Demande%20assistance%20Webmaster%20AEO', '_blank');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx-44-  };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx-45-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx-46-  return (
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-58-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-59-  // Protect /app routes
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-60-  if (request.nextUrl.pathname.startsWith('/app') && !user) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts:61:    return NextResponse.redirect(new URL('/login', request.url))
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-62-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-63-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts:64:  // Redirect logged in users away from auth pages
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-65-  if ((request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register') && user) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts:66:    return NextResponse.redirect(new URL('/app', request.url))
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-67-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-68-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\lib\supabase\middleware.ts-69-  return response
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\auth\signout\route.ts-4-export async function POST() {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\auth\signout\route.ts-5-  const supabase = createClient();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\auth\signout\route.ts-6-  await supabase.auth.signOut();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\auth\signout\route.ts:7:  return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'), {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\auth\signout\route.ts-8-    status: 302,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\auth\signout\route.ts-9-  });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\auth\signout\route.ts-10-}
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-9-  CreditCard
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-10-} from "lucide-react";
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-11-import { createClient } from "@/lib/supabase/server";
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx:12:import { redirect } from "next/navigation";
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-13-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-14-export default async function AppLayout({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-15-  children,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-20-  const { data: { user } } = await supabase.auth.getUser();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-21-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-22-  if (!user) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx:23:    redirect('/login');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-24-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-25-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\app\(app)\app\layout.tsx-26-  return (
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx-44-  const handleApplyRecommendation = async (rec: Recommendation) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx-45-    const cost = getSolutionCost(rec.priority);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx-46-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:47:    // La logique de vérification de solde et de redirection est déléguée à onDeductCredits
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx-48-    const success = onDeductCredits(cost);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx-49-    if (!success) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx-50-      return; 
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx-172-              void supabase.functions.invoke('customer-portal', { body: { user_id: profile.id } }).then(({ data }) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx-173-                const url = String((data as { url?: string } | null)?.url ?? '');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx-174-                if (url) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx:175:                  window.location.href = url;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx-176-                }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx-177-              });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx-178-            }}
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-89-      return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-90-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-91-    if (prospect.contact_phone) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:92:      window.location.href = `tel:${prospect.contact_phone}`;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-93-      return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-94-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-95-    if (prospect.contact_email) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:96:      window.location.href = `mailto:${prospect.contact_email}`;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-97-      return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-98-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-99-    if (prospect.contact_method) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-100-      const asUrl = prospect.contact_method.startsWith('http');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-101-      if (asUrl) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:102:        window.open(prospect.contact_method, '_blank', 'noopener,noreferrer');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-103-      } else {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-104-        setContactInfo(`Canal a utiliser: ${prospect.contact_method}`);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx-105-      }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\settings\credit-packs.tsx-38-      if (!checkoutUrl) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\settings\credit-packs.tsx-39-        throw new Error('URL checkout manquante');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\settings\credit-packs.tsx-40-      }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\settings\credit-packs.tsx:41:      window.location.href = checkoutUrl;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\settings\credit-packs.tsx-42-    } catch (caughtError) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\settings\credit-packs.tsx-43-      const message = caughtError instanceof Error ? caughtError.message : 'Achat credits impossible';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\settings\credit-packs.tsx-44-      setError(message);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-77-    const shareData = {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-78-      title: 'Rapport AEO - CitedBy.ai',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-79-      text: `Découvrez l'analyse AEO pour ${data.url} sur CitedBy.ai`,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx:80:      url: window.location.href,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-81-    };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-82-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-83-    try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-84-      if (navigator.share) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-85-        await navigator.share(shareData);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-86-      } else {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx:87:        await navigator.clipboard.writeText(window.location.href);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-88-        alert('Lien du rapport copié dans le presse-papier !');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-89-      }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-90-    } catch (err) {

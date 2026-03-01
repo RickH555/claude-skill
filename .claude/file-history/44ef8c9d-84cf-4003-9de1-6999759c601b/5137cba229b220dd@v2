@@ -1,0 +1,103 @@
+// services/v3/query-generator.ts
+//
+// Génère automatiquement des requêtes cibles via Gemini (server-side proxy).
+// Fallback avec requêtes par défaut si le proxy n'est pas disponible.
+
+import { callGemini } from '../../lib/ai-proxy';
+
+export interface GeneratedQuery {
+  text: string;
+  type: 'informational' | 'comparative' | 'transactional' | 'reputation';
+  variations: string[];
+}
+
+function getDefaultQueries(niche: string, brandName: string): GeneratedQuery[] {
+  return [
+    {
+      text: `What is the best ${niche} solution?`,
+      type: 'informational',
+      variations: [
+        `Top ${niche} tools in 2026`,
+        `Best ${niche} platforms compared`,
+      ],
+    },
+    {
+      text: `${brandName} vs competitors`,
+      type: 'comparative',
+      variations: [
+        `Is ${brandName} worth it?`,
+        `${brandName} alternatives`,
+      ],
+    },
+    {
+      text: `${brandName} reviews`,
+      type: 'reputation',
+      variations: [
+        `What do people think of ${brandName}?`,
+        `${brandName} customer feedback`,
+      ],
+    },
+  ];
+}
+
+export async function generateTrackedQueries(
+  niche: string,
+  country: string,
+  brandName: string,
+  language: string = 'fr'
+): Promise<GeneratedQuery[]> {
+  try {
+    const prompt = `Tu es un expert SEO et AEO (Answer Engine Optimization).
+Génère exactement 15 requêtes que des utilisateurs poseraient à ChatGPT, Perplexity ou Gemini.
+
+Contexte :
+- Niche : ${niche}
+- Pays : ${country}
+- Marque à surveiller : ${brandName}
+- Langue : ${language === 'fr' ? 'français' : language === 'es' ? 'espagnol' : 'anglais'}
+
+Répartition :
+- 4 requêtes informationnelles (l'utilisateur cherche à comprendre)
+- 4 requêtes comparatives (l'utilisateur compare des solutions)
+- 4 requêtes transactionnelles (l'utilisateur veut acheter/s'inscrire)
+- 3 requêtes réputation (l'utilisateur cherche des avis)
+
+Pour chaque requête, donne 3 variations de formulation.
+
+Réponds en JSON strict avec ce format :
+[
+  {
+    "text": "la requête principale",
+    "type": "informational|comparative|transactional|reputation",
+    "variations": ["variation 1", "variation 2", "variation 3"]
+  }
+]
+
+IMPORTANT : Retourne UNIQUEMENT le JSON, sans commentaire ni markdown.`;
+
+    const text = await callGemini(prompt);
+
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) return getDefaultQueries(niche, brandName);
+
+    const parsed = JSON.parse(jsonMatch[0]) as GeneratedQuery[];
+
+    // Validate structure
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      return getDefaultQueries(niche, brandName);
+    }
+
+    return parsed.map(q => ({
+      text: String(q.text || ''),
+      type: (['informational', 'comparative', 'transactional', 'reputation'].includes(q.type)
+        ? q.type
+        : 'informational') as GeneratedQuery['type'],
+      variations: Array.isArray(q.variations) ? q.variations.map(String).slice(0, 3) : [],
+    }));
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn('Query generation failed, using defaults:', error);
+    }
+    return getDefaultQueries(niche, brandName);
+  }
+}

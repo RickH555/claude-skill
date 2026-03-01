@@ -1,0 +1,759 @@
+2026-03-01T01:18:19.045Z [DEBUG] MDM settings load completed in 100ms
+2026-03-01T01:18:19.103Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-01T01:18:19.103Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-01T01:18:19.103Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-01T01:18:19.103Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-01T01:18:19.282Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-03-01T01:18:19.329Z [DEBUG] Applying permission update: Adding 171 allow rule(s) to destination 'userSettings': ["WebSearch","Bash(echo:*)","Bash(ls:*)","Bash(dir:*)","Bash(cd:*)","Bash(head:*)","Bash(tail:*)","Bash(grep:*)","Bash(find:*)","Bash(findstr:*)","Bash(sort:*)","Bash(wc:*)","Bash(cp:*)","Bash(tee:*)","Bash(test:*)","Bash(timeout:*)","Bash(start:*)","Bash(node:*)","Bash(npm:*)","Bash(npx:*)","Bash(pnpm:*)","Bash(pip install:*)","Bash(python3:*)","Bash(git:*)","Bash(gh:*)","Bash(claude:*)","Bash(powershell:*)","Bash(powershell.exe:*)","Bash(robocopy:*)","Bash(xcopy:*)","Bash(tasklist:*)","Bash(taskkill:*)","Bash(netstat:*)","Bash(wmic:*)","mcp__puppeteer__puppeteer_navigate","mcp__puppeteer__puppeteer_screenshot","mcp__puppeteer__puppeteer_evaluate","mcp__puppeteer__puppeteer_click","mcp__puppeteer__puppeteer_fill","mcp__puppeteer__puppeteer_select","mcp__puppeteer__puppeteer_hover","mcp__filesystem__list_directory","mcp__filesystem__list_directory_with_sizes","mcp__filesystem__directory_tree","mcp__filesystem__read_text_file","mcp__filesystem__read_multiple_files","mcp__filesystem__read_media_file","mcp__filesystem__write_file","mcp__filesystem__create_directory","mcp__filesystem__search_files","mcp__filesystem__list_allowed_directories","mcp__memory__create_entities","mcp__memory__search_nodes","mcp__sequential-thinking__sequentialthinking","Bash(npx vite build)","Bash(npx claude-code-templates@latest:*)","Bash(gh auth status:*)","Bash(npm run build:*)","Bash(npm run dev:*)","Bash(start http://localhost:3000)","Bash(node -e:*)","Bash(npx --yes playwright install:*)","Bash(npx --yes playwright screenshot:*)","Bash(npm install:*)","Bash(npx next start:*)","Bash(npx tsc:*)","Bash(npx vite:*)","Bash(git init:*)","Bash(git add:*)","Bash(git commit -m \"$\\(cat <<''EOF''\nRestore Vite SPA architecture after broken Next.js migration\n\n- Rename _legacy_pages/ back to pages/ \\(24 .tsx files restored\\)\n- Fix package.json scripts to use vite instead of next\n- Install vite and @vitejs/plugin-react as devDependencies\n- Remove tsconfig.json exclusions blocking SPA files\n- Fix JSX syntax error in Results.tsx \\(missing closing div\\)\n- Fix JSX syntax error in SchemaOrg.tsx \\(literal script tag\\)\n- Install missing jspdf and html2canvas dependencies\n- Rewrite CLAUDE.md to reflect actual Vite SPA architecture\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")","Bash(git commit:*)","WebFetch(domain:ninjapromo.io)","Bash(fi)","Bash(for file in pages/Recharge.tsx pages/Account.tsx pages/Affiliation.tsx pages/GenerativeTools.tsx pages/SMCStudio.tsx pages/SchemaOrg.tsx pages/RobotsTxt.tsx pages/SourceOfTruth.tsx pages/ContentWriter.tsx pages/Reputation.tsx pages/BotTracking.tsx pages/ActionPlan.tsx pages/Projects.tsx pages/Directory.tsx)","Bash(do echo \"=== $file ===\")","Bash(if grep -q \"ninja-card\\\\|btn-gradient\\\\|gradient-text\" \"$file\")","Bash(then echo \"UPDATED\")","Bash(else echo \"NEEDS UPDATE\")","Bash(done)","Bash(for file in components/CategoryCard.tsx components/ScoreRing.tsx)","Bash(cmd /c \"robocopy \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS X-Final-Rick-Test\"\" \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS-Backup-NinjaPromo-2026-02-12\"\" /E /XD node_modules .git dist /XF nul /NFL /NDL\")","Bash(npm view:*)","Bash(npx next build)","Bash(curl:*)","Bash(npx vitest run)","Bash(powershell.exe -NoProfile -Command \"Get-ChildItem ''C:\\\\Users\\\\User\\\\Downloads'' -Filter ''*frontend*'' | ForEach-Object { Copy-Item -LiteralPath $_FullName -Destination ''C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png'' }\")","Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*frontend*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png\"\" }')","Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*bandeau*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\bandeau-copy.png\"\" }')","Bash(wmic process where ProcessId=49720 get CommandLine,ExecutablePath:*)","Bash(wmic process:*)","Bash(npm i:*)","Bash(ngrok:*)","Bash(npm audit:*)","Bash(git checkout:*)","Bash(cd \"C:/Users/User/citedby-ai\" && rm -rf .next && npm run build 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && git restore . 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && rm -rf \\\\\n  \"app/\\(app\\)/analyze\" \\\\\n  \"app/\\(app\\)/citations\" \\\\\n  \"app/\\(app\\)/dashboard\" \\\\\n  \"app/\\(app\\)/history\" \\\\\n  \"app/\\(app\\)/layout.tsx\" \\\\\n  \"app/\\(app\\)/marketplace\" \\\\\n  \"app/\\(app\\)/monitoring\" \\\\\n  \"app/\\(app\\)/projects\" \\\\\n  \"app/\\(app\\)/results\" \\\\\n  \"app/\\(app\\)/settings\" \\\\\n  \"app/\\(app\\)/tools\" \\\\\n  \"app/\\(public\\)/login\" \\\\\n  \"app/api/ai\" \\\\\n  \"lib/api-client.ts\" \\\\\n  \"lib/app-context.tsx\" \\\\\n  \"lib/route-map.ts\" \\\\\n  \"lib/toast-context.tsx\" \\\\\n  \"views/\" \\\\\n  \"src/views-lr/\" \\\\\n  \"tsconfig.tsbuildinfo\" \\\\\n  \".next\" \\\\\n  2>&1)","Bash(echo done:*)","Bash(uipro:*)","Bash(cd \"C:/Users/User/citedby-ai\" && python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"SaaS AEO SEO analytics dark mode professional\" --design-system -p \"CitedBy.ai\" 2>&1 || python .claude/skills/ui-ux-pro-max/scripts/search.py \"SaaS AEO SEO analytics dark mode professional\" --design-system -p \"CitedBy.ai\" 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && python .claude/skills/ui-ux-pro-max/scripts/search.py \"landing hero social-proof pricing\" --domain landing 2>&1)","Bash(cd /c/Users/User && python .claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism\" --domain style 2>&1)","Bash(cd /c/Users/User/citedby-ai && python .claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism\" --domain style 2>&1)","Bash(python3 skills/ui-ux-pro-max/scripts/search.py \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1 || python skills/ui-ux-pro-max/scripts/search.py \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1)","Bash(python3 \"$HOME/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1 || python \"$HOME/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1)","Bash(uipro --version 2>/dev/null || uipro-cli --version 2>/dev/null || npx uipro-cli --version 2>/dev/null)","Bash(gsd --help 2>&1 || gsd -h 2>&1 || gsd 2>&1)","Bash(gsd hello world:*)","WebFetch(domain:github.com)","Bash(npm uninstall:*)","Bash(git clone:*)","Bash(npx get-shit-done-cc@latest:*)","Bash(xargs basename:*)","Bash(cd /c/Users/User && npx create-next-app@latest personal-site --typescript --tailwind --eslint --app --src-dir --no-import-alias --use-npm 2>&1)","Bash(cd /c/Users/User/personal-site && npm run lint 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && supabase functions deploy ai-proxy --no-verify-jwt 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && npx supabase --version 2>&1)","WebFetch(domain:next.frase.io)","WebFetch(domain:searchendurance.com)","WebFetch(domain:www.frase.io)","WebFetch(domain:selfmademillennials.com)","WebFetch(domain:www.demandsage.com)","WebFetch(domain:juliety.com)","WebFetch(domain:www.g2.com)","WebFetch(domain:help.frase.io)","Bash(npx playwright:*)","WebFetch(domain:www.stan.store)","WebFetch(domain:www.hopp.co)","WebFetch(domain:help.stan.store)","WebFetch(domain:whop.com)","Bash(cd \"C:/Users/User/stan-io\" && ./node_modules/.bin/tsc --noEmit --pretty -- pages/Dashboard.tsx pages/AllProducts.tsx pages/DigitalProducts.tsx pages/Courses.tsx pages/MyStore.tsx 2>&1)","Bash(echo CCPM_LIST_NOT_AVAILABLE:*)","Bash(npx supabase --version 2>&1 || supabase --version 2>&1)","Bash(npx supabase:*)","Bash(SUPABASE_ACCESS_TOKEN=sbp_8d1963f9205da08d0a34d689ecff258c387f93c9 npx supabase:*)","Bash(cd /c/Users/User/nexus-ai && VERCEL_TOKEN=vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB npx vercel whoami --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB 2>&1)","Bash(cd /c/Users/User/nexus-ai && npx vercel --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB --yes 2>&1)","Bash(cd /c/Users/User/nexus-ai && npx vercel --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production --value \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvYXhjeGxubmtyZXp3d2tmcGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODcyNzQsImV4cCI6MjA4NzM2MzI3NH0.nFsrjQFumprdTe8bIqNrJSeXBNYj8dGin4uXslEGON8\" --yes --scope \"$SCOPE\" 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add SUPABASE_SERVICE_ROLE_KEY production --value \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvYXhjeGxubmtyZXp3d2tmcGhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTc4NzI3NCwiZXhwIjoyMDg3MzYzMjc0fQ.qWVAYZ7xfCzqFQAkRgCArO0gq0wiWYlcVuigCCc-1jI\" --yes --scope \"$SCOPE\" 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add STRIPE_SECRET_KEY production --value \"sk_test_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add STRIPE_WEBHOOK_SECRET production --value \"whsec_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY production --value \"pk_test_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add OPENAI_API_KEY production --value \"sk-placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_APP_URL production --value \"https://nexus-ai-silk-six.vercel.app\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_APP_NAME production --value \"NexusAI\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add RESEND_API_KEY production --value \"re_placeholder\" --yes --scope \"$SCOPE\" 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add STRIPE_WEBHOOK_SECRET production --value \"whsec_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY production --value \"pk_test_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add OPENAI_API_KEY production --value \"sk-placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_APP_URL production --value \"https://nexus-ai-silk-six.vercel.app\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_APP_NAME production --value \"NexusAI\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add RESEND_API_KEY production --value \"re_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env ls --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel --prod --yes --scope nuancesmen-gmailcoms-projects 2>&1)","WebFetch(domain:nexus-ai-silk-six.vercel.app)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env rm OPENAI_API_KEY production --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add OPENAI_API_KEY production --value \"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\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(echo === SURVEY ===:*)","Bash(echo === Anon SELECT active surveys ===:*)","Bash(grep Type error\\\\|error TS:*)","Bash(mkdir -p /c/Users/User/nexus-ai/test-docs/scan && cd /c/Users/User/nexus-ai && node test-docs/scan-clicks.mjs 2>&1)","Bash(pnpm --version 2>/dev/null && node --version 2>/dev/null && npm --version 2>/dev/null)","Bash(cd /c/Users/User/loyalty-app/apps && npx create-expo-app@latest mobile --template tabs 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo install expo-camera expo-location expo-localization expo-notifications expo-secure-store react-native-url-polyfill 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest init -d 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest add button card input label table dialog tabs badge select textarea toast 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest add button card input label table dialog tabs badge select textarea sonner 2>&1)","Bash(echo FOUND: $f:*)","Bash(cd \"C:/Users/User/loyalty-app/apps/mobile\" && npx expo install react-native-nfc-manager 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web --offline 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo install react-native-url-polyfill 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web --offline --port 8082 2>&1)","Bash(npx ecc-agentshield:*)","Bash(mkdir)","Bash(ccpm:*)"]
+2026-03-01T01:18:19.329Z [DEBUG] Applying permission update: Adding 6 deny rule(s) to destination 'userSettings': ["Bash(curl:*)","Bash(wget:*)","Bash(rm -rf:*)","Bash(sudo:*)","Bash(chmod 777:*)","Bash(ssh:*)"]
+2026-03-01T01:18:19.341Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-01T01:18:19.347Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-03-01T01:18:19.351Z [DEBUG] [STARTUP] Running setup()...
+2026-03-01T01:18:19.393Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-03-01T01:18:19.546Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\skills\competitors-analysis\SKILL.md: YAML Parse error: Unexpected token
+2026-03-01T01:18:20.095Z [ERROR] Error: Error: ENOENT: no such file or directory, open 'C:\ProgramData\ClaudeCode\managed-settings.json'
+    at openSync (unknown)
+    at readSync (B:/~BUN/root/claude.exe:12:1441)
+    at OF (B:/~BUN/root/claude.exe:6426:113)
+    at fB (B:/~BUN/root/claude.exe:6428:226)
+    at DxE (B:/~BUN/root/claude.exe:6412:5335)
+    at RLI (B:/~BUN/root/claude.exe:6412:5108)
+    at <anonymous> (B:/~BUN/root/claude.exe:6412:3801)
+    at async bLI (B:/~BUN/root/claude.exe:6412:4183)
+    at async <anonymous> (B:/~BUN/root/claude.exe:11979:400)
+    at processTicksAndRejections (native:7:39)
+2026-03-01T01:18:20.097Z [DEBUG] Error log sink initialized
+2026-03-01T01:18:20.134Z [DEBUG] [STARTUP] setup() completed in 783ms
+2026-03-01T01:18:20.134Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-01T01:18:20.144Z [DEBUG] Git remote URL: null
+2026-03-01T01:18:20.144Z [DEBUG] No git remote URL found
+2026-03-01T01:18:20.553Z [DEBUG] Loading plugin git-pr-workflows from source: "./plugins/git-pr-workflows"
+2026-03-01T01:18:20.562Z [DEBUG] Loading plugin context-management from source: "./plugins/context-management"
+2026-03-01T01:18:20.596Z [DEBUG] Loading plugin claude-md-management from source: "./plugins/claude-md-management"
+2026-03-01T01:18:20.613Z [DEBUG] Loading plugin database-migrations from source: "./plugins/database-migrations"
+2026-03-01T01:18:20.623Z [DEBUG] Loading plugin business-analytics from source: "./plugins/business-analytics"
+2026-03-01T01:18:20.633Z [DEBUG] Loading plugin accessibility-compliance from source: "./plugins/accessibility-compliance"
+2026-03-01T01:18:20.651Z [DEBUG] Loading plugin debugging-toolkit from source: "./plugins/debugging-toolkit"
+2026-03-01T01:18:20.667Z [DEBUG] Loading plugin c4-architecture from source: "./plugins/c4-architecture"
+2026-03-01T01:18:20.698Z [DEBUG] Loading plugin agent-orchestration from source: "./plugins/agent-orchestration"
+2026-03-01T01:18:20.711Z [DEBUG] Loading plugin dependency-management from source: "./plugins/dependency-management"
+2026-03-01T01:18:20.726Z [DEBUG] Loading plugin cicd-automation from source: "./plugins/cicd-automation"
+2026-03-01T01:18:20.736Z [DEBUG] Loading plugin deployment-strategies from source: "./plugins/deployment-strategies"
+2026-03-01T01:18:20.765Z [DEBUG] Loading plugin agent-sdk-dev from source: "./plugins/agent-sdk-dev"
+2026-03-01T01:18:20.773Z [DEBUG] Loading plugin database-design from source: "./plugins/database-design"
+2026-03-01T01:18:20.781Z [DEBUG] Loading plugin cloud-infrastructure from source: "./plugins/cloud-infrastructure"
+2026-03-01T01:18:20.790Z [DEBUG] Loading plugin code-documentation from source: "./plugins/code-documentation"
+2026-03-01T01:18:20.795Z [DEBUG] Loading plugin code-refactoring from source: "./plugins/code-refactoring"
+2026-03-01T01:18:20.825Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-03-01T01:18:20.834Z [DEBUG] Loading plugin agent-teams from source: "./plugins/agent-teams"
+2026-03-01T01:18:20.842Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-03-01T01:18:20.850Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-03-01T01:18:20.866Z [DEBUG] Loading plugin developer-essentials from source: "./plugins/developer-essentials"
+2026-03-01T01:18:20.870Z [DEBUG] Loading plugin distributed-debugging from source: "./plugins/distributed-debugging"
+2026-03-01T01:18:20.874Z [DEBUG] Loading plugin documentation-generation from source: "./plugins/documentation-generation"
+2026-03-01T01:18:20.878Z [DEBUG] Loading plugin dotnet-contribution from source: "./plugins/dotnet-contribution"
+2026-03-01T01:18:20.885Z [DEBUG] Loading plugin error-debugging from source: "./plugins/error-debugging"
+2026-03-01T01:18:20.890Z [DEBUG] Loading plugin error-diagnostics from source: "./plugins/error-diagnostics"
+2026-03-01T01:18:20.898Z [DEBUG] Loading plugin framework-migration from source: "./plugins/framework-migration"
+2026-03-01T01:18:20.903Z [DEBUG] Loading plugin comprehensive-review from source: "./plugins/comprehensive-review"
+2026-03-01T01:18:20.907Z [DEBUG] Loading plugin frontend-mobile-development from source: "./plugins/frontend-mobile-development"
+2026-03-01T01:18:20.911Z [DEBUG] Loading plugin frontend-mobile-security from source: "./plugins/frontend-mobile-security"
+2026-03-01T01:18:20.918Z [DEBUG] Loading plugin full-stack-orchestration from source: "./plugins/full-stack-orchestration"
+2026-03-01T01:18:20.926Z [DEBUG] Loading plugin hr-legal-compliance from source: "./plugins/hr-legal-compliance"
+2026-03-01T01:18:20.943Z [DEBUG] Loading plugin conductor from source: "./plugins/conductor"
+2026-03-01T01:18:20.950Z [DEBUG] Loading plugin incident-response from source: "./plugins/incident-response"
+2026-03-01T01:18:20.957Z [DEBUG] Loading plugin julia-development from source: "./plugins/julia-development"
+2026-03-01T01:18:20.960Z [DEBUG] Loading plugin jvm-languages from source: "./plugins/jvm-languages"
+2026-03-01T01:18:20.965Z [DEBUG] Loading plugin game-development from source: "./plugins/game-development"
+2026-03-01T01:18:20.973Z [DEBUG] Loading plugin functional-programming from source: "./plugins/functional-programming"
+2026-03-01T01:18:20.994Z [DEBUG] Loading plugin content-marketing from source: "./plugins/content-marketing"
+2026-03-01T01:18:21.006Z [DEBUG] Loading plugin observability-monitoring from source: "./plugins/observability-monitoring"
+2026-03-01T01:18:21.011Z [DEBUG] Loading plugin shell-scripting from source: "./plugins/shell-scripting"
+2026-03-01T01:18:21.028Z [DEBUG] Loading plugin seo-technical-optimization from source: "./plugins/seo-technical-optimization"
+2026-03-01T01:18:21.035Z [DEBUG] Loading plugin machine-learning-ops from source: "./plugins/machine-learning-ops"
+2026-03-01T01:18:21.042Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-03-01T01:18:21.048Z [DEBUG] Loading plugin kubernetes-operations from source: "./plugins/kubernetes-operations"
+2026-03-01T01:18:21.062Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-03-01T01:18:21.063Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-03-01T01:18:21.071Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-03-01T01:18:21.076Z [DEBUG] Loading plugin tdd-workflows from source: "./plugins/tdd-workflows"
+2026-03-01T01:18:21.080Z [DEBUG] Loading plugin startup-business-analyst from source: "./plugins/startup-business-analyst"
+2026-03-01T01:18:21.083Z [DEBUG] Loading plugin backend-api-security from source: "./plugins/backend-api-security"
+2026-03-01T01:18:21.086Z [DEBUG] Loading plugin data-engineering from source: "./plugins/data-engineering"
+2026-03-01T01:18:21.089Z [DEBUG] Loading plugin customer-sales-automation from source: "./plugins/customer-sales-automation"
+2026-03-01T01:18:21.093Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-03-01T01:18:21.093Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-03-01T01:18:21.097Z [DEBUG] Loading plugin arm-cortex-microcontrollers from source: "./plugins/arm-cortex-microcontrollers"
+2026-03-01T01:18:21.107Z [DEBUG] Loading plugin api-scaffolding from source: "./plugins/api-scaffolding"
+2026-03-01T01:18:21.109Z [DEBUG] Loading plugin api-testing-observability from source: "./plugins/api-testing-observability"
+2026-03-01T01:18:21.117Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-03-01T01:18:21.126Z [DEBUG] Loading plugin application-performance from source: "./plugins/application-performance"
+2026-03-01T01:18:21.134Z [DEBUG] Loading plugin unit-testing from source: "./plugins/unit-testing"
+2026-03-01T01:18:21.141Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-03-01T01:18:21.150Z [DEBUG] Loading plugin code-review from source: "./plugins/code-review"
+2026-03-01T01:18:21.160Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-03-01T01:18:21.165Z [DEBUG] Loading plugin web-scripting from source: "./plugins/web-scripting"
+2026-03-01T01:18:21.171Z [DEBUG] Loading plugin pr-review-toolkit from source: "./plugins/pr-review-toolkit"
+2026-03-01T01:18:21.175Z [DEBUG] Loading plugin payment-processing from source: "./plugins/payment-processing"
+2026-03-01T01:18:21.179Z [DEBUG] Loading plugin multi-platform-apps from source: "./plugins/multi-platform-apps"
+2026-03-01T01:18:21.183Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-03-01T01:18:21.186Z [DEBUG] Loading plugin performance-testing-review from source: "./plugins/performance-testing-review"
+2026-03-01T01:18:21.190Z [DEBUG] Loading plugin python-development from source: "./plugins/python-development"
+2026-03-01T01:18:21.194Z [DEBUG] Loading plugin backend-development from source: "./plugins/backend-development"
+2026-03-01T01:18:21.197Z [DEBUG] Loading plugin quantitative-trading from source: "./plugins/quantitative-trading"
+2026-03-01T01:18:21.199Z [DEBUG] Loading plugin deployment-validation from source: "./plugins/deployment-validation"
+2026-03-01T01:18:21.201Z [DEBUG] Loading plugin codebase-cleanup from source: "./plugins/codebase-cleanup"
+2026-03-01T01:18:21.203Z [DEBUG] Loading plugin javascript-typescript from source: "./plugins/javascript-typescript"
+2026-03-01T01:18:21.204Z [DEBUG] Loading plugin seo-content-creation from source: "./plugins/seo-content-creation"
+2026-03-01T01:18:21.206Z [DEBUG] Loading plugin stripe from source: "./external_plugins/stripe"
+2026-03-01T01:18:21.208Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-03-01T01:18:21.210Z [DEBUG] Loading plugin blockchain-web3 from source: "./plugins/blockchain-web3"
+2026-03-01T01:18:21.215Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-03-01T01:18:21.216Z [DEBUG] Loading plugin data-validation-suite from source: "./plugins/data-validation-suite"
+2026-03-01T01:18:21.219Z [DEBUG] Loading plugin ui-design from source: "./plugins/ui-design"
+2026-03-01T01:18:21.221Z [DEBUG] Loading plugin team-collaboration from source: "./plugins/team-collaboration"
+2026-03-01T01:18:21.223Z [DEBUG] Loading plugin systems-programming from source: "./plugins/systems-programming"
+2026-03-01T01:18:21.225Z [DEBUG] Loading plugin database-cloud-optimization from source: "./plugins/database-cloud-optimization"
+2026-03-01T01:18:21.227Z [DEBUG] Loading plugin reverse-engineering from source: "./plugins/reverse-engineering"
+2026-03-01T01:18:21.231Z [DEBUG] Loading plugin seo-analysis-monitoring from source: "./plugins/seo-analysis-monitoring"
+2026-03-01T01:18:21.233Z [DEBUG] Loading plugin security-scanning from source: "./plugins/security-scanning"
+2026-03-01T01:18:21.255Z [DEBUG] Loading plugin security-compliance from source: "./plugins/security-compliance"
+2026-03-01T01:18:21.257Z [DEBUG] Loading plugin llm-application-dev from source: "./plugins/llm-application-dev"
+2026-03-01T01:18:21.286Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1772327901282_0pk8yq
+2026-03-01T01:18:21.388Z [DEBUG] Using manifest version for git-pr-workflows@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.389Z [DEBUG] Using manifest version for kubernetes-operations@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.391Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1772327901391_5uwtos
+2026-03-01T01:18:21.446Z [DEBUG] Using manifest version for context-management@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.447Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-03-01T01:18:21.448Z [DEBUG] Using manifest version for claude-md-management@claude-plugins-official: 1.0.0
+2026-03-01T01:18:21.449Z [DEBUG] Using manifest version for blockchain-web3@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.471Z [DEBUG] Using manifest version for c4-architecture@claude-code-workflows: 1.0.0
+2026-03-01T01:18:21.472Z [DEBUG] Using manifest version for database-migrations@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.473Z [DEBUG] Using manifest version for accessibility-compliance@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.473Z [DEBUG] Using manifest version for business-analytics@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.474Z [DEBUG] Using manifest version for ui-design@claude-code-workflows: 1.0.2
+2026-03-01T01:18:21.492Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-03-01T01:18:21.492Z [DEBUG] Using manifest version for debugging-toolkit@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.493Z [DEBUG] Using manifest version for application-performance@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.493Z [DEBUG] Using manifest version for cicd-automation@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.494Z [DEBUG] Using manifest version for cloud-infrastructure@claude-code-workflows: 1.2.2
+2026-03-01T01:18:21.494Z [DEBUG] Using manifest version for payment-processing@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.495Z [DEBUG] Using manifest version for code-documentation@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.495Z [DEBUG] Using manifest version for seo-technical-optimization@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.495Z [DEBUG] Using manifest version for python-development@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.496Z [DEBUG] Using manifest version for machine-learning-ops@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.496Z [DEBUG] Using manifest version for performance-testing-review@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.496Z [DEBUG] Using manifest version for seo-content-creation@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.497Z [DEBUG] Using manifest version for multi-platform-apps@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.498Z [DEBUG] Using manifest version for codebase-cleanup@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.498Z [DEBUG] Using manifest version for observability-monitoring@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.969Z [DEBUG] Loaded 179 unique skills (179 unconditional, 0 conditional, managed: 0, user: 139, project: 0, additional: 0, legacy commands: 40)
+2026-03-01T01:18:21.970Z [DEBUG] Using manifest version for deployment-strategies@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.971Z [DEBUG] Using manifest version for dependency-management@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.972Z [DEBUG] Using manifest version for stripe@claude-plugins-official: 0.1.0
+2026-03-01T01:18:21.972Z [DEBUG] Using manifest version for game-development@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.973Z [DEBUG] Using manifest version for full-stack-orchestration@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.973Z [DEBUG] Using manifest version for julia-development@claude-code-workflows: 1.0.0
+2026-03-01T01:18:21.978Z [DEBUG] Using manifest version for developer-essentials@claude-code-workflows: 1.0.1
+2026-03-01T01:18:21.979Z [DEBUG] Using manifest version for database-design@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.979Z [DEBUG] Using manifest version for error-debugging@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.979Z [DEBUG] Using manifest version for backend-development@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.980Z [DEBUG] Using manifest version for web-scripting@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.981Z [DEBUG] Plugin kubernetes-operations@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\kubernetes-operations\1.2.1
+2026-03-01T01:18:21.981Z [DEBUG] Resolved local plugin kubernetes-operations to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\kubernetes-operations\1.2.1
+2026-03-01T01:18:21.981Z [DEBUG] Using manifest version for arm-cortex-microcontrollers@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.982Z [DEBUG] Using manifest version for content-marketing@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.982Z [DEBUG] Using manifest version for error-diagnostics@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.983Z [DEBUG] Using manifest version for frontend-mobile-security@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.983Z [DEBUG] Using manifest version for quantitative-trading@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.983Z [DEBUG] Using manifest version for jvm-languages@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.984Z [DEBUG] Using manifest version for llm-application-dev@claude-code-workflows: 2.0.4
+2026-03-01T01:18:21.984Z [DEBUG] Plugin claude-md-management@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0
+2026-03-01T01:18:21.984Z [DEBUG] Resolved local plugin claude-md-management to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0
+2026-03-01T01:18:21.984Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-03-01T01:18:21.985Z [DEBUG] Using manifest version for conductor@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.985Z [DEBUG] Using manifest version for data-engineering@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.986Z [DEBUG] Using manifest version for distributed-debugging@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.986Z [DEBUG] Using manifest version for unit-testing@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.986Z [DEBUG] Using manifest version for javascript-typescript@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.987Z [DEBUG] Using manifest version for backend-api-security@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.987Z [DEBUG] Using manifest version for agent-orchestration@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.987Z [DEBUG] Using manifest version for functional-programming@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.988Z [DEBUG] Plugin git-pr-workflows@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\git-pr-workflows\1.3.0
+2026-03-01T01:18:21.988Z [DEBUG] Resolved local plugin git-pr-workflows to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\git-pr-workflows\1.3.0
+2026-03-01T01:18:21.988Z [DEBUG] Using manifest version for code-refactoring@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.988Z [DEBUG] Using manifest version for api-scaffolding@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.988Z [DEBUG] Using manifest version for startup-business-analyst@claude-code-workflows: 1.0.4
+2026-03-01T01:18:21.989Z [DEBUG] Using manifest version for tdd-workflows@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.989Z [DEBUG] Using manifest version for dotnet-contribution@claude-code-workflows: 1.0.0
+2026-03-01T01:18:21.989Z [DEBUG] Using manifest version for shell-scripting@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.989Z [DEBUG] Using manifest version for documentation-generation@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.990Z [DEBUG] Using manifest version for seo-analysis-monitoring@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.990Z [DEBUG] Using manifest version for deployment-validation@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.990Z [DEBUG] Using manifest version for agent-teams@claude-code-workflows: 1.0.2
+2026-03-01T01:18:21.991Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-03-01T01:18:21.991Z [DEBUG] Resolved local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-03-01T01:18:21.991Z [DEBUG] Using manifest version for security-compliance@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.991Z [DEBUG] Using manifest version for api-testing-observability@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.992Z [DEBUG] Plugin blockchain-web3@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\blockchain-web3\1.2.1
+2026-03-01T01:18:21.992Z [DEBUG] Resolved local plugin blockchain-web3 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\blockchain-web3\1.2.1
+2026-03-01T01:18:21.992Z [DEBUG] Using manifest version for incident-response@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.992Z [DEBUG] Using manifest version for comprehensive-review@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.993Z [DEBUG] Using manifest version for hr-legal-compliance@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.993Z [DEBUG] Using manifest version for customer-sales-automation@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.993Z [DEBUG] Using manifest version for frontend-mobile-development@claude-code-workflows: 1.2.1
+2026-03-01T01:18:21.993Z [DEBUG] Using manifest version for framework-migration@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.994Z [DEBUG] Using manifest version for data-validation-suite@claude-code-workflows: 1.2.0
+2026-03-01T01:18:21.994Z [DEBUG] Plugin database-migrations@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\database-migrations\1.2.0
+2026-03-01T01:18:21.994Z [DEBUG] Resolved local plugin database-migrations to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\database-migrations\1.2.0
+2026-03-01T01:18:21.994Z [DEBUG] Using manifest version for reverse-engineering@claude-code-workflows: 1.0.0
+2026-03-01T01:18:21.994Z [DEBUG] Using manifest version for security-scanning@claude-code-workflows: 1.3.0
+2026-03-01T01:18:21.995Z [DEBUG] Plugin accessibility-compliance@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\accessibility-compliance\1.2.1
+2026-03-01T01:18:21.995Z [DEBUG] Resolved local plugin accessibility-compliance to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\accessibility-compliance\1.2.1
+2026-03-01T01:18:21.995Z [DEBUG] Plugin context-management@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\context-management\1.2.0
+2026-03-01T01:18:21.995Z [DEBUG] Resolved local plugin context-management to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\context-management\1.2.0
+2026-03-01T01:18:21.995Z [DEBUG] Plugin business-analytics@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\business-analytics\1.2.1
+2026-03-01T01:18:21.995Z [DEBUG] Resolved local plugin business-analytics to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\business-analytics\1.2.1
+2026-03-01T01:18:21.995Z [DEBUG] Plugin performance-testing-review@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\performance-testing-review\1.2.1
+2026-03-01T01:18:21.995Z [DEBUG] Resolved local plugin performance-testing-review to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\performance-testing-review\1.2.1
+2026-03-01T01:18:21.995Z [DEBUG] Plugin machine-learning-ops@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\machine-learning-ops\1.2.1
+2026-03-01T01:18:21.995Z [DEBUG] Resolved local plugin machine-learning-ops to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\machine-learning-ops\1.2.1
+2026-03-01T01:18:21.996Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-03-01T01:18:21.996Z [DEBUG] Plugin seo-content-creation@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\seo-content-creation\1.2.0
+2026-03-01T01:18:21.996Z [DEBUG] Resolved local plugin seo-content-creation to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\seo-content-creation\1.2.0
+2026-03-01T01:18:21.996Z [DEBUG] Plugin seo-technical-optimization@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\seo-technical-optimization\1.2.0
+2026-03-01T01:18:21.996Z [DEBUG] Resolved local plugin seo-technical-optimization to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\seo-technical-optimization\1.2.0
+2026-03-01T01:18:21.996Z [DEBUG] Plugin python-development@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\python-development\1.2.1
+2026-03-01T01:18:21.996Z [DEBUG] Resolved local plugin python-development to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\python-development\1.2.1
+2026-03-01T01:18:21.996Z [DEBUG] Plugin multi-platform-apps@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\multi-platform-apps\1.3.0
+2026-03-01T01:18:21.996Z [DEBUG] Resolved local plugin multi-platform-apps to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\multi-platform-apps\1.3.0
+2026-03-01T01:18:22.000Z [DEBUG] Plugin cicd-automation@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\cicd-automation\1.2.1
+2026-03-01T01:18:22.000Z [DEBUG] Resolved local plugin cicd-automation to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\cicd-automation\1.2.1
+2026-03-01T01:18:22.000Z [DEBUG] Plugin observability-monitoring@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\observability-monitoring\1.2.1
+2026-03-01T01:18:22.000Z [DEBUG] Resolved local plugin observability-monitoring to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\observability-monitoring\1.2.1
+2026-03-01T01:18:22.001Z [DEBUG] Using manifest version for database-cloud-optimization@claude-code-workflows: 1.2.0
+2026-03-01T01:18:22.001Z [DEBUG] Plugin cloud-infrastructure@claude-code-workflows version 1.2.2 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\cloud-infrastructure\1.2.2
+2026-03-01T01:18:22.001Z [DEBUG] Resolved local plugin cloud-infrastructure to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\cloud-infrastructure\1.2.2
+2026-03-01T01:18:22.002Z [DEBUG] Plugin quantitative-trading@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\quantitative-trading\1.2.1
+2026-03-01T01:18:22.002Z [DEBUG] Resolved local plugin quantitative-trading to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\quantitative-trading\1.2.1
+2026-03-01T01:18:22.010Z [DEBUG] Plugin payment-processing@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\payment-processing\1.2.1
+2026-03-01T01:18:22.011Z [DEBUG] Resolved local plugin payment-processing to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\payment-processing\1.2.1
+2026-03-01T01:18:22.011Z [DEBUG] Plugin frontend-mobile-security@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\frontend-mobile-security\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Resolved local plugin frontend-mobile-security to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\frontend-mobile-security\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Plugin arm-cortex-microcontrollers@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\arm-cortex-microcontrollers\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Resolved local plugin arm-cortex-microcontrollers to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\arm-cortex-microcontrollers\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Plugin codebase-cleanup@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\codebase-cleanup\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Resolved local plugin codebase-cleanup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\codebase-cleanup\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Plugin error-diagnostics@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\error-diagnostics\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Resolved local plugin error-diagnostics to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\error-diagnostics\1.2.0
+2026-03-01T01:18:22.011Z [DEBUG] Plugin application-performance@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\application-performance\1.3.0
+2026-03-01T01:18:22.011Z [DEBUG] Resolved local plugin application-performance to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\application-performance\1.3.0
+2026-03-01T01:18:22.012Z [DEBUG] Using manifest version for team-collaboration@claude-code-workflows: 1.2.0
+2026-03-01T01:18:22.012Z [DEBUG] Plugin ui-design@claude-code-workflows version 1.0.2 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\ui-design\1.0.2
+2026-03-01T01:18:22.012Z [DEBUG] Resolved local plugin ui-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\ui-design\1.0.2
+2026-03-01T01:18:22.012Z [DEBUG] Plugin backend-api-security@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\backend-api-security\1.2.0
+2026-03-01T01:18:22.012Z [DEBUG] Resolved local plugin backend-api-security to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\backend-api-security\1.2.0
+2026-03-01T01:18:22.012Z [DEBUG] Plugin agent-teams@claude-code-workflows version 1.0.2 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\agent-teams\1.0.2
+2026-03-01T01:18:22.012Z [DEBUG] Resolved local plugin agent-teams to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\agent-teams\1.0.2
+2026-03-01T01:18:22.012Z [DEBUG] Plugin documentation-generation@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\documentation-generation\1.2.1
+2026-03-01T01:18:22.012Z [DEBUG] Resolved local plugin documentation-generation to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\documentation-generation\1.2.1
+2026-03-01T01:18:22.013Z [DEBUG] Plugin distributed-debugging@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\distributed-debugging\1.2.0
+2026-03-01T01:18:22.013Z [DEBUG] Resolved local plugin distributed-debugging to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\distributed-debugging\1.2.0
+2026-03-01T01:18:22.021Z [DEBUG] Plugin seo-analysis-monitoring@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\seo-analysis-monitoring\1.2.0
+2026-03-01T01:18:22.021Z [DEBUG] Resolved local plugin seo-analysis-monitoring to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\seo-analysis-monitoring\1.2.0
+2026-03-01T01:18:22.021Z [DEBUG] Using manifest version for systems-programming@claude-code-workflows: 1.2.1
+2026-03-01T01:18:22.022Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-03-01T01:18:22.022Z [DEBUG] Resolved local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-03-01T01:18:22.023Z [DEBUG] Plugin data-engineering@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\data-engineering\1.3.0
+2026-03-01T01:18:22.023Z [DEBUG] Resolved local plugin data-engineering to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\data-engineering\1.3.0
+2026-03-01T01:18:22.025Z [DEBUG] Plugin julia-development@claude-code-workflows version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\julia-development\1.0.0
+2026-03-01T01:18:22.025Z [DEBUG] Resolved local plugin julia-development to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\julia-development\1.0.0
+2026-03-01T01:18:22.025Z [DEBUG] Plugin code-documentation@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\code-documentation\1.2.0
+2026-03-01T01:18:22.025Z [DEBUG] Resolved local plugin code-documentation to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\code-documentation\1.2.0
+2026-03-01T01:18:22.025Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.026Z [DEBUG] Plugin error-debugging@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\error-debugging\1.2.0
+2026-03-01T01:18:22.026Z [DEBUG] Resolved local plugin error-debugging to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\error-debugging\1.2.0
+2026-03-01T01:18:22.026Z [DEBUG] Plugin backend-development@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\backend-development\1.3.0
+2026-03-01T01:18:22.026Z [DEBUG] Resolved local plugin backend-development to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\backend-development\1.3.0
+2026-03-01T01:18:22.026Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.026Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.033Z [DEBUG] Plugin jvm-languages@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\jvm-languages\1.2.0
+2026-03-01T01:18:22.033Z [DEBUG] Resolved local plugin jvm-languages to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\jvm-languages\1.2.0
+2026-03-01T01:18:22.034Z [DEBUG] Plugin developer-essentials@claude-code-workflows version 1.0.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\developer-essentials\1.0.1
+2026-03-01T01:18:22.034Z [DEBUG] Resolved local plugin developer-essentials to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\developer-essentials\1.0.1
+2026-03-01T01:18:22.047Z [DEBUG] Plugin content-marketing@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\content-marketing\1.2.0
+2026-03-01T01:18:22.047Z [DEBUG] Resolved local plugin content-marketing to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\content-marketing\1.2.0
+2026-03-01T01:18:22.047Z [DEBUG] Plugin database-design@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\database-design\1.2.0
+2026-03-01T01:18:22.047Z [DEBUG] Resolved local plugin database-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\database-design\1.2.0
+2026-03-01T01:18:22.047Z [DEBUG] Plugin web-scripting@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\web-scripting\1.2.0
+2026-03-01T01:18:22.047Z [DEBUG] Resolved local plugin web-scripting to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\web-scripting\1.2.0
+2026-03-01T01:18:22.048Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.048Z [DEBUG] Plugin systems-programming@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\systems-programming\1.2.1
+2026-03-01T01:18:22.048Z [DEBUG] Resolved local plugin systems-programming to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\systems-programming\1.2.1
+2026-03-01T01:18:22.049Z [DEBUG] Plugin full-stack-orchestration@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\full-stack-orchestration\1.3.0
+2026-03-01T01:18:22.049Z [DEBUG] Resolved local plugin full-stack-orchestration to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\full-stack-orchestration\1.3.0
+2026-03-01T01:18:22.049Z [DEBUG] Using git SHA for context7@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.049Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.050Z [DEBUG] Plugin stripe@claude-plugins-official version 0.1.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-03-01T01:18:22.050Z [DEBUG] Resolved local plugin stripe to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-03-01T01:18:22.050Z [DEBUG] Plugin database-cloud-optimization@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\database-cloud-optimization\1.2.0
+2026-03-01T01:18:22.050Z [DEBUG] Resolved local plugin database-cloud-optimization to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\database-cloud-optimization\1.2.0
+2026-03-01T01:18:22.063Z [DEBUG] Plugin game-development@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\game-development\1.2.1
+2026-03-01T01:18:22.063Z [DEBUG] Resolved local plugin game-development to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\game-development\1.2.1
+2026-03-01T01:18:22.064Z [DEBUG] Plugin javascript-typescript@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\javascript-typescript\1.2.1
+2026-03-01T01:18:22.064Z [DEBUG] Resolved local plugin javascript-typescript to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\javascript-typescript\1.2.1
+2026-03-01T01:18:22.065Z [DEBUG] Plugin incident-response@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\incident-response\1.3.0
+2026-03-01T01:18:22.065Z [DEBUG] Resolved local plugin incident-response to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\incident-response\1.3.0
+2026-03-01T01:18:22.066Z [DEBUG] Plugin agent-orchestration@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\agent-orchestration\1.2.1
+2026-03-01T01:18:22.066Z [DEBUG] Resolved local plugin agent-orchestration to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\agent-orchestration\1.2.1
+2026-03-01T01:18:22.066Z [DEBUG] Plugin c4-architecture@claude-code-workflows version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\c4-architecture\1.0.0
+2026-03-01T01:18:22.066Z [DEBUG] Resolved local plugin c4-architecture to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\c4-architecture\1.0.0
+2026-03-01T01:18:22.066Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.066Z [DEBUG] Plugin deployment-strategies@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\deployment-strategies\1.2.0
+2026-03-01T01:18:22.066Z [DEBUG] Resolved local plugin deployment-strategies to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\deployment-strategies\1.2.0
+2026-03-01T01:18:22.066Z [DEBUG] Plugin dependency-management@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\dependency-management\1.2.0
+2026-03-01T01:18:22.066Z [DEBUG] Resolved local plugin dependency-management to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\dependency-management\1.2.0
+2026-03-01T01:18:22.067Z [DEBUG] Plugin deployment-validation@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\deployment-validation\1.2.0
+2026-03-01T01:18:22.067Z [DEBUG] Resolved local plugin deployment-validation to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\deployment-validation\1.2.0
+2026-03-01T01:18:22.067Z [DEBUG] Plugin shell-scripting@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\shell-scripting\1.2.1
+2026-03-01T01:18:22.067Z [DEBUG] Resolved local plugin shell-scripting to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\shell-scripting\1.2.1
+2026-03-01T01:18:22.067Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-03-01T01:18:22.067Z [DEBUG] Resolved local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-03-01T01:18:22.067Z [DEBUG] Plugin feature-dev@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\55b58ec6e564
+2026-03-01T01:18:22.067Z [DEBUG] Resolved local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\55b58ec6e564
+2026-03-01T01:18:22.067Z [DEBUG] Plugin llm-application-dev@claude-code-workflows version 2.0.4 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\llm-application-dev\2.0.4
+2026-03-01T01:18:22.067Z [DEBUG] Resolved local plugin llm-application-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\llm-application-dev\2.0.4
+2026-03-01T01:18:22.068Z [DEBUG] Plugin reverse-engineering@claude-code-workflows version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\reverse-engineering\1.0.0
+2026-03-01T01:18:22.068Z [DEBUG] Resolved local plugin reverse-engineering to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\reverse-engineering\1.0.0
+2026-03-01T01:18:22.068Z [DEBUG] Plugin comprehensive-review@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\comprehensive-review\1.3.0
+2026-03-01T01:18:22.068Z [DEBUG] Resolved local plugin comprehensive-review to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\comprehensive-review\1.3.0
+2026-03-01T01:18:22.077Z [DEBUG] Plugin security-compliance@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\security-compliance\1.2.0
+2026-03-01T01:18:22.077Z [DEBUG] Resolved local plugin security-compliance to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\security-compliance\1.2.0
+2026-03-01T01:18:22.079Z [DEBUG] Plugin conductor@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\conductor\1.2.1
+2026-03-01T01:18:22.079Z [DEBUG] Resolved local plugin conductor to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\conductor\1.2.1
+2026-03-01T01:18:22.079Z [DEBUG] Using git SHA for github@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.079Z [DEBUG] Plugin code-refactoring@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\code-refactoring\1.2.0
+2026-03-01T01:18:22.079Z [DEBUG] Resolved local plugin code-refactoring to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\code-refactoring\1.2.0
+2026-03-01T01:18:22.080Z [DEBUG] Plugin unit-testing@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\unit-testing\1.2.0
+2026-03-01T01:18:22.080Z [DEBUG] Resolved local plugin unit-testing to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\unit-testing\1.2.0
+2026-03-01T01:18:22.080Z [DEBUG] Plugin security-scanning@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\security-scanning\1.3.0
+2026-03-01T01:18:22.080Z [DEBUG] Resolved local plugin security-scanning to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\security-scanning\1.3.0
+2026-03-01T01:18:22.081Z [DEBUG] Plugin api-testing-observability@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\api-testing-observability\1.2.0
+2026-03-01T01:18:22.081Z [DEBUG] Resolved local plugin api-testing-observability to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\api-testing-observability\1.2.0
+2026-03-01T01:18:22.081Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-03-01T01:18:22.082Z [DEBUG] Plugin startup-business-analyst@claude-code-workflows version 1.0.4 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\startup-business-analyst\1.0.4
+2026-03-01T01:18:22.082Z [DEBUG] Resolved local plugin startup-business-analyst to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\startup-business-analyst\1.0.4
+2026-03-01T01:18:22.082Z [DEBUG] Plugin debugging-toolkit@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\debugging-toolkit\1.2.0
+2026-03-01T01:18:22.082Z [DEBUG] Resolved local plugin debugging-toolkit to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\debugging-toolkit\1.2.0
+2026-03-01T01:18:22.082Z [DEBUG] Plugin dotnet-contribution@claude-code-workflows version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\dotnet-contribution\1.0.0
+2026-03-01T01:18:22.082Z [DEBUG] Resolved local plugin dotnet-contribution to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\dotnet-contribution\1.0.0
+2026-03-01T01:18:22.083Z [DEBUG] Plugin hr-legal-compliance@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\hr-legal-compliance\1.2.1
+2026-03-01T01:18:22.083Z [DEBUG] Resolved local plugin hr-legal-compliance to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\hr-legal-compliance\1.2.1
+2026-03-01T01:18:22.083Z [DEBUG] Plugin api-scaffolding@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\api-scaffolding\1.2.1
+2026-03-01T01:18:22.083Z [DEBUG] Resolved local plugin api-scaffolding to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\api-scaffolding\1.2.1
+2026-03-01T01:18:22.083Z [DEBUG] Plugin framework-migration@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\framework-migration\1.3.0
+2026-03-01T01:18:22.083Z [DEBUG] Resolved local plugin framework-migration to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\framework-migration\1.3.0
+2026-03-01T01:18:22.084Z [DEBUG] Plugin frontend-mobile-development@claude-code-workflows version 1.2.1 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\frontend-mobile-development\1.2.1
+2026-03-01T01:18:22.084Z [DEBUG] Resolved local plugin frontend-mobile-development to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\frontend-mobile-development\1.2.1
+2026-03-01T01:18:22.084Z [DEBUG] Plugin tdd-workflows@claude-code-workflows version 1.3.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\tdd-workflows\1.3.0
+2026-03-01T01:18:22.084Z [DEBUG] Resolved local plugin tdd-workflows to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\tdd-workflows\1.3.0
+2026-03-01T01:18:22.084Z [DEBUG] Plugin customer-sales-automation@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\customer-sales-automation\1.2.0
+2026-03-01T01:18:22.084Z [DEBUG] Resolved local plugin customer-sales-automation to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\customer-sales-automation\1.2.0
+2026-03-01T01:18:22.100Z [DEBUG] Plugin team-collaboration@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\team-collaboration\1.2.0
+2026-03-01T01:18:22.100Z [DEBUG] Resolved local plugin team-collaboration to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\team-collaboration\1.2.0
+2026-03-01T01:18:22.100Z [DEBUG] Using git SHA for serena@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.103Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-03-01T01:18:22.103Z [DEBUG] Resolved local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-03-01T01:18:22.104Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 55b58ec6e564
+2026-03-01T01:18:22.104Z [DEBUG] Plugin agent-sdk-dev@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\55b58ec6e564
+2026-03-01T01:18:22.104Z [DEBUG] Resolved local plugin agent-sdk-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\55b58ec6e564
+2026-03-01T01:18:22.104Z [DEBUG] Plugin supabase@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\55b58ec6e564
+2026-03-01T01:18:22.104Z [DEBUG] Resolved local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\55b58ec6e564
+2026-03-01T01:18:22.108Z [DEBUG] Plugin context7@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\55b58ec6e564
+2026-03-01T01:18:22.108Z [DEBUG] Resolved local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\55b58ec6e564
+2026-03-01T01:18:22.113Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\55b58ec6e564
+2026-03-01T01:18:22.113Z [DEBUG] Resolved local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\55b58ec6e564
+2026-03-01T01:18:22.147Z [DEBUG] Plugin frontend-design@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\55b58ec6e564
+2026-03-01T01:18:22.147Z [DEBUG] Resolved local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\55b58ec6e564
+2026-03-01T01:18:22.148Z [DEBUG] Plugin github@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\55b58ec6e564
+2026-03-01T01:18:22.148Z [DEBUG] Resolved local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\55b58ec6e564
+2026-03-01T01:18:22.151Z [DEBUG] Plugin functional-programming@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\functional-programming\1.2.0
+2026-03-01T01:18:22.151Z [DEBUG] Resolved local plugin functional-programming to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\functional-programming\1.2.0
+2026-03-01T01:18:22.179Z [DEBUG] Plugin data-validation-suite@claude-code-workflows version 1.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-code-workflows\data-validation-suite\1.2.0
+2026-03-01T01:18:22.179Z [DEBUG] Resolved local plugin data-validation-suite to versioned cache: C:\Users\User\.claude\plugins\cache\claude-code-workflows\data-validation-suite\1.2.0
+2026-03-01T01:18:22.189Z [DEBUG] Plugin serena@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\55b58ec6e564
+2026-03-01T01:18:22.189Z [DEBUG] Resolved local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\55b58ec6e564
+2026-03-01T01:18:22.190Z [DEBUG] Plugin pr-review-toolkit@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\55b58ec6e564
+2026-03-01T01:18:22.190Z [DEBUG] Resolved local plugin pr-review-toolkit to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\55b58ec6e564
+2026-03-01T01:18:22.211Z [DEBUG] Plugin code-review@claude-plugins-official version 55b58ec6e564 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\55b58ec6e564
+2026-03-01T01:18:22.211Z [DEBUG] Resolved local plugin code-review to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\55b58ec6e564
+2026-03-01T01:18:22.256Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-03-01T01:18:22.292Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-03-01T01:18:27.982Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1772327901282_0pk8yq
+2026-03-01T01:18:27.984Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1772327901391_5uwtos
+2026-03-01T01:18:28.043Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-03-01T01:18:28.043Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-03-01T01:18:28.043Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-03-01T01:18:28.043Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.3.1
+2026-03-01T01:18:28.045Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-03-01T01:18:28.046Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.3.1 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.3.1
+2026-03-01T01:18:28.196Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.3.1\hooks\hooks.json
+2026-03-01T01:18:28.197Z [DEBUG] Found 90 plugins (90 enabled, 0 disabled)
+2026-03-01T01:18:28.197Z [DEBUG] getPluginSkills: Processing 90 enabled plugins
+2026-03-01T01:18:28.197Z [DEBUG] Checking plugin frontend-design: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:28.197Z [DEBUG] Attempting to load skills from plugin frontend-design default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\55b58ec6e564\skills
+2026-03-01T01:18:28.205Z [DEBUG] Loading hooks from plugin: superpowers
+2026-03-01T01:18:28.206Z [DEBUG] Registered 1 hooks from 90 plugins
+2026-03-01T01:18:28.226Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-03-01T01:18:28.228Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-03-01T01:18:28.233Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-03-01T01:18:28.243Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-03-01T01:18:28.249Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-03-01T01:18:28.252Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\55b58ec6e564\agents\code-reviewer.md: YAML Parse error: Unexpected token
+2026-03-01T01:18:28.259Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\55b58ec6e564\agents\comment-analyzer.md: YAML Parse error: Unexpected token
+2026-03-01T01:18:28.261Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\55b58ec6e564\agents\pr-test-analyzer.md: YAML Parse error: Unexpected token
+2026-03-01T01:18:28.264Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\55b58ec6e564\agents\silent-failure-hunter.md: YAML Parse error: Unexpected token
+2026-03-01T01:18:28.266Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\55b58ec6e564\agents\type-design-analyzer.md: YAML Parse error: Unexpected token
+2026-03-01T01:18:28.266Z [DEBUG] Loaded 6 agents from plugin pr-review-toolkit default directory
+2026-03-01T01:18:28.272Z [DEBUG] Loaded 1 agents from plugin accessibility-compliance default directory
+2026-03-01T01:18:28.276Z [DEBUG] Loaded 1 agents from plugin agent-orchestration default directory
+2026-03-01T01:18:28.307Z [DEBUG] Loaded 4 agents from plugin agent-teams default directory
+2026-03-01T01:18:28.333Z [DEBUG] Loaded 4 agents from plugin api-scaffolding default directory
+2026-03-01T01:18:28.339Z [DEBUG] Loaded 1 agents from plugin api-testing-observability default directory
+2026-03-01T01:18:28.356Z [DEBUG] Loaded 3 agents from plugin application-performance default directory
+2026-03-01T01:18:28.360Z [DEBUG] Loaded 1 agents from plugin arm-cortex-microcontrollers default directory
+2026-03-01T01:18:28.371Z [DEBUG] Loaded 2 agents from plugin backend-api-security default directory
+2026-03-01T01:18:28.411Z [DEBUG] Loaded 8 agents from plugin backend-development default directory
+2026-03-01T01:18:28.424Z [DEBUG] Loaded 1 agents from plugin blockchain-web3 default directory
+2026-03-01T01:18:28.428Z [DEBUG] Loaded 1 agents from plugin business-analytics default directory
+2026-03-01T01:18:28.446Z [DEBUG] Loaded 4 agents from plugin c4-architecture default directory
+2026-03-01T01:18:28.470Z [DEBUG] Loaded 5 agents from plugin cicd-automation default directory
+2026-03-01T01:18:28.506Z [DEBUG] Loaded 7 agents from plugin cloud-infrastructure default directory
+2026-03-01T01:18:28.544Z [DEBUG] Loaded 3 agents from plugin code-documentation default directory
+2026-03-01T01:18:28.555Z [DEBUG] Loaded 2 agents from plugin code-refactoring default directory
+2026-03-01T01:18:28.563Z [DEBUG] Loaded 2 agents from plugin codebase-cleanup default directory
+2026-03-01T01:18:28.591Z [DEBUG] Loaded 3 agents from plugin comprehensive-review default directory
+2026-03-01T01:18:28.597Z [DEBUG] Loaded 1 agents from plugin conductor default directory
+2026-03-01T01:18:28.606Z [DEBUG] Loaded 2 agents from plugin content-marketing default directory
+2026-03-01T01:18:28.610Z [DEBUG] Loaded 1 agents from plugin context-management default directory
+2026-03-01T01:18:28.618Z [DEBUG] Loaded 2 agents from plugin customer-sales-automation default directory
+2026-03-01T01:18:28.625Z [DEBUG] Loaded 2 agents from plugin data-engineering default directory
+2026-03-01T01:18:28.633Z [DEBUG] Loaded 1 agents from plugin data-validation-suite default directory
+2026-03-01T01:18:28.649Z [DEBUG] Loaded 4 agents from plugin database-cloud-optimization default directory
+2026-03-01T01:18:28.659Z [DEBUG] Loaded 2 agents from plugin database-design default directory
+2026-03-01T01:18:28.665Z [DEBUG] Loaded 2 agents from plugin database-migrations default directory
+2026-03-01T01:18:28.677Z [DEBUG] Loaded 2 agents from plugin debugging-toolkit default directory
+2026-03-01T01:18:28.681Z [DEBUG] Loaded 1 agents from plugin dependency-management default directory
+2026-03-01T01:18:28.688Z [DEBUG] Loaded 2 agents from plugin deployment-strategies default directory
+2026-03-01T01:18:28.692Z [DEBUG] Loaded 1 agents from plugin deployment-validation default directory
+2026-03-01T01:18:28.695Z [DEBUG] Loaded 1 agents from plugin developer-essentials default directory
+2026-03-01T01:18:28.703Z [DEBUG] Loaded 2 agents from plugin distributed-debugging default directory
+2026-03-01T01:18:28.730Z [DEBUG] Loaded 5 agents from plugin documentation-generation default directory
+2026-03-01T01:18:28.738Z [DEBUG] Loaded 1 agents from plugin dotnet-contribution default directory
+2026-03-01T01:18:28.744Z [DEBUG] Loaded 2 agents from plugin error-debugging default directory
+2026-03-01T01:18:28.751Z [DEBUG] Loaded 2 agents from plugin error-diagnostics default directory
+2026-03-01T01:18:28.760Z [DEBUG] Loaded 2 agents from plugin framework-migration default directory
+2026-03-01T01:18:28.776Z [DEBUG] Loaded 2 agents from plugin frontend-mobile-development default directory
+2026-03-01T01:18:28.791Z [DEBUG] Loaded 3 agents from plugin frontend-mobile-security default directory
+2026-03-01T01:18:28.807Z [DEBUG] Loaded 4 agents from plugin full-stack-orchestration default directory
+2026-03-01T01:18:28.824Z [DEBUG] Loaded 2 agents from plugin functional-programming default directory
+2026-03-01T01:18:28.832Z [DEBUG] Loaded 2 agents from plugin game-development default directory
+2026-03-01T01:18:28.838Z [DEBUG] Loaded 1 agents from plugin git-pr-workflows default directory
+2026-03-01T01:18:28.844Z [DEBUG] Loaded 2 agents from plugin hr-legal-compliance default directory
+2026-03-01T01:18:28.874Z [DEBUG] Loaded 6 agents from plugin incident-response default directory
+2026-03-01T01:18:28.885Z [DEBUG] Loaded 2 agents from plugin javascript-typescript default directory
+2026-03-01T01:18:28.890Z [DEBUG] Loaded 1 agents from plugin julia-development default directory
+2026-03-01T01:18:28.904Z [DEBUG] Loaded 3 agents from plugin jvm-languages default directory
+2026-03-01T01:18:28.907Z [DEBUG] Loaded 1 agents from plugin kubernetes-operations default directory
+2026-03-01T01:18:28.926Z [DEBUG] Loaded 3 agents from plugin llm-application-dev default directory
+2026-03-01T01:18:28.949Z [DEBUG] Loaded 3 agents from plugin machine-learning-ops default directory
+2026-03-01T01:18:28.984Z [DEBUG] Loaded 6 agents from plugin multi-platform-apps default directory
+2026-03-01T01:18:29.007Z [DEBUG] Loaded 4 agents from plugin observability-monitoring default directory
+2026-03-01T01:18:29.023Z [DEBUG] Loaded 1 agents from plugin payment-processing default directory
+2026-03-01T01:18:29.032Z [DEBUG] Loaded 2 agents from plugin performance-testing-review default directory
+2026-03-01T01:18:29.045Z [DEBUG] Loaded 3 agents from plugin python-development default directory
+2026-03-01T01:18:29.058Z [DEBUG] Loaded 2 agents from plugin quantitative-trading default directory
+2026-03-01T01:18:29.077Z [DEBUG] Loaded 3 agents from plugin reverse-engineering default directory
+2026-03-01T01:18:29.083Z [DEBUG] Loaded 1 agents from plugin security-compliance default directory
+2026-03-01T01:18:29.093Z [DEBUG] Loaded 2 agents from plugin security-scanning default directory
+2026-03-01T01:18:29.112Z [DEBUG] Loaded 3 agents from plugin seo-analysis-monitoring default directory
+2026-03-01T01:18:29.130Z [DEBUG] Loaded 3 agents from plugin seo-content-creation default directory
+2026-03-01T01:18:29.152Z [DEBUG] Loaded 4 agents from plugin seo-technical-optimization default directory
+2026-03-01T01:18:29.161Z [DEBUG] Loaded 2 agents from plugin shell-scripting default directory
+2026-03-01T01:18:29.171Z [DEBUG] Loaded 1 agents from plugin startup-business-analyst default directory
+2026-03-01T01:18:29.185Z [DEBUG] Loaded 4 agents from plugin systems-programming default directory
+2026-03-01T01:18:29.192Z [DEBUG] Loaded 2 agents from plugin tdd-workflows default directory
+2026-03-01T01:18:29.197Z [DEBUG] Loaded 1 agents from plugin team-collaboration default directory
+2026-03-01T01:18:29.217Z [DEBUG] Loaded 3 agents from plugin ui-design default directory
+2026-03-01T01:18:29.226Z [DEBUG] Loaded 2 agents from plugin unit-testing default directory
+2026-03-01T01:18:29.235Z [DEBUG] Loaded 2 agents from plugin web-scripting default directory
+2026-03-01T01:18:29.235Z [DEBUG] Total plugin agents loaded: 193
+2026-03-01T01:18:29.235Z [DEBUG] Loaded 1 skills from plugin frontend-design default directory
+2026-03-01T01:18:29.237Z [DEBUG] Checking plugin feature-dev: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.237Z [DEBUG] Checking plugin code-simplifier: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.237Z [DEBUG] Checking plugin typescript-lsp: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.237Z [DEBUG] Checking plugin context7: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.237Z [DEBUG] Checking plugin superpowers: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.237Z [DEBUG] Attempting to load skills from plugin superpowers default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.3.1\skills
+2026-03-01T01:18:29.354Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-03-01T01:18:29.379Z [DEBUG] Loaded 14 skills from plugin superpowers default directory
+2026-03-01T01:18:29.379Z [DEBUG] Checking plugin supabase: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.379Z [DEBUG] Checking plugin plugin-dev: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.379Z [DEBUG] Attempting to load skills from plugin plugin-dev default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\55b58ec6e564\skills
+2026-03-01T01:18:29.424Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-03-01T01:18:29.429Z [DEBUG] Loaded 7 skills from plugin plugin-dev default directory
+2026-03-01T01:18:29.429Z [DEBUG] Checking plugin vercel: skillsPath=none, skillsPaths=1 paths
+2026-03-01T01:18:29.429Z [DEBUG] Attempting to load skills from plugin vercel skillsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\
+2026-03-01T01:18:29.429Z [DEBUG] Loading from skillPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\ for plugin vercel
+2026-03-01T01:18:29.492Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-03-01T01:18:29.492Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-03-01T01:18:29.495Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-03-01T01:18:29.512Z [DEBUG] Loaded 3 skills from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\
+2026-03-01T01:18:29.512Z [DEBUG] Checking plugin github: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.512Z [DEBUG] Checking plugin claude-code-setup: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.512Z [DEBUG] Attempting to load skills from plugin claude-code-setup default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0\skills
+2026-03-01T01:18:29.524Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-03-01T01:18:29.540Z [DEBUG] Loaded 1 skills from plugin claude-code-setup default directory
+2026-03-01T01:18:29.540Z [DEBUG] Checking plugin serena: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.540Z [DEBUG] Checking plugin pyright-lsp: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.540Z [DEBUG] Checking plugin agent-sdk-dev: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.540Z [DEBUG] Checking plugin pr-review-toolkit: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.540Z [DEBUG] Checking plugin code-review: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.540Z [DEBUG] Checking plugin stripe: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.540Z [DEBUG] Attempting to load skills from plugin stripe default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0\skills
+2026-03-01T01:18:29.547Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-03-01T01:18:29.553Z [DEBUG] Loaded 1 skills from plugin stripe default directory
+2026-03-01T01:18:29.553Z [DEBUG] Checking plugin claude-md-management: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.553Z [DEBUG] Attempting to load skills from plugin claude-md-management default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0\skills
+2026-03-01T01:18:29.558Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-03-01T01:18:29.563Z [DEBUG] Loaded 1 skills from plugin claude-md-management default directory
+2026-03-01T01:18:29.563Z [DEBUG] Checking plugin accessibility-compliance: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.563Z [DEBUG] Attempting to load skills from plugin accessibility-compliance default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\accessibility-compliance\1.2.1\skills
+2026-03-01T01:18:29.576Z [DEBUG] Loaded 1 commands from plugin code-review default directory
+2026-03-01T01:18:29.614Z [DEBUG] Loaded 2 skills from plugin accessibility-compliance default directory
+2026-03-01T01:18:29.614Z [DEBUG] Checking plugin agent-orchestration: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.614Z [DEBUG] Checking plugin agent-teams: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.614Z [DEBUG] Attempting to load skills from plugin agent-teams default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\agent-teams\1.0.2\skills
+2026-03-01T01:18:29.662Z [DEBUG] Loaded 2 commands from plugin stripe default directory
+2026-03-01T01:18:29.667Z [DEBUG] Loaded 6 skills from plugin agent-teams default directory
+2026-03-01T01:18:29.667Z [DEBUG] Checking plugin api-scaffolding: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.667Z [DEBUG] Attempting to load skills from plugin api-scaffolding default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\api-scaffolding\1.2.1\skills
+2026-03-01T01:18:29.683Z [DEBUG] Loaded 1 commands from plugin claude-md-management default directory
+2026-03-01T01:18:29.688Z [DEBUG] Loaded 1 skills from plugin api-scaffolding default directory
+2026-03-01T01:18:29.688Z [DEBUG] Checking plugin api-testing-observability: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.688Z [DEBUG] Checking plugin application-performance: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.688Z [DEBUG] Checking plugin arm-cortex-microcontrollers: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.688Z [DEBUG] Checking plugin backend-api-security: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.688Z [DEBUG] Checking plugin backend-development: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.688Z [DEBUG] Attempting to load skills from plugin backend-development default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\backend-development\1.3.0\skills
+2026-03-01T01:18:29.733Z [DEBUG] Loaded 1 commands from plugin accessibility-compliance default directory
+2026-03-01T01:18:29.743Z [DEBUG] Loaded 9 skills from plugin backend-development default directory
+2026-03-01T01:18:29.743Z [DEBUG] Checking plugin blockchain-web3: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.743Z [DEBUG] Attempting to load skills from plugin blockchain-web3 default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\blockchain-web3\1.2.1\skills
+2026-03-01T01:18:29.765Z [DEBUG] Loaded 2 commands from plugin agent-orchestration default directory
+2026-03-01T01:18:29.835Z [DEBUG] Loaded 4 skills from plugin blockchain-web3 default directory
+2026-03-01T01:18:29.835Z [DEBUG] Checking plugin business-analytics: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.835Z [DEBUG] Attempting to load skills from plugin business-analytics default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\business-analytics\1.2.1\skills
+2026-03-01T01:18:29.844Z [DEBUG] Loaded 7 commands from plugin agent-teams default directory
+2026-03-01T01:18:29.849Z [DEBUG] Loaded 2 skills from plugin business-analytics default directory
+2026-03-01T01:18:29.849Z [DEBUG] Checking plugin c4-architecture: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.849Z [DEBUG] Checking plugin cicd-automation: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.849Z [DEBUG] Attempting to load skills from plugin cicd-automation default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\cicd-automation\1.2.1\skills
+2026-03-01T01:18:29.869Z [DEBUG] Loaded 1 commands from plugin api-testing-observability default directory
+2026-03-01T01:18:29.874Z [DEBUG] Loaded 4 skills from plugin cicd-automation default directory
+2026-03-01T01:18:29.874Z [DEBUG] Checking plugin cloud-infrastructure: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.874Z [DEBUG] Attempting to load skills from plugin cloud-infrastructure default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\cloud-infrastructure\1.2.2\skills
+2026-03-01T01:18:29.918Z [DEBUG] Loaded 1 commands from plugin application-performance default directory
+2026-03-01T01:18:29.922Z [DEBUG] Loaded 8 skills from plugin cloud-infrastructure default directory
+2026-03-01T01:18:29.922Z [DEBUG] Checking plugin code-documentation: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.922Z [DEBUG] Checking plugin code-refactoring: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.922Z [DEBUG] Checking plugin codebase-cleanup: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.922Z [DEBUG] Checking plugin comprehensive-review: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.922Z [DEBUG] Checking plugin conductor: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.922Z [DEBUG] Attempting to load skills from plugin conductor default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\conductor\1.2.1\skills
+2026-03-01T01:18:29.943Z [DEBUG] Loaded 1 commands from plugin backend-development default directory
+2026-03-01T01:18:29.948Z [DEBUG] Loaded 3 skills from plugin conductor default directory
+2026-03-01T01:18:29.948Z [DEBUG] Checking plugin content-marketing: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.948Z [DEBUG] Checking plugin context-management: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.948Z [DEBUG] Checking plugin customer-sales-automation: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.948Z [DEBUG] Checking plugin data-engineering: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.948Z [DEBUG] Attempting to load skills from plugin data-engineering default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\data-engineering\1.3.0\skills
+2026-03-01T01:18:29.967Z [DEBUG] Loaded 1 commands from plugin c4-architecture default directory
+2026-03-01T01:18:29.971Z [DEBUG] Loaded 4 skills from plugin data-engineering default directory
+2026-03-01T01:18:29.971Z [DEBUG] Checking plugin data-validation-suite: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.971Z [DEBUG] Checking plugin database-cloud-optimization: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.971Z [DEBUG] Checking plugin database-design: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.971Z [DEBUG] Attempting to load skills from plugin database-design default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\database-design\1.2.0\skills
+2026-03-01T01:18:29.977Z [DEBUG] Loaded 1 commands from plugin cicd-automation default directory
+2026-03-01T01:18:29.985Z [DEBUG] Loaded 1 skills from plugin database-design default directory
+2026-03-01T01:18:29.985Z [DEBUG] Checking plugin database-migrations: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.985Z [DEBUG] Checking plugin debugging-toolkit: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.985Z [DEBUG] Checking plugin dependency-management: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.987Z [DEBUG] Checking plugin deployment-strategies: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.987Z [DEBUG] Checking plugin deployment-validation: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:29.987Z [DEBUG] Checking plugin developer-essentials: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:29.987Z [DEBUG] Attempting to load skills from plugin developer-essentials default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\developer-essentials\1.0.1\skills
+2026-03-01T01:18:30.046Z [DEBUG] Loaded 2 commands from plugin code-documentation default directory
+2026-03-01T01:18:30.058Z [DEBUG] Loaded 11 skills from plugin developer-essentials default directory
+2026-03-01T01:18:30.058Z [DEBUG] Checking plugin distributed-debugging: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.058Z [DEBUG] Checking plugin documentation-generation: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.058Z [DEBUG] Attempting to load skills from plugin documentation-generation default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\documentation-generation\1.2.1\skills
+2026-03-01T01:18:30.072Z [DEBUG] Loaded 3 commands from plugin code-refactoring default directory
+2026-03-01T01:18:30.092Z [DEBUG] Loaded 3 skills from plugin documentation-generation default directory
+2026-03-01T01:18:30.092Z [DEBUG] Checking plugin dotnet-contribution: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.092Z [DEBUG] Attempting to load skills from plugin dotnet-contribution default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\dotnet-contribution\1.0.0\skills
+2026-03-01T01:18:30.096Z [DEBUG] Loaded 3 commands from plugin codebase-cleanup default directory
+2026-03-01T01:18:30.104Z [DEBUG] Loaded 1 skills from plugin dotnet-contribution default directory
+2026-03-01T01:18:30.104Z [DEBUG] Checking plugin error-debugging: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.104Z [DEBUG] Checking plugin error-diagnostics: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.104Z [DEBUG] Checking plugin framework-migration: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.104Z [DEBUG] Attempting to load skills from plugin framework-migration default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\framework-migration\1.3.0\skills
+2026-03-01T01:18:30.125Z [DEBUG] Loaded 2 commands from plugin comprehensive-review default directory
+2026-03-01T01:18:30.165Z [DEBUG] Loaded 4 skills from plugin framework-migration default directory
+2026-03-01T01:18:30.165Z [DEBUG] Checking plugin frontend-mobile-development: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.165Z [DEBUG] Attempting to load skills from plugin frontend-mobile-development default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\frontend-mobile-development\1.2.1\skills
+2026-03-01T01:18:30.193Z [DEBUG] Loaded 6 commands from plugin conductor default directory
+2026-03-01T01:18:30.204Z [DEBUG] Loaded 4 skills from plugin frontend-mobile-development default directory
+2026-03-01T01:18:30.204Z [DEBUG] Checking plugin frontend-mobile-security: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.204Z [DEBUG] Checking plugin full-stack-orchestration: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.204Z [DEBUG] Checking plugin functional-programming: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.204Z [DEBUG] Checking plugin game-development: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.204Z [DEBUG] Attempting to load skills from plugin game-development default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\game-development\1.2.1\skills
+2026-03-01T01:18:30.217Z [DEBUG] Loaded 2 commands from plugin context-management default directory
+2026-03-01T01:18:30.224Z [DEBUG] Loaded 2 skills from plugin game-development default directory
+2026-03-01T01:18:30.224Z [DEBUG] Checking plugin git-pr-workflows: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.224Z [DEBUG] Checking plugin hr-legal-compliance: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.224Z [DEBUG] Attempting to load skills from plugin hr-legal-compliance default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\hr-legal-compliance\1.2.1\skills
+2026-03-01T01:18:30.240Z [DEBUG] Loaded 2 commands from plugin data-engineering default directory
+2026-03-01T01:18:30.243Z [DEBUG] Loaded 2 skills from plugin hr-legal-compliance default directory
+2026-03-01T01:18:30.244Z [DEBUG] Checking plugin incident-response: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.244Z [DEBUG] Attempting to load skills from plugin incident-response default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\incident-response\1.3.0\skills
+2026-03-01T01:18:30.258Z [DEBUG] Loaded 1 commands from plugin database-cloud-optimization default directory
+2026-03-01T01:18:30.274Z [DEBUG] Loaded 3 skills from plugin incident-response default directory
+2026-03-01T01:18:30.274Z [DEBUG] Checking plugin javascript-typescript: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.274Z [DEBUG] Attempting to load skills from plugin javascript-typescript default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\javascript-typescript\1.2.1\skills
+2026-03-01T01:18:30.298Z [DEBUG] Loaded 2 commands from plugin database-migrations default directory
+2026-03-01T01:18:30.303Z [DEBUG] Loaded 4 skills from plugin javascript-typescript default directory
+2026-03-01T01:18:30.303Z [DEBUG] Checking plugin julia-development: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.303Z [DEBUG] Checking plugin jvm-languages: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.303Z [DEBUG] Checking plugin kubernetes-operations: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.303Z [DEBUG] Attempting to load skills from plugin kubernetes-operations default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\kubernetes-operations\1.2.1\skills
+2026-03-01T01:18:30.323Z [DEBUG] Loaded 1 commands from plugin debugging-toolkit default directory
+2026-03-01T01:18:30.326Z [DEBUG] Loaded 4 skills from plugin kubernetes-operations default directory
+2026-03-01T01:18:30.326Z [DEBUG] Checking plugin llm-application-dev: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.326Z [DEBUG] Attempting to load skills from plugin llm-application-dev default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\llm-application-dev\2.0.4\skills
+2026-03-01T01:18:30.377Z [DEBUG] Loaded 1 commands from plugin dependency-management default directory
+2026-03-01T01:18:30.383Z [DEBUG] Loaded 8 skills from plugin llm-application-dev default directory
+2026-03-01T01:18:30.383Z [DEBUG] Checking plugin machine-learning-ops: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.383Z [DEBUG] Attempting to load skills from plugin machine-learning-ops default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\machine-learning-ops\1.2.1\skills
+2026-03-01T01:18:30.397Z [DEBUG] Loaded 1 commands from plugin deployment-validation default directory
+2026-03-01T01:18:30.401Z [DEBUG] Loaded 1 skills from plugin machine-learning-ops default directory
+2026-03-01T01:18:30.402Z [DEBUG] Checking plugin multi-platform-apps: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.402Z [DEBUG] Checking plugin observability-monitoring: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.402Z [DEBUG] Attempting to load skills from plugin observability-monitoring default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\observability-monitoring\1.2.1\skills
+2026-03-01T01:18:30.417Z [DEBUG] Loaded 1 commands from plugin distributed-debugging default directory
+2026-03-01T01:18:30.422Z [DEBUG] Loaded 4 skills from plugin observability-monitoring default directory
+2026-03-01T01:18:30.422Z [DEBUG] Checking plugin payment-processing: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.422Z [DEBUG] Attempting to load skills from plugin payment-processing default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\payment-processing\1.2.1\skills
+2026-03-01T01:18:30.458Z [DEBUG] Loaded 1 commands from plugin documentation-generation default directory
+2026-03-01T01:18:30.470Z [DEBUG] Loaded 4 skills from plugin payment-processing default directory
+2026-03-01T01:18:30.470Z [DEBUG] Checking plugin performance-testing-review: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.470Z [DEBUG] Checking plugin python-development: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.470Z [DEBUG] Attempting to load skills from plugin python-development default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\python-development\1.2.1\skills
+2026-03-01T01:18:30.602Z [DEBUG] Loaded 3 commands from plugin error-debugging default directory
+2026-03-01T01:18:30.619Z [DEBUG] Loaded 16 skills from plugin python-development default directory
+2026-03-01T01:18:30.619Z [DEBUG] Checking plugin quantitative-trading: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.619Z [DEBUG] Attempting to load skills from plugin quantitative-trading default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\quantitative-trading\1.2.1\skills
+2026-03-01T01:18:30.658Z [DEBUG] Loaded 3 commands from plugin error-diagnostics default directory
+2026-03-01T01:18:30.690Z [DEBUG] Loaded 2 skills from plugin quantitative-trading default directory
+2026-03-01T01:18:30.690Z [DEBUG] Checking plugin reverse-engineering: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.690Z [DEBUG] Attempting to load skills from plugin reverse-engineering default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\reverse-engineering\1.0.0\skills
+2026-03-01T01:18:30.715Z [DEBUG] Loaded 3 commands from plugin framework-migration default directory
+2026-03-01T01:18:30.719Z [DEBUG] Loaded 4 skills from plugin reverse-engineering default directory
+2026-03-01T01:18:30.720Z [DEBUG] Checking plugin security-compliance: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.720Z [DEBUG] Checking plugin security-scanning: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.720Z [DEBUG] Attempting to load skills from plugin security-scanning default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\security-scanning\1.3.0\skills
+2026-03-01T01:18:30.763Z [DEBUG] Loaded 1 commands from plugin frontend-mobile-development default directory
+2026-03-01T01:18:30.769Z [DEBUG] Loaded 5 skills from plugin security-scanning default directory
+2026-03-01T01:18:30.769Z [DEBUG] Checking plugin seo-analysis-monitoring: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.769Z [DEBUG] Checking plugin seo-content-creation: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.769Z [DEBUG] Checking plugin seo-technical-optimization: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.769Z [DEBUG] Checking plugin shell-scripting: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.769Z [DEBUG] Attempting to load skills from plugin shell-scripting default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\shell-scripting\1.2.1\skills
+2026-03-01T01:18:30.805Z [DEBUG] Loaded 1 commands from plugin frontend-mobile-security default directory
+2026-03-01T01:18:30.809Z [DEBUG] Loaded 3 skills from plugin shell-scripting default directory
+2026-03-01T01:18:30.809Z [DEBUG] Checking plugin startup-business-analyst: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.809Z [DEBUG] Attempting to load skills from plugin startup-business-analyst default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\startup-business-analyst\1.0.4\skills
+2026-03-01T01:18:30.841Z [DEBUG] Loaded 1 commands from plugin full-stack-orchestration default directory
+2026-03-01T01:18:30.853Z [DEBUG] Loaded 5 skills from plugin startup-business-analyst default directory
+2026-03-01T01:18:30.853Z [DEBUG] Checking plugin systems-programming: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.853Z [DEBUG] Attempting to load skills from plugin systems-programming default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\systems-programming\1.2.1\skills
+2026-03-01T01:18:30.869Z [DEBUG] Loaded 3 commands from plugin git-pr-workflows default directory
+2026-03-01T01:18:30.881Z [DEBUG] Loaded 3 skills from plugin systems-programming default directory
+2026-03-01T01:18:30.881Z [DEBUG] Checking plugin tdd-workflows: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.881Z [DEBUG] Checking plugin team-collaboration: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.881Z [DEBUG] Checking plugin ui-design: skillsPath=exists, skillsPaths=0 paths
+2026-03-01T01:18:30.881Z [DEBUG] Attempting to load skills from plugin ui-design default skillsPath: C:\Users\User\.claude\plugins\cache\claude-code-workflows\ui-design\1.0.2\skills
+2026-03-01T01:18:30.944Z [DEBUG] Loaded 2 commands from plugin incident-response default directory
+2026-03-01T01:18:30.949Z [DEBUG] Loaded 9 skills from plugin ui-design default directory
+2026-03-01T01:18:30.949Z [DEBUG] Checking plugin unit-testing: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.949Z [DEBUG] Checking plugin web-scripting: skillsPath=none, skillsPaths=0 paths
+2026-03-01T01:18:30.949Z [DEBUG] Total plugin skills loaded: 174
+2026-03-01T01:18:30.949Z [DEBUG] Loaded 1 commands from plugin javascript-typescript default directory
+2026-03-01T01:18:30.981Z [DEBUG] Loaded 3 commands from plugin llm-application-dev default directory
+2026-03-01T01:18:30.989Z [DEBUG] Loaded 1 commands from plugin machine-learning-ops default directory
+2026-03-01T01:18:30.994Z [DEBUG] getSkills returning: 179 skill dir commands, 174 plugin skills, 3 bundled skills
+2026-03-01T01:18:30.994Z [DEBUG] Loaded 1 commands from plugin multi-platform-apps default directory
+2026-03-01T01:18:31.031Z [DEBUG] Loaded 2 commands from plugin observability-monitoring default directory
+2026-03-01T01:18:31.052Z [DEBUG] Loaded 2 commands from plugin performance-testing-review default directory
+2026-03-01T01:18:31.057Z [DEBUG] Loaded 1 commands from plugin python-development default directory
+2026-03-01T01:18:31.061Z [DEBUG] Loaded 1 commands from plugin security-compliance default directory
+2026-03-01T01:18:31.079Z [DEBUG] Loaded 3 commands from plugin security-scanning default directory
+2026-03-01T01:18:31.093Z [DEBUG] Loaded 3 commands from plugin startup-business-analyst default directory
+2026-03-01T01:18:31.099Z [DEBUG] Loaded 1 commands from plugin systems-programming default directory
+2026-03-01T01:18:31.129Z [DEBUG] Loaded 4 commands from plugin tdd-workflows default directory
+2026-03-01T01:18:31.138Z [DEBUG] Loaded 2 commands from plugin team-collaboration default directory
+2026-03-01T01:18:31.162Z [DEBUG] Loaded 4 commands from plugin ui-design default directory
+2026-03-01T01:18:31.168Z [DEBUG] Loaded 1 commands from plugin unit-testing default directory
+2026-03-01T01:18:31.168Z [DEBUG] Total plugin commands loaded: 104
+2026-03-01T01:18:31.186Z [DEBUG] [STARTUP] Commands and agents loaded in 11052ms
+2026-03-01T01:18:31.189Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-01T01:18:31.191Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-01T01:18:31.191Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-01T01:18:31.199Z [DEBUG] [STARTUP] MCP configs loaded in 11858ms
+2026-03-01T01:18:31.381Z [DEBUG] All plugins already exist, skipping migration
+2026-03-01T01:18:31.385Z [DEBUG] Loaded 90 installed plugins from C:\Users\User\.claude\plugins\installed_plugins.json
+2026-03-01T01:18:31.385Z [DEBUG] Initialized versioned plugins system with 90 plugins
+2026-03-01T01:18:31.582Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-01T01:18:31.986Z [DEBUG] Watching for changes in setting files C:\Users\User\.claude\settings.json...
+2026-03-01T01:18:32.505Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-01T01:18:32.505Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-03-01T01:18:32.523Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-03-01T01:18:32.766Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-01T01:18:32.766Z [DEBUG] Found 2 hook matchers in settings
+2026-03-01T01:18:32.767Z [DEBUG] Matched 2 unique hooks for query "startup" (2 before deduplication)
+2026-03-01T01:18:32.973Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at cu (B:/~BUN/root/claude.exe:92:1144)\n    at <anonymous> (B:/~BUN/root/claude.exe:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (B:/~BUN/root/claude.exe:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-01T01:18:32.975Z [DEBUG] Failed to fetch org fast mode status, defaulting to disabled
+2026-03-01T01:18:32.980Z [DEBUG] Watching for changes in skill/command directories: C:\Users\User\.claude\skills, C:\Users\User\.claude\commands...
+2026-03-01T01:18:32.985Z [DEBUG] Loaded 1 LSP server(s) from plugin: typescript-lsp
+2026-03-01T01:18:33.465Z [DEBUG] Loaded 1 LSP server(s) from plugin: pyright-lsp
+2026-03-01T01:18:43.968Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-03-01T01:18:43.982Z [DEBUG] "Hooks: Checking initial response for async: {\n  \"additional_context\": \"<EXTREMELY_IMPORTANT>\\nYou have superpowers.\\n\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\n\\n---\\nname: using-superpowers\\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\\n---\\n\\n<EXTREMELY-IMPORTANT>\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\\n\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\n\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\n</EXTREMELY-IMPORTANT>\\n\\n## How to Access Skills\\n\\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\\n\\n**In other environments:** Check your platform's documentation for how skills are loaded.\\n\\n# Using Skills\\n\\n## The Rule\\n\\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\\n\\n```dot\\ndigraph skill_flow {\\n    \\\"User message received\\\" [shape=doublecircle];\\n    \\\"About to EnterPlanMode?\\\" [shape=doublecircle];\\n    \\\"Already brainstormed?\\\" [shape=diamond];\\n    \\\"Invoke brainstorming skill\\\" [shape=box];\\n    \\\"Might any skill apply?\\\" [shape=diamond];\\n    \\\"Invoke Skill tool\\\" [shape=box];\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" [shape=box];\\n    \\\"Has checklist?\\\" [shape=diamond];\\n    \\\"Create TodoWrite todo per item\\\" [shape=box];\\n    \\\"Follow skill exactly\\\" [shape=box];\\n    \\\"Respond (including clarifications)\\\" [shape=doublecircle];\\n\\n    \\\"About to EnterPlanMode?\\\" -> \\\"Already brainstormed?\\\";\\n    \\\"Already brainstormed?\\\" -> \\\"Invoke brainstorming skill\\\" [label=\\\"no\\\"];\\n    \\\"Already brainstormed?\\\" -> \\\"Might any skill apply?\\\" [label=\\\"yes\\\"];\\n    \\\"Invoke brainstorming skill\\\" -> \\\"Might any skill apply?\\\";\\n\\n    \\\"User message received\\\" -> \\\"Might any skill apply?\\\";\\n    \\\"Might any skill apply?\\\" -> \\\"Invoke Skill tool\\\" [label=\\\"yes, even 1%\\\"];\\n    \\\"Might any skill apply?\\\" -> \\\"Respond (including clarifications)\\\" [label=\\\"definitely not\\\"];\\n    \\\"Invoke Skill tool\\\" -> \\\"Announce: 'Using [skill] to [purpose]'\\\";\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" -> \\\"Has checklist?\\\";\\n    \\\"Has checklist?\\\" -> \\\"Create TodoWrite todo per item\\\" [label=\\\"yes\\\"];\\n    \\\"Has checklist?\\\" -> \\\"Follow skill exactly\\\" [label=\\\"no\\\"];\\n    \\\"Create TodoWrite todo per item\\\" -> \\\"Follow skill exactly\\\";\\n}\\n```\\n\\n## Red Flags\\n\\nThese thoughts mean STOP—you're rationalizing:\\n\\n| Thought | Reality |\\n|---------|---------|\\n| \\\"This is just a simple question\\\" | Questions are tasks. Check for skills. |\\n| \\\"I need more context first\\\" | Skill check comes BEFORE clarifying questions. |\\n| \\\"Let me explore the codebase first\\\" | Skills tell you HOW to explore. Check first. |\\n| \\\"I can check git/files quickly\\\" | Files lack conversation context. Check for skills. |\\n| \\\"Let me gather information first\\\" | Skills tell you HOW to gather information. |\\n| \\\"This doesn't need a formal skill\\\" | If a skill exists, use it. |\\n| \\\"I remember this skill\\\" | Skills evolve. Read current version. |\\n| \\\"This doesn't count as a task\\\" | Action = task. Check for skills. |\\n| \\\"The skill is overkill\\\" | Simple things become complex. Use it. |\\n| \\\"I'll just do this one thing first\\\" | Check BEFORE doing anything. |\\n| \\\"This feels productive\\\" | Undisciplined action wastes time. Skills prevent this. |\\n| \\\"I know what that means\\\" | Knowing the concept ≠ using the skill. Invoke it. |\\n\\n## Skill Priority\\n\\nWhen multiple skills could apply, use this order:\\n\\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\\n\\n\\\"Let's build X\\\" → brainstorming first, then implementation skills.\\n\\\"Fix this bug\\\" → debugging first, then domain-specific skills.\\n\\n## Skill Types\\n\\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\\n\\n**Flexible** (patterns): Adapt principles to context.\\n\\nThe skill itself tells you which.\\n\\n## User Instructions\\n\\nInstructions say WHAT, not HOW. \\\"Add X\\\" or \\\"Fix Y\\\" doesn't mean skip workflows.\\n\\n\\n</EXTREMELY_IMPORTANT>\",\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"SessionStart\",\n    \"additionalContext\": \"<EXTREMELY_IMPORTANT>\\nYou have superpowers.\\n\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\n\\n---\\nname: using-superpowers\\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\\n---\\n\\n<EXTREMELY-IMPORTANT>\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\\n\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\n\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\n</EXTREMELY-IMPORTANT>\\n\\n## How to Access Skills\\n\\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\\n\\n**In other environments:** Check your platform's documentation for how skills are loaded.\\n\\n# Using Skills\\n\\n## The Rule\\n\\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\\n\\n```dot\\ndigraph skill_flow {\\n    \\\"User message received\\\" [shape=doublecircle];\\n    \\\"About to EnterPlanMode?\\\" [shape=doublecircle];\\n    \\\"Already brainstormed?\\\" [shape=diamond];\\n    \\\"Invoke brainstorming skill\\\" [shape=box];\\n    \\\"Might any skill apply?\\\" [shape=diamond];\\n    \\\"Invoke Skill tool\\\" [shape=box];\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" [shape=box];\\n    \\\"Has checklist?\\\" [shape=diamond];\\n    \\\"Create TodoWrite todo per item\\\" [shape=box];\\n    \\\"Follow skill exactly\\\" [shape=box];\\n    \\\"Respond (including clarifications)\\\" [shape=doublecircle];\\n\\n    \\\"About to EnterPlanMode?\\\" -> \\\"Already brainstormed?\\\";\\n    \\\"Already brainstormed?\\\" -> \\\"Invoke brainstorming skill\\\" [label=\\\"no\\\"];\\n    \\\"Already brainstormed?\\\" -> \\\"Might any skill apply?\\\" [label=\\\"yes\\\"];\\n    \\\"Invoke brainstorming skill\\\" -> \\\"Might any skill apply?\\\";\\n\\n    \\\"User message received\\\" -> \\\"Might any skill apply?\\\";\\n    \\\"Might any skill apply?\\\" -> \\\"Invoke Skill tool\\\" [label=\\\"yes, even 1%\\\"];\\n    \\\"Might any skill apply?\\\" -> \\\"Respond (including clarifications)\\\" [label=\\\"definitely not\\\"];\\n    \\\"Invoke Skill tool\\\" -> \\\"Announce: 'Using [skill] to [purpose]'\\\";\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" -> \\\"Has checklist?\\\";\\n    \\\"Has checklist?\\\" -> \\\"Create TodoWrite todo per item\\\" [label=\\\"yes\\\"];\\n    \\\"Has checklist?\\\" -> \\\"Follow skill exactly\\\" [label=\\\"no\\\"];\\n    \\\"Create TodoWrite todo per item\\\" -> \\\"Follow skill exactly\\\";\\n}\\n```\\n\\n## Red Flags\\n\\nThese thoughts mean STOP—you're rationalizing:\\n\\n| Thought | Reality |\\n|---------|---------|\\n| \\\"This is just a simple question\\\" | Questions are tasks. Check for skills. |\\n| \\\"I need more context first\\\" | Skill check comes BEFORE clarifying questions. |\\n| \\\"Let me explore the codebase first\\\" | Skills tell you HOW to explore. Check first. |\\n| \\\"I can check git/files quickly\\\" | Files lack conversation context. Check for skills. |\\n| \\\"Let me gather information first\\\" | Skills tell you HOW to gather information. |\\n| \\\"This doesn't need a formal skill\\\" | If a skill exists, use it. |\\n| \\\"I remember this skill\\\" | Skills evolve. Read current version. |\\n| \\\"This doesn't count as a task\\\" | Action = task. Check for skills. |\\n| \\\"The skill is overkill\\\" | Simple things become complex. Use it. |\\n| \\\"I'll just do this one thing first\\\" | Check BEFORE doing anything. |\\n| \\\"This feels productive\\\" | Undisciplined action wastes time. Skills prevent this. |\\n| \\\"I know what that means\\\" | Knowing the concept ≠ using the skill. Invoke it. |\\n\\n## Skill Priority\\n\\nWhen multiple skills could apply, use this order:\\n\\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\\n\\n\\\"Let's build X\\\" → brainstorming first, then implementation skills.\\n\\\"Fix this bug\\\" → debugging first, then domain-specific skills.\\n\\n## Skill Types\\n\\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\\n\\n**Flexible** (patterns): Adapt principles to context.\\n\\nThe skill itself tells you which.\\n\\n## User Instructions\\n\\nInstructions say WHAT, not HOW. \\\"Add X\\\" or \\\"Fix Y\\\" doesn't mean skip workflows.\\n\\n\\n</EXTREMELY_IMPORTANT>\"\n  }\n}"
+2026-03-01T01:18:43.983Z [DEBUG] Hooks: Parsed initial response: {"additional_context":"<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n---\nname: using-superpowers\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\n---\n\n<EXTREMELY-IMPORTANT>\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\n\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\n\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\n</EXTREMELY-IMPORTANT>\n\n## How to Access Skills\n\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\n\n**In other environments:** Check your platform's documentation for how skills are loaded.\n\n# Using Skills\n\n## The Rule\n\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\n\n```dot\ndigraph skill_flow {\n    \"User message received\" [shape=doublecircle];\n    \"About to EnterPlanMode?\" [shape=doublecircle];\n    \"Already brainstormed?\" [shape=diamond];\n    \"Invoke brainstorming skill\" [shape=box];\n    \"Might any skill apply?\" [shape=diamond];\n    \"Invoke Skill tool\" [shape=box];\n    \"Announce: 'Using [skill] to [purpose]'\" [shape=box];\n    \"Has checklist?\" [shape=diamond];\n    \"Create TodoWrite todo per item\" [shape=box];\n    \"Follow skill exactly\" [shape=box];\n    \"Respond (including clarifications)\" [shape=doublecircle];\n\n    \"About to EnterPlanMode?\" -> \"Already brainstormed?\";\n    \"Already brainstormed?\" -> \"Invoke brainstorming skill\" [label=\"no\"];\n    \"Already brainstormed?\" -> \"Might any skill apply?\" [label=\"yes\"];\n    \"Invoke brainstorming skill\" -> \"Might any skill apply?\";\n\n    \"User message received\" -> \"Might any skill apply?\";\n    \"Might any skill apply?\" -> \"Invoke Skill tool\" [label=\"yes, even 1%\"];\n    \"Might any skill apply?\" -> \"Respond (including clarifications)\" [label=\"definitely not\"];\n    \"Invoke Skill tool\" -> \"Announce: 'Using [skill] to [purpose]'\";\n    \"Announce: 'Using [skill] to [purpose]'\" -> \"Has checklist?\";\n    \"Has checklist?\" -> \"Create TodoWrite todo per item\" [label=\"yes\"];\n    \"Has checklist?\" -> \"Follow skill exactly\" [label=\"no\"];\n    \"Create TodoWrite todo per item\" -> \"Follow skill exactly\";\n}\n```\n\n## Red Flags\n\nThese thoughts mean STOP—you're rationalizing:\n\n| Thought | Reality |\n|---------|---------|\n| \"This is just a simple question\" | Questions are tasks. Check for skills. |\n| \"I need more context first\" | Skill check comes BEFORE clarifying questions. |\n| \"Let me explore the codebase first\" | Skills tell you HOW to explore. Check first. |\n| \"I can check git/files quickly\" | Files lack conversation context. Check for skills. |\n| \"Let me gather information first\" | Skills tell you HOW to gather information. |\n| \"This doesn't need a formal skill\" | If a skill exists, use it. |\n| \"I remember this skill\" | Skills evolve. Read current version. |\n| \"This doesn't count as a task\" | Action = task. Check for skills. |\n| \"The skill is overkill\" | Simple things become complex. Use it. |\n| \"I'll just do this one thing first\" | Check BEFORE doing anything. |\n| \"This feels productive\" | Undisciplined action wastes time. Skills prevent this. |\n| \"I know what that means\" | Knowing the concept ≠ using the skill. Invoke it. |\n\n## Skill Priority\n\nWhen multiple skills could apply, use this order:\n\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\n\n\"Let's build X\" → brainstorming first, then implementation skills.\n\"Fix this bug\" → debugging first, then domain-specific skills.\n\n## Skill Types\n\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\n\n**Flexible** (patterns): Adapt principles to context.\n\nThe skill itself tells you which.\n\n## User Instructions\n\nInstructions say WHAT, not HOW. \"Add X\" or \"Fix Y\" doesn't mean skip workflows.\n\n\n</EXTREMELY_IMPORTANT>","hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n---\nname: using-superpowers\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\n---\n\n<EXTREMELY-IMPORTANT>\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\n\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\n\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\n</EXTREMELY-IMPORTANT>\n\n## How to Access Skills\n\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\n\n**In other environments:** Check your platform's documentation for how skills are loaded.\n\n# Using Skills\n\n## The Rule\n\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\n\n```dot\ndigraph skill_flow {\n    \"User message received\" [shape=doublecircle];\n    \"About to EnterPlanMode?\" [shape=doublecircle];\n    \"Already brainstormed?\" [shape=diamond];\n    \"Invoke brainstorming skill\" [shape=box];\n    \"Might any skill apply?\" [shape=diamond];\n    \"Invoke Skill tool\" [shape=box];\n    \"Announce: 'Using [skill] to [purpose]'\" [shape=box];\n    \"Has checklist?\" [shape=diamond];\n    \"Create TodoWrite todo per item\" [shape=box];\n    \"Follow skill exactly\" [shape=box];\n    \"Respond (including clarifications)\" [shape=doublecircle];\n\n    \"About to EnterPlanMode?\" -> \"Already brainstormed?\";\n    \"Already brainstormed?\" -> \"Invoke brainstorming skill\" [label=\"no\"];\n    \"Already brainstormed?\" -> \"Might any skill apply?\" [label=\"yes\"];\n    \"Invoke brainstorming skill\" -> \"Might any skill apply?\";\n\n    \"User message received\" -> \"Might any skill apply?\";\n    \"Might any skill apply?\" -> \"Invoke Skill tool\" [label=\"yes, even 1%\"];\n    \"Might any skill apply?\" -> \"Respond (including clarifications)\" [label=\"definitely not\"];\n    \"Invoke Skill tool\" -> \"Announce: 'Using [skill] to [purpose]'\";\n    \"Announce: 'Using [skill] to [purpose]'\" -> \"Has checklist?\";\n    \"Has checklist?\" -> \"Create TodoWrite todo per item\" [label=\"yes\"];\n    \"Has checklist?\" -> \"Follow skill exactly\" [label=\"no\"];\n    \"Create TodoWrite todo per item\" -> \"Follow skill exactly\";\n}\n```\n\n## Red Flags\n\nThese thoughts mean STOP—you're rationalizing:\n\n| Thought | Reality |\n|---------|---------|\n| \"This is just a simple question\" | Questions are tasks. Check for skills. |\n| \"I need more context first\" | Skill check comes BEFORE clarifying questions. |\n| \"Let me explore the codebase first\" | Skills tell you HOW to explore. Check first. |\n| \"I can check git/files quickly\" | Files lack conversation context. Check for skills. |\n| \"Let me gather information first\" | Skills tell you HOW to gather information. |\n| \"This doesn't need a formal skill\" | If a skill exists, use it. |\n| \"I remember this skill\" | Skills evolve. Read current version. |\n| \"This doesn't count as a task\" | Action = task. Check for skills. |\n| \"The skill is overkill\" | Simple things become complex. Use it. |\n| \"I'll just do this one thing first\" | Check BEFORE doing anything. |\n| \"This feels productive\" | Undisciplined action wastes time. Skills prevent this. |\n| \"I know what that means\" | Knowing the concept ≠ using the skill. Invoke it. |\n\n## Skill Priority\n\nWhen multiple skills could apply, use this order:\n\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\n\n\"Let's build X\" → brainstorming first, then implementation skills.\n\"Fix this bug\" → debugging first, then domain-specific skills.\n\n## Skill Types\n\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\n\n**Flexible** (patterns): Adapt principles to context.\n\nThe skill itself tells you which.\n\n## User Instructions\n\nInstructions say WHAT, not HOW. \"Add X\" or \"Fix Y\" doesn't mean skip workflows.\n\n\n</EXTREMELY_IMPORTANT>"}}
+2026-03-01T01:18:43.983Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-03-01T01:18:43.995Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=C:\Users\User\AppData\Roaming\Claude\claude-code\2.1.51\claude.exe)
+2026-03-01T01:18:44.005Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-03-01T01:18:44.006Z [DEBUG] "Hook SessionStart:startup (SessionStart) success:\n{\n  \"additional_context\": \"<EXTREMELY_IMPORTANT>\\nYou have superpowers.\\n\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\n\\n---\\nname: using-superpowers\\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\\n---\\n\\n<EXTREMELY-IMPORTANT>\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\\n\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\n\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\n</EXTREMELY-IMPORTANT>\\n\\n## How to Access Skills\\n\\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\\n\\n**In other environments:** Check your platform's documentation for how skills are loaded.\\n\\n# Using Skills\\n\\n## The Rule\\n\\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\\n\\n```dot\\ndigraph skill_flow {\\n    \\\"User message received\\\" [shape=doublecircle];\\n    \\\"About to EnterPlanMode?\\\" [shape=doublecircle];\\n    \\\"Already brainstormed?\\\" [shape=diamond];\\n    \\\"Invoke brainstorming skill\\\" [shape=box];\\n    \\\"Might any skill apply?\\\" [shape=diamond];\\n    \\\"Invoke Skill tool\\\" [shape=box];\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" [shape=box];\\n    \\\"Has checklist?\\\" [shape=diamond];\\n    \\\"Create TodoWrite todo per item\\\" [shape=box];\\n    \\\"Follow skill exactly\\\" [shape=box];\\n    \\\"Respond (including clarifications)\\\" [shape=doublecircle];\\n\\n    \\\"About to EnterPlanMode?\\\" -> \\\"Already brainstormed?\\\";\\n    \\\"Already brainstormed?\\\" -> \\\"Invoke brainstorming skill\\\" [label=\\\"no\\\"];\\n    \\\"Already brainstormed?\\\" -> \\\"Might any skill apply?\\\" [label=\\\"yes\\\"];\\n    \\\"Invoke brainstorming skill\\\" -> \\\"Might any skill apply?\\\";\\n\\n    \\\"User message received\\\" -> \\\"Might any skill apply?\\\";\\n    \\\"Might any skill apply?\\\" -> \\\"Invoke Skill tool\\\" [label=\\\"yes, even 1%\\\"];\\n    \\\"Might any skill apply?\\\" -> \\\"Respond (including clarifications)\\\" [label=\\\"definitely not\\\"];\\n    \\\"Invoke Skill tool\\\" -> \\\"Announce: 'Using [skill] to [purpose]'\\\";\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" -> \\\"Has checklist?\\\";\\n    \\\"Has checklist?\\\" -> \\\"Create TodoWrite todo per item\\\" [label=\\\"yes\\\"];\\n    \\\"Has checklist?\\\" -> \\\"Follow skill exactly\\\" [label=\\\"no\\\"];\\n    \\\"Create TodoWrite todo per item\\\" -> \\\"Follow skill exactly\\\";\\n}\\n```\\n\\n## Red Flags\\n\\nThese thoughts mean STOP—you're rationalizing:\\n\\n| Thought | Reality |\\n|---------|---------|\\n| \\\"This is just a simple question\\\" | Questions are tasks. Check for skills. |\\n| \\\"I need more context first\\\" | Skill check comes BEFORE clarifying questions. |\\n| \\\"Let me explore the codebase first\\\" | Skills tell you HOW to explore. Check first. |\\n| \\\"I can check git/files quickly\\\" | Files lack conversation context. Check for skills. |\\n| \\\"Let me gather information first\\\" | Skills tell you HOW to gather information. |\\n| \\\"This doesn't need a formal skill\\\" | If a skill exists, use it. |\\n| \\\"I remember this skill\\\" | Skills evolve. Read current version. |\\n| \\\"This doesn't count as a task\\\" | Action = task. Check for skills. |\\n| \\\"The skill is overkill\\\" | Simple things become complex. Use it. |\\n| \\\"I'll just do this one thing first\\\" | Check BEFORE doing anything. |\\n| \\\"This feels productive\\\" | Undisciplined action wastes time. Skills prevent this. |\\n| \\\"I know what that means\\\" | Knowing the concept ≠ using the skill. Invoke it. |\\n\\n## Skill Priority\\n\\nWhen multiple skills could apply, use this order:\\n\\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\\n\\n\\\"Let's build X\\\" → brainstorming first, then implementation skills.\\n\\\"Fix this bug\\\" → debugging first, then domain-specific skills.\\n\\n## Skill Types\\n\\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\\n\\n**Flexible** (patterns): Adapt principles to context.\\n\\nThe skill itself tells you which.\\n\\n## User Instructions\\n\\nInstructions say WHAT, not HOW. \\\"Add X\\\" or \\\"Fix Y\\\" doesn't mean skip workflows.\\n\\n\\n</EXTREMELY_IMPORTANT>\",\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"SessionStart\",\n    \"additionalContext\": \"<EXTREMELY_IMPORTANT>\\nYou have superpowers.\\n\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\n\\n---\\nname: using-superpowers\\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\\n---\\n\\n<EXTREMELY-IMPORTANT>\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\\n\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\n\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\n</EXTREMELY-IMPORTANT>\\n\\n## How to Access Skills\\n\\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\\n\\n**In other environments:** Check your platform's documentation for how skills are loaded.\\n\\n# Using Skills\\n\\n## The Rule\\n\\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\\n\\n```dot\\ndigraph skill_flow {\\n    \\\"User message received\\\" [shape=doublecircle];\\n    \\\"About to EnterPlanMode?\\\" [shape=doublecircle];\\n    \\\"Already brainstormed?\\\" [shape=diamond];\\n    \\\"Invoke brainstorming skill\\\" [shape=box];\\n    \\\"Might any skill apply?\\\" [shape=diamond];\\n    \\\"Invoke Skill tool\\\" [shape=box];\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" [shape=box];\\n    \\\"Has checklist?\\\" [shape=diamond];\\n    \\\"Create TodoWrite todo per item\\\" [shape=box];\\n    \\\"Follow skill exactly\\\" [shape=box];\\n    \\\"Respond (including clarifications)\\\" [shape=doublecircle];\\n\\n    \\\"About to EnterPlanMode?\\\" -> \\\"Already brainstormed?\\\";\\n    \\\"Already brainstormed?\\\" -> \\\"Invoke brainstorming skill\\\" [label=\\\"no\\\"];\\n    \\\"Already brainstormed?\\\" -> \\\"Might any skill apply?\\\" [label=\\\"yes\\\"];\\n    \\\"Invoke brainstorming skill\\\" -> \\\"Might any skill apply?\\\";\\n\\n    \\\"User message received\\\" -> \\\"Might any skill apply?\\\";\\n    \\\"Might any skill apply?\\\" -> \\\"Invoke Skill tool\\\" [label=\\\"yes, even 1%\\\"];\\n    \\\"Might any skill apply?\\\" -> \\\"Respond (including clarifications)\\\" [label=\\\"definitely not\\\"];\\n    \\\"Invoke Skill tool\\\" -> \\\"Announce: 'Using [skill] to [purpose]'\\\";\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" -> \\\"Has checklist?\\\";\\n    \\\"Has checklist?\\\" -> \\\"Create TodoWrite todo per item\\\" [label=\\\"yes\\\"];\\n    \\\"Has checklist?\\\" -> \\\"Follow skill exactly\\\" [label=\\\"no\\\"];\\n    \\\"Create TodoWrite todo per item\\\" -> \\\"Follow skill exactly\\\";\\n}\\n```\\n\\n## Red Flags\\n\\nThese thoughts mean STOP—you're rationalizing:\\n\\n| Thought | Reality |\\n|---------|---------|\\n| \\\"This is just a simple question\\\" | Questions are tasks. Check for skills. |\\n| \\\"I need more context first\\\" | Skill check comes BEFORE clarifying questions. |\\n| \\\"Let me explore the codebase first\\\" | Skills tell you HOW to explore. Check first. |\\n| \\\"I can check git/files quickly\\\" | Files lack conversation context. Check for skills. |\\n| \\\"Let me gather information first\\\" | Skills tell you HOW to gather information. |\\n| \\\"This doesn't need a formal skill\\\" | If a skill exists, use it. |\\n| \\\"I remember this skill\\\" | Skills evolve. Read current version. |\\n| \\\"This doesn't count as a task\\\" | Action = task. Check for skills. |\\n| \\\"The skill is overkill\\\" | Simple things become complex. Use it. |\\n| \\\"I'll just do this one thing first\\\" | Check BEFORE doing anything. |\\n| \\\"This feels productive\\\" | Undisciplined action wastes time. Skills prevent this. |\\n| \\\"I know what that means\\\" | Knowing the concept ≠ using the skill. Invoke it. |\\n\\n## Skill Priority\\n\\nWhen multiple skills could apply, use this order:\\n\\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\\n\\n\\\"Let's build X\\\" → brainstorming first, then implementation skills.\\n\\\"Fix this bug\\\" → debugging first, then domain-specific skills.\\n\\n## Skill Types\\n\\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\\n\\n**Flexible** (patterns): Adapt principles to context.\\n\\nThe skill itself tells you which.\\n\\n## User Instructions\\n\\nInstructions say WHAT, not HOW. \\\"Add X\\\" or \\\"Fix Y\\\" doesn't mean skip workflows.\\n\\n\\n</EXTREMELY_IMPORTANT>\"\n  }\n}\n"
+2026-03-01T01:18:44.015Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-03-01T01:18:44.016Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-03-01T01:18:44.019Z [DEBUG] [FileIndex] not a git repo, returning null
+2026-03-01T01:18:44.019Z [DEBUG] [FileIndex] git ls-files returned null, falling back to ripgrep
+2026-03-01T01:18:44.091Z [DEBUG] installPluginsForHeadless: starting
+2026-03-01T01:18:44.098Z [DEBUG] All plugins already exist, skipping migration
+2026-03-01T01:18:44.098Z [DEBUG] Found 90 installed plugins (V2 format)
+2026-03-01T01:18:44.099Z [DEBUG] installPluginsForHeadless: no missing plugins or marketplaces configured
+2026-03-01T01:18:44.129Z [DEBUG] rg error (signal=undefined, code=ABORT_ERR, stderr: ), 818 results
+2026-03-01T01:18:44.129Z [ERROR] "AbortError: AbortError: The operation was aborted.\n    at unknown\n    at abortChildProcess (node:child_process:947:42)\n    at onAbortListener2 (node:child_process:35:24)\n    at abort (unknown)\n    at <anonymous> (B:/~BUN/root/claude.exe:11974:4545)"
+2026-03-01T01:18:44.376Z [DEBUG] Fetching plugin security messages from https://raw.githubusercontent.com/anthropics/claude-plugins-official/refs/heads/security/security.json
+2026-03-01T01:18:44.626Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-01T01:18:44.629Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK

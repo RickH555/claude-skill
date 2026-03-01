@@ -1,0 +1,157 @@
+# Plan : Mega-Generation Gemini — Une seule requete pour tous les outils generatifs
+
+## Contexte
+
+Actuellement, chaque outil generatif (Schema.org, Robots.txt, llms.txt, llm.json, etc.) envoie sa propre requete Gemini quand l'utilisateur clique "Generer". L'objectif est d'envoyer **UNE SEULE requete Gemini** au moment de l'analyse URL, qui pre-genere toutes les solutions en arriere-plan. Les resultats restent caches et ne s'affichent que lorsque l'utilisateur clique pour les reveler sur chaque page d'outil.
+
+## Outils pre-generables (besoin uniquement de l'URL)
+
+| Outil | Service actuel | Donnees necessaires |
+|-------|---------------|---------------------|
+| robots.txt | `robots_service.ts` → `generateRobotsWithAI()` | URL + detection plateforme |
+| Schema.org | `schema_service.ts` → `generateSchemaWithAI()` | nom, URL, description (extraits du hostname) |
+| llms.txt | `llms-txt-generator.ts` → `generateLlmsTxt()` | nom, URL, description, entity basique |
+| llm.json | `llm-json-generator.ts` → `generateLlmJson()` | idem + industrie estimee |
+| Audit Answer-First | `answer-first-audit.ts` → `auditAnswerFirst()` | URL |
+| Audit E-E-A-T | `eeat/eeat-auditor.ts` → `auditEeat()` | URL |
+
+**Outils NON pre-generables** (besoin d'input utilisateur specifique) : Content Writer, SMC Studio, Reputation, AI Response Layer, Citation Simulator, AI Monitoring.
+
+## Architecture
+
+### 1. Nouveau service : `services/mega-generator.ts`
+
+```
+megaGenerate(url: string): Promise<MegaGenerationResult | null>
+```
+
+- Extrait du hostname : `entityName`, `siteUrl`, `platform`, `protocol`
+- Construit UN system prompt condensant l'expertise des 6 outils
+- Construit UN user prompt avec toutes les infos du site
+- Envoie UNE requete `gemini-2.5-flash` avec un schema JSON combinant les 6 outputs
+- Parse la reponse et retourne un objet avec les 6 resultats
+- Si pas d'API key ou erreur → retourne `null` (fallback aux outils individuels)
+
+**Budget tokens estime :** ~2500 tokens system + ~500 user = ~3000 input, ~8000 output → largement dans les limites Gemini
+
+### 2. Nouveaux types dans `types.ts`
+
+```typescript
+type MegaGenerationStatus = 'idle' | 'generating' | 'completed' | 'failed';
+
+interface PreGeneratedSolutions {
+  status: MegaGenerationStatus;
+  generatedAt?: string;
+  robotsTxt?: { content: string; platformDetected: string; aiBotsCount: number; rulesCount: number };
+  schemaOrg?: { content: string; typesCount: number; byteSize: number };
+  llmsTxt?: { content: string; sections: number; wordCount: number };
+  llmJson?: { content: string; fieldCount: number; byteSize: number };
+  answerFirstAudit?: object; // Schema complet AnswerFirstAuditResult
+  eeatAudit?: object;        // Schema complet EeatAuditResult
+}
+```
+
+Extension de `AnalysisResult` :
+```typescript
+interface AnalysisResult {
+  // ... champs existants inchanges ...
+  preGenerated?: PreGeneratedSolutions;  // NOUVEAU
+}
+```
+
+### 3. Modification de `App.tsx` — handleAnalyze
+
+Apres la ligne `const updatedHistory = db.add(result);` (ligne 383), ajouter un fire-and-forget :
+
+```typescript
+// Pre-generation en arriere-plan
+setMegaStatus('generating');
+megaGenerate(url).then(cache => {
+  if (cache) {
+    const preGenerated = { status: 'completed', generatedAt: new Date().toISOString(), ...cache };
+    // Mettre a jour history[0] (dernier audit ajoute)
+    setHistory(prev => {
+      const updated = { ...prev[0], preGenerated };
+      db.update(0, updated);
+      return [updated, ...prev.slice(1)];
+    });
+    setAnalysisData(prev => prev ? { ...prev, preGenerated } : prev);
+    setMegaStatus('completed');
+  } else {
+    setMegaStatus('failed');
+  }
+}).catch(() => setMegaStatus('failed'));
+```
+
+Nouveau state : `const [megaStatus, setMegaStatus] = useState<MegaGenerationStatus>('idle');`
+
+### 4. Props a ajouter dans App.tsx
+
+| Page | Prop manquante | Ligne App.tsx |
+|------|---------------|---------------|
+| `GenerativeTools` | `history`, `megaStatus` | ~744 |
+| `LlmsTxtGenerator` | `history` | ~981 |
+| `AnswerFirstAudit` | `history` | ~991 |
+| `EeatBuilder` | `history` | ~1022 |
+| `SchemaOrg` | *(a deja `history`)* | ~798 |
+| `RobotsTxt` | *(a deja `history`)* | ~819 |
+
+### 5. Modification des 6 pages d'outils
+
+**Pattern commun :** Chaque page verifie si `history[0]?.preGenerated?.{toolKey}` existe. Si oui, elle utilise le cache au lieu de faire un appel API. Les credits sont debites uniquement au moment du clic utilisateur.
+
+#### `RobotsTxt.tsx` (a deja `history`)
+- Dans le useEffect processUrl : si `preGenerated.robotsTxt` existe, l'utiliser comme `optimizedContent`
+- `handleUnlockAI` : si cache disponible → pas d'appel API, juste debit credits et reveal
+
+#### `SchemaOrg.tsx` (a deja `history`)
+- Stocker `cachedResult` depuis `history[0]?.preGenerated?.schemaOrg`
+- `handleGenerate('ai')` : si cache + formulaire non modifie → pas d'appel API
+
+#### `LlmsTxtGenerator.tsx` (ajouter `history`)
+- Stocker caches depuis `history[0]?.preGenerated?.llmsTxt` et `llmJson`
+- `handleGenerateTxt`/`handleGenerateJson` : utiliser cache si dispo
+
+#### `AnswerFirstAudit.tsx` (ajouter `history`)
+- Matcher le hostname saisi avec celui du cache
+- Si match → utiliser `preGenerated.answerFirstAudit`
+
+#### `EeatBuilder.tsx` (ajouter `history`)
+- Onglet "Audit E-E-A-T" : utiliser `preGenerated.eeatAudit` si dispo
+
+### 6. Badges "Pret" dans `GenerativeTools.tsx`
+
+Ajouter `history` et `megaStatus` en props. Pour les 6 outils pre-generables, afficher un badge contextuel :
+- **Status `generating`** → badge violet pulse "Generation..."
+- **Status `completed` + cache present** → badge vert "Pret"
+- **Sinon** → pas de badge
+
+### 7. Fallback et gestion d'erreurs
+
+- **Pas de cle API** → `megaGenerate()` retourne `null`, outils fonctionnent comme avant
+- **Requete echoue** → status `failed`, outils fonctionnent independamment
+- **Reponse partielle** → valider chaque section individuellement, inclure seulement les valides
+- **Formulaire modifie** → bypass du cache, nouvel appel API individuel
+- **Course condition** → si l'utilisateur genere avant que le mega finisse, l'appel individuel prend le dessus
+
+## Fichiers a modifier
+
+1. **`services/mega-generator.ts`** — NOUVEAU, service mega-generation
+2. **`types.ts`** — Ajouter `PreGeneratedSolutions`, `MegaGenerationStatus`, etendre `AnalysisResult`
+3. **`App.tsx`** — State `megaStatus`, fire-and-forget dans `handleAnalyze`, props supplementaires
+4. **`pages/GenerativeTools.tsx`** — Props `history` + `megaStatus`, badges "Pret"/"Generation..."
+5. **`pages/RobotsTxt.tsx`** — Check cache dans useEffect + handleUnlockAI
+6. **`pages/SchemaOrg.tsx`** — Check cache + state `formModified`
+7. **`pages/LlmsTxtGenerator.tsx`** — Ajouter prop `history`, check caches llmsTxt/llmJson
+8. **`pages/AnswerFirstAudit.tsx`** — Ajouter prop `history`, check cache audit
+9. **`pages/EeatBuilder.tsx`** — Ajouter prop `history`, check cache eeat
+
+## Verification
+
+1. `npm run build` → 0 erreurs
+2. Lancer `npm run dev`, aller sur "Nouvel Audit", soumettre une URL
+3. Verifier dans la console que la mega-generation demarre en arriere-plan
+4. Naviguer vers "Outils Generatifs" → les badges "Pret" doivent apparaitre
+5. Ouvrir Schema.org → cliquer "Generer avec Gemini AI" → doit utiliser le cache (pas de loading long)
+6. Ouvrir Robots.txt → cliquer "Generer avec Gemini AI" → meme comportement cache
+7. Tester sans API key → tout doit fonctionner comme avant (fallback)

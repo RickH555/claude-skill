@@ -1,0 +1,949 @@
+import React, { useState, useRef, useCallback } from 'react';
+import { Sparkles, TrendingUp, Target, Award, MousePointerClick, ArrowRight, ScanLine, Code2, Globe2, Fuel, Zap, Star, Check, Search, Bot, BrainCircuit, Database, Share2, Layers, Infinity, Radio, Globe, Droplet, Loader2, Gift, Shield, UserCheck, GraduationCap, BadgeCheck, ShieldCheck, Lock, Headphones, Flag, ChevronDown } from 'lucide-react';
+import { User } from '../types';
+import ScoreRing from '../components/ScoreRing';
+import { auditAnswerFirst, AnswerFirstAuditResult } from '../services/answer-first-audit';
+
+interface HomeProps {
+  onNavigate: (view: 'analyze' | 'login' | 'recharge' | 'directory') => void;
+  user: User | null;
+  onDirectRecharge?: (packId: number) => void;
+}
+
+const Home: React.FC<HomeProps> = ({ onNavigate, user, onDirectRecharge }) => {
+
+  // ── FAQ State ──
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // ── Score Gratuit State ──
+  const [brandName, setBrandName] = useState('');
+  const [siteUrl, setSiteUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [auditResult, setAuditResult] = useState<AnswerFirstAuditResult | null>(null);
+  const [auditError, setAuditError] = useState<string | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Derive E-E-A-T pillar scores from the 6 audit categories
+  const eeatPillars = auditResult ? [
+    { label: 'Experience', icon: <UserCheck size={16} />, score: Math.round((auditResult.categories.contentFreshness.score + auditResult.categories.answerFirst.score) / 2) },
+    { label: 'Expertise', icon: <GraduationCap size={16} />, score: Math.round((auditResult.categories.faqStructure.score + auditResult.categories.semanticHtml.score) / 2) },
+    { label: 'Authority', icon: <BadgeCheck size={16} />, score: Math.round((auditResult.categories.schemaOrg.score + auditResult.categories.metaOptimization.score) / 2) },
+    { label: 'Trust', icon: <Shield size={16} />, score: Math.round((auditResult.categories.metaOptimization.score + auditResult.categories.schemaOrg.score + auditResult.categories.answerFirst.score) / 3) },
+  ] : [];
+
+  const handleFreeAudit = useCallback(async () => {
+    if (!brandName.trim() || !siteUrl.trim()) {
+      setAuditError('Veuillez remplir les deux champs.');
+      return;
+    }
+    // Basic URL validation
+    let finalUrl = siteUrl.trim();
+    if (!/^https?:\/\//i.test(finalUrl)) {
+      finalUrl = 'https://' + finalUrl;
+    }
+    try {
+      new URL(finalUrl);
+    } catch {
+      setAuditError('URL invalide. Exemple : https://www.example.com');
+      return;
+    }
+
+    setAuditError(null);
+    setAuditResult(null);
+    setIsAnalyzing(true);
+
+    try {
+      const result = await auditAnswerFirst(finalUrl, brandName.trim());
+      setAuditResult(result);
+      // Scroll to results after a small delay for render
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+    } catch (err) {
+      setAuditError('Une erreur est survenue lors de l\'analyse. Veuillez reessayer.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }, [brandName, siteUrl]);
+
+  const getScoreLabel = (score: number): string => {
+    if (score >= 80) return 'Excellent';
+    if (score >= 60) return 'Bon';
+    if (score >= 40) return 'Moyen';
+    if (score >= 20) return 'Faible';
+    return 'Critique';
+  };
+
+  const getScoreColor = (score: number): string => {
+    if (score >= 80) return 'text-purple-400';
+    if (score >= 60) return 'text-violet-400';
+    if (score >= 40) return 'text-amber-400';
+    return 'text-red-400';
+  };
+
+  const getBarColor = (score: number): string => {
+    if (score >= 80) return 'bg-purple-500';
+    if (score >= 60) return 'bg-violet-500';
+    if (score >= 40) return 'bg-amber-500';
+    return 'bg-red-500';
+  };
+
+  const handleStartAnalysis = () => {
+    if (user) {
+      onNavigate('analyze');
+    } else {
+      onNavigate('login');
+    }
+  };
+
+  const handleSelectPlan = (packId: number) => {
+    if (user) {
+      if (onDirectRecharge) {
+        onDirectRecharge(packId);
+      } else {
+        onNavigate('recharge');
+      }
+    } else {
+      onNavigate('login');
+    }
+  };
+
+  const plans = [
+    {
+      id: 1,
+      name: "Le Jerrican",
+      credits: 50,
+      price: 15,
+      icon: <Droplet size={24} />,
+      popular: false,
+      features: ["Id\u00e9al pour tester", "1 Audit complet", "Valable 1 an"]
+    },
+    {
+      id: 2,
+      name: "La Pompe",
+      credits: 200,
+      price: 49,
+      icon: <Fuel size={24} />,
+      popular: true,
+      features: ["Pour optimiser s\u00e9rieusement", "Support prioritaire", "+10% Bonus offert"]
+    },
+    {
+      id: 3,
+      name: "La Citerne",
+      credits: 1000,
+      price: 199,
+      icon: <Database size={24} />,
+      popular: false,
+      features: ["Usage intensif / Agence", "Acc\u00e8s API Beta", "+20% Bonus offert"]
+    }
+  ];
+
+  return (
+    <div className="w-full px-4 sm:px-6 pt-16 pb-32 overflow-hidden">
+
+      {/* ── HERO SECTION ── */}
+      <section className="text-center mb-32 relative max-w-5xl mx-auto">
+        {/* Ambient glows */}
+        <div className="section-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-purple-600/[0.07]"></div>
+        <div className="section-glow top-0 right-0 w-[400px] h-[400px] bg-violet-500/[0.05]"></div>
+
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-gray-300 text-xs font-medium tracking-wide uppercase mb-10">
+          <Sparkles size={12} className="text-purple-400" />
+          <span>Plateforme AEO / GEO</span>
+        </div>
+
+        <h1 className="text-5xl sm:text-6xl md:text-[5.5rem] font-sans font-bold tracking-tight text-white leading-[1.05] mb-8">
+          Faites-vous citer{' '}
+          <br className="hidden md:block" />
+          par les <span className="gradient-text">IA G{'\u00e9'}n{'\u00e9'}ratives</span>
+        </h1>
+
+        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-12">
+          La premi{'\u00e8'}re plateforme d'optimisation AEO. Analysez et influencez la fa{'\u00e7'}on dont ChatGPT, Claude, Gemini et AI Overviews per{'\u00e7'}oivent votre marque.
+        </p>
+
+        {/* CTA Group */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button onClick={handleStartAnalysis} className="w-full sm:w-auto btn-gradient text-base px-8 py-3.5 flex items-center justify-center gap-2.5 shadow-lg shadow-purple-600/25">
+            Lancer un Audit Gratuit <ArrowRight size={18} />
+          </button>
+          <button onClick={() => onNavigate('directory')} className="w-full sm:w-auto px-8 py-3.5 rounded-full glass-card text-gray-200 text-base font-medium hover:bg-white/[0.08] transition-all cursor-pointer">
+            Explorer l'Annuaire
+          </button>
+        </div>
+
+        {/* Social Proof Row */}
+        <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full bg-purple-500/20 border-2 border-black flex items-center justify-center text-xs font-bold text-purple-400">M</div>
+              <div className="w-8 h-8 rounded-full bg-violet-500/20 border-2 border-black flex items-center justify-center text-xs font-bold text-violet-400">T</div>
+              <div className="w-8 h-8 rounded-full bg-purple-400/20 border-2 border-black flex items-center justify-center text-xs font-bold text-purple-300">S</div>
+            </div>
+            <span className="font-medium text-gray-400">2 400+ marques optimis{'\u00e9'}es</span>
+          </div>
+          <div className="flex items-center gap-1">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={14} className="text-amber-400 fill-amber-400" />
+            ))}
+            <span className="ml-1 font-medium text-gray-400">4.9/5</span>
+          </div>
+          <span>Aucune carte bancaire requise</span>
+        </div>
+      </section>
+
+      {/* ── PRODUCT MOCKUP ── */}
+      <section className="mb-32 max-w-5xl mx-auto">
+        <div className="glass-card p-2 shadow-2xl shadow-purple-600/5">
+          <div className="bg-[#0a0a0a] rounded-2xl overflow-hidden">
+            {/* Browser Bar */}
+            <div className="flex items-center gap-2 px-4 py-3 bg-[#111] border-b border-white/[0.06]">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500/60"></div>
+                <div className="w-3 h-3 rounded-full bg-amber-500/60"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500/60"></div>
+              </div>
+              <div className="flex-1 flex justify-center">
+                <div className="px-4 py-1 bg-white/[0.04] border border-white/[0.06] rounded-md text-xs text-gray-500">app.citedby.ai/dashboard</div>
+              </div>
+            </div>
+            {/* Dashboard Content */}
+            <div className="p-6 sm:p-8">
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="glass-card p-4">
+                  <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Score AEO</p>
+                  <p className="text-2xl font-bold text-white mt-1">87<span className="text-sm text-gray-500">/100</span></p>
+                  <p className="text-xs text-purple-400 font-medium mt-1">+12 ce mois</p>
+                </div>
+                <div className="glass-card p-4">
+                  <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Citations IA</p>
+                  <p className="text-2xl font-bold text-white mt-1">142</p>
+                  <p className="text-xs text-purple-400 font-medium mt-1">+23% cette semaine</p>
+                </div>
+                <div className="glass-card p-4">
+                  <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Autorit{'\u00e9'}</p>
+                  <p className="text-2xl font-bold text-white mt-1">94%</p>
+                  <p className="text-xs text-purple-400 font-medium mt-1">E-E-A-T Excellent</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="glass-card p-4 h-32 flex items-end gap-2">
+                  <div className="w-full flex items-end gap-1.5 h-20">
+                    {[40, 55, 35, 70, 60, 85, 95].map((h, i) => (
+                      <div key={i} className="flex-1 rounded-t transition-all" style={{ height: `${h}%`, background: `rgba(124, 58, 237, ${0.2 + i * 0.1})` }}></div>
+                    ))}
+                  </div>
+                </div>
+                <div className="glass-card p-4 h-32">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                      <TrendingUp size={14} className="text-purple-400" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-500">Tendance Visibilit{'\u00e9'}</span>
+                  </div>
+                  <svg className="w-full h-12" viewBox="0 0 200 50"><path d="M0 40 Q30 35 50 25 T100 20 T150 10 T200 5" fill="none" stroke="#7c3aed" strokeWidth="2.5"/><path d="M0 40 Q30 35 50 25 T100 20 T150 10 T200 5 V50 H0 Z" fill="url(#grad-hero)" opacity="0.15"/><defs><linearGradient id="grad-hero" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7c3aed"/><stop offset="100%" stopColor="#7c3aed" stopOpacity="0"/></linearGradient></defs></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── LOGOS / TRUST ── */}
+      <section className="mb-32 border-y border-white/[0.06] py-10">
+        <p className="text-center text-sm font-medium text-gray-600 mb-8">Utilis{'\u00e9'} par des {'\u00e9'}quipes de premier plan</p>
+        <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 opacity-30">
+          {['TechFlow', 'GreenGarden', 'OmniMedia', 'DataForge', 'CloudNine', 'NovaTech'].map(name => (
+            <span key={name} className="font-bold text-xl text-white">{name}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SCORE GRATUIT DE VISIBILITE IA ── */}
+      <section className="mb-32 relative max-w-4xl mx-auto" id="score-gratuit">
+        {/* Ambient glow */}
+        <div className="section-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-purple-600/[0.05]"></div>
+
+        {/* Section header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-white text-sm font-bold tracking-wide uppercase mb-8 shadow-lg shadow-purple-600/10">
+            <Gift size={16} className="text-purple-400" />
+            <span>100% GRATUIT</span>
+            <span className="text-purple-400">&mdash;</span>
+            <span className="text-purple-300">Sans inscription</span>
+          </div>
+
+          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+            Votre Score de <span className="gradient-text">Visibilit{'\u00e9'} IA</span>
+          </h2>
+          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+            D{'\u00e9'}couvrez en 30 secondes comment les IA g{'\u00e9'}n{'\u00e9'}ratives per{'\u00e7'}oivent votre marque. Aucun compte requis.
+          </p>
+        </div>
+
+        {/* Form + Results Container */}
+        <div className="max-w-3xl mx-auto">
+          {/* Form Card */}
+          <div className="glass-card p-8 md:p-10 relative overflow-hidden">
+            {/* Decorative gradient line at top */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+
+            <form
+              onSubmit={(e) => { e.preventDefault(); handleFreeAudit(); }}
+              className="space-y-5"
+            >
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Nom de marque</label>
+                  <input
+                    type="text"
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    placeholder="Ex: CitedBy"
+                    className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder-gray-600 outline-none transition-all focus:border-purple-500/50 focus:bg-white/[0.06] focus:shadow-[0_0_20px_rgba(168,85,247,0.08)]"
+                    disabled={isAnalyzing}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">URL du site</label>
+                  <input
+                    type="text"
+                    value={siteUrl}
+                    onChange={(e) => setSiteUrl(e.target.value)}
+                    placeholder="Ex: https://www.citedby.ai"
+                    className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder-gray-600 outline-none transition-all focus:border-purple-500/50 focus:bg-white/[0.06] focus:shadow-[0_0_20px_rgba(168,85,247,0.08)]"
+                    disabled={isAnalyzing}
+                  />
+                </div>
+              </div>
+
+              {auditError && (
+                <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">{auditError}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={isAnalyzing}
+                className="w-full btn-gradient py-4 text-base font-bold flex items-center justify-center gap-3 shadow-lg shadow-purple-600/25 disabled:opacity-60 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    Analyse en cours...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={20} />
+                    Analyser gratuitement
+                  </>
+                )}
+              </button>
+
+              <p className="text-center text-xs text-gray-600">
+                Aucune carte bancaire requise. 0 GTO Gas consomm{'\u00e9'}. R{'\u00e9'}sultat instantan{'\u00e9'}.
+              </p>
+            </form>
+          </div>
+
+          {/* Loading Animation */}
+          {isAnalyzing && (
+            <div className="mt-8 glass-card p-10 flex flex-col items-center justify-center gap-5">
+              <div className="relative">
+                <div className="w-24 h-24 rounded-full border-4 border-white/[0.06]"></div>
+                <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-transparent border-t-purple-500 animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <ScanLine size={28} className="text-purple-400 animate-pulse" />
+                </div>
+              </div>
+              <div className="text-center">
+                <p className="text-white font-semibold mb-1">Scan en cours...</p>
+                <p className="text-sm text-gray-500">Nous interrogeons les LLMs pour {'\u00e9'}valuer votre marque</p>
+              </div>
+              {/* Animated category tags */}
+              <div className="flex flex-wrap justify-center gap-2">
+                {['Answer-First', 'Schema.org', 'FAQ', 'S\u00e9mantique', 'Fra\u00eecheur', 'Meta'].map((label, i) => (
+                  <div
+                    key={label}
+                    className="px-3 py-1 rounded-full text-[10px] font-medium bg-white/[0.04] border border-white/[0.06] text-gray-500"
+                    style={{ animation: `pulse 1.5s ease-in-out ${i * 0.25}s infinite` }}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Results Section */}
+          {auditResult && !isAnalyzing && (
+            <div ref={resultsRef} className="mt-8 space-y-6">
+              {/* Main Score Card */}
+              <div className="glass-card p-8 md:p-10 relative overflow-hidden">
+                {/* GRATUIT tag */}
+                <div className="absolute top-0 right-0 px-5 py-1.5 bg-gradient-to-r from-purple-500 to-violet-600 text-xs font-bold rounded-bl-2xl rounded-tr-[1.25rem] text-white uppercase tracking-wider">
+                  GRATUIT
+                </div>
+
+                <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                  {/* ScoreRing */}
+                  <div className="flex flex-col items-center gap-3 shrink-0">
+                    <ScoreRing score={auditResult.globalScore} size={160} strokeWidth={10} />
+                    <div className={`text-sm font-bold ${getScoreColor(auditResult.globalScore)}`}>
+                      {getScoreLabel(auditResult.globalScore)}
+                    </div>
+                  </div>
+
+                  {/* E-E-A-T Pillars */}
+                  <div className="flex-1 w-full">
+                    <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                      <Shield size={18} className="text-purple-400" />
+                      Piliers E-E-A-T
+                    </h3>
+                    <div className="space-y-4">
+                      {eeatPillars.map((pillar) => (
+                        <div key={pillar.label}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-purple-400">{pillar.icon}</span>
+                              <span className="text-sm font-medium text-gray-300">{pillar.label}</span>
+                            </div>
+                            <span className={`text-sm font-bold ${getScoreColor(pillar.score)}`}>{pillar.score}/100</span>
+                          </div>
+                          <div className="w-full h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-1000 ease-out ${getBarColor(pillar.score)}`}
+                              style={{ width: `${pillar.score}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary Card */}
+              <div className="glass-card p-8">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <Target size={18} className="text-purple-400" />
+                  Synth{'\u00e8'}se
+                </h3>
+                <p className="text-gray-400 leading-relaxed text-[15px] mb-6">{auditResult.summary}</p>
+
+                {auditResult.topRecommendations.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-300 mb-3 uppercase tracking-wider">Recommandations prioritaires</h4>
+                    <ul className="space-y-2.5">
+                      {auditResult.topRecommendations.map((rec, i) => (
+                        <li key={i} className="flex items-start gap-3 text-sm text-gray-400">
+                          <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="text-[10px] font-bold text-purple-400">{i + 1}</span>
+                          </div>
+                          {rec}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* CTA Card */}
+              <div className="gradient-border p-8 text-center relative overflow-hidden">
+                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+                <div className="relative z-10">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+                    D{'\u00e9'}bloquez l'analyse <span className="gradient-text">compl{'\u00e8'}te</span>
+                  </h3>
+                  <p className="text-gray-500 mb-6 max-w-lg mx-auto">
+                    Cr{'\u00e9'}ez votre compte pour acc{'\u00e9'}der {'\u00e0'} l'audit d{'\u00e9'}taill{'\u00e9'} avec recommandations personnalis{'\u00e9'}es, outils de correction et monitoring continu.
+                  </p>
+                  <button
+                    onClick={() => onNavigate('login')}
+                    className="btn-gradient text-base px-8 py-3.5 inline-flex items-center gap-2.5 shadow-lg shadow-purple-600/25 cursor-pointer"
+                  >
+                    Cr{'\u00e9'}ez votre compte pour l'analyse compl{'\u00e8'}te <ArrowRight size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── STATS BAR ── */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-32 max-w-5xl mx-auto">
+        {[
+          { value: '50%', label: 'des recherches vont vers l\'IA', sublabel: 'd\'ici 2026' },
+          { value: '24h', label: '\u00eatre cit\u00e9', sublabel: 'premier audit' },
+          { value: '0', label: 'clic n\u00e9cessaire', sublabel: 'r\u00e9ponse directe' },
+          { value: '3x', label: 'plus de conversions', sublabel: 'vs SEO classique' },
+        ].map((stat, i) => (
+          <div key={i} className="glass-card p-6 text-center cursor-pointer hover:-translate-y-1 transition-all duration-200" style={{ animationDelay: `${i * 150}ms`, animation: `slide-in-from-bottom 0.5s ease-out ${i * 150}ms both` }}>
+            <div className="text-3xl md:text-4xl font-bold gradient-text mb-2">{stat.value}</div>
+            <p className="text-sm text-gray-300 font-medium">{stat.label}</p>
+            <p className="text-xs text-gray-600 mt-1">{stat.sublabel}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* ── FEATURES GRID ── */}
+      <section className="mb-32 max-w-5xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-3">Fonctionnalit{'\u00e9'}s</p>
+          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+            Vos outils de <span className="gradient-text">visibilit{'\u00e9'} IA</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+            Tout ce dont vous avez besoin pour dominer les r{'\u00e9'}ponses g{'\u00e9'}n{'\u00e9'}ratives.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[
+            {
+              icon: <ScanLine size={24} />,
+              title: "Simulateur de Perception",
+              desc: "Visualisez comment les LLMs (GPT-4, Claude 3) 'voient' votre entit\u00e9 en temps r\u00e9el."
+            },
+            {
+              icon: <Code2 size={24} />,
+              title: "Code S\u00e9mantique",
+              desc: "G\u00e9n\u00e9rez automatiquement les donn\u00e9es structur\u00e9es (JSON-LD) que les robots pr\u00e9f\u00e8rent."
+            },
+            {
+              icon: <Globe2 size={24} />,
+              title: "Annuaire Index\u00e9",
+              desc: "Inscrivez votre marque dans le Knowledge Graph CitedBy pour forcer la d\u00e9couverte."
+            },
+            {
+              icon: <BrainCircuit size={24} />,
+              title: "AI Automation",
+              desc: "Automatisez la g\u00e9n\u00e9ration de Schema.org, llms.txt et contenus Answer-First."
+            },
+            {
+              icon: <Radio size={24} />,
+              title: "Monitoring Continu",
+              desc: "Surveillez vos positions IA en temps r\u00e9el et recevez des alertes de changement."
+            },
+            {
+              icon: <Shield size={24} />,
+              title: "E-E-A-T Builder",
+              desc: "Construisez votre autorit\u00e9 d'entit\u00e9 avec un plan d'action personnalis\u00e9."
+            }
+          ].map((item, i) => (
+            <div key={i} className="glass-card p-7 group cursor-pointer">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-5 text-purple-400 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all duration-200">
+                {item.icon}
+              </div>
+              <h3 className="text-lg font-bold mb-2 text-white group-hover:text-purple-300 transition-colors duration-200">{item.title}</h3>
+              <p className="text-gray-500 leading-relaxed text-[15px]">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SEO vs AEO COMPARISON ── */}
+      <section className="mb-32 max-w-5xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-3">Le Futur</p>
+          <h2 className="text-3xl md:text-5xl font-sans font-bold mb-5 text-white tracking-tight">
+            Le Changement de <span className="gradient-text">Paradigme</span>
+          </h2>
+          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+            Nous passons de l'{'\u00e8'}re de la recherche (Google) {'\u00e0'} l'{'\u00e8'}re de la r{'\u00e9'}ponse (IA).
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 relative">
+          {/* VS Badge */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 glass-card !rounded-full flex items-center justify-center font-bold text-white z-10 text-lg shadow-xl shadow-black/50">
+            VS
+          </div>
+
+          {/* SEO Classic Card */}
+          <div className="glass-card p-8 md:p-10 opacity-60 hover:opacity-90 transition-opacity duration-200">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-white/[0.04] rounded-xl text-gray-500">
+                <Search size={24} />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-400">SEO Classique</h3>
+            </div>
+            <ul className="space-y-5">
+              {[
+                "Optimise pour des mots-cl\u00e9s.",
+                "Vise la liste de liens (SERP).",
+                "Trafic de \"navigation\" (Clicks).",
+                "Contenu long pour retenir l'utilisateur."
+              ].map((text, i) => (
+                <li key={i} className="flex items-start gap-3 text-gray-500">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-600 mt-2.5 shrink-0"></div>
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* AEO Card */}
+          <div className="gradient-border p-8 md:p-10 relative">
+            <div className="absolute top-0 right-0 px-5 py-1.5 btn-gradient text-xs font-bold rounded-bl-2xl rounded-tr-[1.25rem]">Le Futur</div>
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400">
+                <Bot size={24} />
+              </div>
+              <h3 className="text-2xl font-bold text-white">AEO & GEO</h3>
+            </div>
+            <ul className="space-y-5">
+              {[
+                "Optimise pour des entit\u00e9s et des faits.",
+                "Vise la r\u00e9ponse unique (Citations).",
+                "Trafic de \"conviction\" (Autorit\u00e9).",
+                "Format \"Answer-First\" structur\u00e9 pour les LLMs."
+              ].map((text, i) => (
+                <li key={i} className="flex items-start gap-3 text-gray-300">
+                  <Check size={16} className="text-purple-400 mt-1 shrink-0" />
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ── THE 3 PILLARS ── */}
+      <section className="mb-32 max-w-5xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-3">M{'\u00e9'}thodologie</p>
+          <h2 className="text-3xl md:text-5xl font-sans font-bold mb-5 text-white tracking-tight">
+            Les 3 Piliers de <span className="gradient-text">l'Autorit{'\u00e9'} IA</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">Comment CitedBy structure votre pr{'\u00e9'}sence pour convaincre les algorithmes.</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            {
+              icon: <Database size={24} />,
+              title: "1. Identit\u00e9 (Graph)",
+              desc: "Les IA ne raisonnent pas en pages web, mais en concepts. Nous d\u00e9finissons votre \"Entit\u00e9 Nomm\u00e9e\" dans le Knowledge Graph pour que GPT sache exactement qui vous \u00eates."
+            },
+            {
+              icon: <BrainCircuit size={24} />,
+              title: "2. S\u00e9mantique (RAG)",
+              desc: "Pour \u00eatre cit\u00e9, votre contenu doit \u00eatre \"ing\u00e9rable\". Nous transformons votre site avec le pattern Answer-First et des donn\u00e9es structur\u00e9es JSON-LD."
+            },
+            {
+              icon: <Share2 size={24} />,
+              title: "3. Ubiquit\u00e9 (Signal)",
+              desc: "Une IA confirme une information en la croisant. Nous multiplions les signaux de corroboration via notre Annuaire AEO et optimisons vos fichiers techniques."
+            }
+          ].map((pillar, i) => (
+            <div key={i} className="glass-card p-8 group cursor-pointer relative overflow-hidden">
+              {/* Hover glow */}
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-600/0 group-hover:bg-purple-600/[0.06] blur-3xl rounded-full transition-all duration-300"></div>
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-6 group-hover:bg-purple-500/20 transition-colors duration-200">
+                  {pillar.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">{pillar.title}</h3>
+                <p className="text-gray-500 text-[15px] leading-relaxed mb-6">{pillar.desc}</p>
+                <div className="h-[2px] w-10 bg-white/10 rounded-full group-hover:w-16 group-hover:bg-purple-500/50 transition-all duration-300"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ── */}
+      <section className="mb-32 max-w-4xl mx-auto">
+        <div className="gradient-border p-8 md:p-12 relative overflow-hidden">
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
+
+          <div className="relative z-10">
+            <p className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-3 text-center">Comment {'\u00e7'}a marche</p>
+            <h3 className="text-2xl md:text-3xl font-bold text-center mb-12 text-white">Votre parcours d'optimisation</h3>
+
+            <div className="space-y-0">
+              {[
+                {
+                  step: '01',
+                  title: 'Analyse de Perception',
+                  desc: 'Notre scanner interroge les principaux LLMs pour \u00e9tablir votre score de visibilit\u00e9 actuel et identifier les "trous" dans leur connaissance de votre marque.',
+                  active: true
+                },
+                {
+                  step: '02',
+                  title: 'G\u00e9n\u00e9ration du "Source of Truth"',
+                  desc: 'Nous cr\u00e9ons les fichiers llm.txt et llm.json qui serviront de r\u00e9f\u00e9rence canonique pour les robots d\'indexation.',
+                  active: false
+                },
+                {
+                  step: '03',
+                  title: 'Monitoring Continu',
+                  desc: 'Les mod\u00e8les d\'IA changent chaque semaine. CitedBy surveille vos positions et vous alerte si une hallucination concernant votre marque appara\u00eet.',
+                  active: false
+                }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-6 md:gap-8">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                      item.active
+                        ? 'btn-gradient shadow-lg shadow-purple-600/30'
+                        : 'bg-white/[0.05] border border-white/[0.1] text-gray-400'
+                    }`}>
+                      {item.step}
+                    </div>
+                    {i < 2 && <div className="w-px h-full bg-white/[0.06] my-2"></div>}
+                  </div>
+                  <div className="pb-10">
+                    <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>
+                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section className="mb-32 max-w-5xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-3">T{'\u00e9'}moignages</p>
+          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+            Ils nous font <span className="gradient-text">confiance</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+            Des marques de toutes tailles optimisent leur visibilit{'\u00e9'} IA avec CitedBy.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5 mb-12">
+          {[
+            {
+              quote: "En 3 semaines, notre marque est pass\u00e9e de 0 citation \u00e0 \u00eatre recommand\u00e9e par ChatGPT sur nos mots-cl\u00e9s principaux. Le ROI est incroyable.",
+              name: "Marie Dubois",
+              role: "CMO, TechFlow SaaS",
+              avatar: "M",
+              rating: 5
+            },
+            {
+              quote: "L'outil Schema.org et le Source of Truth ont compl\u00e8tement transform\u00e9 notre pr\u00e9sence. Claude nous cite maintenant comme r\u00e9f\u00e9rence dans notre secteur.",
+              name: "Thomas Martin",
+              role: "Head of SEO, GreenGarden",
+              avatar: "T",
+              rating: 5
+            },
+            {
+              quote: "Le dashboard de monitoring est une mine d'or. On voit en temps r\u00e9el quand un bot IA crawle nos pages et comment notre score \u00e9volue.",
+              name: "Sophie Laurent",
+              role: "Directrice Digitale, OmniMedia",
+              avatar: "S",
+              rating: 5
+            }
+          ].map((testimonial, i) => (
+            <div key={i} className="glass-card p-7 flex flex-col cursor-pointer">
+              <div className="flex gap-1 mb-5">
+                {Array.from({ length: testimonial.rating }).map((_, j) => (
+                  <Star key={j} size={14} className="text-amber-400 fill-amber-400" />
+                ))}
+              </div>
+              <p className="text-gray-300 text-[15px] leading-relaxed flex-1 mb-6">"{testimonial.quote}"</p>
+              <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-purple-600/20">
+                  {testimonial.avatar}
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">{testimonial.name}</p>
+                  <p className="text-gray-500 text-xs">{testimonial.role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Trust Badges */}
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 py-8 border-y border-white/[0.06]">
+          {[
+            { label: 'RGPD Compliant', icon: <ShieldCheck size={18} /> },
+            { label: 'SSL Chiffr\u00e9', icon: <Lock size={18} /> },
+            { label: '99.9% Uptime', icon: <Zap size={18} /> },
+            { label: 'Support 24/7', icon: <Headphones size={18} /> },
+            { label: 'Made in France', icon: <Flag size={18} /> },
+          ].map((badge, i) => (
+            <div key={i} className="flex items-center gap-2 text-gray-500 text-sm">
+              <span className="text-purple-400">{badge.icon}</span>
+              <span className="font-medium">{badge.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FAQ SECTION ── */}
+      <section className="mb-32 max-w-3xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-sm font-semibold text-purple-400 uppercase tracking-wider mb-3">FAQ</p>
+          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+            Questions <span className="gradient-text">fr{'\u00e9'}quentes</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+            Tout ce que vous devez savoir sur l'optimisation pour les IA g{'\u00e9'}n{'\u00e9'}ratives.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {[
+            {
+              q: "Qu'est-ce que l'AEO ?",
+              a: "L'AEO (Answer Engine Optimization) est l'art d'optimiser votre pr\u00e9sence en ligne pour que les moteurs de r\u00e9ponse IA — comme ChatGPT, Claude, Gemini et AI Overviews — citent votre marque comme source fiable. Contrairement au SEO classique qui vise les liens bleus, l'AEO vise la r\u00e9ponse directe."
+            },
+            {
+              q: "Comment les IA choisissent-elles les sources \u00e0 citer ?",
+              a: "Les LLMs s'appuient sur l'autorit\u00e9 d'entit\u00e9, les donn\u00e9es structur\u00e9es (Schema.org, JSON-LD), la fra\u00eecheur du contenu et la corroboration multi-sources. CitedBy optimise chacun de ces signaux pour maximiser vos chances d'\u00eatre cit\u00e9."
+            },
+            {
+              q: "Combien de temps pour voir des r\u00e9sultats ?",
+              a: "Les premiers r\u00e9sultats apparaissent g\u00e9n\u00e9ralement entre 2 et 4 semaines apr\u00e8s l'optimisation. Le d\u00e9lai d\u00e9pend de la fr\u00e9quence de crawl des IA et de l'autorit\u00e9 existante de votre domaine. L'audit gratuit vous donne une estimation personnalis\u00e9e."
+            },
+            {
+              q: "Qu'est-ce que le GTO Gas ?",
+              a: "Le GTO Gas est notre syst\u00e8me de cr\u00e9dits virtuels. Chaque action sur la plateforme (audit, g\u00e9n\u00e9ration de code, monitoring) consomme une quantit\u00e9 de Gas. Ce mod\u00e8le vous permet de payer uniquement ce que vous utilisez, sans abonnement obligatoire."
+            },
+            {
+              q: "Est-ce compatible avec le SEO classique ?",
+              a: "Absolument. L'AEO compl\u00e8te le SEO, elle ne le remplace pas. Les optimisations que nous recommandons (donn\u00e9es structur\u00e9es, contenu Answer-First, autorit\u00e9 d'entit\u00e9) am\u00e9liorent aussi votre r\u00e9f\u00e9rencement Google traditionnel et vos chances d'appara\u00eetre dans AI Overviews."
+            }
+          ].map((item, i) => (
+            <div key={i} className="glass-card overflow-hidden">
+              <button
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                className="w-full flex items-center justify-between p-6 text-left cursor-pointer"
+              >
+                <span className="text-white font-semibold text-[15px] pr-4">{item.q}</span>
+                <ChevronDown
+                  size={20}
+                  className={`text-gray-500 shrink-0 transition-transform duration-300 ${openFaq === i ? 'rotate-180 text-purple-400' : ''}`}
+                />
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ${openFaq === i ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}
+              >
+                <p className="px-6 pb-6 text-gray-400 text-[15px] leading-relaxed">{item.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── PRICING SECTION ── */}
+      <section className="mb-12 relative max-w-5xl mx-auto">
+        {/* Background glow */}
+        <div className="section-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-purple-600/[0.05]"></div>
+
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-gray-300 text-xs font-medium tracking-wide uppercase mb-6">
+            <Fuel size={12} className="text-purple-400" />
+            <span>Carburant Algorithmique</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+            Rechargez votre <span className="gradient-text">GTO Gas</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+            Notre monnaie virtuelle pour ex{'\u00e9'}cuter les audits, g{'\u00e9'}n{'\u00e9'}rer les correctifs et valider votre entit{'\u00e9'}.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5 w-full items-stretch">
+          {plans.map((plan, idx) => (
+            <div
+              key={idx}
+              className={`relative glass-card p-8 flex flex-col h-full cursor-pointer ${
+                plan.popular
+                  ? '!border-purple-500/30 shadow-[0_0_60px_rgba(124,58,237,0.1)] md:scale-105 z-10'
+                  : ''
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-gradient text-xs font-bold px-5 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-purple-600/30">
+                  Le Choix Expert
+                </div>
+              )}
+
+              <div className="mb-6 flex items-center justify-between pt-2">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                  plan.popular
+                    ? 'bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-600/20'
+                    : 'bg-purple-500/10 text-gray-500'
+                }`}>
+                  {plan.icon}
+                </div>
+                <div className="text-right">
+                  <span className="block text-3xl font-bold gradient-text">{plan.credits}</span>
+                  <span className="text-[11px] text-gray-600 uppercase font-bold tracking-wider">Cr{'\u00e9'}dits Gas</span>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+              <div className="flex items-baseline gap-1 mb-8">
+                <span className="text-4xl font-bold text-white">{plan.price}{'\u20ac'}</span>
+                <span className="text-sm text-gray-600">HT</span>
+              </div>
+
+              <ul className="space-y-3.5 mb-8 flex-1">
+                {plan.features.map((feat, i) => (
+                  <li key={i} className="flex items-start gap-3 text-[15px] text-gray-400">
+                    <Check size={16} className={`mt-0.5 shrink-0 ${plan.popular ? 'text-purple-400' : 'text-gray-600'}`} />
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => handleSelectPlan(plan.id)}
+                className={`w-full py-3.5 rounded-full font-bold flex items-center justify-center gap-2 transition-all text-[15px] cursor-pointer ${
+                  plan.popular
+                    ? 'btn-gradient shadow-lg shadow-purple-600/25'
+                    : 'bg-white/[0.04] border border-white/[0.08] text-gray-300 hover:bg-white/[0.07] hover:border-white/[0.12]'
+                }`}
+              >
+                {user ? 'Recharger' : 'Cr\u00e9er un compte'} <ArrowRight size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FINAL CTA SECTION ── */}
+      <section className="mt-20 mb-8 max-w-5xl mx-auto">
+        <div className="gradient-border p-10 md:p-16 text-center relative overflow-hidden">
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+          {/* Ambient glows */}
+          <div className="section-glow top-0 right-0 w-[300px] h-[300px] bg-purple-600/[0.08]"></div>
+          <div className="section-glow bottom-0 left-0 w-[300px] h-[300px] bg-violet-600/[0.06]"></div>
+
+          <div className="relative z-10">
+            <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+              Pr{'\u00ea'}t {'\u00e0'} dominer les <span className="gradient-text">r{'\u00e9'}ponses IA</span> ?
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto text-lg mb-10">
+              Rejoignez les marques qui se font citer par ChatGPT, Claude et Gemini. Gratuit pour commencer, aucune carte bancaire requise.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button onClick={handleStartAnalysis} className="w-full sm:w-auto btn-gradient text-base px-8 py-3.5 flex items-center justify-center gap-2.5 shadow-lg shadow-purple-600/25 cursor-pointer">
+                Commencer gratuitement <ArrowRight size={18} />
+              </button>
+              <button onClick={() => onNavigate('directory')} className="w-full sm:w-auto px-8 py-3.5 rounded-full glass-card text-gray-200 text-base font-medium hover:bg-white/[0.08] transition-all cursor-pointer">
+                Explorer l'Annuaire
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  );
+};
+
+export default Home;

@@ -1,0 +1,279 @@
+import { GoogleGenAI } from "@google/genai";
+import {
+  MonitoringResult,
+  CitationEntry,
+  EngineResult,
+  CompetitorData,
+  TimeSeriesPoint,
+  AIEngine,
+  Sentiment,
+  SentimentBreakdown,
+} from "../types/ai-monitoring";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// ── Deterministic helpers ──
+const seededRandom = (seed: number, offset: number): number => {
+  const raw = ((seed * 37 + offset * 19 + 11) * 17) % 1000;
+  return raw / 1000;
+};
+
+const seededInt = (seed: number, offset: number, min: number, max: number): number => {
+  return min + Math.round(seededRandom(seed, offset) * (max - min));
+};
+
+const seededFloat = (seed: number, offset: number, min: number, max: number): number => {
+  return Math.round((min + seededRandom(seed, offset) * (max - min)) * 10) / 10;
+};
+
+// ── Fallback deterministic simulation ──
+const fallbackSimulation = async (brandName: string, url: string, period: '7d' | '30d' | '90d' = '30d'): Promise<MonitoringResult> => {
+  await new Promise(resolve => setTimeout(resolve, 2400));
+
+  let hostname: string;
+  try { hostname = new URL(url).hostname; } catch { hostname = url; }
+  const brand = brandName || hostname;
+  const seed = brand.length + hostname.length;
+
+  const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const multiplier = period === '7d' ? 1 : period === '30d' ? 3.5 : 10;
+
+  // ── Total citations & KPIs ──
+  const totalCitations = seededInt(seed, 1, Math.round(12 * multiplier), Math.round(45 * multiplier));
+  const shareOfVoice = seededFloat(seed, 2, 8, 42);
+  const trend = seededFloat(seed, 3, -15, 25);
+
+  const overallSentiment: SentimentBreakdown = {
+    positive: seededInt(seed, 4, 35, 65),
+    neutral: seededInt(seed, 5, 20, 40),
+    negative: 0,
+  };
+  overallSentiment.negative = 100 - overallSentiment.positive - overallSentiment.neutral;
+  if (overallSentiment.negative < 0) {
+    overallSentiment.neutral += overallSentiment.negative;
+    overallSentiment.negative = 0;
+  }
+
+  // ── Engine results ──
+  const engines: AIEngine[] = ['ChatGPT', 'Claude', 'Perplexity', 'Gemini', 'AI Overviews'];
+  const queryPool = [
+    `meilleur ${brand.split('.')[0]} avis`,
+    `${brand.split('.')[0]} vs concurrent`,
+    `alternative a ${brand.split('.')[0]}`,
+    `${brand.split('.')[0]} prix tarif`,
+    `${brand.split('.')[0]} fiabilite`,
+    `comparatif ${brand.split('.')[0]}`,
+    `${brand.split('.')[0]} guide complet`,
+    `recommandation ${brand.split('.')[0]}`,
+    `${brand.split('.')[0]} pour entreprise`,
+    `top solutions ${brand.split('.')[0]}`,
+    `${brand.split('.')[0]} expertise`,
+    `${brand.split('.')[0]} retour experience`,
+  ];
+
+  const engineResults: EngineResult[] = engines.map((engine, i) => {
+    const engineCitations = seededInt(seed, 10 + i, Math.round(3 * multiplier), Math.round(15 * multiplier));
+    const engineSov = seededFloat(seed, 20 + i, 5, 45);
+    const engineSentiment: SentimentBreakdown = {
+      positive: seededInt(seed, 30 + i, 30, 70),
+      neutral: seededInt(seed, 40 + i, 15, 40),
+      negative: 0,
+    };
+    engineSentiment.negative = Math.max(0, 100 - engineSentiment.positive - engineSentiment.neutral);
+    if (engineSentiment.negative < 0) {
+      engineSentiment.neutral += engineSentiment.negative;
+      engineSentiment.negative = 0;
+    }
+
+    const topQueries = queryPool
+      .sort(() => seededRandom(seed, 50 + i * 10) - 0.5)
+      .slice(0, seededInt(seed, 60 + i, 3, 5));
+
+    return {
+      engine,
+      totalCitations: engineCitations,
+      shareOfVoice: engineSov,
+      avgPosition: seededFloat(seed, 70 + i, 1, 5),
+      sentiment: engineSentiment,
+      trend: seededFloat(seed, 80 + i, -20, 30),
+      topQueries,
+    };
+  });
+
+  // ── Citations table ──
+  const sentiments: Sentiment[] = ['positive', 'neutral', 'negative'];
+  const citationCount = Math.min(totalCitations, 20);
+  const citations: CitationEntry[] = Array.from({ length: citationCount }, (_, i) => {
+    const engineIndex = i % 5;
+    const sentimentIndex = seededInt(seed, 100 + i, 0, 2);
+    const daysAgo = seededInt(seed, 120 + i, 0, periodDays - 1);
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+
+    return {
+      id: `cit-${seed}-${i}`,
+      engine: engines[engineIndex],
+      query: queryPool[i % queryPool.length],
+      position: seededInt(seed, 140 + i, 1, 8),
+      date: date.toISOString().split('T')[0],
+      sentiment: sentiments[sentimentIndex],
+      snippet: generateSnippet(brand, engines[engineIndex], sentiments[sentimentIndex], seed + i),
+      confidence: seededInt(seed, 160 + i, 60, 98),
+    };
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // ── Competitors ──
+  const competitorNames = [
+    'CompetitorAlpha', 'RivalTech', 'MarketLeader', 'IndustryStar', 'NextGenCorp'
+  ];
+  const competitors: CompetitorData[] = competitorNames.slice(0, 4).map((name, i) => ({
+    name,
+    totalCitations: seededInt(seed, 200 + i, Math.round(8 * multiplier), Math.round(50 * multiplier)),
+    shareOfVoice: seededFloat(seed, 210 + i, 5, 35),
+    avgSentiment: seededInt(seed, 220 + i, 40, 85),
+    trend: seededFloat(seed, 230 + i, -20, 30),
+    dominantEngine: engines[seededInt(seed, 240 + i, 0, 4)],
+  }));
+
+  // ── Time series ──
+  const timeSeries: TimeSeriesPoint[] = Array.from({ length: periodDays }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (periodDays - 1 - i));
+    const daySeed = seed + i * 7;
+    const chatgpt = seededInt(daySeed, 300, 0, 5);
+    const claude = seededInt(daySeed, 310, 0, 4);
+    const perplexity = seededInt(daySeed, 320, 0, 4);
+    const gemini = seededInt(daySeed, 330, 0, 3);
+    const aiOverviews = seededInt(daySeed, 340, 0, 4);
+    return {
+      date: date.toISOString().split('T')[0],
+      citations: chatgpt + claude + perplexity + gemini + aiOverviews,
+      chatgpt,
+      claude,
+      perplexity,
+      gemini,
+      aiOverviews,
+    };
+  });
+
+  // ── Summary & recommendations ──
+  const summary = totalCitations > 80
+    ? `${brand} beneficie d'une excellente visibilite sur les moteurs IA avec ${totalCitations} citations detectees sur ${periodDays} jours. Le sentiment est majoritairement positif (${overallSentiment.positive}%). La part de voix de ${shareOfVoice}% positionne la marque parmi les leaders cites.`
+    : totalCitations > 30
+      ? `${brand} a une visibilite moderee sur les IA generatives avec ${totalCitations} citations sur ${periodDays} jours. Le Share of Voice de ${shareOfVoice}% offre une marge de progression. Concentrez vos efforts sur les moteurs ou la marque est sous-representee.`
+      : `${brand} a une faible presence dans les reponses IA (${totalCitations} citations sur ${periodDays} jours). La part de voix de ${shareOfVoice}% indique un besoin urgent d'optimisation AEO pour ameliorer la citabilite de la marque.`;
+
+  const recommendations = [
+    'Enrichir le contenu du site avec des donnees factuelles et structurees (Schema.org) pour ameliorer la citabilite.',
+    'Creer des pages "hub" thematiques qui repondent directement aux questions frequentes detectees.',
+    'Renforcer les signaux E-E-A-T (bios auteur, certifications, avis clients) pour gagner en autorite.',
+    'Publier du contenu regulier sur les sujets ou la marque est citee pour maintenir la visibilite.',
+    'Optimiser le fichier llms.txt pour guider les IA sur les informations cles de la marque.',
+  ];
+
+  return {
+    brandName: brand,
+    url,
+    scanDate: new Date().toISOString(),
+    period,
+    totalCitations,
+    shareOfVoice,
+    overallSentiment,
+    trend,
+    engineResults,
+    citations,
+    competitors,
+    timeSeries,
+    summary,
+    recommendations,
+  };
+};
+
+function generateSnippet(brand: string, engine: AIEngine, sentiment: Sentiment, seed: number): string {
+  const positiveSnippets = [
+    `${brand} est frequemment recommande pour sa fiabilite et son expertise dans le domaine.`,
+    `Selon les retours, ${brand} offre un excellent rapport qualite-prix et un service client reactif.`,
+    `${brand} se distingue par son approche innovante et ses resultats prouves aupres de ses clients.`,
+    `Les utilisateurs saluent la qualite de service de ${brand} et son expertise reconnue.`,
+  ];
+  const neutralSnippets = [
+    `${brand} fait partie des acteurs du marche avec une offre competitive.`,
+    `${brand} propose des services comparables aux standards de l'industrie.`,
+    `Parmi les options disponibles, ${brand} est mentionne comme une alternative a considerer.`,
+    `${brand} est present sur ce segment avec une offre qui repond aux besoins standards.`,
+  ];
+  const negativeSnippets = [
+    `Certains utilisateurs rapportent des delais chez ${brand}, bien que la qualite soit reconnue.`,
+    `${brand} pourrait ameliorer certains aspects de son service pour rester competitif.`,
+    `Des alternatives a ${brand} existent pour ceux qui cherchent un meilleur rapport qualite-prix.`,
+  ];
+
+  const pool = sentiment === 'positive' ? positiveSnippets : sentiment === 'neutral' ? neutralSnippets : negativeSnippets;
+  const idx = seed % pool.length;
+  return pool[idx];
+}
+
+// ── Main export ──
+export const runMonitoringScan = async (
+  brandName: string,
+  url: string,
+  period: '7d' | '30d' | '90d' = '30d'
+): Promise<MonitoringResult> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.warn("API_KEY not found, using simulation.");
+    return fallbackSimulation(brandName, url, period);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const prompt = `Tu es un expert en monitoring de visibilite de marque sur les moteurs de reponse IA (ChatGPT, Claude, Perplexity, Gemini, AI Overviews).
+
+Analyse la marque "${brandName}" (${url}) et genere un rapport de monitoring IA complet pour les ${period === '7d' ? '7 derniers jours' : period === '30d' ? '30 derniers jours' : '90 derniers jours'}.
+
+Genere un JSON avec:
+- totalCitations: nombre total de citations detectees
+- shareOfVoice: pourcentage de part de voix (0-100)
+- overallSentiment: { positive: number, neutral: number, negative: number } (somme = 100)
+- trend: evolution en % vs periode precedente
+- engineResults: tableau de 5 objets (ChatGPT, Claude, Perplexity, Gemini, AI Overviews) avec totalCitations, shareOfVoice, avgPosition, sentiment, trend, topQueries
+- citations: tableau de 15-20 citations recentes avec engine, query, position, date, sentiment, snippet, confidence
+- competitors: tableau de 4 concurrents avec name, totalCitations, shareOfVoice, avgSentiment, trend, dominantEngine
+- timeSeries: tableau de points jour par jour avec date, citations, chatgpt, claude, perplexity, gemini, aiOverviews
+- summary: resume en francais de la visibilite IA
+- recommendations: 5 recommandations actionables en francais
+
+Reponds UNIQUEMENT avec le JSON valide.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        temperature: 0.4,
+      }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    const parsed = JSON.parse(output);
+    return {
+      brandName,
+      url,
+      scanDate: new Date().toISOString(),
+      period,
+      ...parsed,
+    };
+  } catch (error) {
+    console.error("AI Monitoring scan failed:", error);
+    return fallbackSimulation(brandName, url, period);
+  }
+};

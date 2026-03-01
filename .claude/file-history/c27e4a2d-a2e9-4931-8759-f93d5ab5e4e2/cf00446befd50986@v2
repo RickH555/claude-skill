@@ -1,0 +1,87 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import KpiCards from '@/components/merchant/KpiCards';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function MerchantHome() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Fetch merchant programs IDs
+  const { data: programs } = await supabase
+    .from('loyalty_programs')
+    .select('id')
+    .eq('merchant_id', user!.id);
+
+  const programIds = programs?.map(p => p.id) || [];
+
+  // Fetch KPIs in parallel
+  const [clientsRes, txnRes, progRes, pointsRes] = await Promise.all([
+    programIds.length > 0
+      ? supabase.from('customer_cards').select('*', { count: 'exact', head: true }).in('program_id', programIds)
+      : Promise.resolve({ count: 0 }),
+    supabase.from('transactions').select('*', { count: 'exact', head: true })
+      .eq('merchant_id', user!.id)
+      .gte('created_at', new Date(Date.now() - 86400000).toISOString()),
+    supabase.from('loyalty_programs').select('*', { count: 'exact', head: true })
+      .eq('merchant_id', user!.id).eq('is_active', true),
+    programIds.length > 0
+      ? supabase.from('customer_cards').select('balance').in('program_id', programIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const totalPoints = (pointsRes as any).data?.reduce((sum: number, c: any) => sum + (c.balance || 0), 0) || 0;
+
+  // Fetch recent transactions
+  const { data: recentTxns } = await supabase
+    .from('transactions')
+    .select('*, customer_cards(customer_id, loyalty_programs(name))')
+    .eq('merchant_id', user!.id)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  return (
+    <div className="space-y-8">
+      <PageHeader title="Tableau de bord" description="Vue d'ensemble de votre activité fidélité." />
+      <KpiCards data={{
+        activeClients: (clientsRes as any).count || 0,
+        transactionsToday: (txnRes as any).count || 0,
+        activePrograms: (progRes as any).count || 0,
+        totalPoints,
+      }} />
+
+      {/* Recent activity */}
+      <div>
+        <h2 className="text-[15px] font-semibold text-[var(--text-primary)] mb-4">Activité récente</h2>
+        {recentTxns && recentTxns.length > 0 ? (
+          <Card padding="none">
+            <div className="divide-y divide-[var(--border-subtle)]">
+              {recentTxns.map((txn: any) => (
+                <div key={txn.id} className="flex items-center justify-between px-5 py-3">
+                  <div>
+                    <p className="text-[13px] text-[var(--text-primary)] font-medium">
+                      {(txn.customer_cards as any)?.loyalty_programs?.name || 'Programme'}
+                    </p>
+                    <p className="text-[12px] text-[var(--text-tertiary)]">
+                      {new Date(txn.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                  <Badge variant={txn.type === 'earn' ? 'success' : 'warning'}>
+                    {txn.type === 'earn' ? `+${txn.amount}` : `-${txn.amount}`}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </Card>
+        ) : (
+          <Card className="text-center py-8">
+            <p className="text-[var(--text-tertiary)] text-[13px]">Aucune transaction récente.</p>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

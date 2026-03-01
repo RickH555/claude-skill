@@ -1,0 +1,168 @@
+import React, { useState, useRef } from 'react';
+import { 
+  Search, Globe, Brain, Target, BarChart3, CheckCircle2, AlertTriangle, 
+  XCircle, Sparkles, ArrowRight, Download, RefreshCw, Lightbulb, 
+  Clock, Award, Rocket, Play, Loader2, Quote, Layers, Bot, Activity, Share2 
+} from 'lucide-react';
+
+// --- TYPES POUR TYPESCRIPT ---
+interface AnalysisItem {
+  status: 'success' | 'warning' | 'error';
+  message: string;
+  recommendation?: string | null;
+  impact?: 'high' | 'medium' | 'low';
+}
+
+interface CategoryData {
+  score: number;
+  items: AnalysisItem[];
+}
+
+interface Recommendation {
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  action: string;
+  impact: number;
+  effort: string;
+  category: string;
+}
+
+// --- COMPOSANTS DE STYLE ---
+const NoiseTexture = () => (
+  <svg className="fixed inset-0 w-full h-full pointer-events-none opacity-[0.015] z-50" style={{ mixBlendMode: 'overlay' }}>
+    <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter>
+    <rect width="100%" height="100%" filter="url(#noise)"/>
+  </svg>
+);
+
+const GradientOrbs = () => (
+  <div className="fixed inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-emerald-500/20 blur-3xl animate-pulse" />
+    <div className="absolute top-1/2 -left-40 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-3xl animate-pulse" />
+  </div>
+);
+
+// --- COMPOSANT PRINCIPAL ---
+export default function App() {
+  const [url, setUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const runAnalysis = () => {
+    if (!url) return;
+    setIsAnalyzing(true);
+    // Simulation d'analyse
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setAnalysisComplete(true);
+    }, 3000);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] text-white selection:bg-emerald-500/30 font-sans">
+      <NoiseTexture />
+      <GradientOrbs />
+
+      {/* Header */}
+      <header className="relative z-40 border-b border-white/5 backdrop-blur-md bg-[#0a0a0f]/50 sticky top-0">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-emerald-500 p-2 rounded-xl">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-xl font-bold">CitedBy<span className="text-emerald-400">.ai</span></h1>
+          </div>
+          <button className="bg-white/5 border border-white/10 px-5 py-2 rounded-full text-sm">Connexion</button>
+        </div>
+      </header>
+
+      <main className="relative z-10 pt-20 pb-24 px-6">
+        {/* Barre de recherche (L'entrée du SaaS) */}
+        {!analysisComplete && (
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-6xl font-bold mb-6">Faites-vous <span className="text-emerald-400">citer</span> par les IA</h2>
+            <p className="text-xl text-white/50 mb-10">Optimisez votre site pour ChatGPT, Claude et Perplexity.</p>
+            
+            <div className="relative max-w-2xl mx-auto group">
+              <div className="flex bg-white/5 border border-white/10 rounded-2xl p-2">
+                <input 
+                  className="flex-1 bg-transparent px-4 py-4 outline-none text-lg" 
+                  placeholder="https://votre-site.com" 
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
+                <button 
+                  onClick={runAnalysis}
+                  disabled={isAnalyzing}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-black px-8 py-4 rounded-xl font-bold transition-all"
+                >
+                  {isAnalyzing ? <Loader2 className="animate-spin" /> : "Analyser"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* L'interface Tableau de Bord (Une fois l'analyse faite) */}
+        {analysisComplete && (
+          <div ref={resultsRef} className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <div className="flex items-center justify-between mb-8 p-6 bg-white/5 border border-white/10 rounded-2xl">
+              <div className="flex items-center gap-4">
+                <Globe className="w-6 h-6 text-emerald-400" />
+                <div>
+                  <p className="text-white/40 text-sm">Analyse de</p>
+                  <p className="text-white font-medium">{url}</p>
+                </div>
+              </div>
+              <button onClick={() => setAnalysisComplete(false)} className="text-emerald-400 text-sm flex items-center gap-2">
+                <RefreshCw className="w-4 h-4" /> Nouvelle analyse
+              </button>
+            </div>
+
+            {/* Onglets du SaaS */}
+            <div className="flex gap-4 mb-8">
+              {['overview', 'recommendations', 'ai-preview'].map(t => (
+                <button 
+                  key={t} 
+                  onClick={() => setActiveTab(t)}
+                  className={`px-6 py-2 rounded-full text-sm transition-all ${activeTab === t ? 'bg-emerald-500 text-black font-bold' : 'bg-white/5 text-white/50'}`}
+                >
+                  {t.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* Contenu de l'interface */}
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-8 min-h-[400px]">
+              {activeTab === 'overview' && (
+                <div className="text-center py-20">
+                  <div className="inline-block relative">
+                    <span className="text-8xl font-bold text-emerald-400">72</span>
+                    <span className="text-2xl text-white/40">/100</span>
+                  </div>
+                  <h3 className="text-2xl font-bold mt-4">Score de Citabilité Global</h3>
+                  <p className="text-white/50 mt-2">Votre site a une probabilité modérée d'être cité par les IA génératives.</p>
+                </div>
+              )}
+              {activeTab === 'recommendations' && (
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                    <h4 className="font-bold text-red-400 flex items-center gap-2"><AlertTriangle className="w-4 h-4"/> Critique</h4>
+                    <p className="mt-2 text-sm text-white/70">Ajoutez des données structurées Schema.org FAQPage.</p>
+                  </div>
+                  <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
+                    <h4 className="font-bold text-amber-400 flex items-center gap-2"><Lightbulb className="w-4 h-4"/> Amélioration</h4>
+                    <p className="mt-2 text-sm text-white/70">Utilisez des listes à puces pour vos définitions clés.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

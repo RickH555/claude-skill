@@ -1,0 +1,1273 @@
+import React, { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { User, AnalysisResult, SMCContent, GeneratedSolution, MegaGenerationStatus } from './types';
+import { analyzeUrl } from './services/analyzer';
+import { db } from './services/database';
+import { megaGenerate } from './services/mega-generator';
+import { generateAllSolutions } from './services/solution-mega-generator';
+import { storeInVault, hasVault } from './services/solution-vault';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Analyze from './pages/Analyze';
+
+// Lazy-loaded pages for bundle optimization
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const GenerativeTools = lazy(() => import('./pages/GenerativeTools'));
+const Results = lazy(() => import('./pages/Results').then(m => ({ default: m.Results })));
+const HistoryView = lazy(() => import('./pages/History'));
+const SMCStudio = lazy(() => import('./pages/SMCStudio'));
+const SourceOfTruth = lazy(() => import('./pages/SourceOfTruth'));
+const SchemaOrg = lazy(() => import('./pages/SchemaOrg'));
+const PublisherRequest = lazy(() => import('./pages/PublisherRequest'));
+const RobotsTxt = lazy(() => import('./pages/RobotsTxt'));
+const Directory = lazy(() => import('./pages/Directory'));
+const DirectoryEntity = lazy(() => import('./pages/DirectoryEntity'));
+const Recharge = lazy(() => import('./pages/Recharge'));
+const Projects = lazy(() => import('./pages/Projects'));
+const Account = lazy(() => import('./pages/Account'));
+const Clients = lazy(() => import('./pages/Clients'));
+const Affiliation = lazy(() => import('./pages/Affiliation'));
+const ContentWriter = lazy(() => import('./pages/ContentWriter'));
+const Reputation = lazy(() => import('./pages/Reputation'));
+const BotTracking = lazy(() => import('./pages/BotTracking'));
+const Messages = lazy(() => import('./pages/Messages'));
+const AlertsAEO = lazy(() => import('./pages/AlertsAEO'));
+const MissionOrders = lazy(() => import('./pages/MissionOrders'));
+const BlogOptimizer = lazy(() => import('./pages/BlogOptimizer'));
+const AiResponseLayer = lazy(() => import('./pages/AiResponseLayer'));
+const LlmsTxtGenerator = lazy(() => import('./pages/LlmsTxtGenerator'));
+const AnswerFirstAudit = lazy(() => import('./pages/AnswerFirstAudit'));
+const AiCitationSimulator = lazy(() => import('./pages/AiCitationSimulator'));
+const EeatBuilder = lazy(() => import('./pages/EeatBuilder'));
+const AiMonitoring = lazy(() => import('./pages/AiMonitoring'));
+const Integrations = lazy(() => import('./pages/Integrations'));
+const ApiDeveloper = lazy(() => import('./pages/ApiDeveloper'));
+const ActionPlan = lazy(() => import('./pages/ActionPlan'));
+const Plan = lazy(() => import('./pages/Plan'));
+
+// V3 — Citation Verification Engine pages
+const CitationDashboardPage = lazy(() => import('./pages/v3/CitationDashboardPage'));
+const TrackedQueriesPage = lazy(() => import('./pages/v3/TrackedQueriesPage'));
+const CitationDetailPage = lazy(() => import('./pages/v3/CitationDetailPage'));
+const BenchmarkPage = lazy(() => import('./pages/v3/BenchmarkPage'));
+const AlertsPage = lazy(() => import('./pages/v3/AlertsPage'));
+const AlertSettingsPage = lazy(() => import('./pages/v3/AlertSettingsPage'));
+const MonthlyReportPage = lazy(() => import('./pages/v3/MonthlyReportPage'));
+const CalibrationPage = lazy(() => import('./pages/v3/CalibrationPage'));
+
+import {
+  LayoutDashboard, Plus, ChevronRight,
+  AlertTriangle, X, ArrowUp
+} from 'lucide-react';
+import { I18nProvider, useTranslation } from './i18n';
+
+// Extracted components
+import { Toast, ToastContext, ToastContainer } from './components/ToastSystem';
+export { useToast } from './components/ToastSystem';
+import CommandPalettePanel from './components/CommandPalette';
+import ShortcutsModal from './components/ShortcutsModal';
+import OnboardingModal from './components/OnboardingModal';
+import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
+import MobileBottomNav from './components/MobileBottomNav';
+import AppFooter from './components/AppFooter';
+
+// Animated number hook for smooth credit transitions
+const useAnimatedNumber = (value: number, duration = 600) => {
+  const [display, setDisplay] = useState(value);
+  const prevValue = useRef(value);
+  useEffect(() => {
+    if (prevValue.current === value) return;
+    const start = prevValue.current;
+    const diff = value - start;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(start + diff * eased));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+    prevValue.current = value;
+  }, [value, duration]);
+  return display;
+};
+
+const PLAN_LIMITS = {
+  free: 1,
+  pro: 3,
+  enterprise: 1000 // Illimité en pratique
+};
+
+const App: React.FC = () => {
+  return (
+    <I18nProvider>
+      <AppContent />
+    </I18nProvider>
+  );
+};
+
+const AppContent: React.FC = () => {
+  const { t, tf, locale } = useTranslation();
+
+  // ── Toast system ──
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const showToast = useCallback((type: Toast['type'], message: string) => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, type, message }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+  }, []);
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  // ── Profile dropdown ──
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setIsProfileOpen(false);
+    };
+    if (isProfileOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileOpen]);
+
+  // ── Page transition ──
+  const [pageKey, setPageKey] = useState(0);
+
+  // ── Auto-hide navbar on scroll + progress bar + back-to-top ──
+  const [navbarVisible, setNavbarVisible] = useState(true);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const lastScrollY = useRef(0);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY < 60) {
+        setNavbarVisible(true);
+      } else if (currentY > lastScrollY.current + 10) {
+        setNavbarVisible(false);
+      } else if (currentY < lastScrollY.current - 10) {
+        setNavbarVisible(true);
+      }
+      lastScrollY.current = currentY;
+      // Back to top visibility
+      setShowBackToTop(currentY > 400);
+      // Scroll progress bar
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollHeight > 0 ? (currentY / scrollHeight) * 100 : 0;
+      const bar = document.getElementById('scroll-progress');
+      if (bar) bar.style.width = `${progress}%`;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // ── Session activity timer ──
+  const [sessionMinutes, setSessionMinutes] = useState(0);
+  const sessionStartRef = useRef(Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSessionMinutes(Math.floor((Date.now() - sessionStartRef.current) / 60000));
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ── Quick Actions dropdown ──
+  const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
+  const quickActionsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (quickActionsRef.current && !quickActionsRef.current.contains(e.target as Node)) setIsQuickActionsOpen(false);
+    };
+    if (isQuickActionsOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isQuickActionsOpen]);
+
+  const [currentView, setCurrentView] = useState<'home' | 'analyze' | 'results' | 'directory' | 'directory-entity' | 'login' | 'projects' | 'source-of-truth' | 'robots-txt' | 'history' | 'recharge' | 'account' | 'publisher-request' | 'schema-org' | 'smc-studio' | 'dashboard' | 'generative-tools' | 'clients' | 'affiliation' | 'messages' | 'alerts' | 'content-writer' | 'reputation' | 'bot-tracking' | 'mission-orders' | 'blog-optimizer' | 'ai-response-layer' | 'llms-txt' | 'answer-first-audit' | 'ai-citation-simulator' | 'eeat-builder' | 'ai-monitoring' | 'integrations' | 'api-developer' | 'action-plan' | 'plan' | 'citation-dashboard' | 'tracked-queries' | 'citation-detail' | 'benchmark' | 'v3-alerts' | 'alert-settings' | 'monthly-report' | 'calibration'>('home');
+  const [viewHistory, setViewHistory] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0); // Used to force remount of components
+  
+  const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+  const [history, setHistory] = useState<AnalysisResult[]>([]);
+  
+  // Load history from DB on mount
+  useEffect(() => {
+    const loadedHistory = db.getAll();
+    setHistory(loadedHistory);
+  }, []);
+
+  // Bibliothèques de contenu généré
+  const [smcLibrary, setSmcLibrary] = useState<SMCContent[]>([]); 
+  const [truthLibrary, setTruthLibrary] = useState<SMCContent[]>([]);
+  const [schemaLibrary, setSchemaLibrary] = useState<SMCContent[]>([]);
+  const [robotsLibrary, setRobotsLibrary] = useState<SMCContent[]>([]);
+
+  const [megaStatus, setMegaStatus] = useState<MegaGenerationStatus>('idle');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [resultsTab, setResultsTab] = useState<'overview' | 'details' | 'archives' | 'recommendations'>('overview');
+  const [publisherRequestData, setPublisherRequestData] = useState<{ topic: string, url: string, brief: string } | null>(null);
+  const [initialRechargePackId, setInitialRechargePackId] = useState<number | null>(null);
+  const [initialAccountTab, setInitialAccountTab] = useState<'profile' | 'subscription' | 'billing'>('profile');
+  
+  // État pour gérer l'ouverture des sections du menu (Accordion exclusif)
+  const [sectionsState, setSectionsState] = useState({
+    optimization: false,
+    tools: false
+  });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  // Mock notifications data
+  const notifications = [
+    { id: 1, type: 'critical' as const, title: 'Chute de visibilité détectée sur votre site principal', time: 'Il y a 12min', unread: true },
+    { id: 2, type: 'warning' as const, title: 'Votre quota GTO Gas est bientôt épuisé (15% restant)', time: 'Il y a 2h', unread: true },
+    { id: 3, type: 'info' as const, title: 'Nouveau rapport de monitoring AEO disponible', time: 'Il y a 5h', unread: true },
+    { id: 4, type: 'success' as const, title: 'Audit SEO terminé avec succès pour example.com', time: 'Il y a 1j', unread: false },
+    { id: 5, type: 'warning' as const, title: 'Mise à jour des critères de référencement Google détectée', time: 'Il y a 2j', unread: false },
+  ];
+
+  // Close notification panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setIsNotifOpen(false);
+      }
+    };
+    if (isNotifOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isNotifOpen]);
+
+  // Command Palette (Ctrl+K) & Keyboard Shortcuts (?)
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [lowCreditsDismissed, setLowCreditsDismissed] = useState(false);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setIsCommandPaletteOpen(false);
+        setIsShortcutsOpen(false);
+      }
+      if (e.key === '?' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        setIsShortcutsOpen(prev => !prev);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // ── Welcome Onboarding Modal ──
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Default user is NULL to allow testing the login flow
+  const [user, setUser] = useState<User | null>(null);
+  const animatedCredits = useAnimatedNumber(user?.credits ?? 0);
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  // Show onboarding modal on first login
+  useEffect(() => {
+    if (user && !localStorage.getItem('citedby_onboarded')) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
+
+  // Calcul du nombre de projets consommé sur le mois en cours (Renouvellement mensuel)
+  const monthlyProjectCount = useMemo(() => {
+    if (history.length === 0) return 0;
+
+    // Définir le début du cycle de facturation (simulé au 1er du mois courant)
+    const now = new Date();
+    const billingCycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // 1. Identifier la date de création (première analyse) de chaque domaine
+    const projectCreationDates = new Map<string, Date>();
+    
+    history.forEach(h => {
+        let hostname;
+        try { hostname = new URL(h.url).hostname; } catch(e) { hostname = h.url; }
+        
+        const analysisDate = new Date(h.timestamp);
+        
+        if (!projectCreationDates.has(hostname)) {
+            projectCreationDates.set(hostname, analysisDate);
+        } else {
+            // On garde la date la plus ancienne trouvée pour ce domaine
+            if (analysisDate < projectCreationDates.get(hostname)!) {
+                projectCreationDates.set(hostname, analysisDate);
+            }
+        }
+    });
+
+    // 2. Compter uniquement les projets dont la "création" est postérieure au début du cycle
+    let count = 0;
+    projectCreationDates.forEach((creationDate) => {
+        if (creationDate >= billingCycleStart) {
+            count++;
+        }
+    });
+    
+    return count;
+  }, [history]);
+
+  // Vérifier si le plan d'action est complet (toutes les recommendations ont une solution générée)
+  const actionPlanStatus = useMemo(() => {
+    if (history.length === 0) return { complete: false, completed: 0, total: 0 };
+    const latest = history[history.length - 1];
+    const total = latest.recommendations.length;
+    const completed = latest.recommendations.filter(rec =>
+      latest.generatedSolutions?.[rec.id]
+    ).length;
+    return { complete: total > 0 && completed === total, completed, total };
+  }, [history]);
+
+  const navigateTo = (view: typeof currentView) => {
+    setIsMobileMenuOpen(false);
+    // Si on navigue vers autre chose que recharge, on reset l'ID du pack
+    if (view !== 'recharge') {
+        setInitialRechargePackId(null);
+    }
+    // Reset l'onglet du compte si on ne va pas vers le compte
+    if (view !== 'account') {
+        setInitialAccountTab('profile');
+    }
+    setViewHistory(prev => [...prev, currentView]);
+    setCurrentView(view);
+    setRefreshKey(prev => prev + 1); // Force remount to reset internal state of views
+    setPageKey(prev => prev + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goBack = () => {
+    setIsMobileMenuOpen(false);
+    if (viewHistory.length > 0) {
+      const newHistory = [...viewHistory];
+      const prevView = newHistory.pop();
+      setViewHistory(newHistory);
+      if (prevView) {
+        setCurrentView(prevView as any);
+        setRefreshKey(prev => prev + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      setCurrentView('home'); // Default fallback
+      setRefreshKey(prev => prev + 1);
+    }
+  };
+
+  const handleDirectRecharge = (packId: number) => {
+    setInitialRechargePackId(packId);
+    navigateTo('recharge');
+  };
+
+  const handleAnalyze = async (url: string) => {
+    // Vérification de la limite de projets (Quota mensuel)
+    if (user) {
+        const limit = PLAN_LIMITS[user.plan] || 1;
+        let hostname = url;
+        try { hostname = new URL(url).hostname; } catch(e) {}
+
+        // On vérifie si c'est un projet déjà existant dans l'historique global
+        const isExistingProject = history.some(h => {
+            try { return new URL(h.url).hostname === hostname; } 
+            catch(e) { return false; }
+        });
+
+        // Si c'est un tout nouveau projet et qu'on a atteint la limite MENSUELLE
+        // Les anciens projets ne comptent pas dans cette limite
+        if (!isExistingProject && monthlyProjectCount >= limit) {
+            // Redirection vers l'onglet Abonnement
+            alert(`Limite de nouveaux projets atteinte pour ce mois (${monthlyProjectCount}/${limit}). Passez au plan supérieur pour ajouter plus de projets.`);
+            setInitialAccountTab('subscription');
+            navigateTo('account');
+            return;
+        }
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const result = await analyzeUrl(url);
+      setAnalysisData(result);
+      
+      // Update history via DB service
+      const updatedHistory = db.add(result);
+      setHistory(updatedHistory);
+
+      // Show celebration on first audit
+      if (history.length === 0) {
+        setShowCelebration(true);
+        setTimeout(() => setShowCelebration(false), 3000);
+      }
+
+      showToast('success', 'Audit terminé avec succès !');
+
+      // Pre-generation en arriere-plan (fire-and-forget)
+      setMegaStatus('generating');
+      megaGenerate(url).then(cache => {
+        if (cache) {
+          const preGenerated = { status: 'completed' as const, generatedAt: new Date().toISOString(), ...cache };
+          setHistory(prev => {
+            if (prev.length === 0) return prev;
+            const updated = { ...prev[0], preGenerated };
+            db.update(0, updated);
+            return [updated, ...prev.slice(1)];
+          });
+          setAnalysisData(prev => prev ? { ...prev, preGenerated } : prev);
+          setMegaStatus('completed');
+        } else {
+          setMegaStatus('failed');
+        }
+      }).catch(() => setMegaStatus('failed'));
+
+      // Solution mega-generation en arrière-plan (Generate All, Reveal on Credit)
+      const auditId = result.timestamp;
+      if (!hasVault(auditId)) {
+        const failedCriteria = result.recommendations.map(rec => ({
+          id: rec.id,
+          name: rec.title,
+          category: rec.category,
+          maxPoints: rec.priority === 'critical' ? 5 : rec.priority === 'high' ? 4 : rec.priority === 'medium' ? 3 : 1,
+        }));
+        let hostname = url;
+        try { hostname = new URL(url).hostname; } catch { /* keep raw */ }
+        generateAllSolutions(
+          url,
+          hostname,
+          result.recommendations.map(r => r.title).join('. '),
+          failedCriteria,
+          [],
+          hostname,
+          'fr'
+        ).then(megaResult => {
+          storeInVault(auditId, megaResult);
+          console.log('[SolutionMegaGen] Solutions pré-générées et stockées:', megaResult.solutionsCount);
+        }).catch(err => {
+          console.error('[SolutionMegaGen] Erreur:', err);
+        });
+      }
+
+      // Redirection vers Monitoring AEO → onglet Rapport d'Audit
+      setResultsTab('details');
+      navigateTo('projects');
+      setSectionsState({
+        optimization: false,
+        tools: false
+      });
+    } catch (error) {
+      console.error("Analysis failed", error);
+      alert("Erreur lors de l'analyse. Veuillez réessayer.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // Used for Admin/User private analysis view
+  const handleViewAnalysis = (result: AnalysisResult, tab: any = 'overview') => {
+    setAnalysisData(result);
+    setResultsTab(tab);
+    // Redirect to Projects (Monitoring AEO) instead of Results (Report)
+    navigateTo('projects');
+    setSectionsState({
+        optimization: true,
+        tools: false
+    });
+  };
+
+  // New handler for Public Directory View
+  const handleViewDirectoryEntity = (result: AnalysisResult) => {
+    setAnalysisData(result);
+    navigateTo('directory-entity');
+  };
+
+  const handleUpdateAnalysis = (index: number, updatedData: Partial<AnalysisResult>) => {
+    const updatedHistory = db.update(index, updatedData);
+    setHistory(updatedHistory);
+  };
+
+  const handleSaveSolution = useCallback((analysisId: string, recommendationId: string, solution: GeneratedSolution) => {
+    const timestamp = new Date().toISOString();
+    const solutionWithMeta = { ...solution, timestamp };
+
+    setAnalysisData(prev => {
+        if (!prev || prev.timestamp !== analysisId) return prev;
+        
+        return {
+            ...prev,
+            generatedSolutions: {
+                ...(prev.generatedSolutions || {}),
+                [recommendationId]: solutionWithMeta
+            }
+        };
+    });
+
+    // We need to find the index in the history to update the DB
+    setHistory(prevHistory => {
+        const index = prevHistory.findIndex(item => item.timestamp === analysisId);
+        if (index !== -1) {
+            const updatedItem = {
+                ...prevHistory[index],
+                generatedSolutions: {
+                    ...(prevHistory[index].generatedSolutions || {}),
+                    [recommendationId]: solutionWithMeta
+                }
+            };
+            // Persist using db service
+            const newHistory = [...prevHistory];
+            newHistory[index] = updatedItem;
+            // Note: calling db.update relies on index which matches prevHistory order if initialized from DB
+            db.update(index, updatedItem);
+            return newHistory;
+        }
+        return prevHistory;
+    });
+  }, []); 
+
+  // Helpers pour ajouter du contenu aux bibliothèques
+  const handleAddToSmcLibrary = (item: SMCContent) => setSmcLibrary(prev => [item, ...prev]);
+  const handleAddToTruthLibrary = (item: SMCContent) => setTruthLibrary(prev => [item, ...prev]);
+  const handleAddToSchemaLibrary = (item: SMCContent) => setSchemaLibrary(prev => [item, ...prev]);
+  const handleAddToRobotsLibrary = (item: SMCContent) => setRobotsLibrary(prev => [item, ...prev]);
+
+  const handleNavigateToPublisher = (data: { topic: string, url: string, brief: string }) => {
+    setPublisherRequestData(data);
+    navigateTo('publisher-request');
+  };
+
+  const handleNavigateToDirectory = () => {
+    navigateTo('directory');
+  };
+
+  const handleDeductCredits = (amount: number): boolean => {
+    if (!user) {
+        if(confirm("Vous devez être connecté pour effectuer cette action. Se connecter maintenant ?")) {
+            navigateTo('login');
+        }
+        return false;
+    }
+    
+    if (user.credits < amount) {
+        // Redirection explicite vers la section GTO Gas (Recharge)
+        alert(`Solde GTO Gas insuffisant pour générer cette solution.\n\nIl vous manque ${amount - user.credits} crédits.\n\nRedirection vers la station de recharge...`);
+        navigateTo('recharge');
+        return false;
+    }
+    
+    setUser(prev => prev ? { ...prev, credits: prev.credits - amount } : null);
+    return true;
+  };
+
+  const handleRecharge = (amount: number, planLevel: 'free' | 'pro' | 'enterprise') => {
+    if (!user) return;
+    
+    setUser({ 
+        ...user, 
+        credits: user.credits + amount,
+        plan: planLevel 
+    });
+    
+    // Si c'est une recharge depuis la page de recharge, on ne force pas le retour, l'UX est gérée dans Recharge.tsx
+  };
+
+  const handleUpgradePlan = (newPlan: 'free' | 'pro' | 'enterprise') => {
+    if (!user) return;
+    setUser({ ...user, plan: newPlan });
+  };
+
+  const handleLogin = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    // On réinitialise l'historique pour éviter que le bouton retour ne renvoie au login
+    // et on force la navigation vers le dashboard
+    setViewHistory(['home']); 
+    setCurrentView('analyze'); // Redirection vers Nouvel Audit
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const handleLogout = () => {
+    setIsMobileMenuOpen(false);
+    setUser(null);
+    setCurrentView('home');
+    setViewHistory([]);
+    setRefreshKey(prev => prev + 1);
+  };
+
+  useEffect(() => {
+    if (!user && isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [user, isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileMenuOpen]);
+
+  const PlaceholderView = ({ title, icon: Icon }: { title: string, icon: React.ElementType }) => (
+    <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 animate-in fade-in zoom-in duration-300">
+      <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white/10">
+        <Icon size={48} className="text-gray-500 opacity-50" />
+      </div>
+      <h2 className="text-3xl font-serif font-bold text-white mb-4">{title}</h2>
+      <p className="text-gray-400 max-w-md mb-8">
+        {t.common.featureInDev}
+      </p>
+      <button
+        onClick={() => navigateTo('dashboard')}
+        className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all flex items-center gap-2 font-medium"
+      >
+        <LayoutDashboard size={18} /> {t.common.returnToDashboard}
+      </button>
+    </div>
+  );
+
+  return (
+    <ToastContext.Provider value={{ showToast }}>
+    <div className="min-h-screen flex flex-col font-sans text-gray-100 selection:bg-primary/30 bg-black">
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+      {/* First Audit Celebration */}
+      {showCelebration && (
+        <div className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center">
+          <div className="text-center animate-in fade-in zoom-in duration-500">
+            <div className="text-6xl mb-4 animate-bounce">🎉</div>
+            <div className="bg-[#13131d]/90 backdrop-blur-xl border border-purple-500/30 rounded-2xl px-8 py-5 shadow-2xl shadow-purple-900/30">
+              <h3 className="text-xl font-bold text-white mb-1">Premier audit réussi !</h3>
+              <p className="text-sm text-purple-300">Votre parcours AEO commence maintenant</p>
+            </div>
+          </div>
+          {/* Particle dots */}
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 rounded-full"
+              style={{
+                background: ['#a855f7', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'][i % 5],
+                left: `${20 + Math.random() * 60}%`,
+                top: `${20 + Math.random() * 60}%`,
+                animation: `fade-in 0.3s ease-out ${i * 50}ms both, slide-in-from-bottom 1.5s ease-out ${i * 50}ms both`,
+                opacity: 0,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Welcome Onboarding Modal */}
+      <OnboardingModal
+        show={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onNavigate={(view: string) => navigateTo(view as any)}
+      />
+
+      {/* Command Palette (Ctrl+K) */}
+      {user && isCommandPaletteOpen && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={() => setIsCommandPaletteOpen(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <CommandPalettePanel
+            onClose={() => setIsCommandPaletteOpen(false)}
+            onNavigate={(view: string) => { navigateTo(view as any); setIsCommandPaletteOpen(false); }}
+          />
+        </div>
+      )}
+
+      {/* Keyboard Shortcuts Modal (?) */}
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
+
+      {/* Fixed Full-Width Navbar */}
+      <Navbar
+        user={user}
+        navbarVisible={navbarVisible}
+        animatedCredits={animatedCredits}
+        sessionMinutes={sessionMinutes}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        isSidebarCollapsed={isSidebarCollapsed}
+        setIsSidebarCollapsed={setIsSidebarCollapsed}
+        navigateTo={(view: string) => navigateTo(view as any)}
+        onLogout={handleLogout}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        notifications={notifications}
+        isNotifOpen={isNotifOpen}
+        setIsNotifOpen={setIsNotifOpen}
+        notifRef={notifRef as React.RefObject<HTMLDivElement>}
+        isQuickActionsOpen={isQuickActionsOpen}
+        setIsQuickActionsOpen={setIsQuickActionsOpen}
+        quickActionsRef={quickActionsRef as React.RefObject<HTMLDivElement>}
+        isProfileOpen={isProfileOpen}
+        setIsProfileOpen={setIsProfileOpen}
+        profileRef={profileRef as React.RefObject<HTMLDivElement>}
+      />
+      {/* Spacer for fixed navbar */}
+      <div className="h-14 shrink-0" />
+
+      <div className="flex-grow flex flex-col md:flex-row w-full relative">
+        {user && (
+          <Sidebar
+            currentView={currentView}
+            navigateTo={(view: string) => navigateTo(view as any)}
+            isSidebarCollapsed={isSidebarCollapsed}
+            isMobileMenuOpen={isMobileMenuOpen}
+            setIsMobileMenuOpen={setIsMobileMenuOpen}
+          />
+        )}
+
+        <main className="flex-1 w-full min-w-0 pb-20 md:pb-0">
+          {/* Low Credits Warning Banner */}
+          {user && user.credits <= 10 && !lowCreditsDismissed && currentView !== 'recharge' && (
+            <div className="mx-4 mt-3 mb-1 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3 animate-slide-up">
+              <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+              <p className="text-sm text-amber-300 flex-1">Crédits bientôt épuisés ({user.credits} restants). <button onClick={() => navigateTo('recharge')} className="underline font-semibold hover:text-amber-200">Recharger maintenant</button></p>
+              <button onClick={() => setLowCreditsDismissed(true)} className="text-amber-400/60 hover:text-amber-300"><X size={14} /></button>
+            </div>
+          )}
+          {/* Breadcrumb */}
+          {user && !['home', 'analyze', 'login'].includes(currentView) && (() => {
+            const labels: Record<string, string> = {
+              'dashboard': 'Dashboard', 'projects': 'Monitoring AEO', 'generative-tools': 'Outils Génératifs',
+              'directory': 'Annuaire', 'directory-entity': 'Fiche Annuaire', 'recharge': 'GTO Gas',
+              'account': 'Compte & Plan', 'clients': 'Base Clients', 'affiliation': 'Affiliation',
+              'messages': 'Messages', 'alerts': 'Alertes AEO', 'mission-orders': 'Ordres de Mission',
+              'smc-studio': 'SMC Studio', 'content-writer': 'AI Content Writer', 'reputation': 'Réputation IA',
+              'source-of-truth': 'Source of Truth', 'schema-org': 'Schema.org', 'robots-txt': 'Robots.txt',
+              'bot-tracking': 'Suivi Bots', 'blog-optimizer': 'Blog Optimiser', 'history': 'Historique',
+              'results': 'Résultats', 'publisher-request': 'Publisher Request', 'ai-response-layer': 'AI Response Layer',
+              'llms-txt': 'Générateur llms.txt', 'answer-first-audit': 'Audit Answer-First', 'ai-citation-simulator': 'Simulateur Citation IA',
+              'eeat-builder': 'E-E-A-T Builder', 'ai-monitoring': 'Monitoring IA',
+              'integrations': 'Intégrations', 'api-developer': 'API Developer Hub',
+              'action-plan': "Plan d'action", 'plan': 'Plan & Abonnement',
+            };
+            const toolChildren = ['smc-studio', 'content-writer', 'reputation', 'source-of-truth', 'schema-org', 'robots-txt', 'bot-tracking', 'blog-optimizer', 'ai-response-layer', 'llms-txt', 'answer-first-audit', 'ai-citation-simulator', 'eeat-builder'];
+            const isToolChild = toolChildren.includes(currentView);
+            return (
+              <div className="px-6 pt-3 pb-0 flex items-center gap-1.5 text-xs text-gray-600">
+                <button onClick={() => navigateTo('analyze')} className="hover:text-gray-400 transition-colors">Accueil</button>
+                <ChevronRight size={10} />
+                {isToolChild && (
+                  <>
+                    <button onClick={() => navigateTo('generative-tools')} className="hover:text-gray-400 transition-colors">Outils Génératifs</button>
+                    <ChevronRight size={10} />
+                  </>
+                )}
+                <span className="text-gray-400">{labels[currentView] || currentView}</span>
+              </div>
+            );
+          })()}
+          <Suspense fallback={
+            <div className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="h-8 w-48 skeleton-shimmer rounded-xl" />
+                <div className="h-10 w-36 skeleton-shimmer rounded-full" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {[1,2,3,4].map(i => <div key={i} className="h-28 skeleton-shimmer rounded-2xl border border-white/[0.04]" />)}
+              </div>
+              <div className="h-64 skeleton-shimmer rounded-2xl border border-white/[0.04]" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="h-48 skeleton-shimmer rounded-2xl border border-white/[0.04]" />
+                <div className="h-48 skeleton-shimmer rounded-2xl border border-white/[0.04]" />
+              </div>
+            </div>
+          }>
+          <div key={pageKey} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+          {currentView === 'home' && (
+            <Home 
+                key={`home-${refreshKey}`}
+                onNavigate={(view) => navigateTo(view)} 
+                user={user} 
+                onDirectRecharge={handleDirectRecharge}
+            />
+          )}
+
+          {currentView === 'login' && (
+            <Login key={`login-${refreshKey}`} onLogin={handleLogin} onBack={goBack} />
+          )}
+
+          {currentView === 'dashboard' && (
+            <Dashboard 
+                key={`dashboard-${refreshKey}`}
+                onBack={goBack} 
+                history={history} 
+                onView={handleViewAnalysis}
+                onNavigate={navigateTo}
+            />
+          )}
+
+          {currentView === 'generative-tools' && (
+            <GenerativeTools key={`generative-tools-${refreshKey}`} onNavigate={navigateTo} history={history} megaStatus={megaStatus} />
+          )}
+
+          {currentView === 'analyze' && (
+            <Analyze key={`analyze-${refreshKey}`} onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+          )}
+          
+          {currentView === 'results' && analysisData && (
+            <Results 
+              key={`results-${refreshKey}`}
+              data={analysisData} 
+              onBack={goBack} 
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              onSaveSolution={handleSaveSolution}
+              initialTab={resultsTab as any}
+              onNewAnalysis={() => navigateTo('analyze')}
+            />
+          )}
+
+          {currentView === 'history' && (
+            <HistoryView
+              key={`history-${refreshKey}`}
+              onBack={goBack}
+              history={history}
+              onView={handleViewAnalysis}
+            />
+          )}
+
+          {currentView === 'smc-studio' && (
+            <SMCStudio 
+              key={`smc-studio-${refreshKey}`}
+              onBack={goBack} 
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              library={smcLibrary}
+              onAddToLibrary={handleAddToSmcLibrary}
+              onNavigateToPublisher={handleNavigateToPublisher}
+              onNavigateToDirectory={handleNavigateToDirectory}
+            />
+          )}
+
+          {currentView === 'source-of-truth' && (
+            <SourceOfTruth 
+              key={`source-of-truth-${refreshKey}`}
+              onBack={goBack} 
+              history={history}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              savedFiles={truthLibrary}
+              onSaveFile={handleAddToTruthLibrary}
+            />
+          )}
+
+          {currentView === 'schema-org' && (
+            <SchemaOrg 
+              key={`schema-org-${refreshKey}`}
+              onBack={goBack} 
+              history={history}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              savedFiles={schemaLibrary}
+              onSaveFile={handleAddToSchemaLibrary}
+            />
+          )}
+
+          {currentView === 'publisher-request' && (
+            <PublisherRequest 
+              key={`publisher-request-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              data={publisherRequestData}
+            />
+          )}
+
+          {currentView === 'robots-txt' && (
+            <RobotsTxt 
+              key={`robots-txt-${refreshKey}`}
+              onBack={goBack} 
+              history={history}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              onUpdateAnalysis={handleUpdateAnalysis}
+              savedFiles={robotsLibrary}
+              onSaveFile={handleAddToRobotsLibrary}
+            />
+          )}
+
+          {currentView === 'directory' && (
+            <Directory
+              key={`directory-${refreshKey}`}
+              onBack={goBack}
+              onViewEntity={handleViewDirectoryEntity}
+              onNavigateToPlan={() => {
+                setInitialAccountTab('subscription');
+                navigateTo('account');
+              }}
+              user={user}
+              directClientCount={monthlyProjectCount}
+              maxClients={user ? PLAN_LIMITS[user.plan] : 1}
+              actionPlanComplete={actionPlanStatus.complete}
+              actionPlanProgress={actionPlanStatus}
+              onNavigateToActionPlan={() => {
+                setResultsTab('recommendations');
+                navigateTo('projects');
+              }}
+            />
+          )}
+
+          {/* Nouvelle vue Directory Entity (Public Profile) */}
+          {currentView === 'directory-entity' && analysisData && (
+            <DirectoryEntity 
+              key={`directory-entity-${refreshKey}`}
+              data={analysisData}
+              onBack={goBack}
+            />
+          )}
+
+          {currentView === 'recharge' && (
+            <Recharge 
+              key={`recharge-${refreshKey}`}
+              onBack={goBack} 
+              onRecharge={handleRecharge}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)} 
+              initialPackId={initialRechargePackId}
+            />
+          )}
+
+          {currentView === 'projects' && (
+            <Projects
+              key={`projects-${refreshKey}`}
+              onBack={goBack}
+              onNavigateToAnalysis={() => navigateTo('analyze')}
+              user={user}
+              history={history}
+              onViewAnalysis={handleViewAnalysis}
+              projectCount={monthlyProjectCount}
+              maxProjects={user ? PLAN_LIMITS[user.plan] : 1}
+              onNavigateToPlan={() => {
+                setInitialAccountTab('subscription');
+                navigateTo('account');
+              }}
+              onDeductCredits={handleDeductCredits}
+              onSaveSolution={handleSaveSolution}
+              onNewAnalysis={() => navigateTo('analyze')}
+              onNavigateToRecharge={() => navigateTo('recharge')}
+              initialUrl={analysisData?.url}
+              initialTab={resultsTab}
+            />
+          )}
+
+          {currentView === 'account' && (
+            <Account
+              key={`account-${refreshKey}`}
+              user={user}
+              onLogout={handleLogout}
+              onNavigate={navigateTo}
+              onUpgrade={handleUpgradePlan}
+              projectCount={monthlyProjectCount}
+              maxProjects={user ? PLAN_LIMITS[user.plan] : 1}
+              initialTab={initialAccountTab}
+            />
+          )}
+
+          {/* Client Database View */}
+          {currentView === 'clients' && (
+            <Clients
+              key={`clients-${refreshKey}`}
+              onBack={goBack}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+              user={user}
+              directClientCount={monthlyProjectCount}
+              maxClients={user ? PLAN_LIMITS[user.plan] : 1}
+            />
+          )}
+
+          {/* Affiliation Database View */}
+          {currentView === 'affiliation' && (
+            <Affiliation
+              key={`affiliation-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+
+          {/* AI Content Writer B2B */}
+          {currentView === 'content-writer' && (
+            <ContentWriter
+              key={`content-writer-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* Reputation & Sentiment IA */}
+          {currentView === 'reputation' && (
+            <Reputation
+              key={`reputation-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* Bot Tracking - Activation & Suivi des Bots IA */}
+          {currentView === 'bot-tracking' && (
+            <BotTracking
+              key={`bot-tracking-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+
+          {/* Blog Optimiser */}
+          {currentView === 'blog-optimizer' && (
+            <BlogOptimizer
+              key={`blog-optimizer-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              onNavigateToPublisher={handleNavigateToPublisher}
+            />
+          )}
+
+          {/* AI Response Layer */}
+          {currentView === 'ai-response-layer' && (
+            <AiResponseLayer
+              key={`ai-response-layer-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* Générateur llms.txt */}
+          {currentView === 'llms-txt' && (
+            <LlmsTxtGenerator
+              key={`llms-txt-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              history={history}
+            />
+          )}
+
+          {/* Audit Answer-First */}
+          {currentView === 'answer-first-audit' && (
+            <AnswerFirstAudit
+              key={`answer-first-audit-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              history={history}
+            />
+          )}
+
+          {/* Simulateur Citation IA */}
+          {currentView === 'ai-citation-simulator' && (
+            <AiCitationSimulator
+              key={`ai-citation-simulator-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* AI Monitoring */}
+          {currentView === 'ai-monitoring' && (
+            <AiMonitoring
+              key={`ai-monitoring-${refreshKey}`}
+              onBack={goBack}
+              onNavigate={navigateTo}
+              onDeductCredits={handleDeductCredits}
+              user={user}
+            />
+          )}
+
+          {/* E-E-A-T Builder */}
+          {currentView === 'eeat-builder' && (
+            <EeatBuilder
+              key={`eeat-builder-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              history={history}
+            />
+          )}
+
+          {/* Integrations GA4 & Search Console */}
+          {currentView === 'integrations' && (
+            <Integrations
+              key={`integrations-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* API Developer Hub */}
+          {currentView === 'api-developer' && (
+            <ApiDeveloper
+              key={`api-developer-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* Plan d'action (depuis Results) */}
+          {currentView === 'action-plan' && analysisData && (
+            <ActionPlan
+              key={`action-plan-${refreshKey}`}
+              data={analysisData}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              onSaveSolution={handleSaveSolution}
+              onNavigateToAnalysis={() => navigateTo('analyze')}
+              onNavigateToRecharge={() => navigateTo('recharge')}
+            />
+          )}
+
+          {/* Plan standalone (via Account) */}
+          {currentView === 'plan' && (
+            <Plan
+              key={`plan-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onUpgrade={handleUpgradePlan}
+            />
+          )}
+
+          {/* Messagerie */}
+          {currentView === 'messages' && (
+            <Messages
+              key={`messages-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+          {currentView === 'alerts' && (
+            <AlertsAEO
+              key={`alerts-aeo-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+            />
+          )}
+
+          {/* Ordres de Mission */}
+          {currentView === 'mission-orders' && (
+            <MissionOrders
+              key={`mission-orders-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+            />
+          )}
+
+          {/* ═══ V3 — Citation Verification Engine ═══ */}
+          {currentView === 'citation-dashboard' && (
+            <CitationDashboardPage
+              key={`citation-dashboard-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+            />
+          )}
+          {currentView === 'tracked-queries' && (
+            <TrackedQueriesPage
+              key={`tracked-queries-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+            />
+          )}
+          {currentView === 'citation-detail' && (
+            <CitationDetailPage
+              key={`citation-detail-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+            />
+          )}
+          {currentView === 'benchmark' && (
+            <BenchmarkPage
+              key={`benchmark-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+          {currentView === 'v3-alerts' && (
+            <AlertsPage
+              key={`v3-alerts-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+            />
+          )}
+          {currentView === 'alert-settings' && (
+            <AlertSettingsPage
+              key={`alert-settings-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+          {currentView === 'monthly-report' && (
+            <MonthlyReportPage
+              key={`monthly-report-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onNavigate={(view) => navigateTo(view as typeof currentView)}
+            />
+          )}
+          {currentView === 'calibration' && (
+            <CalibrationPage
+              key={`calibration-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+          </div>
+          </Suspense>
+        </main>
+      </div>
+
+      {/* Floating Action Button — New Audit */}
+      {user && !['analyze', 'login', 'home'].includes(currentView) && (
+        <button
+          onClick={() => navigateTo('analyze')}
+          className="fixed bottom-24 md:bottom-8 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 shadow-xl shadow-purple-900/40 flex items-center justify-center text-white hover:scale-110 hover:shadow-2xl hover:shadow-purple-800/50 transition-all duration-300 group"
+          title="Nouvel Audit AEO"
+        >
+          <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+        </button>
+      )}
+
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-24 md:bottom-8 right-[5.5rem] z-40 w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.1] backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.12] transition-all duration-200 animate-fade-up"
+          title="Retour en haut"
+        >
+          <ArrowUp size={16} />
+        </button>
+      )}
+
+      {user && (
+        <MobileBottomNav
+          currentView={currentView}
+          navigateTo={(view: string) => navigateTo(view as any)}
+          isMobileMenuOpen={isMobileMenuOpen}
+        />
+      )}
+
+      <AppFooter
+        user={user}
+        navigateTo={(view: string) => navigateTo(view as any)}
+      />
+    </div>
+    </ToastContext.Provider>
+  );
+};
+
+export default App;

@@ -1,0 +1,68 @@
+import { createServerSupabase } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  const supabase = await createServerSupabase();
+
+  // Verify the merchant is authenticated
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { customer_qr_id, secret_key, program_id } = body;
+
+  if (!customer_qr_id || !secret_key) {
+    return NextResponse.json({ error: 'customer_qr_id et secret_key requis' }, { status: 400 });
+  }
+
+  // Validate the customer QR code
+  const { data: qrCode } = await supabase
+    .from('customer_qr_codes')
+    .select('*, customers(id, email, full_name)')
+    .eq('id', customer_qr_id)
+    .eq('secret_key', secret_key)
+    .eq('is_active', true)
+    .single();
+
+  if (!qrCode) {
+    return NextResponse.json({ error: 'QR code invalide ou expire' }, { status: 404 });
+  }
+
+  const customerId = qrCode.customer_id;
+
+  // If program_id is provided, fetch the specific card
+  if (program_id) {
+    const { data: card } = await supabase
+      .from('customer_cards')
+      .select('*, loyalty_programs(name, type, target)')
+      .eq('customer_id', customerId)
+      .eq('program_id', program_id)
+      .single();
+
+    return NextResponse.json({
+      customer: qrCode.customers,
+      card: card || null,
+    });
+  }
+
+  // Otherwise, fetch all cards for the merchant's programs
+  const { data: merchantPrograms } = await supabase
+    .from('loyalty_programs')
+    .select('id')
+    .eq('merchant_id', user.id);
+
+  const programIds = merchantPrograms?.map(p => p.id) || [];
+
+  const { data: cards } = await supabase
+    .from('customer_cards')
+    .select('*, loyalty_programs(name, type, target)')
+    .eq('customer_id', customerId)
+    .in('program_id', programIds.length > 0 ? programIds : ['__none__']);
+
+  return NextResponse.json({
+    customer: qrCode.customers,
+    cards: cards || [],
+  });
+}

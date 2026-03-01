@@ -1,0 +1,3571 @@
+# Digital Loyalty Card App — Implementation Plan
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Build a B2B2C digital loyalty platform with mobile app (consumer) + web dashboard (merchant) + Supabase backend.
+
+**Architecture:** Turborepo monorepo with Expo SDK 54 (React Native) mobile app, Next.js 15 merchant dashboard, and Supabase (PostgreSQL + Auth + Edge Functions + Realtime) as the backend. QR code + NFC validation, push notifications, Stripe subscriptions.
+
+**Tech Stack:** Expo SDK 54, React Native, Expo Router, Zustand, Next.js 15, Tailwind CSS, shadcn/ui, Supabase, Stripe, PostHog, i18next
+
+**Design Doc:** `docs/plans/2026-02-25-loyalty-card-app-design.md`
+
+---
+
+## Phase 1 — MVP Core (Weeks 1-4)
+
+---
+
+### Task 1: Monorepo Scaffold with Turborepo
+
+**Files:**
+- Create: `loyalty-app/package.json`
+- Create: `loyalty-app/turbo.json`
+- Create: `loyalty-app/pnpm-workspace.yaml`
+- Create: `loyalty-app/.gitignore`
+- Create: `loyalty-app/.nvmrc`
+- Create: `loyalty-app/packages/shared/package.json`
+- Create: `loyalty-app/packages/shared/src/types/index.ts`
+
+**Step 1: Create monorepo root**
+
+```bash
+mkdir loyalty-app && cd loyalty-app
+git init
+pnpm init
+```
+
+**Step 2: Configure pnpm workspaces**
+
+Create `pnpm-workspace.yaml`:
+```yaml
+packages:
+  - "apps/*"
+  - "packages/*"
+```
+
+**Step 3: Configure Turborepo**
+
+Create `turbo.json`:
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    }
+  }
+}
+```
+
+**Step 4: Create shared types package**
+
+Create `packages/shared/package.json`:
+```json
+{
+  "name": "@loyalty/shared",
+  "version": "0.0.1",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "typescript": "^5.7.0"
+  }
+}
+```
+
+Create `packages/shared/src/types/index.ts`:
+```typescript
+export type ProgramType = 'stamp' | 'points';
+export type DiscountType = 'percentage' | 'fixed' | 'freebie';
+export type ValidationMethod = 'qr' | 'nfc' | 'manual';
+export type TransactionType = 'stamp_add' | 'points_add' | 'reward_redeem';
+export type CustomerTier = 'bronze' | 'silver' | 'gold' | 'vip';
+export type MerchantPlan = 'free' | 'pro' | 'business';
+export type CampaignStatus = 'draft' | 'scheduled' | 'sent' | 'cancelled';
+export type NotificationType = 'campaign' | 'reward_available' | 'expiration_warning' | 'proximity' | 'welcome' | 'referral';
+
+export interface Merchant {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  address: string | null;
+  category: string | null;
+  plan: MerchantPlan;
+  subscription_status: string;
+  stripe_customer_id: string | null;
+  created_at: string;
+}
+
+export interface LoyaltyProgram {
+  id: string;
+  merchant_id: string;
+  type: ProgramType;
+  name: string;
+  stamp_goal: number | null;
+  points_per_euro: number | null;
+  reward_description: string | null;
+  expiration_days: number | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface Reward {
+  id: string;
+  program_id: string;
+  name: string;
+  description: string | null;
+  points_cost: number | null;
+  stamps_required: number | null;
+  discount_type: DiscountType;
+  discount_value: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface Customer {
+  id: string;
+  email: string;
+  name: string | null;
+  phone: string | null;
+  push_token: string | null;
+  preferred_language: string;
+  created_at: string;
+}
+
+export interface CustomerCard {
+  id: string;
+  customer_id: string;
+  program_id: string;
+  current_stamps: number;
+  current_points: number;
+  tier: CustomerTier;
+  last_activity: string;
+  created_at: string;
+}
+
+export interface Transaction {
+  id: string;
+  card_id: string;
+  type: TransactionType;
+  value: number;
+  validated_by: ValidationMethod;
+  created_at: string;
+}
+```
+
+Create `packages/shared/src/index.ts`:
+```typescript
+export * from './types/index';
+```
+
+**Step 5: Create .gitignore and .nvmrc**
+
+`.gitignore`:
+```
+node_modules
+.env
+.env.local
+dist
+.next
+.expo
+*.tsbuildinfo
+.turbo
+```
+
+`.nvmrc`:
+```
+20
+```
+
+**Step 6: Install Turborepo and commit**
+
+```bash
+pnpm add -D turbo -w
+git add .
+git commit -m "chore: scaffold Turborepo monorepo with shared types"
+```
+
+---
+
+### Task 2: Expo Mobile App Scaffold
+
+**Files:**
+- Create: `loyalty-app/apps/mobile/` (Expo project)
+- Create: `loyalty-app/apps/mobile/app/_layout.tsx`
+- Create: `loyalty-app/apps/mobile/app/(tabs)/_layout.tsx`
+- Create: `loyalty-app/apps/mobile/lib/supabase.ts`
+
+**Step 1: Create Expo app**
+
+```bash
+cd loyalty-app/apps
+npx create-expo-app@latest mobile --template tabs
+cd mobile
+```
+
+**Step 2: Install core dependencies**
+
+```bash
+npx expo install expo-router expo-camera expo-location expo-localization expo-notifications expo-secure-store
+pnpm add @supabase/supabase-js zustand react-native-qrcode-svg react-native-svg i18next react-i18next
+pnpm add -D @types/react
+```
+
+**Step 3: Add workspace dependency on shared package**
+
+In `apps/mobile/package.json`, add:
+```json
+{
+  "dependencies": {
+    "@loyalty/shared": "workspace:*"
+  }
+}
+```
+
+Run `pnpm install` from monorepo root.
+
+**Step 4: Create Supabase client**
+
+Create `apps/mobile/lib/supabase.ts`:
+```typescript
+import 'react-native-url-polyfill/dist/polyfill';
+import { createClient } from '@supabase/supabase-js';
+import * as SecureStore from 'expo-secure-store';
+
+const ExpoSecureStoreAdapter = {
+  getItem: (key: string) => SecureStore.getItemAsync(key),
+  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
+  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+};
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: ExpoSecureStoreAdapter,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});
+```
+
+**Step 5: Create Zustand auth store**
+
+Create `apps/mobile/lib/store.ts`:
+```typescript
+import { create } from 'zustand';
+import type { Customer } from '@loyalty/shared';
+
+interface AuthState {
+  session: any | null;
+  profile: Customer | null;
+  setSession: (session: any | null) => void;
+  setProfile: (profile: Customer | null) => void;
+  reset: () => void;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  session: null,
+  profile: null,
+  setSession: (session) => set({ session }),
+  setProfile: (profile) => set({ profile }),
+  reset: () => set({ session: null, profile: null }),
+}));
+```
+
+**Step 6: Create root layout with auth guard**
+
+Replace `apps/mobile/app/_layout.tsx`:
+```typescript
+import { useEffect, useState } from 'react';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { supabase } from '../lib/supabase';
+import { useAuthStore } from '../lib/store';
+
+export default function RootLayout() {
+  const { session, setSession } = useAuthStore();
+  const segments = useSegments();
+  const router = useRouter();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setReady(true);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    const inAuth = segments[0] === '(auth)';
+    if (!session && !inAuth) {
+      router.replace('/(auth)/login');
+    } else if (session && inAuth) {
+      router.replace('/(tabs)');
+    }
+  }, [session, segments, ready]);
+
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
+```
+
+**Step 7: Create placeholder auth screens**
+
+Create `apps/mobile/app/(auth)/_layout.tsx`:
+```typescript
+import { Stack } from 'expo-router';
+export default function AuthLayout() {
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
+```
+
+Create `apps/mobile/app/(auth)/login.tsx`:
+```typescript
+import { View, Text } from 'react-native';
+export default function LoginScreen() {
+  return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Login - TODO</Text></View>;
+}
+```
+
+**Step 8: Create tab layout**
+
+Replace `apps/mobile/app/(tabs)/_layout.tsx`:
+```typescript
+import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
+export default function TabsLayout() {
+  return (
+    <Tabs screenOptions={{ tabBarActiveTintColor: '#6366f1' }}>
+      <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} /> }} />
+      <Tabs.Screen name="scan" options={{ title: 'Scan', tabBarIcon: ({ color, size }) => <Ionicons name="qr-code" size={size} color={color} /> }} />
+      <Tabs.Screen name="rewards" options={{ title: 'Rewards', tabBarIcon: ({ color, size }) => <Ionicons name="gift" size={size} color={color} /> }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profile', tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} /> }} />
+    </Tabs>
+  );
+}
+```
+
+Create placeholder files for each tab:
+- `apps/mobile/app/(tabs)/index.tsx` — Home
+- `apps/mobile/app/(tabs)/scan.tsx` — Scanner
+- `apps/mobile/app/(tabs)/rewards.tsx` — Rewards
+- `apps/mobile/app/(tabs)/profile.tsx` — Profile
+
+Each as:
+```typescript
+import { View, Text } from 'react-native';
+export default function Screen() {
+  return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Screen - TODO</Text></View>;
+}
+```
+
+**Step 9: Create .env.example**
+
+Create `apps/mobile/.env.example`:
+```
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+**Step 10: Verify app starts**
+
+```bash
+cd loyalty-app
+pnpm --filter mobile start
+```
+
+Expected: Expo dev server starts, app renders with 4 tabs.
+
+**Step 11: Commit**
+
+```bash
+git add .
+git commit -m "feat: scaffold Expo mobile app with auth guard and tab navigation"
+```
+
+---
+
+### Task 3: Next.js Dashboard Scaffold
+
+**Files:**
+- Create: `loyalty-app/apps/dashboard/` (Next.js project)
+- Create: `loyalty-app/apps/dashboard/lib/supabase.ts`
+
+**Step 1: Create Next.js app**
+
+```bash
+cd loyalty-app/apps
+npx create-next-app@latest dashboard --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
+cd dashboard
+```
+
+**Step 2: Install dependencies**
+
+```bash
+pnpm add @supabase/supabase-js @supabase/ssr
+pnpm add -D @loyalty/shared
+npx shadcn@latest init -d
+```
+
+Add to `apps/dashboard/package.json`:
+```json
+{
+  "dependencies": {
+    "@loyalty/shared": "workspace:*"
+  }
+}
+```
+
+**Step 3: Install shadcn components**
+
+```bash
+npx shadcn@latest add button card input label table dialog tabs badge select textarea toast sidebar
+```
+
+**Step 4: Create Supabase server/client helpers**
+
+Create `apps/dashboard/lib/supabase/server.ts`:
+```typescript
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+
+export async function createClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          } catch { /* Server Component — ignore */ }
+        },
+      },
+    }
+  );
+}
+```
+
+Create `apps/dashboard/lib/supabase/client.ts`:
+```typescript
+import { createBrowserClient } from '@supabase/ssr';
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
+```
+
+Create `apps/dashboard/lib/supabase/middleware.ts`:
+```typescript
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+
+export async function updateSession(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
+        },
+      },
+    }
+  );
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/register')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
+  }
+  return supabaseResponse;
+}
+```
+
+Create `apps/dashboard/middleware.ts`:
+```typescript
+import { updateSession } from '@/lib/supabase/middleware';
+import type { NextRequest } from 'next/server';
+
+export async function middleware(request: NextRequest) {
+  return await updateSession(request);
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|login|register|api).*)'],
+};
+```
+
+**Step 5: Create login page**
+
+Create `apps/dashboard/src/app/login/page.tsx`:
+```typescript
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { setError(error.message); setLoading(false); return; }
+    router.push('/');
+    router.refresh();
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <Card className="w-full max-w-md">
+        <CardHeader><CardTitle>Merchant Login</CardTitle></CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div><Label htmlFor="email">Email</Label><Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
+            <div><Label htmlFor="password">Password</Label><Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Signing in...' : 'Sign In'}</Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+**Step 6: Create dashboard layout with sidebar**
+
+Create `apps/dashboard/src/app/(dashboard)/layout.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  return (
+    <div className="flex min-h-screen">
+      <DashboardSidebar />
+      <main className="flex-1 p-6 bg-gray-50">{children}</main>
+    </div>
+  );
+}
+```
+
+Create `apps/dashboard/src/components/dashboard-sidebar.tsx`:
+```typescript
+'use client';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { LayoutDashboard, CreditCard, Users, Megaphone, BarChart3, QrCode, Settings } from 'lucide-react';
+
+const links = [
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/programs', label: 'Programs', icon: CreditCard },
+  { href: '/clients', label: 'Clients', icon: Users },
+  { href: '/campaigns', label: 'Campaigns', icon: Megaphone },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/qr-codes', label: 'QR Codes', icon: QrCode },
+  { href: '/settings', label: 'Settings', icon: Settings },
+];
+
+export function DashboardSidebar() {
+  const pathname = usePathname();
+  return (
+    <aside className="w-64 bg-white border-r p-4">
+      <h1 className="text-xl font-bold mb-8 px-2">Loyalty App</h1>
+      <nav className="space-y-1">
+        {links.map(({ href, label, icon: Icon }) => (
+          <Link key={href} href={href} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${pathname === href ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600 hover:bg-gray-100'}`}>
+            <Icon className="h-4 w-4" />{label}
+          </Link>
+        ))}
+      </nav>
+    </aside>
+  );
+}
+```
+
+**Step 7: Create placeholder dashboard page**
+
+Create `apps/dashboard/src/app/(dashboard)/page.tsx`:
+```typescript
+export default function DashboardPage() {
+  return <div><h2 className="text-2xl font-bold">Dashboard</h2><p className="text-gray-500 mt-2">Welcome back. Your KPIs will appear here.</p></div>;
+}
+```
+
+**Step 8: Create .env.example and verify**
+
+Create `apps/dashboard/.env.example`:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+```bash
+cd loyalty-app
+pnpm --filter dashboard dev
+```
+
+Expected: Next.js starts, `/login` page renders with form, sidebar visible on dashboard.
+
+**Step 9: Commit**
+
+```bash
+git add .
+git commit -m "feat: scaffold Next.js merchant dashboard with auth and sidebar"
+```
+
+---
+
+### Task 4: Supabase Project + Database Schema
+
+**Files:**
+- Create: `loyalty-app/supabase/config.toml`
+- Create: `loyalty-app/supabase/migrations/001_initial_schema.sql`
+
+**Step 1: Initialize Supabase locally**
+
+```bash
+cd loyalty-app
+npx supabase init
+```
+
+**Step 2: Write the initial migration**
+
+Create `supabase/migrations/001_initial_schema.sql`:
+```sql
+-- Enable extensions
+create extension if not exists "uuid-ossp";
+create extension if not exists "pgcrypto";
+
+-- MERCHANTS
+create table public.merchants (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users(id) on delete cascade not null,
+  name text not null,
+  logo_url text,
+  address text,
+  category text,
+  plan text not null default 'free' check (plan in ('free', 'pro', 'business')),
+  subscription_status text not null default 'active',
+  stripe_customer_id text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- LOYALTY PROGRAMS
+create table public.loyalty_programs (
+  id uuid primary key default uuid_generate_v4(),
+  merchant_id uuid references public.merchants(id) on delete cascade not null,
+  type text not null check (type in ('stamp', 'points')),
+  name text not null,
+  stamp_goal int,
+  points_per_euro numeric(10,2),
+  reward_description text,
+  expiration_days int,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- REWARDS
+create table public.rewards (
+  id uuid primary key default uuid_generate_v4(),
+  program_id uuid references public.loyalty_programs(id) on delete cascade not null,
+  name text not null,
+  description text,
+  points_cost int,
+  stamps_required int,
+  discount_type text not null check (discount_type in ('percentage', 'fixed', 'freebie')),
+  discount_value numeric(10,2) not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- QR CODES
+create table public.qr_codes (
+  id uuid primary key default uuid_generate_v4(),
+  merchant_id uuid references public.merchants(id) on delete cascade not null,
+  program_id uuid references public.loyalty_programs(id) on delete cascade not null,
+  label text,
+  secret_key text not null default encode(gen_random_bytes(32), 'hex'),
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- CUSTOMERS (extends auth.users)
+create table public.customers (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text not null,
+  name text,
+  phone text,
+  push_token text,
+  preferred_language text not null default 'en',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- CUSTOMER CARDS
+create table public.customer_cards (
+  id uuid primary key default uuid_generate_v4(),
+  customer_id uuid references public.customers(id) on delete cascade not null,
+  program_id uuid references public.loyalty_programs(id) on delete cascade not null,
+  current_stamps int not null default 0,
+  current_points numeric(10,2) not null default 0,
+  tier text not null default 'bronze' check (tier in ('bronze', 'silver', 'gold', 'vip')),
+  last_activity timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  unique(customer_id, program_id)
+);
+
+-- TRANSACTIONS
+create table public.transactions (
+  id uuid primary key default uuid_generate_v4(),
+  card_id uuid references public.customer_cards(id) on delete cascade not null,
+  type text not null check (type in ('stamp_add', 'points_add', 'reward_redeem')),
+  value numeric(10,2) not null default 0,
+  validated_by text not null default 'qr' check (validated_by in ('qr', 'nfc', 'manual')),
+  created_at timestamptz not null default now()
+);
+
+-- CAMPAIGNS
+create table public.campaigns (
+  id uuid primary key default uuid_generate_v4(),
+  merchant_id uuid references public.merchants(id) on delete cascade not null,
+  title text not null,
+  body text not null,
+  image_url text,
+  type text not null default 'push' check (type in ('push', 'in_app', 'targeted_ad')),
+  target_segment text not null default 'all' check (target_segment in ('all', 'new', 'inactive', 'vip', 'custom')),
+  scheduled_at timestamptz,
+  sent_at timestamptz,
+  status text not null default 'draft' check (status in ('draft', 'scheduled', 'sent', 'cancelled')),
+  opens int not null default 0,
+  clicks int not null default 0,
+  conversions int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+-- NOTIFICATIONS
+create table public.notifications (
+  id uuid primary key default uuid_generate_v4(),
+  customer_id uuid references public.customers(id) on delete cascade not null,
+  campaign_id uuid references public.campaigns(id) on delete set null,
+  title text not null,
+  body text not null,
+  type text not null check (type in ('campaign', 'reward_available', 'expiration_warning', 'proximity', 'welcome', 'referral')),
+  read_at timestamptz,
+  sent_at timestamptz not null default now(),
+  deep_link text
+);
+
+-- REFERRALS
+create table public.referrals (
+  id uuid primary key default uuid_generate_v4(),
+  referrer_id uuid references public.customers(id) on delete cascade not null,
+  referred_id uuid references public.customers(id) on delete cascade,
+  merchant_id uuid references public.merchants(id) on delete cascade,
+  referral_code text not null unique,
+  reward_given boolean not null default false,
+  status text not null default 'pending' check (status in ('pending', 'completed', 'expired')),
+  created_at timestamptz not null default now()
+);
+
+-- INDEXES
+create index idx_loyalty_programs_merchant on public.loyalty_programs(merchant_id);
+create index idx_rewards_program on public.rewards(program_id);
+create index idx_customer_cards_customer on public.customer_cards(customer_id);
+create index idx_customer_cards_program on public.customer_cards(program_id);
+create index idx_transactions_card on public.transactions(card_id);
+create index idx_campaigns_merchant on public.campaigns(merchant_id);
+create index idx_notifications_customer on public.notifications(customer_id);
+create index idx_qr_codes_merchant on public.qr_codes(merchant_id);
+
+-- UPDATED_AT TRIGGER
+create or replace function public.handle_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger merchants_updated_at before update on public.merchants
+  for each row execute function public.handle_updated_at();
+create trigger loyalty_programs_updated_at before update on public.loyalty_programs
+  for each row execute function public.handle_updated_at();
+create trigger customers_updated_at before update on public.customers
+  for each row execute function public.handle_updated_at();
+```
+
+**Step 3: Apply migration locally**
+
+```bash
+npx supabase start
+npx supabase db reset
+```
+
+Expected: All tables created, no errors.
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: add initial database schema with all tables and indexes"
+```
+
+---
+
+### Task 5: Row Level Security (RLS) Policies
+
+**Files:**
+- Create: `loyalty-app/supabase/migrations/002_rls_policies.sql`
+
+**Step 1: Write RLS policies**
+
+Create `supabase/migrations/002_rls_policies.sql`:
+```sql
+-- Enable RLS on all tables
+alter table public.merchants enable row level security;
+alter table public.loyalty_programs enable row level security;
+alter table public.rewards enable row level security;
+alter table public.qr_codes enable row level security;
+alter table public.customers enable row level security;
+alter table public.customer_cards enable row level security;
+alter table public.transactions enable row level security;
+alter table public.campaigns enable row level security;
+alter table public.notifications enable row level security;
+alter table public.referrals enable row level security;
+
+-- MERCHANTS: owner can CRUD
+create policy "Merchants: owner full access" on public.merchants
+  for all using (auth.uid() = user_id);
+
+-- LOYALTY PROGRAMS: merchant owner can CRUD, customers can read active
+create policy "Programs: merchant owner full access" on public.loyalty_programs
+  for all using (merchant_id in (select id from public.merchants where user_id = auth.uid()));
+
+create policy "Programs: customers can read active" on public.loyalty_programs
+  for select using (is_active = true);
+
+-- REWARDS: merchant owner can CRUD, customers can read active
+create policy "Rewards: merchant owner full access" on public.rewards
+  for all using (program_id in (
+    select lp.id from public.loyalty_programs lp
+    join public.merchants m on m.id = lp.merchant_id
+    where m.user_id = auth.uid()
+  ));
+
+create policy "Rewards: customers can read active" on public.rewards
+  for select using (is_active = true);
+
+-- QR CODES: merchant owner can CRUD
+create policy "QR codes: merchant owner full access" on public.qr_codes
+  for all using (merchant_id in (select id from public.merchants where user_id = auth.uid()));
+
+-- CUSTOMERS: own profile only
+create policy "Customers: own profile" on public.customers
+  for all using (auth.uid() = id);
+
+-- Also let merchants read their customers (via cards)
+create policy "Customers: merchant can read" on public.customers
+  for select using (
+    id in (
+      select cc.customer_id from public.customer_cards cc
+      join public.loyalty_programs lp on lp.id = cc.program_id
+      join public.merchants m on m.id = lp.merchant_id
+      where m.user_id = auth.uid()
+    )
+  );
+
+-- CUSTOMER CARDS: customer owns, merchant can read
+create policy "Cards: customer full access" on public.customer_cards
+  for all using (auth.uid() = customer_id);
+
+create policy "Cards: merchant can read" on public.customer_cards
+  for select using (
+    program_id in (
+      select lp.id from public.loyalty_programs lp
+      join public.merchants m on m.id = lp.merchant_id
+      where m.user_id = auth.uid()
+    )
+  );
+
+-- TRANSACTIONS: customer can read own, merchant can read their programs'
+create policy "Transactions: customer can read own" on public.transactions
+  for select using (
+    card_id in (select id from public.customer_cards where customer_id = auth.uid())
+  );
+
+create policy "Transactions: merchant can read" on public.transactions
+  for select using (
+    card_id in (
+      select cc.id from public.customer_cards cc
+      join public.loyalty_programs lp on lp.id = cc.program_id
+      join public.merchants m on m.id = lp.merchant_id
+      where m.user_id = auth.uid()
+    )
+  );
+
+-- CAMPAIGNS: merchant owner can CRUD
+create policy "Campaigns: merchant owner full access" on public.campaigns
+  for all using (merchant_id in (select id from public.merchants where user_id = auth.uid()));
+
+-- NOTIFICATIONS: customer can read own
+create policy "Notifications: customer can read own" on public.notifications
+  for select using (auth.uid() = customer_id);
+
+create policy "Notifications: customer can update own" on public.notifications
+  for update using (auth.uid() = customer_id);
+
+-- REFERRALS: customer can read own
+create policy "Referrals: own referrals" on public.referrals
+  for all using (auth.uid() = referrer_id or auth.uid() = referred_id);
+```
+
+**Step 2: Apply and verify**
+
+```bash
+npx supabase db reset
+```
+
+Expected: No errors. All policies applied.
+
+**Step 3: Commit**
+
+```bash
+git add .
+git commit -m "feat: add Row Level Security policies for all tables"
+```
+
+---
+
+### Task 6: Auth — Mobile App (Email + Google + Apple)
+
+**Files:**
+- Modify: `apps/mobile/app/(auth)/login.tsx`
+- Create: `apps/mobile/app/(auth)/register.tsx`
+- Create: `apps/mobile/components/auth/social-buttons.tsx`
+- Create: `apps/mobile/hooks/useAuth.ts`
+
+**Step 1: Create useAuth hook**
+
+Create `apps/mobile/hooks/useAuth.ts`:
+```typescript
+import { supabase } from '../lib/supabase';
+import { useAuthStore } from '../lib/store';
+import { Alert } from 'react-native';
+
+export function useAuth() {
+  const { setSession, setProfile, reset } = useAuthStore();
+
+  async function signInWithEmail(email: string, password: string) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    setSession(data.session);
+    await fetchProfile(data.session.user.id);
+  }
+
+  async function signUpWithEmail(email: string, password: string, name: string) {
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+    if (error) throw error;
+    if (data.session) {
+      setSession(data.session);
+      // Create customer profile
+      const { error: profileError } = await supabase.from('customers').insert({
+        id: data.session.user.id,
+        email,
+        name,
+      });
+      if (profileError) console.error('Profile creation error:', profileError);
+      await fetchProfile(data.session.user.id);
+    }
+  }
+
+  async function fetchProfile(userId: string) {
+    const { data } = await supabase.from('customers').select('*').eq('id', userId).single();
+    if (data) setProfile(data);
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    reset();
+  }
+
+  return { signInWithEmail, signUpWithEmail, signOut, fetchProfile };
+}
+```
+
+**Step 2: Build login screen**
+
+Replace `apps/mobile/app/(auth)/login.tsx`:
+```typescript
+import { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { Link } from 'expo-router';
+import { useAuth } from '../../hooks/useAuth';
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { signInWithEmail } = useAuth();
+
+  async function handleLogin() {
+    if (!email || !password) { setError('Please fill all fields'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await signInWithEmail(email, password);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>Sign in to access your loyalty cards</Text>
+      <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+      <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
+      </TouchableOpacity>
+      <Link href="/(auth)/register" asChild>
+        <TouchableOpacity style={styles.link}><Text style={styles.linkText}>Don't have an account? Sign Up</Text></TouchableOpacity>
+      </Link>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 8 },
+  subtitle: { fontSize: 16, color: '#666', marginBottom: 32 },
+  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 12, padding: 16, fontSize: 16, marginBottom: 12 },
+  button: { backgroundColor: '#6366f1', padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 8 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  error: { color: '#ef4444', fontSize: 14, marginBottom: 8 },
+  link: { marginTop: 16, alignItems: 'center' },
+  linkText: { color: '#6366f1', fontSize: 14 },
+});
+```
+
+**Step 3: Build register screen**
+
+Create `apps/mobile/app/(auth)/register.tsx`:
+```typescript
+import { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { Link } from 'expo-router';
+import { useAuth } from '../../hooks/useAuth';
+
+export default function RegisterScreen() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { signUpWithEmail } = useAuth();
+
+  async function handleRegister() {
+    if (!name || !email || !password) { setError('Please fill all fields'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await signUpWithEmail(email, password, name);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <Text style={styles.title}>Create Account</Text>
+      <Text style={styles.subtitle}>Join and start collecting rewards</Text>
+      <TextInput style={styles.input} placeholder="Full Name" value={name} onChangeText={setName} />
+      <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+      <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Creating account...' : 'Sign Up'}</Text>
+      </TouchableOpacity>
+      <Link href="/(auth)/login" asChild>
+        <TouchableOpacity style={styles.link}><Text style={styles.linkText}>Already have an account? Sign In</Text></TouchableOpacity>
+      </Link>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 8 },
+  subtitle: { fontSize: 16, color: '#666', marginBottom: 32 },
+  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 12, padding: 16, fontSize: 16, marginBottom: 12 },
+  button: { backgroundColor: '#6366f1', padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 8 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  error: { color: '#ef4444', fontSize: 14, marginBottom: 8 },
+  link: { marginTop: 16, alignItems: 'center' },
+  linkText: { color: '#6366f1', fontSize: 14 },
+});
+```
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: implement email auth with login and register screens"
+```
+
+---
+
+### Task 7: Auth — Merchant Dashboard (Email)
+
+**Files:**
+- Create: `apps/dashboard/src/app/register/page.tsx`
+- Create: `apps/dashboard/src/hooks/use-merchant.ts`
+
+**Step 1: Create merchant registration page**
+
+Create `apps/dashboard/src/app/register/page.tsx`:
+```typescript
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
+
+export default function RegisterPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [businessName, setBusinessName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    const { data, error: authError } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { name, business_name: businessName, role: 'merchant' } },
+    });
+    if (authError) { setError(authError.message); setLoading(false); return; }
+    if (data.user) {
+      const { error: merchantError } = await supabase.from('merchants').insert({
+        user_id: data.user.id,
+        name: businessName,
+      });
+      if (merchantError) { setError(merchantError.message); setLoading(false); return; }
+    }
+    router.push('/');
+    router.refresh();
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <Card className="w-full max-w-md">
+        <CardHeader><CardTitle>Create Merchant Account</CardTitle></CardHeader>
+        <CardContent>
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div><Label>Your Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} required /></div>
+            <div><Label>Business Name</Label><Input value={businessName} onChange={(e) => setBusinessName(e.target.value)} required /></div>
+            <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
+            <div><Label>Password</Label><Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Creating...' : 'Create Account'}</Button>
+          </form>
+          <p className="text-sm text-center mt-4 text-gray-500">Already have an account? <Link href="/login" className="text-indigo-600 hover:underline">Sign In</Link></p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+**Step 2: Create useMerchant hook**
+
+Create `apps/dashboard/src/hooks/use-merchant.ts`:
+```typescript
+'use client';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { Merchant } from '@loyalty/shared';
+
+export function useMerchant() {
+  const [merchant, setMerchant] = useState<Merchant | null>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetch() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+      const { data } = await supabase.from('merchants').select('*').eq('user_id', user.id).single();
+      setMerchant(data);
+      setLoading(false);
+    }
+    fetch();
+  }, []);
+
+  return { merchant, loading };
+}
+```
+
+**Step 3: Commit**
+
+```bash
+git add .
+git commit -m "feat: add merchant registration and useMerchant hook"
+```
+
+---
+
+### Task 8: Merchant — Loyalty Program CRUD (Dashboard)
+
+**Files:**
+- Create: `apps/dashboard/src/app/(dashboard)/programs/page.tsx`
+- Create: `apps/dashboard/src/app/(dashboard)/programs/new/page.tsx`
+- Create: `apps/dashboard/src/app/(dashboard)/programs/[id]/page.tsx`
+- Create: `apps/dashboard/src/components/program-form.tsx`
+
+**Step 1: Create program list page**
+
+Create `apps/dashboard/src/app/(dashboard)/programs/page.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
+export default async function ProgramsPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: merchant } = await supabase.from('merchants').select('id').eq('user_id', user!.id).single();
+  const { data: programs } = await supabase
+    .from('loyalty_programs')
+    .select('*, rewards(count)')
+    .eq('merchant_id', merchant!.id)
+    .order('created_at', { ascending: false });
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Loyalty Programs</h2>
+        <Link href="/programs/new"><Button>Create Program</Button></Link>
+      </div>
+      {!programs?.length ? (
+        <p className="text-gray-500">No programs yet. Create your first loyalty program!</p>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {programs.map((p) => (
+            <Link key={p.id} href={`/programs/${p.id}`}>
+              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">{p.name}</CardTitle>
+                    <Badge variant={p.is_active ? 'default' : 'secondary'}>{p.is_active ? 'Active' : 'Inactive'}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500 capitalize">{p.type} card</p>
+                  {p.type === 'stamp' && <p className="text-sm">Goal: {p.stamp_goal} stamps</p>}
+                  {p.type === 'points' && <p className="text-sm">{p.points_per_euro} pts/EUR</p>}
+                  {p.expiration_days && <p className="text-sm text-gray-400">Expires in {p.expiration_days} days</p>}
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**Step 2: Create program form component**
+
+Create `apps/dashboard/src/components/program-form.tsx`:
+```typescript
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import type { LoyaltyProgram } from '@loyalty/shared';
+
+interface Props {
+  merchantId: string;
+  program?: LoyaltyProgram;
+}
+
+export function ProgramForm({ merchantId, program }: Props) {
+  const [name, setName] = useState(program?.name ?? '');
+  const [type, setType] = useState<string>(program?.type ?? 'stamp');
+  const [stampGoal, setStampGoal] = useState(program?.stamp_goal?.toString() ?? '10');
+  const [pointsPerEuro, setPointsPerEuro] = useState(program?.points_per_euro?.toString() ?? '1');
+  const [rewardDescription, setRewardDescription] = useState(program?.reward_description ?? '');
+  const [expirationDays, setExpirationDays] = useState(program?.expiration_days?.toString() ?? '');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    const payload = {
+      merchant_id: merchantId,
+      name,
+      type,
+      stamp_goal: type === 'stamp' ? parseInt(stampGoal) : null,
+      points_per_euro: type === 'points' ? parseFloat(pointsPerEuro) : null,
+      reward_description: rewardDescription || null,
+      expiration_days: expirationDays ? parseInt(expirationDays) : null,
+    };
+
+    if (program) {
+      await supabase.from('loyalty_programs').update(payload).eq('id', program.id);
+    } else {
+      await supabase.from('loyalty_programs').insert(payload);
+    }
+    router.push('/programs');
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
+      <div><Label>Program Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Coffee Stamp Card" required /></div>
+      <div>
+        <Label>Type</Label>
+        <Select value={type} onValueChange={setType}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="stamp">Stamp Card</SelectItem>
+            <SelectItem value="points">Points System</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {type === 'stamp' && <div><Label>Stamps to complete</Label><Input type="number" value={stampGoal} onChange={(e) => setStampGoal(e.target.value)} min="1" required /></div>}
+      {type === 'points' && <div><Label>Points per EUR spent</Label><Input type="number" step="0.1" value={pointsPerEuro} onChange={(e) => setPointsPerEuro(e.target.value)} min="0.1" required /></div>}
+      <div><Label>Reward Description</Label><Textarea value={rewardDescription} onChange={(e) => setRewardDescription(e.target.value)} placeholder="e.g. Free coffee after 10 stamps" /></div>
+      <div><Label>Expiration (days, optional)</Label><Input type="number" value={expirationDays} onChange={(e) => setExpirationDays(e.target.value)} placeholder="Leave empty for no expiration" /></div>
+      <Button type="submit" disabled={loading}>{loading ? 'Saving...' : program ? 'Update Program' : 'Create Program'}</Button>
+    </form>
+  );
+}
+```
+
+**Step 3: Create new program page**
+
+Create `apps/dashboard/src/app/(dashboard)/programs/new/page.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import { ProgramForm } from '@/components/program-form';
+
+export default async function NewProgramPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: merchant } = await supabase.from('merchants').select('id').eq('user_id', user!.id).single();
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-6">Create New Program</h2>
+      <ProgramForm merchantId={merchant!.id} />
+    </div>
+  );
+}
+```
+
+**Step 4: Create program detail/edit page**
+
+Create `apps/dashboard/src/app/(dashboard)/programs/[id]/page.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import { ProgramForm } from '@/components/program-form';
+import { notFound } from 'next/navigation';
+
+export default async function ProgramDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: merchant } = await supabase.from('merchants').select('id').eq('user_id', user!.id).single();
+  const { data: program } = await supabase.from('loyalty_programs').select('*').eq('id', id).single();
+  if (!program) notFound();
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-6">Edit: {program.name}</h2>
+      <ProgramForm merchantId={merchant!.id} program={program} />
+    </div>
+  );
+}
+```
+
+**Step 5: Commit**
+
+```bash
+git add .
+git commit -m "feat: add loyalty program CRUD in merchant dashboard"
+```
+
+---
+
+### Task 9: Rewards CRUD (Dashboard)
+
+**Files:**
+- Create: `apps/dashboard/src/app/(dashboard)/programs/[id]/rewards/page.tsx`
+- Create: `apps/dashboard/src/components/reward-form.tsx`
+
+**Step 1: Create reward form component**
+
+Create `apps/dashboard/src/components/reward-form.tsx`:
+```typescript
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+
+interface Props {
+  programId: string;
+  programType: 'stamp' | 'points';
+}
+
+export function RewardForm({ programId, programType }: Props) {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [discountType, setDiscountType] = useState('percentage');
+  const [discountValue, setDiscountValue] = useState('');
+  const [cost, setCost] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    await supabase.from('rewards').insert({
+      program_id: programId,
+      name,
+      description: description || null,
+      discount_type: discountType,
+      discount_value: parseFloat(discountValue),
+      points_cost: programType === 'points' ? parseInt(cost) : null,
+      stamps_required: programType === 'stamp' ? parseInt(cost) : null,
+    });
+    router.refresh();
+    setName(''); setDescription(''); setDiscountValue(''); setCost('');
+    setLoading(false);
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3 p-4 border rounded-lg">
+      <h3 className="font-semibold">Add Reward</h3>
+      <div><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Free Coffee" required /></div>
+      <div><Label>Description</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} /></div>
+      <div>
+        <Label>Discount Type</Label>
+        <Select value={discountType} onValueChange={setDiscountType}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="percentage">Percentage off</SelectItem>
+            <SelectItem value="fixed">Fixed amount off</SelectItem>
+            <SelectItem value="freebie">Free item</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {discountType !== 'freebie' && <div><Label>Discount Value {discountType === 'percentage' ? '(%)' : '(EUR)'}</Label><Input type="number" step="0.01" value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} required /></div>}
+      <div><Label>{programType === 'stamp' ? 'Stamps Required' : 'Points Cost'}</Label><Input type="number" value={cost} onChange={(e) => setCost(e.target.value)} required /></div>
+      <Button type="submit" disabled={loading}>{loading ? 'Adding...' : 'Add Reward'}</Button>
+    </form>
+  );
+}
+```
+
+**Step 2: Create rewards page inside program detail**
+
+Create `apps/dashboard/src/app/(dashboard)/programs/[id]/rewards/page.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
+import { RewardForm } from '@/components/reward-form';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+
+export default async function RewardsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: program } = await supabase.from('loyalty_programs').select('*').eq('id', id).single();
+  if (!program) notFound();
+  const { data: rewards } = await supabase.from('rewards').select('*').eq('program_id', id).order('created_at');
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <Link href={`/programs/${id}`} className="text-sm text-gray-500 hover:underline">← Back to program</Link>
+          <h2 className="text-2xl font-bold">Rewards for {program.name}</h2>
+        </div>
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div>
+          <h3 className="font-semibold mb-3">Existing Rewards</h3>
+          {!rewards?.length ? <p className="text-gray-500">No rewards yet.</p> : (
+            <div className="space-y-3">
+              {rewards.map((r) => (
+                <div key={r.id} className="p-4 border rounded-lg">
+                  <div className="flex justify-between"><span className="font-medium">{r.name}</span><Badge>{r.discount_type}</Badge></div>
+                  {r.description && <p className="text-sm text-gray-500 mt-1">{r.description}</p>}
+                  <p className="text-sm mt-1">
+                    {r.discount_type === 'freebie' ? 'Free item' : `${r.discount_value}${r.discount_type === 'percentage' ? '%' : ' EUR'} off`}
+                    {' · '}
+                    {program.type === 'stamp' ? `${r.stamps_required} stamps` : `${r.points_cost} points`}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <RewardForm programId={id} programType={program.type} />
+      </div>
+    </div>
+  );
+}
+```
+
+**Step 3: Commit**
+
+```bash
+git add .
+git commit -m "feat: add rewards CRUD within loyalty programs"
+```
+
+---
+
+### Task 10: QR Code Generation (Merchant Dashboard)
+
+**Files:**
+- Create: `apps/dashboard/src/app/(dashboard)/qr-codes/page.tsx`
+- Create: `apps/dashboard/src/components/qr-generator.tsx`
+
+**Step 1: Install QR library for web**
+
+```bash
+cd apps/dashboard
+pnpm add qrcode react-qrcode-logo
+pnpm add -D @types/qrcode
+```
+
+**Step 2: Create QR code page**
+
+Create `apps/dashboard/src/app/(dashboard)/qr-codes/page.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import { QrGenerator } from '@/components/qr-generator';
+
+export default async function QrCodesPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: merchant } = await supabase.from('merchants').select('id').eq('user_id', user!.id).single();
+  const { data: programs } = await supabase.from('loyalty_programs').select('id, name, type').eq('merchant_id', merchant!.id).eq('is_active', true);
+  const { data: qrCodes } = await supabase.from('qr_codes').select('*, loyalty_programs(name)').eq('merchant_id', merchant!.id);
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-6">QR Codes</h2>
+      <QrGenerator merchantId={merchant!.id} programs={programs ?? []} existingCodes={qrCodes ?? []} />
+    </div>
+  );
+}
+```
+
+**Step 3: Create QR generator component**
+
+Create `apps/dashboard/src/components/qr-generator.tsx`:
+```typescript
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { QRCode } from 'react-qrcode-logo';
+
+interface Props {
+  merchantId: string;
+  programs: { id: string; name: string; type: string }[];
+  existingCodes: any[];
+}
+
+export function QrGenerator({ merchantId, programs, existingCodes }: Props) {
+  const [selectedProgram, setSelectedProgram] = useState('');
+  const [label, setLabel] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleCreate() {
+    if (!selectedProgram) return;
+    setLoading(true);
+    await supabase.from('qr_codes').insert({
+      merchant_id: merchantId,
+      program_id: selectedProgram,
+      label: label || null,
+    });
+    setLabel('');
+    setLoading(false);
+    router.refresh();
+  }
+
+  function buildQrPayload(code: any) {
+    return JSON.stringify({ type: 'loyalty_scan', qr_id: code.id, secret: code.secret_key });
+  }
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div>
+        <h3 className="font-semibold mb-3">Generate New QR</h3>
+        <div className="space-y-3 p-4 border rounded-lg">
+          <div>
+            <Label>Program</Label>
+            <Select value={selectedProgram} onValueChange={setSelectedProgram}>
+              <SelectTrigger><SelectValue placeholder="Select program" /></SelectTrigger>
+              <SelectContent>{programs.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div><Label>Label (optional)</Label><Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Counter 1" /></div>
+          <Button onClick={handleCreate} disabled={loading || !selectedProgram}>{loading ? 'Creating...' : 'Generate QR Code'}</Button>
+        </div>
+      </div>
+      <div>
+        <h3 className="font-semibold mb-3">Existing QR Codes</h3>
+        {!existingCodes.length ? <p className="text-gray-500">No QR codes yet.</p> : (
+          <div className="space-y-4">
+            {existingCodes.map((code) => (
+              <div key={code.id} className="p-4 border rounded-lg flex items-center gap-4">
+                <QRCode value={buildQrPayload(code)} size={100} />
+                <div>
+                  <p className="font-medium">{code.label || 'Unlabeled'}</p>
+                  <p className="text-sm text-gray-500">{code.loyalty_programs?.name}</p>
+                  <p className="text-xs text-gray-400 font-mono">ID: {code.id.slice(0, 8)}...</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: add QR code generation for merchants"
+```
+
+---
+
+### Task 11: QR Scan Validation — Edge Function
+
+**Files:**
+- Create: `loyalty-app/supabase/functions/validate-scan/index.ts`
+
+**Step 1: Create the Edge Function**
+
+Create `supabase/functions/validate-scan/index.ts`:
+```typescript
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) return new Response(JSON.stringify({ error: 'No auth' }), { status: 401, headers: corsHeaders });
+
+    // Verify the customer
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (authError || !user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
+
+    const { qr_id, secret } = await req.json();
+
+    // Validate QR code
+    const { data: qrCode, error: qrError } = await supabase
+      .from('qr_codes')
+      .select('*, loyalty_programs(*)')
+      .eq('id', qr_id)
+      .eq('secret_key', secret)
+      .eq('is_active', true)
+      .single();
+
+    if (qrError || !qrCode) return new Response(JSON.stringify({ error: 'Invalid QR code' }), { status: 400, headers: corsHeaders });
+
+    const program = qrCode.loyalty_programs;
+
+    // Get or create customer card
+    let { data: card } = await supabase
+      .from('customer_cards')
+      .select('*')
+      .eq('customer_id', user.id)
+      .eq('program_id', program.id)
+      .single();
+
+    if (!card) {
+      // Ensure customer profile exists
+      const { data: existingCustomer } = await supabase.from('customers').select('id').eq('id', user.id).single();
+      if (!existingCustomer) {
+        await supabase.from('customers').insert({ id: user.id, email: user.email! });
+      }
+
+      const { data: newCard } = await supabase
+        .from('customer_cards')
+        .insert({ customer_id: user.id, program_id: program.id })
+        .select()
+        .single();
+      card = newCard;
+    }
+
+    if (!card) return new Response(JSON.stringify({ error: 'Could not create card' }), { status: 500, headers: corsHeaders });
+
+    // Add stamp or points
+    let transactionType: string;
+    let value: number;
+
+    if (program.type === 'stamp') {
+      transactionType = 'stamp_add';
+      value = 1;
+      await supabase.from('customer_cards').update({
+        current_stamps: card.current_stamps + 1,
+        last_activity: new Date().toISOString(),
+      }).eq('id', card.id);
+    } else {
+      transactionType = 'points_add';
+      value = program.points_per_euro || 1;
+      await supabase.from('customer_cards').update({
+        current_points: card.current_points + value,
+        last_activity: new Date().toISOString(),
+      }).eq('id', card.id);
+    }
+
+    // Record transaction
+    await supabase.from('transactions').insert({
+      card_id: card.id,
+      type: transactionType,
+      value,
+      validated_by: 'qr',
+    });
+
+    return new Response(JSON.stringify({
+      success: true,
+      program_name: program.name,
+      type: program.type,
+      added: value,
+      new_total: program.type === 'stamp' ? card.current_stamps + 1 : card.current_points + value,
+      goal: program.type === 'stamp' ? program.stamp_goal : null,
+    }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+  }
+});
+```
+
+**Step 2: Deploy locally and test**
+
+```bash
+npx supabase functions serve validate-scan --no-verify-jwt
+```
+
+**Step 3: Commit**
+
+```bash
+git add .
+git commit -m "feat: add validate-scan Edge Function for QR code stamp/point collection"
+```
+
+---
+
+### Task 12: Mobile App — Home Screen (Cards List)
+
+**Files:**
+- Modify: `apps/mobile/app/(tabs)/index.tsx`
+- Create: `apps/mobile/components/card-item.tsx`
+- Create: `apps/mobile/hooks/useCards.ts`
+
+**Step 1: Create useCards hook**
+
+Create `apps/mobile/hooks/useCards.ts`:
+```typescript
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuthStore } from '../lib/store';
+
+export interface CardWithProgram {
+  id: string;
+  current_stamps: number;
+  current_points: number;
+  tier: string;
+  last_activity: string;
+  loyalty_programs: {
+    id: string;
+    name: string;
+    type: 'stamp' | 'points';
+    stamp_goal: number | null;
+    reward_description: string | null;
+    merchants: { name: string; logo_url: string | null };
+  };
+}
+
+export function useCards() {
+  const [cards, setCards] = useState<CardWithProgram[]>([]);
+  const [loading, setLoading] = useState(true);
+  const session = useAuthStore((s) => s.session);
+
+  async function fetchCards() {
+    if (!session) return;
+    const { data } = await supabase
+      .from('customer_cards')
+      .select('*, loyalty_programs(*, merchants(name, logo_url))')
+      .eq('customer_id', session.user.id)
+      .order('last_activity', { ascending: false });
+    setCards((data as any) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => { fetchCards(); }, [session]);
+
+  return { cards, loading, refresh: fetchCards };
+}
+```
+
+**Step 2: Create card item component**
+
+Create `apps/mobile/components/card-item.tsx`:
+```typescript
+import { View, Text, StyleSheet } from 'react-native';
+import type { CardWithProgram } from '../hooks/useCards';
+
+export function CardItem({ card }: { card: CardWithProgram }) {
+  const program = card.loyalty_programs;
+  const merchant = program.merchants;
+
+  return (
+    <View style={styles.card}>
+      <Text style={styles.merchant}>{merchant.name}</Text>
+      <Text style={styles.program}>{program.name}</Text>
+      {program.type === 'stamp' ? (
+        <View style={styles.stampRow}>
+          {Array.from({ length: program.stamp_goal || 10 }).map((_, i) => (
+            <View key={i} style={[styles.stamp, i < card.current_stamps && styles.stampFilled]} />
+          ))}
+        </View>
+      ) : (
+        <Text style={styles.points}>{card.current_points} pts</Text>
+      )}
+      {program.reward_description && <Text style={styles.reward}>{program.reward_description}</Text>}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: { backgroundColor: '#fff', borderRadius: 16, padding: 20, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, elevation: 2 },
+  merchant: { fontSize: 14, color: '#666', marginBottom: 2 },
+  program: { fontSize: 18, fontWeight: '700', marginBottom: 12 },
+  stampRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  stamp: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: '#ddd' },
+  stampFilled: { backgroundColor: '#6366f1', borderColor: '#6366f1' },
+  points: { fontSize: 32, fontWeight: '800', color: '#6366f1' },
+  reward: { fontSize: 13, color: '#888', marginTop: 8 },
+});
+```
+
+**Step 3: Update home screen**
+
+Replace `apps/mobile/app/(tabs)/index.tsx`:
+```typescript
+import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { useCards } from '../../hooks/useCards';
+import { CardItem } from '../../components/card-item';
+
+export default function HomeScreen() {
+  const { cards, loading, refresh } = useCards();
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>My Cards</Text>
+      <FlatList
+        data={cards}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <CardItem card={item} />}
+        ListEmptyComponent={<Text style={styles.empty}>{loading ? 'Loading...' : 'No loyalty cards yet. Scan a QR code to get started!'}</Text>}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh} />}
+        contentContainerStyle={styles.list}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 28, fontWeight: 'bold', padding: 24, paddingBottom: 12 },
+  list: { paddingHorizontal: 16 },
+  empty: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 16, paddingHorizontal: 32 },
+});
+```
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: implement home screen with loyalty cards display"
+```
+
+---
+
+### Task 13: Mobile App — QR Scanner
+
+**Files:**
+- Modify: `apps/mobile/app/(tabs)/scan.tsx`
+
+**Step 1: Implement QR scanner screen**
+
+Replace `apps/mobile/app/(tabs)/scan.tsx`:
+```typescript
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { supabase } from '../../lib/supabase';
+import { useAuthStore } from '../../lib/store';
+
+export default function ScanScreen() {
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const session = useAuthStore((s) => s.session);
+
+  if (!permission) return <View />;
+  if (!permission.granted) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.text}>Camera permission is required to scan QR codes</Text>
+        <TouchableOpacity style={styles.button} onPress={requestPermission}>
+          <Text style={styles.buttonText}>Grant Permission</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  async function handleBarCodeScanned({ data }: { data: string }) {
+    if (scanned || processing) return;
+    setScanned(true);
+    setProcessing(true);
+
+    try {
+      const payload = JSON.parse(data);
+      if (payload.type !== 'loyalty_scan') {
+        Alert.alert('Invalid QR', 'This is not a loyalty QR code.');
+        return;
+      }
+
+      const { data: result, error } = await supabase.functions.invoke('validate-scan', {
+        body: { qr_id: payload.qr_id, secret: payload.secret },
+      });
+
+      if (error) throw error;
+
+      if (result.success) {
+        const msg = result.type === 'stamp'
+          ? `Stamp added! ${result.new_total}/${result.goal}`
+          : `+${result.added} points! Total: ${result.new_total}`;
+        Alert.alert(result.program_name, msg);
+      } else {
+        Alert.alert('Error', result.error || 'Scan failed');
+      }
+    } catch (e: any) {
+      Alert.alert('Error', e.message || 'Could not process QR code');
+    } finally {
+      setProcessing(false);
+      setTimeout(() => setScanned(false), 2000);
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <CameraView
+        style={styles.camera}
+        barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.frame} />
+          <Text style={styles.hint}>{processing ? 'Processing...' : 'Point at a loyalty QR code'}</Text>
+        </View>
+      </CameraView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  text: { fontSize: 16, textAlign: 'center', marginBottom: 16 },
+  camera: { flex: 1 },
+  overlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  frame: { width: 250, height: 250, borderWidth: 3, borderColor: '#fff', borderRadius: 20 },
+  hint: { color: '#fff', fontSize: 16, marginTop: 20, fontWeight: '600' },
+  button: { backgroundColor: '#6366f1', padding: 16, borderRadius: 12 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+});
+```
+
+**Step 2: Commit**
+
+```bash
+git add .
+git commit -m "feat: implement QR code scanner with validation"
+```
+
+---
+
+### Task 14: Reward Redemption — Edge Function
+
+**Files:**
+- Create: `loyalty-app/supabase/functions/redeem-reward/index.ts`
+
+**Step 1: Create the Edge Function**
+
+Create `supabase/functions/redeem-reward/index.ts`:
+```typescript
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) return new Response(JSON.stringify({ error: 'No auth' }), { status: 401, headers: corsHeaders });
+
+    const { data: { user } } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    if (!user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
+
+    const { card_id, reward_id } = await req.json();
+
+    // Fetch card and reward
+    const { data: card } = await supabase.from('customer_cards').select('*, loyalty_programs(type)').eq('id', card_id).eq('customer_id', user.id).single();
+    if (!card) return new Response(JSON.stringify({ error: 'Card not found' }), { status: 404, headers: corsHeaders });
+
+    const { data: reward } = await supabase.from('rewards').select('*').eq('id', reward_id).eq('is_active', true).single();
+    if (!reward) return new Response(JSON.stringify({ error: 'Reward not found' }), { status: 404, headers: corsHeaders });
+
+    // Check if customer has enough
+    const programType = card.loyalty_programs.type;
+    if (programType === 'stamp' && card.current_stamps < (reward.stamps_required || 0)) {
+      return new Response(JSON.stringify({ error: 'Not enough stamps' }), { status: 400, headers: corsHeaders });
+    }
+    if (programType === 'points' && card.current_points < (reward.points_cost || 0)) {
+      return new Response(JSON.stringify({ error: 'Not enough points' }), { status: 400, headers: corsHeaders });
+    }
+
+    // Deduct and record
+    if (programType === 'stamp') {
+      await supabase.from('customer_cards').update({
+        current_stamps: card.current_stamps - (reward.stamps_required || 0),
+        last_activity: new Date().toISOString(),
+      }).eq('id', card.id);
+    } else {
+      await supabase.from('customer_cards').update({
+        current_points: card.current_points - (reward.points_cost || 0),
+        last_activity: new Date().toISOString(),
+      }).eq('id', card.id);
+    }
+
+    await supabase.from('transactions').insert({
+      card_id: card.id,
+      type: 'reward_redeem',
+      value: reward.stamps_required || reward.points_cost || 0,
+      validated_by: 'manual',
+    });
+
+    return new Response(JSON.stringify({
+      success: true,
+      reward_name: reward.name,
+      discount_type: reward.discount_type,
+      discount_value: reward.discount_value,
+    }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+  }
+});
+```
+
+**Step 2: Commit**
+
+```bash
+git add .
+git commit -m "feat: add redeem-reward Edge Function"
+```
+
+---
+
+### Task 15: Mobile App — Rewards Screen
+
+**Files:**
+- Modify: `apps/mobile/app/(tabs)/rewards.tsx`
+
+**Step 1: Implement rewards screen**
+
+Replace `apps/mobile/app/(tabs)/rewards.tsx`:
+```typescript
+import { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
+import { supabase } from '../../lib/supabase';
+import { useAuthStore } from '../../lib/store';
+
+interface RewardItem {
+  id: string;
+  name: string;
+  description: string | null;
+  discount_type: string;
+  discount_value: number;
+  points_cost: number | null;
+  stamps_required: number | null;
+  program_name: string;
+  program_type: string;
+  card_id: string;
+  current_stamps: number;
+  current_points: number;
+  can_redeem: boolean;
+}
+
+export default function RewardsScreen() {
+  const [rewards, setRewards] = useState<RewardItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const session = useAuthStore((s) => s.session);
+
+  async function fetchRewards() {
+    if (!session) return;
+    const { data: cards } = await supabase
+      .from('customer_cards')
+      .select('*, loyalty_programs(name, type, rewards(*))')
+      .eq('customer_id', session.user.id);
+
+    const items: RewardItem[] = [];
+    cards?.forEach((card: any) => {
+      const program = card.loyalty_programs;
+      program.rewards?.forEach((r: any) => {
+        const canRedeem = program.type === 'stamp'
+          ? card.current_stamps >= (r.stamps_required || 0)
+          : card.current_points >= (r.points_cost || 0);
+        items.push({
+          ...r,
+          program_name: program.name,
+          program_type: program.type,
+          card_id: card.id,
+          current_stamps: card.current_stamps,
+          current_points: card.current_points,
+          can_redeem: canRedeem,
+        });
+      });
+    });
+    setRewards(items);
+    setLoading(false);
+  }
+
+  useEffect(() => { fetchRewards(); }, [session]);
+
+  async function handleRedeem(item: RewardItem) {
+    Alert.alert('Redeem Reward', `Use ${item.program_type === 'stamp' ? item.stamps_required + ' stamps' : item.points_cost + ' points'} for "${item.name}"?`, [
+      { text: 'Cancel' },
+      {
+        text: 'Redeem', onPress: async () => {
+          const { data, error } = await supabase.functions.invoke('redeem-reward', {
+            body: { card_id: item.card_id, reward_id: item.id },
+          });
+          if (error) { Alert.alert('Error', error.message); return; }
+          Alert.alert('Redeemed!', `You got: ${data.reward_name}`);
+          fetchRewards();
+        },
+      },
+    ]);
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Rewards</Text>
+      <FlatList
+        data={rewards}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Text style={styles.program}>{item.program_name}</Text>
+            <Text style={styles.name}>{item.name}</Text>
+            {item.description && <Text style={styles.desc}>{item.description}</Text>}
+            <Text style={styles.cost}>
+              {item.program_type === 'stamp' ? `${item.stamps_required} stamps` : `${item.points_cost} pts`}
+              {' · '}
+              {item.discount_type === 'freebie' ? 'Free' : `${item.discount_value}${item.discount_type === 'percentage' ? '%' : '€'} off`}
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, !item.can_redeem && styles.buttonDisabled]}
+              onPress={() => handleRedeem(item)}
+              disabled={!item.can_redeem}
+            >
+              <Text style={styles.buttonText}>{item.can_redeem ? 'Redeem' : 'Not enough'}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.empty}>{loading ? 'Loading...' : 'No rewards available yet.'}</Text>}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={fetchRewards} />}
+        contentContainerStyle={styles.list}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 28, fontWeight: 'bold', padding: 24, paddingBottom: 12 },
+  list: { paddingHorizontal: 16 },
+  card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10, elevation: 2 },
+  program: { fontSize: 12, color: '#888', marginBottom: 4 },
+  name: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  desc: { fontSize: 14, color: '#666', marginBottom: 8 },
+  cost: { fontSize: 14, color: '#6366f1', fontWeight: '600', marginBottom: 12 },
+  button: { backgroundColor: '#6366f1', padding: 12, borderRadius: 10, alignItems: 'center' },
+  buttonDisabled: { backgroundColor: '#d1d5db' },
+  buttonText: { color: '#fff', fontWeight: '600' },
+  empty: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 16 },
+});
+```
+
+**Step 2: Commit**
+
+```bash
+git add .
+git commit -m "feat: implement rewards screen with redemption"
+```
+
+---
+
+### Task 16: Merchant Dashboard — Clients List
+
+**Files:**
+- Create: `apps/dashboard/src/app/(dashboard)/clients/page.tsx`
+
+**Step 1: Create clients page**
+
+Create `apps/dashboard/src/app/(dashboard)/clients/page.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+
+export default async function ClientsPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: merchant } = await supabase.from('merchants').select('id').eq('user_id', user!.id).single();
+
+  const { data: cards } = await supabase
+    .from('customer_cards')
+    .select('*, customers(name, email), loyalty_programs!inner(name, type, merchant_id)')
+    .eq('loyalty_programs.merchant_id', merchant!.id)
+    .order('last_activity', { ascending: false });
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-6">Clients</h2>
+      {!cards?.length ? (
+        <p className="text-gray-500">No clients yet. Share your QR code to get started!</p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Program</TableHead>
+              <TableHead>Progress</TableHead>
+              <TableHead>Tier</TableHead>
+              <TableHead>Last Activity</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {cards.map((card: any) => (
+              <TableRow key={card.id}>
+                <TableCell>{card.customers?.name || '—'}</TableCell>
+                <TableCell>{card.customers?.email}</TableCell>
+                <TableCell>{card.loyalty_programs?.name}</TableCell>
+                <TableCell>
+                  {card.loyalty_programs?.type === 'stamp'
+                    ? `${card.current_stamps} stamps`
+                    : `${card.current_points} pts`}
+                </TableCell>
+                <TableCell><Badge variant="outline" className="capitalize">{card.tier}</Badge></TableCell>
+                <TableCell>{new Date(card.last_activity).toLocaleDateString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
+}
+```
+
+**Step 2: Commit**
+
+```bash
+git add .
+git commit -m "feat: add clients list page to merchant dashboard"
+```
+
+---
+
+### Task 17: Push Notifications Setup
+
+**Files:**
+- Create: `apps/mobile/hooks/useNotifications.ts`
+- Create: `loyalty-app/supabase/functions/send-push/index.ts`
+
+**Step 1: Create notification registration hook**
+
+Create `apps/mobile/hooks/useNotifications.ts`:
+```typescript
+import { useEffect, useRef } from 'react';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import { Platform } from 'react-native';
+import { supabase } from '../lib/supabase';
+import { useAuthStore } from '../lib/store';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
+export function useNotifications() {
+  const session = useAuthStore((s) => s.session);
+  const notificationListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<Notifications.EventSubscription>();
+
+  useEffect(() => {
+    if (!session) return;
+
+    async function register() {
+      if (!Device.isDevice) return;
+
+      const { status: existing } = await Notifications.getPermissionsAsync();
+      let finalStatus = existing;
+      if (existing !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') return;
+
+      const tokenData = await Notifications.getExpoPushTokenAsync();
+      const token = tokenData.data;
+
+      // Save token to customer profile
+      await supabase.from('customers').update({ push_token: token }).eq('id', session.user.id);
+    }
+
+    register();
+
+    notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+      // Handle foreground notification
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      // Handle notification tap — navigate via deep_link
+    });
+
+    return () => {
+      notificationListener.current?.remove();
+      responseListener.current?.remove();
+    };
+  }, [session]);
+}
+```
+
+**Step 2: Create send-push Edge Function**
+
+Create `supabase/functions/send-push/index.ts`:
+```typescript
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    const { campaign_id } = await req.json();
+
+    const { data: campaign } = await supabase.from('campaigns').select('*').eq('id', campaign_id).single();
+    if (!campaign) return new Response(JSON.stringify({ error: 'Campaign not found' }), { status: 404, headers: corsHeaders });
+
+    // Get target customers based on segment
+    const { data: merchant } = await supabase.from('merchants').select('id').eq('id', campaign.merchant_id).single();
+
+    let customerQuery = supabase
+      .from('customer_cards')
+      .select('customer_id, customers(push_token)')
+      .eq('loyalty_programs.merchant_id', merchant!.id);
+
+    const { data: cards } = await supabase
+      .from('customer_cards')
+      .select('customer_id, customers(push_token), loyalty_programs!inner(merchant_id)')
+      .eq('loyalty_programs.merchant_id', campaign.merchant_id);
+
+    const tokens = cards
+      ?.map((c: any) => c.customers?.push_token)
+      .filter(Boolean) as string[];
+
+    if (!tokens.length) {
+      return new Response(JSON.stringify({ sent: 0 }), { status: 200, headers: corsHeaders });
+    }
+
+    // Send via Expo Push API
+    const messages = tokens.map((token) => ({
+      to: token,
+      title: campaign.title,
+      body: campaign.body,
+      data: { campaign_id: campaign.id, type: 'campaign' },
+    }));
+
+    const pushResponse = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(messages),
+    });
+
+    // Record notifications
+    const notifications = cards?.map((c: any) => ({
+      customer_id: c.customer_id,
+      campaign_id: campaign.id,
+      title: campaign.title,
+      body: campaign.body,
+      type: 'campaign' as const,
+    })) ?? [];
+
+    if (notifications.length) {
+      await supabase.from('notifications').insert(notifications);
+    }
+
+    // Update campaign status
+    await supabase.from('campaigns').update({
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+    }).eq('id', campaign.id);
+
+    return new Response(JSON.stringify({ sent: tokens.length }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+  }
+});
+```
+
+**Step 3: Wire useNotifications into root layout**
+
+Add to `apps/mobile/app/_layout.tsx` inside the component:
+```typescript
+import { useNotifications } from '../hooks/useNotifications';
+// Inside component body:
+useNotifications();
+```
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: add push notification registration and send-push Edge Function"
+```
+
+---
+
+### Task 18: Basic Campaign Send (Dashboard)
+
+**Files:**
+- Create: `apps/dashboard/src/app/(dashboard)/campaigns/page.tsx`
+- Create: `apps/dashboard/src/components/campaign-form.tsx`
+
+**Step 1: Create campaign form**
+
+Create `apps/dashboard/src/components/campaign-form.tsx`:
+```typescript
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+
+export function CampaignForm({ merchantId }: { merchantId: string }) {
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function handleSend(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+
+    // Create campaign
+    const { data: campaign, error } = await supabase.from('campaigns').insert({
+      merchant_id: merchantId,
+      title,
+      body,
+      type: 'push',
+      target_segment: 'all',
+      status: 'draft',
+    }).select().single();
+
+    if (error || !campaign) { setLoading(false); return; }
+
+    // Send push via Edge Function
+    await supabase.functions.invoke('send-push', { body: { campaign_id: campaign.id } });
+
+    setTitle('');
+    setBody('');
+    setLoading(false);
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={handleSend} className="space-y-4 max-w-lg p-4 border rounded-lg">
+      <h3 className="font-semibold">Send Push Notification</h3>
+      <div><Label>Title</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Weekend Special!" required /></div>
+      <div><Label>Message</Label><Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="e.g. 20% off all items this weekend!" required /></div>
+      <Button type="submit" disabled={loading}>{loading ? 'Sending...' : 'Send to All Clients'}</Button>
+    </form>
+  );
+}
+```
+
+**Step 2: Create campaigns page**
+
+Create `apps/dashboard/src/app/(dashboard)/campaigns/page.tsx`:
+```typescript
+import { createClient } from '@/lib/supabase/server';
+import { CampaignForm } from '@/components/campaign-form';
+import { Badge } from '@/components/ui/badge';
+
+export default async function CampaignsPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: merchant } = await supabase.from('merchants').select('id').eq('user_id', user!.id).single();
+  const { data: campaigns } = await supabase
+    .from('campaigns')
+    .select('*')
+    .eq('merchant_id', merchant!.id)
+    .order('created_at', { ascending: false });
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-6">Campaigns</h2>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <CampaignForm merchantId={merchant!.id} />
+        <div>
+          <h3 className="font-semibold mb-3">Past Campaigns</h3>
+          {!campaigns?.length ? <p className="text-gray-500">No campaigns sent yet.</p> : (
+            <div className="space-y-3">
+              {campaigns.map((c) => (
+                <div key={c.id} className="p-4 border rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium">{c.title}</p>
+                      <p className="text-sm text-gray-500 mt-1">{c.body}</p>
+                    </div>
+                    <Badge variant={c.status === 'sent' ? 'default' : 'secondary'}>{c.status}</Badge>
+                  </div>
+                  {c.sent_at && <p className="text-xs text-gray-400 mt-2">Sent {new Date(c.sent_at).toLocaleString()}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**Step 3: Commit**
+
+```bash
+git add .
+git commit -m "feat: add campaign creation and push send from dashboard"
+```
+
+---
+
+**END OF PHASE 1** — At this point the MVP is functional: merchants can create loyalty programs, generate QR codes, and send push campaigns. Customers can scan QR codes, collect stamps/points, and redeem rewards.
+
+
+---
+
+## Phase 2 — Marketing & Monetization (Weeks 5-8)
+
+---
+
+### Task 19: Campaign Segmentation
+
+**Files:**
+- Modify: `apps/dashboard/src/components/campaign-form.tsx`
+- Modify: `supabase/functions/send-push/index.ts`
+
+**Step 1: Add segment selector to campaign form**
+
+Add a `Select` component to `campaign-form.tsx` with options: `all`, `new` (joined < 30 days), `inactive` (no activity > 14 days), `vip` (gold/vip tier).
+
+Save the selected segment in the `target_segment` field when creating the campaign.
+
+**Step 2: Update send-push to filter by segment**
+
+In `send-push/index.ts`, after fetching all cards for the merchant, apply segment filters:
+
+```typescript
+let filteredCards = cards ?? [];
+switch (campaign.target_segment) {
+  case 'new':
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+    filteredCards = filteredCards.filter((c: any) => c.created_at > thirtyDaysAgo);
+    break;
+  case 'inactive':
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString();
+    filteredCards = filteredCards.filter((c: any) => c.last_activity < fourteenDaysAgo);
+    break;
+  case 'vip':
+    filteredCards = filteredCards.filter((c: any) => ['gold', 'vip'].includes(c.tier));
+    break;
+  // 'all' = no filter
+}
+```
+
+Use `filteredCards` for token extraction instead of `cards`.
+
+**Step 3: Commit**
+
+```bash
+git add .
+git commit -m "feat: add customer segmentation to campaigns"
+```
+
+---
+
+### Task 20: Analytics Dashboard — KPIs
+
+**Files:**
+- Create: `apps/dashboard/src/app/(dashboard)/analytics/page.tsx`
+- Create: `apps/dashboard/src/components/kpi-cards.tsx`
+- Create: `supabase/migrations/003_analytics_views.sql`
+
+**Step 1: Create SQL views for analytics**
+
+Create `supabase/migrations/003_analytics_views.sql`:
+```sql
+create or replace view public.merchant_kpis as
+select
+  m.id as merchant_id,
+  count(distinct cc.customer_id) as total_clients,
+  count(distinct cc.customer_id) filter (where cc.last_activity > now() - interval '30 days') as active_clients_30d,
+  count(distinct t.id) as total_transactions,
+  count(distinct t.id) filter (where t.created_at > now() - interval '7 days') as transactions_7d,
+  count(distinct c.id) filter (where c.status = 'sent') as campaigns_sent,
+  coalesce(sum(c.opens), 0) as total_opens,
+  coalesce(sum(c.clicks), 0) as total_clicks
+from merchants m
+left join loyalty_programs lp on lp.merchant_id = m.id
+left join customer_cards cc on cc.program_id = lp.id
+left join transactions t on t.card_id = cc.id
+left join campaigns c on c.merchant_id = m.id
+group by m.id;
+```
+
+**Step 2: Create KPI cards component**
+
+Create `apps/dashboard/src/components/kpi-cards.tsx`:
+```typescript
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface KPI { label: string; value: string | number; change?: string; }
+
+export function KpiCards({ kpis }: { kpis: KPI[] }) {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {kpis.map((kpi) => (
+        <Card key={kpi.label}>
+          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-gray-500">{kpi.label}</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{kpi.value}</p>
+            {kpi.change && <p className="text-xs text-green-600 mt-1">{kpi.change}</p>}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+```
+
+**Step 3: Create analytics page**
+
+Create `apps/dashboard/src/app/(dashboard)/analytics/page.tsx` that fetches from the `merchant_kpis` view and renders `KpiCards` with: Total Clients, Active Clients (30d), Transactions (7d), Campaigns Sent.
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: add analytics dashboard with KPIs"
+```
+
+---
+
+### Task 21: Stripe Integration (Merchant Subscriptions)
+
+**Files:**
+- Create: `apps/dashboard/src/app/api/stripe/checkout/route.ts`
+- Create: `apps/dashboard/src/app/api/stripe/webhook/route.ts`
+- Create: `apps/dashboard/src/app/(dashboard)/subscription/page.tsx`
+- Create: `supabase/migrations/004_plan_limits.sql`
+
+**Step 1: Install Stripe**
+
+```bash
+cd apps/dashboard && pnpm add stripe
+```
+
+**Step 2: Create checkout API route**
+
+Create `apps/dashboard/src/app/api/stripe/checkout/route.ts`:
+```typescript
+import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { createClient } from '@/lib/supabase/server';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+const PRICE_IDS: Record<string, string> = {
+  pro: process.env.STRIPE_PRO_PRICE_ID!,
+  business: process.env.STRIPE_BUSINESS_PRICE_ID!,
+};
+
+export async function POST(req: Request) {
+  const { plan } = await req.json();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { data: merchant } = await supabase.from('merchants').select('*').eq('user_id', user.id).single();
+
+  let customerId = merchant?.stripe_customer_id;
+  if (!customerId) {
+    const customer = await stripe.customers.create({ email: user.email, metadata: { merchant_id: merchant!.id } });
+    customerId = customer.id;
+    await supabase.from('merchants').update({ stripe_customer_id: customerId }).eq('id', merchant!.id);
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    customer: customerId,
+    mode: 'subscription',
+    line_items: [{ price: PRICE_IDS[plan], quantity: 1 }],
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription?success=true`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription?cancelled=true`,
+  });
+
+  return NextResponse.json({ url: session.url });
+}
+```
+
+**Step 3: Create webhook handler**
+
+Create `apps/dashboard/src/app/api/stripe/webhook/route.ts` that:
+- Verifies Stripe signature
+- Handles `customer.subscription.created`, `updated`, `deleted` events
+- Updates merchant `plan` and `subscription_status` accordingly
+
+**Step 4: Create subscription page**
+
+Create `apps/dashboard/src/app/(dashboard)/subscription/page.tsx` with 3 pricing cards (Free/Pro/Business) and upgrade buttons calling the checkout API.
+
+**Step 5: Add plan enforcement trigger**
+
+Create `supabase/migrations/004_plan_limits.sql`:
+```sql
+create or replace function public.check_program_limit()
+returns trigger as $$
+declare merchant_plan text; program_count int;
+begin
+  select plan into merchant_plan from merchants where id = new.merchant_id;
+  select count(*) into program_count from loyalty_programs where merchant_id = new.merchant_id;
+  if merchant_plan = 'free' and program_count >= 1 then raise exception 'Free plan: 1 program max'; end if;
+  if merchant_plan = 'pro' and program_count >= 3 then raise exception 'Pro plan: 3 programs max'; end if;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger check_program_limit_trigger
+  before insert on public.loyalty_programs
+  for each row execute function public.check_program_limit();
+```
+
+**Step 6: Commit**
+
+```bash
+git add .
+git commit -m "feat: integrate Stripe subscriptions with plan enforcement"
+```
+
+---
+
+### Task 22: Referral System
+
+**Files:**
+- Create: `apps/mobile/app/referral.tsx`
+- Create: `supabase/functions/process-referral/index.ts`
+- Modify: `apps/mobile/hooks/useAuth.ts`
+
+**Step 1: Generate referral code on customer signup**
+
+In `useAuth.ts` `signUpWithEmail`, after creating the customer profile, insert a referral row with a unique code:
+```typescript
+const code = `${name.slice(0, 4).toUpperCase()}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+await supabase.from('referrals').insert({ referrer_id: data.session.user.id, referral_code: code });
+```
+
+**Step 2: Create referral screen**
+
+Shows the user referral code, a Share button (via `expo-sharing`), and list of referral statuses.
+
+**Step 3: Create process-referral Edge Function**
+
+Accepts `{ referral_code, new_customer_id }`, validates code, links referred_id, awards bonus to both parties, updates status to completed.
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: implement referral system"
+```
+
+---
+
+### Task 23: Automatic Notifications
+
+**Files:**
+- Create: `supabase/functions/auto-notifications/index.ts`
+- Create: `supabase/migrations/005_cron_auto_notif.sql`
+
+**Step 1: Create auto-notifications Edge Function**
+
+Runs daily and handles:
+1. **Inactivity** — `last_activity` > 14 days ago: sends "We miss you!" push
+2. **Expiration warning** — Points/stamps expire within 7 days: sends reminder
+3. **Reward available** — Stamps >= goal or points >= any reward cost: sends congratulation
+
+Each check deduplicates against existing notifications table.
+
+**Step 2: Schedule via pg_cron**
+
+```sql
+select cron.schedule('auto-notifications', '0 10 * * *',
+  $$select net.http_post(
+    url := current_setting('app.supabase_url') || '/functions/v1/auto-notifications',
+    headers := jsonb_build_object('Authorization', 'Bearer ' || current_setting('app.service_role_key')),
+    body := '{}'::jsonb
+  )$$
+);
+```
+
+**Step 3: Commit**
+
+```bash
+git add .
+git commit -m "feat: add automatic notifications with cron scheduling"
+```
+
+---
+
+### Task 24: Internationalization (i18n)
+
+**Files:**
+- Create: `apps/mobile/lib/i18n.ts`
+- Create: `apps/mobile/locales/en.json`
+- Create: `apps/mobile/locales/fr.json`
+- Create: `apps/mobile/locales/es.json`
+- Create: `apps/mobile/locales/ar.json`
+
+**Step 1: Configure i18next for mobile**
+
+```typescript
+// apps/mobile/lib/i18n.ts
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import * as Localization from 'expo-localization';
+import en from '../locales/en.json';
+import fr from '../locales/fr.json';
+
+i18n.use(initReactI18next).init({
+  resources: { en: { translation: en }, fr: { translation: fr } },
+  lng: Localization.getLocales()[0]?.languageCode ?? 'en',
+  fallbackLng: 'en',
+});
+export default i18n;
+```
+
+**Step 2: Create locale files**
+
+`en.json`, `fr.json`, `es.json`, `ar.json` with keys for all screens: home, scan, rewards, profile, auth.
+
+**Step 3: Import in root layout and replace all hardcoded strings**
+
+Add `import '../lib/i18n'` to `_layout.tsx`. Use `useTranslation()` hook and `t('key')` throughout all screens.
+
+**Step 4: Add i18n to dashboard with next-intl**
+
+```bash
+cd apps/dashboard && pnpm add next-intl
+```
+
+Configure middleware for locale detection and create translation files.
+
+**Step 5: Commit**
+
+```bash
+git add .
+git commit -m "feat: add i18n with en/fr/es/ar"
+```
+
+---
+
+**END OF PHASE 2** — The platform now has segmented campaigns, analytics, Stripe monetization, referrals, auto-notifications, and multilingual support.
+
+
+---
+
+## Phase 3 — Advanced (Weeks 9-12)
+
+---
+
+### Task 25: NFC Support
+
+**Files:**
+- Create: `apps/mobile/hooks/useNfc.ts`
+- Create: `apps/mobile/components/nfc-scanner.tsx`
+- Modify: `apps/mobile/app/(tabs)/scan.tsx`
+
+**Step 1: Install NFC library**
+
+```bash
+cd apps/mobile && npx expo install react-native-nfc-manager
+```
+
+**Step 2: Create useNfc hook**
+
+Create `apps/mobile/hooks/useNfc.ts`:
+```typescript
+import { useEffect, useState } from 'react';
+import NfcManager, { NfcTech, Ndef } from 'react-native-nfc-manager';
+
+export function useNfc() {
+  const [supported, setSupported] = useState(false);
+
+  useEffect(() => {
+    NfcManager.start().then(() => setSupported(true)).catch(() => setSupported(false));
+    return () => { NfcManager.cancelTechnologyRequest().catch(() => {}); };
+  }, []);
+
+  async function readTag(): Promise<string | null> {
+    try {
+      await NfcManager.requestTechnology(NfcTech.Ndef);
+      const tag = await NfcManager.getTag();
+      if (tag?.ndefMessage?.[0]) {
+        const payload = Ndef.text.decodePayload(new Uint8Array(tag.ndefMessage[0].payload));
+        return payload;
+      }
+      return null;
+    } catch {
+      return null;
+    } finally {
+      NfcManager.cancelTechnologyRequest().catch(() => {});
+    }
+  }
+
+  return { supported, readTag };
+}
+```
+
+**Step 3: Add NFC tab to scanner screen**
+
+Update `apps/mobile/app/(tabs)/scan.tsx` to add a toggle between QR and NFC modes. When NFC is selected, show a "Tap your phone" UI and call `readTag()`. Parse the NFC payload the same way as QR (JSON with `qr_id` and `secret`) and call `validate-scan`.
+
+**Step 4: Update validate-scan Edge Function**
+
+Add `validated_by: 'nfc'` support to the transaction recording.
+
+**Step 5: Add NFC tag management to merchant dashboard**
+
+Create `apps/dashboard/src/app/(dashboard)/qr-codes/nfc/page.tsx` showing instructions for programming NFC tags with the same JSON payload as QR codes.
+
+**Step 6: Commit**
+
+```bash
+git add .
+git commit -m "feat: add NFC tag reading for stamp/point collection"
+```
+
+---
+
+### Task 26: Geolocation + Proximity Notifications
+
+**Files:**
+- Create: `supabase/migrations/006_postgis.sql`
+- Create: `apps/mobile/hooks/useLocation.ts`
+- Create: `supabase/functions/proximity-check/index.ts`
+- Modify: `supabase/migrations/001_initial_schema.sql` (add lat/lng to merchants)
+
+**Step 1: Enable PostGIS and add coordinates**
+
+Create `supabase/migrations/006_postgis.sql`:
+```sql
+create extension if not exists postgis;
+
+alter table public.merchants add column if not exists latitude double precision;
+alter table public.merchants add column if not exists longitude double precision;
+alter table public.merchants add column if not exists geog geography(Point, 4326);
+
+-- Auto-update geography column
+create or replace function update_merchant_geog()
+returns trigger as $$
+begin
+  if new.latitude is not null and new.longitude is not null then
+    new.geog = st_point(new.longitude, new.latitude)::geography;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger merchant_geog_trigger before insert or update on merchants
+  for each row execute function update_merchant_geog();
+
+create index idx_merchants_geog on merchants using gist(geog);
+```
+
+**Step 2: Create location tracking hook**
+
+Create `apps/mobile/hooks/useLocation.ts`:
+```typescript
+import { useEffect } from 'react';
+import * as Location from 'expo-location';
+import { supabase } from '../lib/supabase';
+import { useAuthStore } from '../lib/store';
+
+export function useLocation() {
+  const session = useAuthStore((s) => s.session);
+
+  useEffect(() => {
+    if (!session) return;
+
+    let subscription: Location.LocationSubscription;
+
+    async function start() {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+
+      subscription = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.Balanced, distanceInterval: 200 },
+        async (location) => {
+          await supabase.functions.invoke('proximity-check', {
+            body: {
+              lat: location.coords.latitude,
+              lng: location.coords.longitude,
+            },
+          });
+        }
+      );
+    }
+
+    start();
+    return () => { subscription?.remove(); };
+  }, [session]);
+}
+```
+
+**Step 3: Create proximity-check Edge Function**
+
+Create `supabase/functions/proximity-check/index.ts` that:
+- Takes `{ lat, lng }` from authenticated customer
+- Queries merchants within 500m using PostGIS: `ST_DWithin(geog, ST_Point(lng, lat)::geography, 500)`
+- For each nearby merchant, checks if customer has a card
+- If yes and no proximity notification sent in last 24h, sends push: "You are near {merchant}! Check your rewards"
+- Records notification with type `proximity`
+
+**Step 4: Add location fields to merchant settings**
+
+Update `apps/dashboard/src/app/(dashboard)/settings/page.tsx` to include latitude/longitude inputs (or a map picker).
+
+**Step 5: Create stores map in mobile app**
+
+Create `apps/mobile/app/(tabs)/stores.tsx` with a map view (using `react-native-maps`) showing nearby merchants and their active programs.
+
+**Step 6: Commit**
+
+```bash
+git add .
+git commit -m "feat: add geolocation with proximity notifications"
+```
+
+---
+
+### Task 27: A/B Testing for Campaigns
+
+**Files:**
+- Create: `supabase/migrations/007_ab_testing.sql`
+- Modify: `apps/dashboard/src/components/campaign-form.tsx`
+- Modify: `supabase/functions/send-push/index.ts`
+
+**Step 1: Add A/B fields to campaigns**
+
+Create `supabase/migrations/007_ab_testing.sql`:
+```sql
+alter table public.campaigns add column if not exists variant char(1) default null;
+alter table public.campaigns add column if not exists parent_campaign_id uuid references campaigns(id);
+```
+
+**Step 2: Update campaign form**
+
+Add a toggle "Enable A/B Test" to campaign form. When enabled, show two variants (A and B) with separate title/body fields. On submit, create two campaign rows with `variant = 'A'` and `variant = 'B'`, linked via `parent_campaign_id`.
+
+**Step 3: Update send-push**
+
+When sending an A/B campaign, split the target audience 50/50 randomly and send each half a different variant. Track opens/clicks separately per variant.
+
+**Step 4: Add A/B results view**
+
+Create a comparison view in the analytics showing variant A vs B performance (open rate, click rate, conversions).
+
+**Step 5: Commit**
+
+```bash
+git add .
+git commit -m "feat: add A/B testing for campaigns"
+```
+
+---
+
+### Task 28: Multi-Location Support
+
+**Files:**
+- Create: `supabase/migrations/008_locations.sql`
+- Create: `apps/dashboard/src/app/(dashboard)/settings/locations/page.tsx`
+
+**Step 1: Create locations table**
+
+Create `supabase/migrations/008_locations.sql`:
+```sql
+create table public.merchant_locations (
+  id uuid primary key default uuid_generate_v4(),
+  merchant_id uuid references merchants(id) on delete cascade not null,
+  name text not null,
+  address text,
+  latitude double precision,
+  longitude double precision,
+  geog geography(Point, 4326),
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
+
+alter table public.merchant_locations enable row level security;
+create policy "Locations: merchant owner" on public.merchant_locations
+  for all using (merchant_id in (select id from merchants where user_id = auth.uid()));
+
+-- Update QR codes to optionally link to a location
+alter table public.qr_codes add column if not exists location_id uuid references merchant_locations(id);
+```
+
+**Step 2: Create locations management page**
+
+Build `apps/dashboard/src/app/(dashboard)/settings/locations/page.tsx` with:
+- List of locations with name, address
+- Add/edit/deactivate locations
+- QR codes can be assigned to specific locations
+
+**Step 3: Update analytics to break down by location**
+
+Add location filtering to the analytics dashboard.
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: add multi-location support for merchants"
+```
+
+---
+
+### Task 29: Public API for Integrations
+
+**Files:**
+- Create: `supabase/functions/api-v1/index.ts`
+- Create: `apps/dashboard/src/app/(dashboard)/settings/api/page.tsx`
+- Create: `supabase/migrations/009_api_keys.sql`
+
+**Step 1: Create API keys table**
+
+```sql
+create table public.api_keys (
+  id uuid primary key default uuid_generate_v4(),
+  merchant_id uuid references merchants(id) on delete cascade not null,
+  key_hash text not null,
+  name text not null,
+  last_used_at timestamptz,
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
+
+alter table public.api_keys enable row level security;
+create policy "API keys: merchant owner" on public.api_keys
+  for all using (merchant_id in (select id from merchants where user_id = auth.uid()));
+```
+
+**Step 2: Create API v1 Edge Function**
+
+Create `supabase/functions/api-v1/index.ts` that provides REST endpoints:
+- `GET /programs` — List merchant programs
+- `GET /clients` — List merchant clients
+- `POST /stamps` — Add stamp to customer
+- `POST /points` — Add points to customer
+- `GET /analytics` — Get KPIs
+
+Authentication via API key in `X-API-Key` header, validated against `api_keys` table.
+
+**Step 3: Create API key management page**
+
+Build page to generate, view, and revoke API keys. Show only the key once on creation (hash stored in DB). Plan enforcement: only Business plan merchants can access API.
+
+**Step 4: Commit**
+
+```bash
+git add .
+git commit -m "feat: add public REST API with API key auth"
+```
+
+---
+
+### Task 30: VIP/Gold/Silver Tier System
+
+**Files:**
+- Create: `supabase/functions/update-tiers/index.ts`
+- Create: `supabase/migrations/010_tier_rules.sql`
+- Modify: `apps/mobile/components/card-item.tsx`
+
+**Step 1: Create tier rules table**
+
+```sql
+create table public.tier_rules (
+  id uuid primary key default uuid_generate_v4(),
+  program_id uuid references loyalty_programs(id) on delete cascade not null,
+  tier text not null check (tier in ('silver', 'gold', 'vip')),
+  min_transactions int not null,
+  min_points numeric(10,2) default 0,
+  created_at timestamptz default now(),
+  unique(program_id, tier)
+);
+```
+
+**Step 2: Create update-tiers Edge Function**
+
+Runs daily (via cron) or after each transaction. For each customer card:
+- Count transactions in last 90 days
+- Compare against tier_rules for the program
+- Upgrade or downgrade tier accordingly
+- Send notification on tier change
+
+**Step 3: Update mobile card display**
+
+Add tier badge (bronze/silver/gold/vip) with distinct colors to `card-item.tsx`. Add a progress bar showing how close the customer is to the next tier.
+
+**Step 4: Create tier management in dashboard**
+
+Add a "Tier Rules" section to program edit page where merchants define thresholds for each tier.
+
+**Step 5: Commit**
+
+```bash
+git add .
+git commit -m "feat: implement VIP/Gold/Silver tier system"
+```
+
+---
+
+### Task 31: Mobile App — Profile Screen + Settings
+
+**Files:**
+- Modify: `apps/mobile/app/(tabs)/profile.tsx`
+
+**Step 1: Complete profile screen**
+
+Replace placeholder with full profile screen showing:
+- User avatar, name, email
+- Push notification preferences toggle
+- Language selector
+- Link to referral screen
+- Transaction history list
+- Sign out button
+
+**Step 2: Commit**
+
+```bash
+git add .
+git commit -m "feat: complete profile screen with settings"
+```
+
+---
+
+### Task 32: Merchant Dashboard — Settings Page
+
+**Files:**
+- Create: `apps/dashboard/src/app/(dashboard)/settings/page.tsx`
+
+**Step 1: Create settings page**
+
+Build settings page with:
+- Business logo upload (Supabase Storage)
+- Store name, address, category, phone
+- Opening hours
+- Link to locations management
+- Link to API keys (Business plan)
+- Account deletion
+
+**Step 2: Commit**
+
+```bash
+git add .
+git commit -m "feat: complete merchant settings page"
+```
+
+---
+
+### Task 33: Final Polish + CI/CD
+
+**Files:**
+- Create: `loyalty-app/.github/workflows/ci.yml`
+- Create: `loyalty-app/apps/mobile/eas.json`
+
+**Step 1: Set up EAS Build**
+
+```bash
+cd apps/mobile
+npx eas-cli init
+npx eas build:configure
+```
+
+Create `apps/mobile/eas.json`:
+```json
+{
+  "build": {
+    "preview": { "distribution": "internal", "ios": { "simulator": true } },
+    "production": { "autoIncrement": true }
+  },
+  "submit": {
+    "production": {
+      "ios": { "appleId": "YOUR_APPLE_ID", "ascAppId": "YOUR_ASC_APP_ID" },
+      "android": { "serviceAccountKeyPath": "./play-store-key.json" }
+    }
+  }
+}
+```
+
+**Step 2: Create GitHub Actions CI**
+
+Create `.github/workflows/ci.yml`:
+```yaml
+name: CI
+on: [push, pull_request]
+jobs:
+  lint-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo lint typecheck
+  test-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter dashboard build
+```
+
+**Step 3: Deploy dashboard to Vercel**
+
+```bash
+cd apps/dashboard
+npx vercel --prod
+```
+
+**Step 4: Deploy Supabase to production**
+
+```bash
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push
+npx supabase functions deploy validate-scan
+npx supabase functions deploy redeem-reward
+npx supabase functions deploy send-push
+npx supabase functions deploy auto-notifications
+npx supabase functions deploy proximity-check
+npx supabase functions deploy api-v1
+npx supabase functions deploy update-tiers
+npx supabase functions deploy process-referral
+```
+
+**Step 5: Build mobile apps**
+
+```bash
+cd apps/mobile
+npx eas build --platform all --profile production
+npx eas submit --platform all
+```
+
+**Step 6: Commit**
+
+```bash
+git add .
+git commit -m "chore: add CI/CD pipeline and deployment configs"
+```
+
+---
+
+**END OF PHASE 3** — The platform is fully featured with NFC, geolocation, A/B testing, multi-location, public API, tier system, and deployed to production.
+
+---
+
+## Summary
+
+| Phase | Tasks | Weeks | Key Deliverables |
+|-------|-------|-------|-----------------|
+| **1 — MVP** | 1-18 | 1-4 | Auth, loyalty cards, QR scan, dashboard, push |
+| **2 — Marketing** | 19-24 | 5-8 | Segments, analytics, Stripe, referrals, i18n |
+| **3 — Advanced** | 25-33 | 9-12 | NFC, geoloc, A/B, multi-site, API, tiers, CI/CD |
+
+**Total: 33 tasks across 3 phases over 12 weeks.**

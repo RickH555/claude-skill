@@ -1,0 +1,33 @@
+'use client';
+
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { Toast, ToastContainer } from '@/components/ToastSystem';
+
+interface ToastContextValue {
+  showToast: (type: Toast['type'], message: string) => void;
+}
+
+const ToastCtx = createContext<ToastContextValue>({ showToast: () => {} });
+
+export const useToast = () => useContext(ToastCtx);
+
+export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const showToast = useCallback((type: Toast['type'], message: string) => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, type, message }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+  }, []);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  return (
+    <ToastCtx.Provider value={{ showToast }}>
+      {children}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </ToastCtx.Provider>
+  );
+}

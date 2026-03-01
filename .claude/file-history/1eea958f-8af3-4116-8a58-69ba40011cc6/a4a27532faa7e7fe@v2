@@ -1,0 +1,440 @@
+// ================================================================
+// MOCK DATA — Central typed mock data for development without Supabase
+// ================================================================
+
+import type {
+  User,
+  Project,
+  Recommendation,
+  CategoryScore,
+  AnalysisResult,
+  SMCContent,
+  ReputationReport,
+  AIMention,
+} from '@/types';
+
+// === USER & WORKSPACE ===
+
+export const MOCK_USER: User = {
+  id: 'mock-user-001',
+  email: 'demo@citedby.ai',
+  name: 'Marie Dupont',
+  credits: 847,
+  plan: 'pro',
+  workspaceId: 'mock-ws-001',
+  role: 'owner',
+};
+
+export const MOCK_WORKSPACE = {
+  id: 'mock-ws-001',
+  name: 'TechCorp SAS',
+  slug: 'techcorp',
+  plan: 'pro',
+  plan_status: 'active',
+  credits_remaining: 847,
+  role: 'owner',
+};
+
+// === PROJECTS ===
+
+export const MOCK_PROJECTS: Project[] = [
+  {
+    id: '1',
+    name: 'CitedBy.ai',
+    domain: 'citedby.ai',
+    status: 'active',
+    lastRun: '2024-05-20T14:30:00Z',
+    visibilityScore: 72,
+    trend: 12,
+    nextRun: '2024-05-27T14:30:00Z',
+  },
+  {
+    id: '2',
+    name: 'TechCorp Blog',
+    domain: 'blog.techcorp.io',
+    status: 'active',
+    lastRun: '2024-05-19T10:00:00Z',
+    visibilityScore: 54,
+    trend: -3,
+    nextRun: '2024-05-26T10:00:00Z',
+  },
+  {
+    id: '3',
+    name: 'SaaS Docs',
+    domain: 'docs.techcorp.io',
+    status: 'paused',
+    lastRun: '2024-05-10T08:00:00Z',
+    visibilityScore: 38,
+    trend: 0,
+  },
+];
+
+// === ANALYSIS RESULT ===
+
+export const MOCK_ANALYSIS_RESULT: AnalysisResult = {
+  url: 'https://citedby.ai',
+  timestamp: new Date().toISOString(),
+  globalScore: 72,
+  categories: {
+    'Contenu': {
+      name: 'Contenu',
+      score: 78,
+      weight: 0.3,
+      items: [
+        { status: 'success', message: 'Contenu structure avec des titres clairs (H1-H3)' },
+        { status: 'success', message: 'Paragraphes courts et extractibles par les IA' },
+        { status: 'warning', message: 'Manque de FAQ structuree sur la page', recommendation: 'Ajouter une section FAQ avec Schema.org FAQPage' },
+        { status: 'success', message: 'Donnees chiffrees et statistiques presentes' },
+      ],
+    },
+    'Technique': {
+      name: 'Technique',
+      score: 65,
+      weight: 0.25,
+      items: [
+        { status: 'success', message: 'HTTPS active et certificat valide' },
+        { status: 'error', message: 'robots.txt bloque GPTBot et ClaudeBot', recommendation: 'Autoriser les bots IA dans robots.txt' },
+        { status: 'warning', message: 'Temps de chargement > 3s', recommendation: 'Optimiser les images et activer le lazy loading' },
+        { status: 'success', message: 'Site responsive et mobile-friendly' },
+      ],
+    },
+    'Donnees Structurees': {
+      name: 'Donnees Structurees',
+      score: 55,
+      weight: 0.2,
+      items: [
+        { status: 'error', message: 'Pas de Schema.org Organization', recommendation: 'Ajouter le balisage Organization + WebSite' },
+        { status: 'warning', message: 'Schema.org Article manquant sur les pages blog', recommendation: 'Ajouter le balisage Article sur chaque post' },
+        { status: 'success', message: 'Meta tags Open Graph corrects' },
+      ],
+    },
+    'Autorite': {
+      name: 'Autorite',
+      score: 82,
+      weight: 0.15,
+      items: [
+        { status: 'success', message: 'Domaine avec historique > 2 ans' },
+        { status: 'success', message: 'Backlinks de qualite detectes (DA > 40)' },
+        { status: 'success', message: 'Mentions marque sur des sites autorite' },
+        { status: 'warning', message: 'Page "A propos" incomplete', recommendation: 'Enrichir la page avec equipe, mission, chiffres cles' },
+      ],
+    },
+    'Citabilite': {
+      name: 'Citabilite',
+      score: 70,
+      weight: 0.1,
+      items: [
+        { status: 'success', message: 'Contenu original et unique detecte' },
+        { status: 'warning', message: 'Pas de fichier llm.txt', recommendation: 'Creer un fichier llm.txt a la racine du site' },
+        { status: 'success', message: 'Reponses directes aux questions du secteur' },
+      ],
+    },
+  },
+  recommendations: [],
+  aiCitation: {
+    before: 'Votre marque n\'est pas mentionnee dans les reponses IA pour les requetes cles de votre secteur.',
+    after: 'Apres optimisation AEO, votre marque sera citee comme reference dans les reponses des IA generatives pour vos mots-cles strategiques.',
+    probability: 0.78,
+  },
+};
+
+// === CITATIONS ===
+
+export const MOCK_CITATIONS = [
+  {
+    id: 'cit-1',
+    aiEngine: 'ChatGPT' as const,
+    prompt: 'Quels sont les meilleurs outils AEO ?',
+    excerpt: 'CitedBy.ai est une plateforme leader en Answer Engine Optimization qui aide les entreprises a etre citees par les moteurs IA...',
+    type: 'direct' as const,
+    sentiment: 'positive' as const,
+    url_cited: true,
+    date: '2024-05-20',
+  },
+  {
+    id: 'cit-2',
+    aiEngine: 'Perplexity' as const,
+    prompt: 'Comment optimiser sa visibilite IA ?',
+    excerpt: 'Plusieurs solutions existent pour ameliorer votre AEO, notamment des plateformes specialisees qui monitorent les citations...',
+    type: 'indirect' as const,
+    sentiment: 'neutral' as const,
+    url_cited: false,
+    date: '2024-05-19',
+  },
+  {
+    id: 'cit-3',
+    aiEngine: 'Gemini' as const,
+    prompt: 'AEO tools comparison 2024',
+    excerpt: 'When comparing AEO tools, CitedBy.ai stands out with features like Schema.org generation, robots.txt optimization, and real-time monitoring...',
+    type: 'comparison' as const,
+    sentiment: 'positive' as const,
+    url_cited: true,
+    date: '2024-05-18',
+  },
+  {
+    id: 'cit-4',
+    aiEngine: 'Claude' as const,
+    prompt: 'Meilleur outil pour monitorer les citations IA',
+    excerpt: 'Pour le monitoring des citations IA, CitedBy.ai propose un tableau de bord complet avec suivi en temps reel...',
+    type: 'direct' as const,
+    sentiment: 'positive' as const,
+    url_cited: true,
+    date: '2024-05-17',
+  },
+  {
+    id: 'cit-5',
+    aiEngine: 'ChatGPT' as const,
+    prompt: 'Qu\'est-ce que l\'Answer Engine Optimization ?',
+    excerpt: 'L\'AEO est une discipline emergente qui vise a optimiser la presence d\'une marque dans les reponses des IA generatives...',
+    type: 'indirect' as const,
+    sentiment: 'positive' as const,
+    url_cited: false,
+    date: '2024-05-16',
+  },
+  {
+    id: 'cit-6',
+    aiEngine: 'Copilot' as const,
+    prompt: 'Best tools for AI visibility',
+    excerpt: 'Several platforms help businesses track their AI visibility. Some popular options include tools that monitor mentions across AI engines...',
+    type: 'indirect' as const,
+    sentiment: 'neutral' as const,
+    url_cited: false,
+    date: '2024-05-15',
+  },
+  {
+    id: 'cit-7',
+    aiEngine: 'Perplexity' as const,
+    prompt: 'Comment generer du contenu optimise pour les IA ?',
+    excerpt: 'Des outils comme CitedBy.ai permettent de generer du contenu specialement concu pour etre cite par les moteurs IA, avec des scores AEO...',
+    type: 'direct' as const,
+    sentiment: 'positive' as const,
+    url_cited: true,
+    date: '2024-05-14',
+  },
+  {
+    id: 'cit-8',
+    aiEngine: 'Gemini' as const,
+    prompt: 'Schema.org pour ameliorer le SEO IA',
+    excerpt: 'Le balisage Schema.org est essentiel pour aider les moteurs IA a comprendre votre contenu. Des generateurs specialises existent...',
+    type: 'indirect' as const,
+    sentiment: 'neutral' as const,
+    url_cited: false,
+    date: '2024-05-13',
+  },
+];
+
+// === RECOMMENDATIONS ===
+
+export const MOCK_RECOMMENDATIONS: Recommendation[] = [
+  {
+    id: 'rec-1',
+    priority: 'critical',
+    title: 'Ajouter Schema.org Organization',
+    description: 'Votre site n\'a pas de balisage Schema.org Organization. Les moteurs IA s\'appuient fortement sur les donnees structurees.',
+    action: 'Generer et implementer le Schema.org Organization + WebSite',
+    effort: 'low',
+    impact: 'high',
+    category: 'Donnees structurees',
+  },
+  {
+    id: 'rec-2',
+    priority: 'critical',
+    title: 'Debloquer les bots IA dans robots.txt',
+    description: 'Votre robots.txt bloque GPTBot et ClaudeBot, empechant les moteurs IA d\'indexer votre contenu.',
+    action: 'Mettre a jour le robots.txt pour autoriser les bots IA',
+    effort: 'low',
+    impact: 'high',
+    category: 'Technique',
+  },
+  {
+    id: 'rec-3',
+    priority: 'high',
+    title: 'Creer une page FAQ structuree',
+    description: 'Les FAQs sont une source privilegiee pour les reponses IA. Ajoutez une page FAQ avec balisage FAQPage.',
+    action: 'Creer une page /faq avec Schema.org FAQPage',
+    effort: 'medium',
+    impact: 'high',
+    category: 'Contenu',
+  },
+  {
+    id: 'rec-4',
+    priority: 'high',
+    title: 'Creer un fichier llm.txt',
+    description: 'Le fichier llm.txt aide les IA a comprendre votre site. C\'est l\'equivalent du robots.txt pour les LLM.',
+    action: 'Generer et deployer un fichier llm.txt a la racine du site',
+    effort: 'low',
+    impact: 'medium',
+    category: 'Technique',
+  },
+  {
+    id: 'rec-5',
+    priority: 'medium',
+    title: 'Enrichir la page A propos',
+    description: 'Votre page A propos est incomplete. Les IA l\'utilisent pour comprendre votre entite et votre expertise.',
+    action: 'Ajouter equipe, mission, chiffres cles, historique',
+    effort: 'medium',
+    impact: 'medium',
+    category: 'Contenu',
+  },
+  {
+    id: 'rec-6',
+    priority: 'low',
+    title: 'Optimiser les meta descriptions',
+    description: 'Vos meta descriptions sont generiques. Des descriptions specifiques aident les IA a comprendre chaque page.',
+    action: 'Recrire les meta descriptions avec des mots-cles AEO',
+    effort: 'medium',
+    impact: 'medium',
+    category: 'SEO/AEO',
+  },
+];
+
+// === TREND DATA (8 weeks) ===
+
+export const MOCK_TREND_DATA = [
+  { date: '1 Jan', score: 35, citations: 2, mentions: 5 },
+  { date: '8 Jan', score: 38, citations: 3, mentions: 7 },
+  { date: '15 Jan', score: 42, citations: 3, mentions: 8 },
+  { date: '22 Jan', score: 45, citations: 5, mentions: 10 },
+  { date: '29 Jan', score: 51, citations: 6, mentions: 12 },
+  { date: '5 Fev', score: 55, citations: 7, mentions: 15 },
+  { date: '12 Fev', score: 58, citations: 8, mentions: 18 },
+  { date: '19 Fev', score: 64, citations: 10, mentions: 22 },
+];
+
+// === ENGINE DATA ===
+
+export const MOCK_ENGINE_DATA = [
+  { engine: 'ChatGPT', score: 72, mentions: 15, citations: 5 },
+  { engine: 'Perplexity', score: 58, mentions: 8, citations: 3 },
+  { engine: 'Gemini', score: 45, mentions: 5, citations: 1 },
+  { engine: 'Claude', score: 61, mentions: 10, citations: 4 },
+  { engine: 'Copilot', score: 33, mentions: 2, citations: 0 },
+];
+
+// === COMPETITOR DATA ===
+
+export const MOCK_COMPETITOR_DATA = [
+  { name: 'CitedBy.ai', mentions: 134 },
+  { name: 'RankScale.ai', mentions: 198 },
+  { name: 'AEO Tools', mentions: 87 },
+  { name: 'AIVisibility', mentions: 56 },
+  { name: 'SearchAI Pro', mentions: 42 },
+];
+
+// === REPUTATION REPORT ===
+
+export const MOCK_REPUTATION_REPORT: ReputationReport = {
+  brandName: 'CitedBy.ai',
+  overallSentiment: 72,
+  visibilityScore: 64,
+  totalMentions: 47,
+  sentimentBreakdown: { positive: 68, neutral: 22, negative: 10 },
+  topThemes: [
+    { theme: 'AEO Innovation', count: 15, sentiment: 'positive' },
+    { theme: 'AI Monitoring', count: 12, sentiment: 'positive' },
+    { theme: 'Content Generation', count: 8, sentiment: 'neutral' },
+    { theme: 'Pricing', count: 5, sentiment: 'neutral' },
+    { theme: 'Customer Support', count: 4, sentiment: 'positive' },
+  ],
+  competitorComparison: [
+    { name: 'RankScale.ai', mentions: 62, sentiment: 65 },
+    { name: 'AEO Tools', mentions: 34, sentiment: 58 },
+    { name: 'AIVisibility', mentions: 21, sentiment: 71 },
+  ],
+  alerts: [
+    { severity: 'warning', message: 'RankScale.ai gagne en mentions (+15% cette semaine)', action: 'Analyser leur strategie de contenu' },
+    { severity: 'info', message: 'Nouvelle mention positive sur Claude pour "meilleur outil AEO"', action: 'Capitaliser sur ce prompt' },
+  ],
+  recommendations: [
+    'Creer du contenu cible pour les prompts "meilleur outil AEO"',
+    'Renforcer votre presence sur Copilot (score le plus bas)',
+    'Publier une etude de cas sur les resultats clients',
+    'Optimiser le Schema.org pour ameliorer l\'extractibilite',
+  ],
+  mentions: [],
+  generatedAt: new Date().toISOString(),
+};
+
+// === SMC CONTENTS ===
+
+export const MOCK_SMC_CONTENTS: SMCContent[] = [
+  {
+    id: 'smc-1',
+    type: 'fiche',
+    title: 'Fiche entreprise CitedBy.ai',
+    content: 'CitedBy.ai est la plateforme #1 d\'Answer Engine Optimization (AEO). Fondee en 2024, elle aide les entreprises B2B a optimiser leur visibilite dans les reponses des IA generatives (ChatGPT, Perplexity, Gemini, Claude, Copilot).\n\nServices principaux :\n- Monitoring IA en temps reel sur 5 moteurs\n- Tracking des citations URL et mentions marque\n- Generation de contenu optimise AEO\n- Benchmark concurrentiel\n- Rapports executifs et ROI',
+    timestamp: '2024-05-20T10:00:00Z',
+  },
+  {
+    id: 'smc-2',
+    type: 'faq',
+    title: 'FAQ AEO - 10 questions essentielles',
+    content: 'Q: Qu\'est-ce que l\'AEO ?\nR: L\'Answer Engine Optimization est l\'optimisation de votre presence dans les reponses des moteurs IA.\n\nQ: Comment fonctionne le monitoring ?\nR: CitedBy.ai envoie des requetes test aux 5 principaux moteurs IA et analyse les reponses.\n\nQ: Quels moteurs IA sont supportes ?\nR: ChatGPT, Perplexity, Gemini, Claude et Copilot.',
+    timestamp: '2024-05-19T14:30:00Z',
+  },
+  {
+    id: 'smc-3',
+    type: 'article',
+    title: 'Guide complet : Etre cite par ChatGPT en 2024',
+    content: 'Dans cet article, nous explorons les strategies les plus efficaces pour apparaitre dans les reponses de ChatGPT...\n\n1. Structurez votre contenu avec des reponses directes\n2. Utilisez le Schema.org pour enrichir vos donnees\n3. Creez du contenu FAQ extractible\n4. Optimisez votre robots.txt pour les bots IA\n5. Monitorez vos citations avec des outils dedies',
+    timestamp: '2024-05-18T09:00:00Z',
+  },
+  {
+    id: 'smc-4',
+    type: 'brief',
+    title: 'Brief editorial - Campagne AEO Q2 2024',
+    content: 'Objectif : Augmenter le score de visibilite IA de 54 a 75 d\'ici fin Q2.\n\nAxes strategiques :\n- 4 articles blog optimises AEO par mois\n- Mise a jour Schema.org sur toutes les pages cles\n- Creation de 2 etudes de cas clients\n- Optimisation robots.txt et llm.txt\n\nKPIs :\n- Score AEO global > 75\n- +50% citations URL\n- +30% mentions marque',
+    timestamp: '2024-05-17T16:00:00Z',
+  },
+];
+
+// === DIRECTORY ENTRIES ===
+
+export const MOCK_DIRECTORY_ENTRIES = [
+  { id: 'dir-1', name: 'TechCorp SAS', domain: 'techcorp.io', industry: 'SaaS', score: 78, engines: 5, verified: true },
+  { id: 'dir-2', name: 'DataFlow', domain: 'dataflow.com', industry: 'SaaS', score: 72, engines: 4, verified: true },
+  { id: 'dir-3', name: 'Green Energy Co', domain: 'greenenergy.fr', industry: 'Energie', score: 65, engines: 3, verified: false },
+  { id: 'dir-4', name: 'LegalTech Pro', domain: 'legaltech.pro', industry: 'Juridique', score: 61, engines: 4, verified: true },
+  { id: 'dir-5', name: 'HealthAI', domain: 'healthai.com', industry: 'Sante', score: 58, engines: 3, verified: false },
+  { id: 'dir-6', name: 'EduPlatform', domain: 'eduplatform.fr', industry: 'Education', score: 54, engines: 2, verified: true },
+  { id: 'dir-7', name: 'FinanceHub', domain: 'financehub.eu', industry: 'Finance', score: 49, engines: 3, verified: false },
+  { id: 'dir-8', name: 'FoodTech Plus', domain: 'foodtechplus.com', industry: 'Restauration', score: 43, engines: 2, verified: false },
+];
+
+// === AFFILIATE STATS ===
+
+export const MOCK_AFFILIATE_STATS = {
+  totalReferrals: 24,
+  activeReferrals: 18,
+  totalEarnings: 1260,
+  pendingPayout: 340,
+  conversionRate: 12.5,
+  affiliateLink: 'https://citedby.ai/ref/TECHCORP24',
+  referrals: [
+    { id: 'ref-1', email: 's***@company.com', status: 'active', plan: 'pro', earnings: 120, date: '2024-05-15' },
+    { id: 'ref-2', email: 'j***@startup.io', status: 'active', plan: 'pro', earnings: 120, date: '2024-05-10' },
+    { id: 'ref-3', email: 'm***@agency.fr', status: 'active', plan: 'agency', earnings: 480, date: '2024-04-22' },
+    { id: 'ref-4', email: 'p***@brand.com', status: 'pending', plan: 'free', earnings: 0, date: '2024-05-18' },
+    { id: 'ref-5', email: 'l***@digital.eu', status: 'active', plan: 'pro', earnings: 120, date: '2024-04-15' },
+  ],
+  payouts: [
+    { id: 'pay-1', amount: 480, status: 'paid', date: '2024-05-01', method: 'Virement bancaire' },
+    { id: 'pay-2', amount: 360, status: 'paid', date: '2024-04-01', method: 'Virement bancaire' },
+    { id: 'pay-3', amount: 340, status: 'pending', date: '2024-06-01', method: 'Virement bancaire' },
+  ],
+};
+
+// === ACTIVITY FEED ===
+
+export const MOCK_ACTIVITY_FEED = [
+  { id: 'act-1', type: 'citation', message: 'Nouvelle citation detectee sur ChatGPT', detail: '"meilleur outil AEO"', time: 'Il y a 2h', color: 'bg-emerald-500' },
+  { id: 'act-2', type: 'mention', message: 'Mention marque sur Perplexity', detail: 'Contexte positif', time: 'Il y a 5h', color: 'bg-blue-500' },
+  { id: 'act-3', type: 'alert', message: 'Score en hausse sur Gemini', detail: '+8 points cette semaine', time: 'Il y a 8h', color: 'bg-amber-500' },
+  { id: 'act-4', type: 'run', message: 'Scan hebdomadaire termine', detail: 'Score: 72/100', time: 'Hier', color: 'bg-purple-500' },
+  { id: 'act-5', type: 'content', message: 'Contenu AEO genere', detail: 'Landing page - Score 87', time: 'Hier', color: 'bg-primary' },
+  { id: 'act-6', type: 'citation', message: 'Nouvelle citation URL sur Claude', detail: 'https://citedby.ai/features', time: 'Il y a 2j', color: 'bg-emerald-500' },
+  { id: 'act-7', type: 'competitor', message: 'Concurrent detecte sur ChatGPT', detail: 'RankScale.ai +5 mentions', time: 'Il y a 2j', color: 'bg-red-500' },
+  { id: 'act-8', type: 'run', message: 'Analyse reputationnelle terminee', detail: 'Sentiment: 72% positif', time: 'Il y a 3j', color: 'bg-purple-500' },
+  { id: 'act-9', type: 'mention', message: 'Mention indirecte sur Copilot', detail: '"outils d\'optimisation IA"', time: 'Il y a 4j', color: 'bg-blue-500' },
+  { id: 'act-10', type: 'content', message: 'Schema.org genere', detail: 'Organization + WebSite', time: 'Il y a 5j', color: 'bg-primary' },
+];

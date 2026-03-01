@@ -1,0 +1,296 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  Code,
+  Sparkles,
+  Loader2,
+  Copy,
+  Check,
+  Building,
+  Globe,
+  ShoppingCart,
+  User,
+  FileText,
+  HelpCircle,
+} from 'lucide-react';
+import { PageHeader } from '@/components/page-header';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CodeBlock } from '@/components/code-block';
+
+const SCHEMA_TYPES = [
+  { id: 'Organization', label: 'Organization', description: 'Entreprise, association, marque', icon: Building },
+  { id: 'WebSite', label: 'WebSite', description: 'Site web avec moteur de recherche', icon: Globe },
+  { id: 'Product', label: 'Product', description: 'Produit physique ou digital', icon: ShoppingCart },
+  { id: 'Person', label: 'Person', description: 'Personne, auteur, expert', icon: User },
+  { id: 'Article', label: 'Article', description: 'Article de blog ou actualite', icon: FileText },
+  { id: 'FAQPage', label: 'FAQPage', description: 'Page de questions frequentes', icon: HelpCircle },
+];
+
+export default function SchemaOrgPage() {
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [name, setName] = useState('');
+  const [url, setUrl] = useState('');
+  const [description, setDescription] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerate = () => {
+    if (!selectedType || !name) return;
+    setGenerating(true);
+
+    setTimeout(() => {
+      const schemas: Record<string, object> = {
+        Organization: {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": name,
+          "url": url || `https://${name.toLowerCase().replace(/\s+/g, '')}.com`,
+          "description": description || `${name} - Solutions innovantes`,
+          "logo": `${url || 'https://example.com'}/logo.png`,
+          "sameAs": [
+            "https://twitter.com/example",
+            "https://linkedin.com/company/example",
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+33-1-00-00-00-00",
+            "contactType": "customer service",
+            "availableLanguage": ["French", "English"],
+          },
+          "foundingDate": "2024",
+          "numberOfEmployees": {
+            "@type": "QuantitativeValue",
+            "value": 50,
+          },
+        },
+        WebSite: {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": name,
+          "url": url || `https://${name.toLowerCase().replace(/\s+/g, '')}.com`,
+          "description": description,
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": `${url || 'https://example.com'}/search?q={search_term_string}`,
+            },
+            "query-input": "required name=search_term_string",
+          },
+        },
+        Product: {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": name,
+          "description": description,
+          "brand": { "@type": "Brand", "name": name.split(' ')[0] },
+          "offers": {
+            "@type": "Offer",
+            "price": "49.00",
+            "priceCurrency": "EUR",
+            "availability": "https://schema.org/InStock",
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.7",
+            "reviewCount": "128",
+          },
+        },
+        Person: {
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "name": name,
+          "url": url,
+          "description": description,
+          "jobTitle": "Expert",
+          "sameAs": [],
+        },
+        Article: {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": name,
+          "description": description,
+          "author": { "@type": "Organization", "name": "CitedBy.ai" },
+          "datePublished": new Date().toISOString().split('T')[0],
+          "dateModified": new Date().toISOString().split('T')[0],
+          "publisher": {
+            "@type": "Organization",
+            "name": "CitedBy.ai",
+            "logo": { "@type": "ImageObject", "url": "https://citedby.ai/logo.png" },
+          },
+        },
+        FAQPage: {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": `Qu'est-ce que ${name} ?`,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": description || `${name} est une solution innovante...`,
+              },
+            },
+            {
+              "@type": "Question",
+              "name": `Comment fonctionne ${name} ?`,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": `${name} utilise une technologie avancee pour...`,
+              },
+            },
+          ],
+        },
+      };
+
+      setResult(JSON.stringify(schemas[selectedType] || schemas.Organization, null, 2));
+      setGenerating(false);
+    }, 1500);
+  };
+
+  const handleCopy = () => {
+    if (result) {
+      navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <PageHeader
+        title="Schema.org Generator"
+        description="Generez le balisage JSON-LD structure pour connecter votre marque au Knowledge Graph."
+        breadcrumbs={[
+          { label: 'App', href: '/app' },
+          { label: 'Outils Generatifs', href: '/app/generative-tools' },
+          { label: 'Schema.org' },
+        ]}
+      />
+
+      <div className="grid lg:grid-cols-12 gap-8 animate-fade-in-up">
+        {/* Form */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Type Selector */}
+          <div>
+            <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider mb-3">
+              Type de schema
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {SCHEMA_TYPES.map((st) => {
+                const Icon = st.icon;
+                return (
+                  <button
+                    key={st.id}
+                    onClick={() => setSelectedType(st.id)}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      selectedType === st.id
+                        ? 'bg-primary/10 border-primary/30'
+                        : 'bg-white/[0.02] border-white/10 hover:border-white/20'
+                    }`}
+                  >
+                    <Icon size={16} className={selectedType === st.id ? 'text-primary mb-1.5' : 'text-white/30 mb-1.5'} />
+                    <p className="text-xs font-bold text-white">{st.label}</p>
+                    <p className="text-[10px] text-white/30">{st.description}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Fields */}
+          {selectedType && (
+            <Card className="p-5 space-y-4 animate-fade-in-up">
+              <div>
+                <label className="block text-xs font-medium text-white/50 mb-1">Nom *</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={selectedType === 'Article' ? 'Titre de l\'article' : 'Nom de l\'entite'}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-2.5 text-white placeholder:text-white/30 focus:border-primary/50 outline-none transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-white/50 mb-1">URL</label>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://example.com"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-2.5 text-white placeholder:text-white/30 focus:border-primary/50 outline-none transition-all text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-white/50 mb-1">Description</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Description courte..."
+                  rows={3}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-2.5 text-white placeholder:text-white/30 focus:border-primary/50 outline-none transition-all text-sm resize-none"
+                />
+              </div>
+              <Button
+                onClick={handleGenerate}
+                disabled={!name || generating}
+                className="w-full gap-2"
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    Generation...
+                  </>
+                ) : (
+                  <>
+                    <Code size={16} />
+                    Generer le JSON-LD
+                  </>
+                )}
+              </Button>
+            </Card>
+          )}
+        </div>
+
+        {/* Output */}
+        <div className="lg:col-span-7">
+          {result ? (
+            <div className="space-y-4 animate-fade-in-up">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Code size={16} className="text-orange-400" />
+                  <span className="text-sm font-bold text-white">JSON-LD genere</span>
+                  <Badge variant="secondary" className="text-[10px]">{selectedType}</Badge>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  {copied ? 'Copie !' : 'Copier'}
+                </Button>
+              </div>
+              <CodeBlock code={result} language="json" title={`schema-${selectedType?.toLowerCase()}.json`} />
+              <Card className="p-4">
+                <p className="text-xs text-white/40">
+                  <Sparkles size={12} className="inline text-primary mr-1" />
+                  Collez ce code dans une balise <code className="text-primary/70">&lt;script type=&quot;application/ld+json&quot;&gt;</code> dans le <code className="text-primary/70">&lt;head&gt;</code> de votre page.
+                </p>
+              </Card>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
+              <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+                <Code size={24} className="text-white/20" />
+              </div>
+              <p className="text-white/30 text-sm">
+                Selectionnez un type et remplissez les champs pour generer le JSON-LD
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

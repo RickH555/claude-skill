@@ -1,0 +1,72 @@
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Footer } from '@/components/landing/footer';
+import { Brain, Shield, Zap, Users } from 'lucide-react';
+
+const values = [
+  { icon: Brain, title: 'AI-First', description: 'We build with the latest AI models to deliver accurate, fast results that continuously improve.' },
+  { icon: Shield, title: 'Privacy & Security', description: 'Your data is encrypted at rest and in transit. We never use your documents to train models.' },
+  { icon: Zap, title: 'Developer Experience', description: 'Clean APIs, comprehensive docs, and intuitive interfaces that developers love.' },
+  { icon: Users, title: 'Customer Obsessed', description: 'Every feature we build starts with a real customer need. Your feedback drives our roadmap.' },
+];
+
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen">
+      <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">N</span>
+              </div>
+              <span className="text-lg font-bold">NexusAI</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost"><Link href="/login">Sign In</Link></Button>
+              <Button asChild><Link href="/signup">Get Started</Link></Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="mx-auto max-w-4xl px-6 py-16">
+        <h1 className="text-4xl font-bold tracking-tight text-center">About NexusAI</h1>
+        <p className="mt-6 text-lg text-muted-foreground text-center max-w-2xl mx-auto">
+          NexusAI is an AI-powered platform that combines intelligent document processing with smart feedback analysis, helping businesses automate their workflows and understand their customers better.
+        </p>
+
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-2">Our Mission</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            We believe every business should have access to enterprise-grade AI tools. NexusAI democratizes document intelligence and customer feedback analysis by making powerful AI accessible through an intuitive platform that anyone can use.
+          </p>
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-8">Our Values</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {values.map((v) => (
+              <div key={v.title} className="flex gap-4 p-4 rounded-lg border">
+                <div className="rounded-lg bg-primary/10 p-2 h-fit">
+                  <v.icon className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">{v.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{v.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-bold mb-4">Ready to get started?</h2>
+          <Button asChild size="lg"><Link href="/signup">Try NexusAI Free</Link></Button>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

@@ -1,0 +1,140 @@
+import { MonitoringResult, CitationEntry, EngineResult, CompetitorData, SentimentBreakdown } from '../types/ai-monitoring';
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Deterministic pseudo-random based on string seed
+const seedRandom = (str: string, index: number): number => {
+  let hash = 0;
+  const combined = str + index.toString();
+  for (let i = 0; i < combined.length; i++) {
+    const char = combined.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit
+  }
+  return Math.abs(hash % 100);
+};
+
+const ENGINES = ['chatgpt', 'claude', 'perplexity', 'gemini', 'aiOverviews'] as const;
+
+const SAMPLE_QUERIES = [
+  'Quel est le meilleur outil pour',
+  'Recommande-moi un service de',
+  'Compare les solutions de',
+  'Qui est le leader en',
+  'Quelle entreprise propose',
+  'Avis sur les outils de',
+  'Top 5 des plateformes de',
+  'Alternative à',
+  'Comment choisir un bon',
+  'Quelle est la meilleure stratégie pour'
+];
+
+const fallbackSimulation = async (brandName: string, brandUrl: string, period: '7d' | '30d' | '90d'): Promise<MonitoringResult> => {
+  await delay(2000);
+
+  const seed = brandName.length + brandUrl.length;
+  const periodDays = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+
+  // Generate engine results
+  const engineResults: EngineResult[] = ENGINES.map((engine, i) => {
+    const baseCitations = seedRandom(brandName + engine, i) % 30 + 5;
+    const citations = Math.round(baseCitations * (periodDays / 30));
+    return {
+      engine,
+      citations,
+      shareOfVoice: seedRandom(brandName, i * 3) % 40 + 10,
+      sentiment: {
+        positive: seedRandom(brandName, i * 7) % 40 + 30,
+        neutral: seedRandom(brandName, i * 11) % 30 + 20,
+        negative: 100 - (seedRandom(brandName, i * 7) % 40 + 30) - (seedRandom(brandName, i * 11) % 30 + 20)
+      },
+      trend: (seedRandom(brandName, i * 5) % 40) - 10
+    };
+  });
+
+  const totalCitations = engineResults.reduce((sum, e) => sum + e.citations, 0);
+  const avgShareOfVoice = Math.round(engineResults.reduce((sum, e) => sum + e.shareOfVoice, 0) / engineResults.length);
+
+  // Generate recent citations
+  const recentCitations: CitationEntry[] = [];
+  for (let i = 0; i < Math.min(10, totalCitations); i++) {
+    const engineIdx = i % 5;
+    const sentiments: Array<'positive' | 'neutral' | 'negative'> = ['positive', 'neutral', 'negative'];
+    const queryBase = SAMPLE_QUERIES[i % SAMPLE_QUERIES.length];
+    const daysAgo = Math.floor(seedRandom(brandName, i * 13) % periodDays);
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+
+    recentCitations.push({
+      id: `cit-${i}`,
+      engine: ENGINES[engineIdx],
+      query: `${queryBase} ${brandName.toLowerCase()}`,
+      position: (seedRandom(brandName, i * 17) % 5) + 1,
+      sentiment: sentiments[seedRandom(brandName, i * 19) % 3],
+      snippet: `${brandName} est reconnu comme un acteur majeur dans son domaine, offrant des solutions innovantes et fiables pour ses clients.`,
+      date: date.toISOString(),
+      url: brandUrl
+    });
+  }
+
+  // Sort by date, most recent first
+  recentCitations.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Generate competitor data
+  const competitorNames = ['Concurrent A', 'Concurrent B', 'Concurrent C'];
+  const competitors: CompetitorData[] = competitorNames.map((name, i) => ({
+    name,
+    citations: Math.round(totalCitations * (0.5 + seedRandom(name, i) / 200)),
+    shareOfVoice: seedRandom(name, i * 3) % 35 + 5,
+    trend: (seedRandom(name, i * 7) % 30) - 15
+  }));
+
+  // Generate time series
+  const dataPoints = period === '7d' ? 7 : period === '30d' ? 15 : 12;
+  const timeSeriesData = Array.from({ length: dataPoints }, (_, i) => {
+    const date = new Date();
+    const daysBack = period === '7d' ? i : period === '30d' ? i * 2 : i * 7.5;
+    date.setDate(date.getDate() - Math.round((dataPoints - 1 - i) * (periodDays / dataPoints)));
+
+    return {
+      date: date.toISOString().split('T')[0],
+      citations: seedRandom(brandName, i * 23) % 15 + 3,
+      chatgpt: seedRandom(brandName + 'gpt', i) % 8 + 1,
+      claude: seedRandom(brandName + 'claude', i) % 6 + 1,
+      perplexity: seedRandom(brandName + 'perp', i) % 5 + 1,
+      gemini: seedRandom(brandName + 'gem', i) % 7 + 1,
+      aiOverviews: seedRandom(brandName + 'aio', i) % 4 + 1
+    };
+  });
+
+  // Overall sentiment
+  const overallSentiment: SentimentBreakdown = {
+    positive: Math.round(engineResults.reduce((s, e) => s + e.sentiment.positive, 0) / engineResults.length),
+    neutral: Math.round(engineResults.reduce((s, e) => s + e.sentiment.neutral, 0) / engineResults.length),
+    negative: Math.round(engineResults.reduce((s, e) => s + e.sentiment.negative, 0) / engineResults.length)
+  };
+
+  return {
+    brandName,
+    brandUrl,
+    scanDate: new Date().toISOString(),
+    period,
+    totalCitations,
+    shareOfVoice: avgShareOfVoice,
+    overallSentiment,
+    trend: (seedRandom(brandName, 99) % 30) - 5,
+    engineResults,
+    recentCitations,
+    competitors,
+    timeSeriesData
+  };
+};
+
+export const scanBrandVisibility = async (
+  brandName: string,
+  brandUrl: string,
+  period: '7d' | '30d' | '90d' = '30d'
+): Promise<MonitoringResult> => {
+  // Always use simulation for now (Gemini API integration can be added later)
+  return fallbackSimulation(brandName, brandUrl, period);
+};

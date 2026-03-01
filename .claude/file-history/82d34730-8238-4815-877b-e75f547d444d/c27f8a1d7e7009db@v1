@@ -1,0 +1,326 @@
+import React, { useState } from 'react';
+import { AnalysisResult, CategoryScore, GeneratedSolution, User } from '../types';
+import CategoryCard from '../components/CategoryCard';
+import { Info, Download, Share2, ScanLine, CheckCircle2, AlertTriangle, Zap } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
+interface Props {
+  data: AnalysisResult;
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  onSaveSolution: (analysisId: string, recId: string, solution: GeneratedSolution) => void;
+  initialTab?: 'details' | 'archives' | 'overview'; // Expanded type to include overview
+  onNewAnalysis?: () => void;
+}
+
+export const Results: React.FC<Props> = ({ data, onBack, user, onDeductCredits, onSaveSolution, onNewAnalysis }) => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const categoryScores = Object.values(data.categories) as CategoryScore[];
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('full-pdf-report');
+    if (!element) return;
+
+    setIsExporting(true);
+    try {
+      // Wait a moment for the hidden div to render properly
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: 1000 // Force width to match container style
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // First page
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      // Subsequent pages if content overflows
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+      
+      const hostname = new URL(data.url).hostname;
+      pdf.save(`Audit_AEO_${hostname}_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (err) {
+      console.error('PDF Export failed', err);
+      alert('Erreur lors de la génération du PDF.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Rapport AEO - CitedBy.ai',
+      text: `Découvrez l'analyse AEO pour ${data.url} sur CitedBy.ai`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Lien du rapport copié dans le presse-papier !');
+      }
+    } catch (err) {
+      console.error('Share failed', err);
+    }
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 pb-20 pt-6 relative">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6 pt-6">
+        <div>
+          <h1 className="text-3xl font-serif font-bold text-white mb-2">{new URL(data.url).hostname}</h1>
+          <p className="text-gray-400 text-sm">Analysé le {new Date(data.timestamp).toLocaleDateString()} à {new Date(data.timestamp).toLocaleTimeString()}</p>
+        </div>
+        
+        {onNewAnalysis && (
+            <button 
+                onClick={onNewAnalysis}
+                className="flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primaryDark text-black font-bold rounded-xl transition-all shadow-lg shadow-primary/20 hover:scale-105"
+            >
+                <ScanLine size={18} /> Lancer un nouvel audit
+            </button>
+        )}
+      </div>
+
+      {/* Content - Single View (Details) */}
+      <div className="min-h-[500px]">
+          <div className="space-y-6 animate-in fade-in">
+            <div className="flex justify-between items-center mb-4">
+               <h3 className="text-lg font-medium text-white">Analyse détaillée par catégorie</h3>
+               <div className="flex gap-3">
+                  <button 
+                    onClick={handleShare}
+                    className="flex items-center gap-2 px-3 py-2 bg-purple-500/5 border border-white/10 hover:bg-purple-500/10 rounded-lg text-sm text-gray-300 transition-colors"
+                  >
+                    <Share2 size={16} /> Partager
+                  </button>
+                  <button 
+                    onClick={handleDownloadPDF}
+                    disabled={isExporting}
+                    className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/20 hover:bg-primary/20 rounded-lg text-sm text-primary font-medium transition-colors"
+                  >
+                    {isExporting ? (
+                        <>
+                            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                            Génération...
+                        </>
+                    ) : (
+                        <>
+                            <Download size={16} /> Générer PDF Complet
+                        </>
+                    )}
+                  </button>
+               </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {categoryScores.map((cat, i) => (
+                <CategoryCard key={i} category={cat} />
+              ))}
+            </div>
+
+            {/* --- PROFESSIONAL PDF REPORT CONTAINER (HIDDEN) --- */}
+            <div 
+              id="full-pdf-report" 
+              className="bg-white text-black font-sans"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-9999px',
+                width: '1000px', 
+                padding: '60px',
+              }}
+            >
+              {/* PAGE 1: COVER */}
+              <div className="flex flex-col h-[1300px] relative border-b-2 border-gray-100 mb-10 pb-10">
+                  {/* Header Logo */}
+                  <div className="flex justify-between items-center mb-20">
+                      <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded bg-[#10b981] flex items-center justify-center text-white font-serif font-bold text-3xl">C</div>
+                          <span className="font-serif text-3xl font-bold text-gray-900">CitedBy.ai</span>
+                      </div>
+                      <div className="text-right">
+                          <p className="text-gray-500 text-sm">Rapport d'Audit AEO</p>
+                          <p className="text-gray-900 font-bold">{new Date(data.timestamp).toLocaleDateString()}</p>
+                      </div>
+                  </div>
+
+                  {/* Title Section */}
+                  <div className="text-center mt-20 mb-20">
+                      <h1 className="text-5xl font-serif font-bold text-gray-900 mb-6 tracking-tight">Audit de Visibilité Générative</h1>
+                      <p className="text-2xl text-gray-500">{new URL(data.url).hostname}</p>
+                  </div>
+
+                  {/* Score Hero */}
+                  <div className="flex justify-center mb-20">
+                      <div className="relative w-64 h-64 flex items-center justify-center">
+                          {/* We recreate a static SVG ring for PDF to avoid animation glitches */}
+                          <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                              <circle cx="50" cy="50" r="45" fill="none" stroke="#f3f4f6" strokeWidth="8" />
+                              <circle 
+                                cx="50" 
+                                cy="50" 
+                                r="45" 
+                                fill="none" 
+                                stroke={data.globalScore >= 80 ? "#10b981" : data.globalScore >= 50 ? "#c084fc" : "#ef4444"}
+                                strokeWidth="8" 
+                                strokeDasharray={`${(data.globalScore / 100) * 283} 283`}
+                                strokeLinecap="round"
+                              />
+                          </svg>
+                          <div className="absolute flex flex-col items-center">
+                              <span className="text-6xl font-bold text-gray-900">{data.globalScore}</span>
+                              <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">Score Global</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Executive Summary */}
+                  <div className="bg-gray-50 p-8 rounded-2xl border border-gray-200 mt-auto mb-10">
+                      <h3 className="font-bold text-gray-900 text-lg mb-4 flex items-center gap-2">
+                          <Info size={20} className="text-[#10b981]" /> Synthèse de l'analyste
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed mb-4">
+                          L'analyse de <strong>{new URL(data.url).hostname}</strong> révèle une probabilité de citation par les assistants IA de <strong>{data.aiCitation.probability}%</strong>. 
+                          {data.globalScore < 50 
+                              ? " L'entité manque actuellement de signaux structurés pour être correctement identifiée par les Knowledge Graphs."
+                              : " L'entité possède une base solide mais nécessite des optimisations sémantiques pour garantir la primauté de la réponse."}
+                      </p>
+                      <div className="grid grid-cols-3 gap-6 pt-4 border-t border-gray-200">
+                          <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold">Confiance</p>
+                              <p className="text-lg font-bold text-gray-900">{data.categories['trust']?.score || 0}/100</p>
+                          </div>
+                          <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold">Technique</p>
+                              <p className="text-lg font-bold text-gray-900">{data.categories['technical']?.score || 0}/100</p>
+                          </div>
+                          <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold">Autorité</p>
+                              <p className="text-lg font-bold text-gray-900">{data.categories['entity']?.score || 0}/100</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              {/* PAGE 2: DETAILS & RECOMMANDATIONS */}
+              <div className="flex flex-col min-h-[1000px]">
+                  <h2 className="text-2xl font-serif font-bold text-gray-900 mb-8 pb-4 border-b border-gray-200">
+                      Détail des Performances
+                  </h2>
+
+                  {/* Categories Grid */}
+                  <div className="grid grid-cols-2 gap-6 mb-12">
+                      {categoryScores.map((cat, i) => (
+                          <div key={i} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                              <div className="flex justify-between items-start mb-4">
+                                  <h4 className="font-bold text-gray-800 text-lg">{cat.name}</h4>
+                                  <div className={`text-xl font-bold ${cat.score >= 80 ? 'text-[#10b981]' : cat.score >= 50 ? 'text-[#c084fc]' : 'text-[#ef4444]'}`}>
+                                      {cat.score}
+                                  </div>
+                              </div>
+                              <ul className="space-y-2">
+                                  {cat.items.slice(0, 4).map((item, idx) => (
+                                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                                          {item.status === 'success' ? (
+                                              <CheckCircle2 size={16} className="text-[#10b981] mt-0.5 shrink-0" />
+                                          ) : (
+                                              <AlertTriangle size={16} className="text-[#c084fc] mt-0.5 shrink-0" />
+                                          )}
+                                          {item.message}
+                                      </li>
+                                  ))}
+                              </ul>
+                          </div>
+                      ))}
+                  </div>
+
+                  <h2 className="text-2xl font-serif font-bold text-gray-900 mb-8 pb-4 border-b border-gray-200 page-break">
+                      Plan d'Action Prioritaire
+                  </h2>
+
+                  {/* Recommendations Table */}
+                  <div className="space-y-4">
+                      {data.recommendations.map((rec, idx) => (
+                          <div key={idx} className="flex gap-6 p-6 bg-gray-50 rounded-xl border border-gray-100">
+                              <div className="w-24 shrink-0 flex flex-col items-center justify-center border-r border-gray-200 pr-6">
+                                  <span className={`text-xs font-bold uppercase px-2 py-1 rounded mb-2 ${
+                                      rec.priority === 'critical' ? 'bg-red-100 text-red-600' :
+                                      rec.priority === 'high' ? 'bg-orange-100 text-orange-600' :
+                                      'bg-blue-100 text-blue-600'
+                                  }`}>
+                                      {rec.priority}
+                                  </span>
+                                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">{rec.category}</span>
+                              </div>
+                              <div className="flex-1">
+                                  <h4 className="font-bold text-gray-900 mb-2">{rec.title}</h4>
+                                  <p className="text-sm text-gray-600 mb-3">{rec.description}</p>
+                                  <div className="bg-white p-3 rounded border border-gray-200 text-sm text-gray-800 flex gap-2">
+                                      <Zap size={16} className="text-[#10b981] shrink-0" />
+                                      <strong>Action :</strong> {rec.action}
+                                  </div>
+                              </div>
+                              <div className="w-32 shrink-0 flex flex-col justify-center text-right pl-6 border-l border-gray-200">
+                                  <p className="text-xs text-gray-500 mb-1">Impact</p>
+                                  <div className="flex justify-end gap-1 mb-3">
+                                      {[1,2,3].map(n => (
+                                          <div key={n} className={`w-2 h-2 rounded-full ${
+                                              (rec.impact === 'high' && n <= 3) || (rec.impact === 'medium' && n <= 2) || (rec.impact === 'low' && n === 1) 
+                                              ? 'bg-[#10b981]' 
+                                              : 'bg-gray-300'
+                                          }`}></div>
+                                      ))}
+                                  </div>
+                                  <p className="text-xs text-gray-500 mb-1">Effort</p>
+                                  <p className="text-sm font-bold text-gray-700 capitalize">{rec.effort}</p>
+                              </div>
+                          </div>
+                      ))}
+                  </div>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-20 pt-8 border-t border-gray-200 flex justify-between items-center text-gray-400 text-sm">
+                  <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded bg-gray-200 flex items-center justify-center text-gray-500 font-serif font-bold text-xs">C</div>
+                      <span>Généré par CitedBy.ai</span>
+                  </div>
+                  <p>Document confidentiel - Usage interne uniquement</p>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  );
+};

@@ -1,0 +1,84 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const LINKS = [
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how" },
+  { label: "Pricing", href: "#pricing" },
+];
+
+export default function Navbar() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <nav className="fixed top-0 left-0 z-50 w-full">
+      <div className="glass-strong mx-auto mt-4 flex max-w-5xl items-center justify-between rounded-2xl px-6 py-3 sm:mx-8 lg:mx-auto">
+        <a href="#" className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-white">
+            C
+          </span>
+          <span className="text-lg font-semibold tracking-tight text-white">
+            citedby<span className="text-accent-bright">.ai</span>
+          </span>
+        </a>
+
+        <div className="hidden items-center gap-8 md:flex">
+          {LINKS.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-sm font-medium text-white/60 transition-colors hover:text-white"
+            >
+              {l.label}
+            </a>
+          ))}
+          <a
+            href="#pricing"
+            className="rounded-xl bg-accent px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-accent-bright hover:shadow-lg hover:shadow-accent/25"
+          >
+            Get Started
+          </a>
+        </div>
+
+        <button
+          onClick={() => setOpen(!open)}
+          className="text-sm font-medium text-white/70 md:hidden"
+          aria-label="Toggle menu"
+        >
+          {open ? "Close" : "Menu"}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="glass-strong mx-4 mt-2 flex flex-col gap-4 rounded-2xl p-6 md:hidden"
+          >
+            {LINKS.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="text-base font-medium text-white/80 transition-colors hover:text-white"
+              >
+                {l.label}
+              </a>
+            ))}
+            <a
+              href="#pricing"
+              onClick={() => setOpen(false)}
+              className="mt-2 rounded-xl bg-accent px-5 py-2.5 text-center text-sm font-semibold text-white"
+            >
+              Get Started
+            </a>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+}

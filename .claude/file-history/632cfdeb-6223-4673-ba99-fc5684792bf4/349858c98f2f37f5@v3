@@ -1,0 +1,170 @@
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { Bell, X, AlertTriangle, Info, CheckCircle, AlertCircle } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+
+interface Alert {
+  id: string
+  severity: "critical" | "warning" | "info" | "success"
+  title: string
+  message: string
+  action?: string
+  is_read: boolean
+  created_at: string
+}
+
+// Mock alerts — will come from Supabase
+const MOCK_ALERTS: Alert[] = [
+  {
+    id: "1",
+    severity: "critical",
+    title: "Score en baisse",
+    message: "Votre score de visibilite a chute de 15% cette semaine",
+    action: "Lancez un audit AEO pour identifier les causes",
+    is_read: false,
+    created_at: new Date(Date.now() - 3600000).toISOString(),
+  },
+  {
+    id: "2",
+    severity: "warning",
+    title: "Nouveau concurrent detecte",
+    message: "Rankscale.ai a ete mentionne 5 fois sur ChatGPT",
+    action: "Analysez leur strategie de contenu",
+    is_read: false,
+    created_at: new Date(Date.now() - 7200000).toISOString(),
+  },
+  {
+    id: "3",
+    severity: "success",
+    title: "Nouvelle citation !",
+    message: "Votre URL a ete citee sur Perplexity pour 'meilleur outil AEO'",
+    is_read: false,
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: "4",
+    severity: "info",
+    title: "Scan termine",
+    message: "Votre scan hebdomadaire est termine. Score: 64/100",
+    is_read: true,
+    created_at: new Date(Date.now() - 172800000).toISOString(),
+  },
+]
+
+const SEVERITY_CONFIG: Record<string, { icon: typeof Bell; color: string; bg: string }> = {
+  critical: { icon: AlertCircle, color: "text-red-400", bg: "bg-red-500/10" },
+  warning: { icon: AlertTriangle, color: "text-amber-400", bg: "bg-amber-500/10" },
+  info: { icon: Info, color: "text-blue-400", bg: "bg-blue-500/10" },
+  success: { icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+}
+
+export function NotificationBell() {
+  const [open, setOpen] = useState(false)
+  const [alerts, setAlerts] = useState(MOCK_ALERTS)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  const unreadCount = alerts.filter((a) => !a.is_read).length
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const markAsRead = (id: string) => {
+    setAlerts((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, is_read: true } : a))
+    )
+  }
+
+  const markAllRead = () => {
+    setAlerts((prev) => prev.map((a) => ({ ...a, is_read: true })))
+  }
+
+  const formatTime = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime()
+    const hours = Math.floor(diff / 3600000)
+    if (hours < 1) return "A l'instant"
+    if (hours < 24) return `Il y a ${hours}h`
+    const days = Math.floor(hours / 24)
+    return `Il y a ${days}j`
+  }
+
+  return (
+    <div className="relative" ref={panelRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="relative p-2 rounded-xl hover:bg-white/5 transition-colors"
+        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} non lues)` : ""}`}
+        aria-expanded={open}
+      >
+        <Bell size={18} className="text-white/50" aria-hidden="true" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center animate-pulse-glow">
+            {unreadCount}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-12 w-[calc(100vw-2rem)] sm:w-96 bg-[#1a1d21] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50" role="dialog" aria-label="Panneau de notifications">
+          <div className="flex items-center justify-between p-4 border-b border-white/5">
+            <h3 className="font-semibold text-white text-sm">Notifications</h3>
+            {unreadCount > 0 && (
+              <button
+                onClick={markAllRead}
+                className="text-xs text-primary hover:text-primary/80"
+              >
+                Tout marquer lu
+              </button>
+            )}
+          </div>
+
+          <div className="max-h-96 overflow-y-auto">
+            {alerts.length === 0 ? (
+              <div className="p-8 text-center text-white/30 text-sm">
+                Aucune notification
+              </div>
+            ) : (
+              alerts.map((alert) => {
+                const config = SEVERITY_CONFIG[alert.severity]
+                const Icon = config.icon
+
+                return (
+                  <div
+                    key={alert.id}
+                    onClick={() => markAsRead(alert.id)}
+                    className={cn(
+                      "flex gap-3 p-4 border-b border-white/5 cursor-pointer transition-colors hover:bg-white/5",
+                      !alert.is_read && "bg-white/[0.02]"
+                    )}
+                  >
+                    <div className={cn("p-2 rounded-xl shrink-0 self-start", config.bg)}>
+                      <Icon size={14} className={config.color} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={cn("text-sm font-medium truncate", alert.is_read ? "text-white/50" : "text-white")}>
+                          {alert.title}
+                        </p>
+                        {!alert.is_read && <div className="w-2 h-2 rounded-full bg-primary shrink-0" />}
+                      </div>
+                      <p className="text-xs text-white/40 mt-0.5 line-clamp-2">{alert.message}</p>
+                      <p className="text-[10px] text-white/20 mt-1">{formatTime(alert.created_at)}</p>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

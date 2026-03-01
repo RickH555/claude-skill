@@ -1,0 +1,76 @@
+'use client';
+
+import { QRCode } from 'react-qrcode-logo';
+import Card from '@/components/ui/Card';
+import { RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+interface CustomerQrDisplayProps {
+  qrId: string;
+  secretKey: string;
+  appUrl: string;
+}
+
+export default function CustomerQrDisplay({ qrId, secretKey, appUrl }: CustomerQrDisplayProps) {
+  // Rotate the displayed code every 30 seconds for security
+  const [timestamp, setTimestamp] = useState(() => Math.floor(Date.now() / 30000));
+  const [secondsLeft, setSecondsLeft] = useState(30);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const currentSlot = Math.floor(now / 30000);
+      const remaining = 30 - Math.floor((now % 30000) / 1000);
+      setTimestamp(currentSlot);
+      setSecondsLeft(remaining);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // The QR payload: customer QR ID + time-based token
+  const qrPayload = JSON.stringify({
+    type: 'customer',
+    id: qrId,
+    key: secretKey,
+    t: timestamp,
+  });
+
+  return (
+    <div className="space-y-4">
+      <Card padding="lg" className="flex flex-col items-center space-y-4">
+        <p className="text-[13px] text-[var(--text-secondary)] text-center">
+          Presentez ce QR code au marchand pour gagner des points ou tampons.
+        </p>
+
+        <div className="bg-white p-3 rounded-xl">
+          <QRCode
+            value={qrPayload}
+            size={220}
+            qrStyle="dots"
+            eyeRadius={8}
+            fgColor="#1a1a2e"
+            bgColor="#ffffff"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 text-[12px] text-[var(--text-tertiary)]">
+          <RefreshCw className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '3s' }} />
+          <span>Actualisation dans {secondsLeft}s</span>
+        </div>
+
+        <p className="text-[11px] text-[var(--text-tertiary)] text-center">
+          Code unique : {qrId.slice(0, 8).toUpperCase()}
+        </p>
+      </Card>
+
+      <Card padding="md">
+        <h3 className="text-[13px] font-semibold text-[var(--text-primary)] mb-2">Comment ca marche ?</h3>
+        <ol className="text-[12px] text-[var(--text-secondary)] space-y-1.5 list-decimal list-inside">
+          <li>Le marchand ouvre son scanner</li>
+          <li>Il scanne votre QR code</li>
+          <li>Vos points ou tampons sont credites automatiquement</li>
+        </ol>
+      </Card>
+    </div>
+  );
+}

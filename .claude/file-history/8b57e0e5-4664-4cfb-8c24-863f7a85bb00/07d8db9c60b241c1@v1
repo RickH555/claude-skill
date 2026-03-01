@@ -1,0 +1,15 @@
+'use client';
+export const dynamic = 'force-dynamic';
+import { useAppContext } from '@/lib/app-context';
+import CitationDashboardPage from '@/views/v3/CitationDashboardPage';
+
+export default function CitationsPage() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return (
+    <CitationDashboardPage
+      onBack={goBack}
+      user={user}
+      onNavigate={navigateTo}
+    />
+  );
+}

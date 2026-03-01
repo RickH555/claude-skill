@@ -1,0 +1,65 @@
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Footer } from '@/components/landing/footer';
+import { MapPin, Briefcase } from 'lucide-react';
+
+const positions = [
+  { title: 'Senior Full-Stack Engineer', location: 'Remote', type: 'Full-time', team: 'Engineering' },
+  { title: 'AI/ML Engineer', location: 'Remote', type: 'Full-time', team: 'AI' },
+  { title: 'Product Designer', location: 'Remote', type: 'Full-time', team: 'Design' },
+  { title: 'Developer Advocate', location: 'Remote', type: 'Full-time', team: 'Growth' },
+];
+
+export default function CareersPage() {
+  return (
+    <div className="min-h-screen">
+      <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">N</span>
+              </div>
+              <span className="text-lg font-bold">NexusAI</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost"><Link href="/login">Sign In</Link></Button>
+              <Button asChild><Link href="/signup">Get Started</Link></Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="mx-auto max-w-4xl px-6 py-16">
+        <h1 className="text-4xl font-bold tracking-tight text-center">Careers at NexusAI</h1>
+        <p className="mt-4 text-lg text-muted-foreground text-center max-w-2xl mx-auto">
+          Join us in building the future of AI-powered business tools. We&apos;re a remote-first team passionate about making AI accessible to everyone.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-16 mb-6">Open Positions</h2>
+        <div className="space-y-4">
+          {positions.map((pos) => (
+            <Card key={pos.title} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-lg">{pos.title}</h3>
+                  <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1"><Briefcase className="h-3 w-3" />{pos.team}</span>
+                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{pos.location}</span>
+                    <span>{pos.type}</span>
+                  </div>
+                </div>
+                <Button variant="outline" asChild>
+                  <Link href="/contact">Apply</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

@@ -1,0 +1,182 @@
+import { chromium } from 'playwright';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const SS = (name) => path.join(__dirname, 'scan', `${name}.png`);
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+
+  // ===== TEST 1: Landing page - click every button/link =====
+  console.log('=== Landing page interactive elements ===\n');
+  const ctx1 = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const p1 = await ctx1.newPage();
+  await p1.goto(APP, { waitUntil: 'networkidle' });
+  await p1.waitForTimeout(1500);
+
+  // Get ALL clickable elements
+  const landingElements = await p1.evaluate(() => {
+    const els = [];
+    document.querySelectorAll('a, button, [role="button"], [onclick]').forEach((el, i) => {
+      const text = el.textContent?.trim().substring(0, 60);
+      const href = el.getAttribute('href') || '';
+      const tag = el.tagName.toLowerCase();
+      const visible = el.offsetParent !== null;
+      if (text && visible) {
+        els.push({ text, href, tag, index: i });
+      }
+    });
+    return els;
+  });
+
+  console.log(`Found ${landingElements.length} clickable elements:`);
+  landingElements.forEach(el => {
+    console.log(`  [${el.tag}] "${el.text}" -> ${el.href || '(no href)'}`);
+  });
+
+  // Now scroll the full page and check for footer
+  console.log('\n--- Checking full page content (scrolled to bottom) ---');
+  await p1.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await p1.waitForTimeout(1000);
+  await p1.screenshot({ path: SS('landing-bottom') });
+
+  const footerContent = await p1.evaluate(() => {
+    const footer = document.querySelector('footer');
+    if (!footer) return 'NO FOOTER FOUND';
+    return footer.innerHTML.substring(0, 2000);
+  });
+  console.log(`Footer: ${footerContent.length > 20 ? 'EXISTS' : footerContent}`);
+
+  const footerLinks = await p1.evaluate(() => {
+    const footer = document.querySelector('footer');
+    if (!footer) return [];
+    return [...footer.querySelectorAll('a')].map(a => ({
+      text: a.textContent?.trim(),
+      href: a.getAttribute('href')
+    }));
+  });
+  console.log(`Footer links: ${footerLinks.length}`);
+  footerLinks.forEach(l => console.log(`  "${l.text}" -> ${l.href}`));
+
+  // ===== TEST 2: Pricing page buttons =====
+  console.log('\n=== Pricing page interactive elements ===\n');
+  await p1.goto(`${APP}/pricing`, { waitUntil: 'networkidle' });
+  await p1.waitForTimeout(1000);
+
+  const pricingElements = await p1.evaluate(() => {
+    return [...document.querySelectorAll('a, button')].filter(el => el.offsetParent !== null).map(el => ({
+      text: el.textContent?.trim().substring(0, 60),
+      href: el.getAttribute('href') || '',
+      tag: el.tagName.toLowerCase()
+    }));
+  });
+
+  console.log(`Found ${pricingElements.length} clickable elements:`);
+  pricingElements.forEach(el => {
+    console.log(`  [${el.tag}] "${el.text}" -> ${el.href || '(no href)'}`);
+  });
+
+  // Click "Get Started Free" and see where it goes
+  const getStartedBtn = p1.locator('a:has-text("Get Started Free"), button:has-text("Get Started Free")').first();
+  if (await getStartedBtn.count() > 0) {
+    await getStartedBtn.click();
+    await p1.waitForTimeout(2000);
+    console.log(`\n"Get Started Free" -> ${p1.url().replace(APP, '')}`);
+  }
+
+  // Go back and click "Start Free Trial"
+  await p1.goto(`${APP}/pricing`, { waitUntil: 'networkidle' });
+  const trialBtn = p1.locator('a:has-text("Start Free Trial"), button:has-text("Start Free Trial")').first();
+  if (await trialBtn.count() > 0) {
+    await trialBtn.click();
+    await p1.waitForTimeout(2000);
+    console.log(`"Start Free Trial" -> ${p1.url().replace(APP, '')}`);
+  }
+
+  await ctx1.close();
+
+  // ===== TEST 3: Dashboard - click all buttons =====
+  console.log('\n=== Dashboard - all interactive elements ===\n');
+  const ctx2 = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const p2 = await ctx2.newPage();
+  await p2.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await p2.fill('input[type="email"]', 'admin@nexusai.app');
+  await p2.fill('input[type="password"]', 'NexusAdmin2026!');
+  await p2.click('button[type="submit"]');
+  await p2.waitForURL('**/dashboard**', { timeout: 15000 });
+
+  // Check each dashboard page for any link/button that leads to 404
+  const dashPages = [
+    '/dashboard',
+    '/dashboard/documents',
+    '/dashboard/surveys',
+    '/dashboard/templates',
+    '/dashboard/settings',
+    '/dashboard/settings/billing',
+  ];
+
+  for (const dp of dashPages) {
+    await p2.goto(`${APP}${dp}`, { waitUntil: 'networkidle' });
+    await p2.waitForTimeout(1000);
+
+    const pageElements = await p2.evaluate(() => {
+      return [...document.querySelectorAll('a, button')].filter(el => el.offsetParent !== null).map(el => ({
+        text: el.textContent?.trim().substring(0, 60),
+        href: el.getAttribute('href') || '',
+        tag: el.tagName.toLowerCase()
+      })).filter(el => el.text && el.href && el.href.startsWith('/'));
+    });
+
+    if (pageElements.length > 0) {
+      console.log(`${dp}:`);
+      pageElements.forEach(el => console.log(`  [${el.tag}] "${el.text}" -> ${el.href}`));
+      console.log('');
+    }
+  }
+
+  // ===== TEST 4: Click "Upgrade to Pro" button =====
+  console.log('=== Testing specific actions ===\n');
+  await p2.goto(`${APP}/dashboard/settings/billing`, { waitUntil: 'networkidle' });
+  await p2.waitForTimeout(1000);
+
+  const upgradeBtn = p2.locator('button:has-text("Upgrade to Pro")').first();
+  if (await upgradeBtn.count() > 0) {
+    console.log('Clicking "Upgrade to Pro"...');
+    await upgradeBtn.click();
+    await p2.waitForTimeout(3000);
+    console.log(`  -> URL: ${p2.url().replace(APP, '')}`);
+    const body = await p2.textContent('body');
+    if (body.includes('404') || body.includes('This page could not be found')) {
+      console.log('  -> 404 PAGE!');
+    } else {
+      console.log(`  -> Page loaded OK`);
+    }
+  }
+
+  // Test API Keys "Upgrade Plan" button
+  await p2.goto(`${APP}/dashboard/settings/api-keys`, { waitUntil: 'networkidle' });
+  await p2.waitForTimeout(1000);
+  const upgradePlanBtn = p2.locator('button:has-text("Upgrade Plan"), a:has-text("Upgrade Plan")').first();
+  if (await upgradePlanBtn.count() > 0) {
+    console.log('Clicking "Upgrade Plan" on API Keys...');
+    await upgradePlanBtn.click();
+    await p2.waitForTimeout(2000);
+    console.log(`  -> URL: ${p2.url().replace(APP, '')}`);
+  }
+
+  // Test "Copy" URL button on survey
+  await p2.goto(`${APP}/dashboard/surveys/02023306-325a-4eac-bd57-39c01be98291`, { waitUntil: 'networkidle' });
+  await p2.waitForTimeout(1000);
+  const previewBtn = p2.locator('a:has-text("Preview")').first();
+  if (await previewBtn.count() > 0) {
+    console.log('Clicking "Preview" on survey...');
+    const href = await previewBtn.getAttribute('href');
+    console.log(`  -> href: ${href}`);
+  }
+
+  await ctx2.close();
+  await browser.close();
+  console.log('\nDone!');
+})();

@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": false,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "./*": ["./*"]
+    }
+  },
+  "include": [
+    "App.tsx",
+    "index.tsx",
+    "types.ts",
+    "pages/**/*",
+    "services/**/*",
+    "components/**/*",
+    "i18n/**/*",
+    "lib/**/*",
+    "vite.config.ts"
+  ],
+  "exclude": ["dist", "node_modules", "src", "app"]
+}

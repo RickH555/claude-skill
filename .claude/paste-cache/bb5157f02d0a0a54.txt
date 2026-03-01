@@ -1,0 +1,108 @@
+ : Les features 5, 6, 7, 8, 9 sont independantes et peuvent etre lancees en agents paralleles.                                                        │
+│                                                                                                                                                                      │
+│ ---                                                                                                                                                                  │
+│ Fichiers critiques                                                                                                                                                   │
+│                                                                                                                                                                      │
+│ ┌───────────────────────────────┬──────────┬───────────────────────────────────────┘                                                             │
+│                                                                                                                                                                      │
+│ Patterns a reutiliser                                                                                                                                                │
+│                                                                                                                                                                      │
+│ - Service pattern : getApiKey() → Gemini → fallbackSimulation() (voir services/eeat/eeat-auditor.ts)                                                                 │
+│ - Recharts : Deja utilise dans Dashboard.tsx (AreaChart, ResponsiveContainer)                                                                                        │
+│ - Tabs : Pattern useState activeTab (voir EeatBuilder.tsx, Account.tsx)                                                                                              │
+│ - ScoreRing : Composant existant components/ScoreRing.tsx                                                                                                            │
+│ - CodeBlock avec copy : Existe dans EeatBuilder.tsx                                                                                                                  │
+│ - Credit deduction : onDeductCredits(amount) prop pattern                                                                                                            │
+│ - Sidebar NavItem : Pattern existant dans App.tsx avec .includes(currentView)                                                                                        │
+│ - Lazy loading : React.lazy(() => import('./pages/X')) pattern                                                                                                       │
+│                                                                                                                                                                      │
+│ Verification                                                                                                                                                         │
+│                                                                                                                                                                      │
+│ 1. npm run build — Pas d'erreurs TypeScript                                                                                                                          │
+│ 2. Dev server (npm run dev) — Navigation vers chaque nouvelle feature                                                                                                │
+│ 3. Puppeteer :                                                                                                                                                       │
+│   - Home page → voir section Score Gratuit → tester le formulaire                                                                                                    │
+│   - Login → Sidebar → cliquer "Monitoring IA" → voir dashboard                                                                                                       │
+│   - Account → onglet White Label (uniquement plan Agency)                                                                                                            │
+│   - Outils Generatifs → E-E-A-T Builder → onglet Historique                                                                                                          │
+│   - E-E-A-T Builder → Audit → resultats → boutons "Corriger"                                                                                                         │
+│   - E-E-A-T Builder → generer → boutons export CMS                                                              : Les features 5, 6, 7, 8, 9 sont independantes et peuvent etre lancees en agents paralleles.                                                        │
+│                                                                                                                                                                      │
+│ ---                                                                                                                                                                  │
+│ Fichiers critiques                                                                                                                                                   │
+│                                                                                                                                                                      │
+│ ┌───────────────────────────────┬──────────┬───────────────────────────────────────┘                                                             │
+│                                                                                                                                                                      │
+│ Patterns a reutiliser                                                                                                                                                │
+│                                                                                                                                                                      │
+│ - Service pattern : getApiKey() → Gemini → fallbackSimulation() (voir services/eeat/eeat-auditor.ts)                                                                 │
+│ - Recharts : Deja utilise dans Dashboard.tsx (AreaChart, ResponsiveContainer)                                                                                        │
+│ - Tabs : Pattern useState activeTab (voir EeatBuilder.tsx, Account.tsx)                                                                                              │
+│ - ScoreRing : Composant existant components/ScoreRing.tsx                                                                                                            │
+│ - CodeBlock avec copy : Existe dans EeatBuilder.tsx                                                                                                                  │
+│ - Credit deduction : onDeductCredits(amount) prop pattern                                                                                                            │
+│ - Sidebar NavItem : Pattern existant dans App.tsx avec .includes(currentView)                                                                                        │
+│ - Lazy loading : React.lazy(() => import('./pages/X')) pattern                                                                                                       │
+│                                                                                                                                                                      │
+│ Verification                                                                                                                                                         │
+│                                                                                                                                                                      │
+│ 1. npm run build — Pas d'erreurs TypeScript                                                                                                                          │
+│ 2. Dev server (npm run dev) — Navigation vers chaque nouvelle feature                                                                                                │
+│ 3. Puppeteer :                                                                                                                                                       │
+│   - Home page → voir section Score Gratuit → tester le formulaire                                                                                                    │
+│   - Login → Sidebar → cliquer "Monitoring IA" → voir dashboard                                                                                                       │
+│   - Account → onglet White Label (uniquement plan Agency)                                                                                                            │
+│   - Outils Generatifs → E-E-A-T Builder → onglet Historique                                                                                                          │
+│   - E-E-A-T Builder → Audit → resultats → boutons "Corriger"                                                                                                         │
+│   - E-E-A-T Builder → generer → boutons export CMS                                                             ───────────────────────┘                                                                │
+│                                                                                                                                                                      │
+│ Parallelisation : Les features 5, 6, 7, 8, 9 sont independantes et peuvent etre lancees en agents paralleles.                                                        │
+│                                                                                                                                                                      │
+│ ---                                                                                                                                                                  │
+│ Fichiers critiques                                                                                                                                                   │
+│                 () → Gemini → fallbackSimulation() (voir services/eeat/eeat-auditor.ts)                                                                 │
+│ - Recharts : Deja utilise dans Dashboard.tsx (AreaChart, ResponsiveContainer)                                                                                        │
+│ - Tabs : Pattern useState activeTab (voir EeatBuilder.tsx, Account.tsx)                                                                                              │
+│ - ScoreRing : Composant existant components/ScoreRing.tsx                                                                                                            │
+│ - CodeBlock avec copy : Existe dans EeatBuilder.tsx                                                                                                                  │
+│ - Credit deduction : onDeductCredits(amount) prop pattern                                                                                                            │
+│ - Sidebar NavItem : Pattern existant dans App.tsx avec .includes(currentView)                                                                                        │
+│ - Lazy loading : React.lazy(() => import('./pages/X')) pattern                                                                                                       │
+│                                                                                                                                                                      │
+│ Verification                                                                                                                                                         │
+│                                                                                                                                                                      │
+│ 1. npm run build — Pas d'erreurs TypeScript                                                                                                                          │
+│ 2. Dev server (npm run dev) — Navigation vers chaque nouvelle feature                                                                                                │
+│ 3. Puppeteer :                                                                                                                                                       │
+│   - Home page → voir section Score Gratuit → tester le formulaire                                                                                                    │
+│   - Login → Sidebar → cliquer "Monitoring IA" → voir dashboard                                                                                                       │
+│   - Account → onglet White Label (uniquement plan Agency)                                                                                                            │
+│   - Outils Generatifs → E-E-A-T Builder → onglet Historique                                                                              : Les features 5, 6, 7, 8, 9 sont independantes et peuvent etre lancees en agents paralleles.                                                        │
+│                                                                                                                                                                      │
+│ ---                                                                                                                                                                  │
+│ Fichiers critiques                                                                                                                                                   │
+│                                                                                                                                                                      │
+│ ┌───────────────────────────────┬──────────┬───────────────────────────────────────┘                                                             │
+│                                                                                                                                                                      │
+│ Patterns a reutiliser                                                                                                                                                │
+│                                                                                                                                                                      │
+│ - Service pattern : getApiKey() → Gemini → fallbackSimulation() (voir services/eeat/eeat-auditor.ts)                                                                 │
+│ - Recharts : Deja utilise dans Dashboard.tsx (AreaChart, ResponsiveContainer)                                                                                        │
+│ - Tabs : Pattern useState activeTab (voir EeatBuilder.tsx, Account.tsx)                                                                                              │
+│ - ScoreRing : Composant existant components/ScoreRing.tsx                                                                                                            │
+│ - CodeBlock avec copy : Existe dans EeatBuilder.tsx                                                                                                                  │
+│ - Credit deduction : onDeductCredits(amount) prop pattern                                                                                                            │
+│ - Sidebar NavItem : Pattern existant dans App.tsx avec .includes(currentView)                                                                                        │
+│ - Lazy loading : React.lazy(() => import('./pages/X')) pattern                                                                                                       │
+│                                                                                                                                                                      │
+│ Verification                                                                                                                                                         │
+│                                                                                                                                                                      │
+│ 1. npm run build — Pas d'erreurs TypeScript                                                                                                                          │
+│ 2. Dev server (npm run dev) — Navigation vers chaque nouvelle feature                                                                                                │
+│ 3. Puppeteer :                                                                                                                                                       │
+│   - Home page → voir section Score Gratuit → tester le formulaire                                                                                                    │
+│   - Login → Sidebar → cliquer "Monitoring IA" → voir dashboard                                                                                                       │
+│   - Account → onglet White Label (uniquement plan Agency)                                                                                                            │
+│   - Outils Generatifs → E-E-A-T Builder → onglet Historique                                                                                                          │
+│   - E-E-A-T Builder → Audit → resultats → boutons "Corriger"                                                                                                         │
+│   - E-E-A-T Builder → generer → boutons export CMS                                                             

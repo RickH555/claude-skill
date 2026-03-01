@@ -1,0 +1,22 @@
+[
+  {
+    "content": "Verify build still passes",
+    "status": "completed",
+    "activeForm": "Verifying build still passes"
+  },
+  {
+    "content": "Start Next.js dev server on localhost",
+    "status": "completed",
+    "activeForm": "Starting Next.js dev server"
+  },
+  {
+    "content": "Test app in browser and fix runtime errors",
+    "status": "completed",
+    "activeForm": "Testing app in browser"
+  },
+  {
+    "content": "Guide Supabase project setup (credentials + migration)",
+    "status": "in_progress",
+    "activeForm": "Guiding Supabase project setup"
+  }
+]

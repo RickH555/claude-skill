@@ -1,0 +1,79 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function ClientsPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Get merchant's programs
+  const { data: programs } = await supabase
+    .from('loyalty_programs')
+    .select('id')
+    .eq('merchant_id', user!.id);
+
+  const programIds = programs?.map(p => p.id) || [];
+
+  // Fetch customer cards for these programs
+  const { data: cards } = programIds.length > 0
+    ? await supabase
+        .from('customer_cards')
+        .select('*, customers(email, full_name), loyalty_programs(name, type, target)')
+        .in('program_id', programIds)
+        .order('created_at', { ascending: false })
+    : { data: [] };
+
+  const tierVariant = (tier: string) => {
+    if (tier === 'vip') return 'accent';
+    if (tier === 'gold') return 'warning';
+    if (tier === 'silver') return 'blue';
+    return 'default';
+  };
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Clients" description="Consultez et gérez vos clients fidélité." />
+
+      {cards && cards.length > 0 ? (
+        <Card padding="none">
+          {/* Table header */}
+          <div className="hidden md:grid grid-cols-5 gap-4 px-5 py-3 border-b border-[var(--border-default)] text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+            <span>Client</span>
+            <span>Programme</span>
+            <span>Solde</span>
+            <span>Tier</span>
+            <span>Inscription</span>
+          </div>
+
+          <div className="divide-y divide-[var(--border-subtle)]">
+            {cards.map((card: any) => (
+              <div key={card.id} className="grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-4 px-5 py-3 items-center">
+                <div>
+                  <p className="text-[13px] font-medium text-[var(--text-primary)]">
+                    {card.customers?.full_name || 'Client'}
+                  </p>
+                  <p className="text-[11px] text-[var(--text-tertiary)]">{card.customers?.email}</p>
+                </div>
+                <p className="text-[13px] text-[var(--text-secondary)]">{card.loyalty_programs?.name}</p>
+                <p className="text-[13px] text-[var(--text-primary)] font-medium">
+                  {card.balance} / {card.loyalty_programs?.target} {card.loyalty_programs?.type === 'stamp' ? 'tampons' : 'pts'}
+                </p>
+                <Badge variant={tierVariant(card.tier)}>{card.tier.toUpperCase()}</Badge>
+                <p className="text-[12px] text-[var(--text-tertiary)]">
+                  {new Date(card.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : (
+        <Card className="text-center py-12">
+          <p className="text-[var(--text-tertiary)]">Aucun client inscrit pour le moment.</p>
+        </Card>
+      )}
+    </div>
+  );
+}

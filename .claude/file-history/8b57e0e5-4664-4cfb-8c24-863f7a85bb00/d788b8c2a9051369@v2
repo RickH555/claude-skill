@@ -1,0 +1,36 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { generateAuthorBio, generateAboutPage, generateTrustSignals, generateCredentials, generateCitationBlock, auditEeat } from '@/services/eeat';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { action, ...params } = body;
+
+    let result;
+    switch (action) {
+      case 'authorBio':
+        result = await generateAuthorBio(params.profile);
+        break;
+      case 'aboutPage':
+        result = await generateAboutPage(params.org);
+        break;
+      case 'trustSignals':
+        result = await generateTrustSignals(params.config, params.orgName);
+        break;
+      case 'credentials':
+        result = await generateCredentials(params.profile);
+        break;
+      case 'citationBlock':
+        result = await generateCitationBlock(params.profile, params.articleTitle);
+        break;
+      case 'audit':
+        result = await auditEeat(params.url, params.brandName);
+        break;
+      default:
+        return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
+    }
+    return NextResponse.json({ result });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Internal error' }, { status: 500 });
+  }
+}

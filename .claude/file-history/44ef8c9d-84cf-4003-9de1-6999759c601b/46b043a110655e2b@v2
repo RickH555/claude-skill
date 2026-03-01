@@ -1,0 +1,87 @@
+// services/v3/citation-api-client.ts
+//
+// Appelle les APIs des 3 moteurs IA pour vérifier les citations.
+// Les appels passent par l'edge function ai-proxy (clés API server-side).
+// Fallback en simulation si l'utilisateur n'est pas authentifié.
+
+import { callAI } from '../../lib/ai-proxy';
+import type { AIProvider } from '../../lib/ai-proxy';
+import type { EngineId } from '../../config/engine-weights';
+
+export interface APICallResult {
+  engine: EngineId;
+  prompt: string;
+  responseText: string;
+  sources: string[];
+  latencyMs: number;
+  isSimulated: boolean;
+  error?: string;
+}
+
+// ─── Simulated responses ───
+
+function simulateResponse(engine: EngineId, prompt: string): APICallResult {
+  const responses: Record<EngineId, string> = {
+    chatgpt: `Based on my analysis, there are several options to consider for "${prompt.slice(0, 50)}". I recommend exploring the top providers in this space. Key factors include reliability, pricing, and customer support. Many users have found success with established platforms that offer comprehensive solutions. Consider reviewing recent comparisons and user testimonials before making a decision.`,
+    perplexity: `According to recent sources, "${prompt.slice(0, 50)}" involves several key considerations. Based on web data, the leading solutions include various established providers. Sources suggest comparing features, pricing tiers, and integration capabilities. Recent reviews highlight the importance of scalability and support quality. [Sources: example.com, review-site.com]`,
+    gemini: `Here's what I found about "${prompt.slice(0, 50)}". There are multiple approaches and providers worth considering. The most recommended options typically offer strong integration capabilities, competitive pricing, and reliable customer support. Industry experts suggest evaluating based on your specific needs and scale requirements.`,
+  };
+
+  return {
+    engine,
+    prompt,
+    responseText: responses[engine],
+    sources: engine === 'perplexity' ? ['example.com', 'review-site.com'] : [],
+    latencyMs: 200 + Math.random() * 300,
+    isSimulated: true,
+  };
+}
+
+// ─── Engine → Provider mapping ───
+
+const engineToProvider: Record<EngineId, AIProvider> = {
+  chatgpt: 'chatgpt',
+  perplexity: 'perplexity',
+  gemini: 'gemini',
+};
+
+// ─── Unified engine caller via server-side proxy ───
+
+async function callEngineViaProxy(engine: EngineId, prompt: string): Promise<APICallResult> {
+  const start = Date.now();
+  try {
+    const text = await callAI({
+      provider: engineToProvider[engine],
+      prompt,
+      temperature: 0.3,
+      maxTokens: 1000,
+    });
+
+    return {
+      engine,
+      prompt,
+      responseText: text,
+      sources: [],
+      latencyMs: Date.now() - start,
+      isSimulated: false,
+    };
+  } catch (error) {
+    return {
+      ...simulateResponse(engine, prompt),
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+// ─── Dispatcher ───
+
+export async function callAIEngine(engine: EngineId, prompt: string): Promise<APICallResult> {
+  switch (engine) {
+    case 'chatgpt':
+    case 'perplexity':
+    case 'gemini':
+      return callEngineViaProxy(engine, prompt);
+    default:
+      return simulateResponse('chatgpt', prompt);
+  }
+}

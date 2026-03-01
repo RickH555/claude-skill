@@ -1,0 +1,69 @@
+"use client";
+
+import { motion } from "framer-motion";
+
+export default function About() {
+  return (
+    <section id="about" className="border-b-4 border-white bg-black px-6 py-24">
+      <div className="mx-auto max-w-7xl">
+        <motion.h2
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 text-5xl font-black uppercase tracking-tighter text-white md:text-7xl"
+        >
+          ABOUT<span className="text-brutal-yellow">.</span>
+        </motion.h2>
+
+        <div className="grid gap-8 md:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="border-4 border-white bg-black p-8"
+          >
+            <p className="text-lg leading-relaxed text-white/90">
+              I&apos;m a developer who believes great software doesn&apos;t need
+              to hide behind polished veneers. I write code that&apos;s as
+              honest as the interfaces I build — <strong className="text-brutal-yellow">direct, functional, and
+              unapologetic</strong>.
+            </p>
+            <p className="mt-6 text-lg leading-relaxed text-white/90">
+              With years of experience across the full stack, I specialize in
+              turning complex problems into clean, performant solutions. From
+              database schemas to pixel-perfect UIs, I own the entire pipeline.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col gap-6"
+          >
+            {[
+              { number: "5+", label: "YEARS EXPERIENCE" },
+              { number: "30+", label: "PROJECTS SHIPPED" },
+              { number: "100%", label: "CODE OWNERSHIP" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="border-4 border-brutal-yellow bg-black p-6 transition-all hover:bg-brutal-yellow hover:text-black"
+              >
+                <p className="text-4xl font-black text-brutal-yellow transition-colors group-hover:text-black md:text-5xl">
+                  {stat.number}
+                </p>
+                <p className="mt-1 text-sm font-bold uppercase tracking-widest text-white">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}

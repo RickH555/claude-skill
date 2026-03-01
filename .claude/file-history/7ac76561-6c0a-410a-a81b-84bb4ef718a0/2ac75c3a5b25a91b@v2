@@ -1,0 +1,215 @@
+import React, { useState, useMemo } from 'react';
+import { AnalysisResult, Recommendation, GeneratedSolution, User } from '../types';
+import { generateSolution } from '../services/generator';
+import RecommendationCard from '../components/RecommendationCard';
+import GenerationModal from '../components/GenerationModal';
+import { Zap, AlertTriangle, Fuel, ArrowRight } from 'lucide-react';
+
+interface Props {
+  data: AnalysisResult;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  onSaveSolution: (analysisId: string, recId: string, solution: GeneratedSolution) => void;
+  onNavigateToAnalysis: () => void;
+  onNavigateToRecharge: () => void;
+}
+
+const ActionPlan: React.FC<Props> = ({ data, user, onDeductCredits, onSaveSolution, onNavigateToAnalysis, onNavigateToRecharge }) => {
+  // Generation Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGeneratingSolution, setIsGeneratingSolution] = useState(false);
+  const [generatedSolution, setGeneratedSolution] = useState<GeneratedSolution | null>(null);
+
+  // Fonction utilitaire pour calculer le coût
+  const getSolutionCost = (priority: string): number => {
+    switch (priority) {
+      case 'critical': return 5;
+      case 'high': return 4;
+      case 'medium': return 3;
+      case 'low': return 1;
+      default: return 3;
+    }
+  };
+
+  // Calcul du coût total restant
+  const totalRemainingCost = useMemo(() => {
+    if (!data) return 0;
+    return data.recommendations.reduce((acc, rec) => {
+        // Ne compte pas les coûts des solutions déjà générées
+        if (data.generatedSolutions && data.generatedSolutions[rec.id]) return acc;
+        return acc + getSolutionCost(rec.priority);
+    }, 0);
+  }, [data?.recommendations, data?.generatedSolutions]);
+
+  const handleApplyRecommendation = async (rec: Recommendation) => {
+    const cost = getSolutionCost(rec.priority);
+
+    // La logique de vérification de solde et de redirection est déléguée à onDeductCredits
+    const success = onDeductCredits(cost);
+    if (!success) {
+      return; 
+    }
+
+    setIsModalOpen(true);
+    setIsGeneratingSolution(true);
+    setGeneratedSolution(null);
+
+    try {
+      const solution = await generateSolution(rec, data.url);
+      setGeneratedSolution(solution);
+      // PASSAGE DE L'ID D'ANALYSE (data.timestamp) OBLIGATOIRE
+      onSaveSolution(data.timestamp, rec.id, solution); 
+      
+    } catch (error) {
+      console.error("Error generating solution", error);
+      setGeneratedSolution({
+        title: "Erreur de génération",
+        explanation: "Le service d'IA est momentanément indisponible.",
+        type: 'text',
+        content: "Veuillez réessayer dans quelques instants.",
+        implementationSteps: ["Réessayez l'opération"]
+      });
+    } finally {
+      setIsGeneratingSolution(false);
+    }
+  };
+
+  const handleOpenStoredSolution = (solution: GeneratedSolution) => {
+    setGeneratedSolution(solution);
+    setIsModalOpen(true);
+  };
+
+  if (!data) {
+    return (
+        <div className="w-full px-4 py-10 min-h-[80vh] flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 bg-white/[0.04] rounded-2xl flex items-center justify-center mb-6">
+                <Zap size={40} className="text-gray-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Aucun plan d'action actif</h2>
+            <p className="text-gray-500 max-w-md mb-8">
+                Veuillez d'abord lancer une analyse ou sélectionner un projet pour générer un plan d'action AEO.
+            </p>
+            <button 
+                onClick={onNavigateToAnalysis}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-2xl hover:from-purple-600 hover:to-violet-700 transition-colors"
+            >
+                Lancer une analyse
+            </button>
+        </div>
+    );
+  }
+
+  const criticalRecs = data.recommendations.filter(r => r.priority === 'critical');
+  const otherRecs = data.recommendations.filter(r => r.priority !== 'critical');
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-10 animate-in fade-in duration-500 pb-24">
+      
+      <GenerationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        isLoading={isGeneratingSolution}
+        solution={generatedSolution}
+      />
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-sans font-bold text-white mb-2 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-accent/20 flex items-center justify-center text-accent border border-accent/30">
+              <Zap size={24} />
+            </div>
+            Plan d'Action AEO
+        </h1>
+        <p className="text-gray-500">
+            Générez les correctifs techniques et sémantiques pour {new URL(data.url).hostname}.
+        </p>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 bg-white/[0.04] p-4 rounded-2xl border border-white/[0.08]">
+        <div>
+            <p className="text-sm text-gray-500">{data.recommendations.length} points d'optimisation détectés</p>
+        </div>
+        <div className="flex items-center gap-3">
+            <span className="text-xs px-2 py-1 bg-black/40 rounded border border-white/[0.08] text-gray-500">
+            Coût unitaire : <span className="text-accent font-bold">1-5 crédits</span>
+            </span>
+        </div>
+      </div>
+
+      {/* Critical Recommendations Section */}
+      {criticalRecs.length > 0 && (
+            <div className="mb-12 animate-in slide-in-from-bottom-2">
+                <h3 className="text-lg font-bold text-red-400 mb-4 flex items-center gap-2">
+                <AlertTriangle size={20} />
+                Urgences Critiques ({criticalRecs.length})
+                </h3>
+                <div className="space-y-4">
+                {criticalRecs.map(rec => (
+                    <RecommendationCard 
+                        key={rec.id} 
+                        rec={rec} 
+                        cost={getSolutionCost(rec.priority)}
+                        onApply={handleApplyRecommendation}
+                        existingSolution={data.generatedSolutions?.[rec.id]}
+                        onView={handleOpenStoredSolution}
+                    />
+                ))}
+                </div>
+            </div>
+      )}
+
+      {/* Standard Recommendations Section */}
+      {otherRecs.length > 0 && (
+            <div className="animate-in slide-in-from-bottom-4 delay-100">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Zap size={20} className="text-purple-400" />
+                Optimisations Recommandées ({otherRecs.length})
+                </h3>
+                <div className="space-y-4">
+                {otherRecs.map(rec => (
+                    <RecommendationCard 
+                        key={rec.id} 
+                        rec={rec} 
+                        cost={getSolutionCost(rec.priority)}
+                        onApply={handleApplyRecommendation}
+                        existingSolution={data.generatedSolutions?.[rec.id]}
+                        onView={handleOpenStoredSolution}
+                    />
+                ))}
+                </div>
+            </div>
+      )}
+
+      {/* TOTAL COST SUMMARY - CLICKABLE FOR RECHARGE */}
+      {totalRemainingCost > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 w-[90%] md:w-auto z-40">
+            <button 
+                onClick={onNavigateToRecharge}
+                className="p-4 rounded-2xl border border-white/[0.08] bg-[#0f1115]/90 backdrop-blur-md shadow-2xl flex items-center gap-6 animate-in fade-in slide-in-from-bottom-6 w-full md:w-auto hover:border-primary/50 hover:bg-[#0f1115] transition-all cursor-pointer text-left group"
+            >
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                        <Fuel size={18} />
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase font-bold">Coût restant</p>
+                        <div className="text-xl font-bold text-white font-sans">{totalRemainingCost} <span className="text-xs font-sans font-medium text-gray-500">Crédits</span></div>
+                    </div>
+                </div>
+                
+                {user && (
+                    <div className={`text-xs font-medium px-3 py-1.5 rounded-full border flex items-center gap-2 ${user.credits >= totalRemainingCost ? 'bg-purple-500/10 text-purple-300 border-white/[0.1]' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                        {user.credits >= totalRemainingCost 
+                            ? `Solde suffisant` 
+                            : `Manque ${totalRemainingCost - user.credits}`
+                        }
+                        {user.credits < totalRemainingCost && <ArrowRight size={12} />}
+                    </div>
+                )}
+            </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ActionPlan;

@@ -1,0 +1,238 @@
+import { chromium } from 'playwright';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const SS = (name) => path.join(__dirname, `fb-${name}.png`);
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+
+  page.on('response', async resp => {
+    if (resp.status() >= 400 && resp.url().includes('/api/')) {
+      let body = ''; try { body = await resp.text(); } catch {}
+      console.log(`  [HTTP ${resp.status()}] ${resp.url().split('.app')[1]?.substring(0,80)} -> ${body.substring(0,200)}`);
+    }
+  });
+
+  // ========== 1. LOGIN ==========
+  console.log('=== STEP 1: Login ===');
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+
+  // ========== 2. CREATE SURVEY ==========
+  console.log('=== STEP 2: Create Survey ===');
+  await page.goto(`${APP}/dashboard/surveys/create`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000);
+
+  await page.fill('#title', 'Satisfaction Client NexusAI - Q1 2026');
+  await page.fill('#description', 'Enquete trimestrielle de satisfaction pour nos utilisateurs NexusAI.');
+
+  // Q1: Rating
+  console.log('   Adding Q1: Rating...');
+  await page.click('button:has-text("Rating")');
+  await page.waitForTimeout(500);
+  await page.locator('input[placeholder="Question 1"]').fill('Comment evaluez-vous votre satisfaction globale avec NexusAI ?');
+
+  // Q2: NPS
+  console.log('   Adding Q2: NPS...');
+  await page.click('button:has-text("NPS")');
+  await page.waitForTimeout(500);
+  await page.locator('input[placeholder="Question 2"]').fill('Recommanderiez-vous NexusAI a un collegue ?');
+
+  // Q3: Single Choice
+  console.log('   Adding Q3: Single Choice...');
+  await page.click('button:has-text("Single Choice")');
+  await page.waitForTimeout(500);
+  await page.locator('input[placeholder="Question 3"]').fill('Quelle fonctionnalite utilisez-vous le plus ?');
+
+  const optionInputs = page.locator('.pl-4 input.h-8');
+  const optCount = await optionInputs.count();
+  await optionInputs.nth(optCount - 2).fill('DocAI - Extraction de documents');
+  await optionInputs.nth(optCount - 1).fill('FeedbackAI - Sondages et Analyse');
+  await page.locator('button:has-text("Add option")').last().click();
+  await page.waitForTimeout(300);
+  await page.locator('.pl-4 input.h-8').last().fill('Templates - Modeles extraction');
+
+  // Q4: Open Ended
+  console.log('   Adding Q4: Open Ended...');
+  await page.click('button:has-text("Open Ended")');
+  await page.waitForTimeout(500);
+  await page.locator('input[placeholder="Question 4"]').fill('Que pouvons-nous ameliorer dans NexusAI ?');
+
+  // Q5: Yes/No
+  console.log('   Adding Q5: Yes / No...');
+  await page.click('button:has-text("Yes / No")');
+  await page.waitForTimeout(500);
+  await page.locator('input[placeholder="Question 5"]').fill('Trouvez-vous le rapport qualite/prix acceptable ?');
+
+  await page.screenshot({ path: SS('01-survey-built'), fullPage: true });
+
+  // Publish
+  console.log('   Publishing...');
+  await page.click('button:has-text("Publish Survey")');
+  await page.waitForTimeout(5000);
+
+  const currentUrl = page.url();
+  console.log('   Redirected to:', currentUrl);
+  await page.screenshot({ path: SS('02-survey-published') });
+
+  const surveyId = currentUrl.split('/surveys/')[1]?.split('?')[0]?.split('#')[0];
+  if (!surveyId) {
+    console.error('Could not extract survey ID from', currentUrl);
+    await browser.close();
+    return;
+  }
+  console.log('   Survey ID:', surveyId);
+
+  // ========== 3. SUBMIT RESPONSES ==========
+  console.log('\n=== STEP 3: Submit 8 responses ===');
+
+  const responses = [
+    { rating: 5, nps: 9, choice: 0, text: "Excellent outil! L extraction de factures m a fait gagner 3h par semaine. L interface est intuitive et les resultats sont tres precis.", yesno: 'Yes' },
+    { rating: 4, nps: 8, choice: 0, text: "Tres bon produit, l IA est impressionnante sur les documents. J aimerais plus de formats d export.", yesno: 'Yes' },
+    { rating: 3, nps: 6, choice: 1, text: "Les sondages sont pratiques mais l analyse IA pourrait etre plus detaillee. Le prix est correct pour le plan Pro.", yesno: 'Yes' },
+    { rating: 2, nps: 3, choice: 1, text: "Le traitement des documents est lent (40 secondes). L interface mobile n est pas optimisee. Decu par rapport aux promesses.", yesno: 'No' },
+    { rating: 5, nps: 10, choice: 2, text: "Les templates sont geniaux! On les configure une fois et apres c est automatique. Support client reactif aussi.", yesno: 'Yes' },
+    { rating: 3, nps: 5, choice: 0, text: "DocAI fonctionne bien sur les factures claires mais galere sur les scans de mauvaise qualite. Le dashboard pourrait avoir plus de stats.", yesno: 'No' },
+    { rating: 4, nps: 7, choice: 1, text: "FeedbackAI nous a permis de comprendre nos clients bien mieux qu avant. L analyse de sentiment est pertinente. Manque juste l integration Slack.", yesno: 'Yes' },
+    { rating: 1, nps: 1, choice: 0, text: "Trop cher pour ce que c est. Le plan gratuit est trop limite (10 docs). La concurrence offre plus pour moins cher. Je vais annuler.", yesno: 'No' },
+  ];
+
+  const publicUrl = `${APP}/s/${surveyId}`;
+
+  for (let i = 0; i < responses.length; i++) {
+    const r = responses[i];
+    console.log(`   Response ${i+1}/8...`);
+
+    const anonCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const anonPage = await anonCtx.newPage();
+
+    await anonPage.goto(publicUrl, { waitUntil: 'networkidle' });
+    await anonPage.waitForTimeout(2000);
+
+    if (i === 0) {
+      await anonPage.screenshot({ path: SS('03-public-survey'), fullPage: true });
+    }
+
+    // Try to fill each question by looking at the page structure
+    // Q1 Rating: click the rating number
+    const ratingBtns = anonPage.locator('button').filter({ hasText: /^[1-5]$/ });
+    const ratingCount = await ratingBtns.count();
+    if (ratingCount >= 5) {
+      await ratingBtns.nth(r.rating - 1).click();
+    }
+
+    // Q2 NPS: click the NPS number
+    const npsBtns = anonPage.locator('button').filter({ hasText: new RegExp(`^${r.nps}$`) });
+    if (await npsBtns.count() > 0) {
+      // For NPS, if the number also exists in rating, we need the second occurrence
+      if (r.nps <= 5 && await npsBtns.count() > 1) {
+        await npsBtns.nth(1).click();
+      } else {
+        await npsBtns.last().click();
+      }
+    }
+
+    // Q3 Single Choice: click the radio
+    const radioItems = anonPage.locator('[role="radiogroup"] button, [role="radio"]');
+    const radioCount = await radioItems.count();
+    if (radioCount > 0 && r.choice < radioCount) {
+      await radioItems.nth(r.choice).click();
+    }
+
+    // Q4 Open ended: fill textarea
+    const ta = anonPage.locator('textarea');
+    if (await ta.count() > 0) {
+      await ta.first().fill(r.text);
+    }
+
+    // Q5 Yes/No: click the button
+    const ynBtn = anonPage.locator(`button:has-text("${r.yesno}")`).last();
+    if (await ynBtn.count() > 0) {
+      await ynBtn.click();
+    }
+
+    if (i === 0) {
+      await anonPage.screenshot({ path: SS('04-response-filled'), fullPage: true });
+    }
+
+    // Submit
+    const submitBtn = anonPage.locator('button:has-text("Submit"), button[type="submit"]').first();
+    if (await submitBtn.count() > 0) {
+      await submitBtn.click();
+      await anonPage.waitForTimeout(3000);
+      if (i === 0) {
+        await anonPage.screenshot({ path: SS('05-response-submitted') });
+      }
+    }
+
+    await anonCtx.close();
+  }
+  console.log('   All 8 responses submitted');
+
+  // ========== 4. VIEW RESPONSES ==========
+  console.log('\n=== STEP 4: View survey results ===');
+  await page.goto(`${APP}/dashboard/surveys/${surveyId}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(3000);
+  await page.screenshot({ path: SS('06-survey-overview') });
+
+  // Click Responses tab
+  const responsesTab = page.locator('button:has-text("Responses"), [role="tab"]:has-text("Responses")');
+  if (await responsesTab.count() > 0) {
+    await responsesTab.click();
+    await page.waitForTimeout(2000);
+    await page.screenshot({ path: SS('07-responses-tab') });
+    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('07b-responses-scroll') });
+  }
+
+  // ========== 5. RUN AI ANALYSIS ==========
+  console.log('\n=== STEP 5: Run AI Analysis ===');
+
+  const analysisTab = page.locator('button:has-text("Analysis"), [role="tab"]:has-text("Analysis"), [role="tab"]:has-text("Analys")');
+  if (await analysisTab.count() > 0) {
+    await analysisTab.first().click();
+    await page.waitForTimeout(2000);
+  }
+  await page.screenshot({ path: SS('08-before-analysis') });
+
+  const analyzeBtn = page.locator('button:has-text("Run"), button:has-text("Analyze"), button:has-text("Generate")');
+  const analyzeBtnCount = await analyzeBtn.count();
+  console.log(`   Found ${analyzeBtnCount} analyze buttons`);
+
+  if (analyzeBtnCount > 0) {
+    console.log('   Triggering AI analysis...');
+    await analyzeBtn.first().click();
+
+    for (let i = 0; i < 30; i++) {
+      await page.waitForTimeout(3000);
+      const content = await page.textContent('body');
+      if (content?.includes('ummary') || content?.includes('entiment') ||
+          content?.includes('heme') || content?.includes('ecommend') ||
+          content?.includes('insight') || content?.includes('Insight')) {
+        console.log(`   Analysis complete in ${(i+1)*3}s`);
+        break;
+      }
+      if (i % 5 === 4) console.log(`   Still analyzing... ${(i+1)*3}s`);
+    }
+  }
+
+  await page.screenshot({ path: SS('09-analysis-result') });
+
+  for (let s = 1; s <= 4; s++) {
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: SS(`10-analysis-scroll${s}`) });
+  }
+
+  await browser.close();
+  console.log('\n=== DONE ===');
+})();

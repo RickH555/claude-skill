@@ -1,0 +1,19 @@
+# Supabase (placeholder - UI navigation only)
+NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.placeholder
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoyMDAwMDAwMDAwfQ.placeholder
+
+# Stripe (placeholder)
+STRIPE_SECRET_KEY=sk_test_placeholder
+STRIPE_WEBHOOK_SECRET=whsec_placeholder
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
+
+# OpenAI (placeholder)
+OPENAI_API_KEY=sk-placeholder
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_NAME=NexusAI
+
+# Resend (optional)
+RESEND_API_KEY=re_placeholder

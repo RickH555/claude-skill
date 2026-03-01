@@ -1,0 +1,117 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Search } from 'lucide-react';
+
+const CommandPalettePanel: React.FC<{ onClose: () => void; onNavigate: (view: string) => void }> = ({ onClose, onNavigate }) => {
+  const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => inputRef.current?.focus(), 100);
+  }, []);
+
+  const commands = [
+    { id: 'analyze', label: 'Nouvel Audit AEO', icon: '🔍', category: 'Navigation' },
+    { id: 'dashboard', label: 'Dashboard Pro', icon: '📊', category: 'Navigation' },
+    { id: 'projects', label: 'Monitoring AEO', icon: '📈', category: 'Navigation' },
+    { id: 'generative-tools', label: 'Outils Génératifs', icon: '✨', category: 'Outils' },
+    { id: 'smc-studio', label: 'SMC Studio', icon: '✏️', category: 'Outils' },
+    { id: 'content-writer', label: 'AI Content Writer', icon: '📝', category: 'Outils' },
+    { id: 'reputation', label: 'Réputation IA', icon: '🛡️', category: 'Outils' },
+    { id: 'source-of-truth', label: 'Source of Truth', icon: '📄', category: 'Outils' },
+    { id: 'schema-org', label: 'Schema.org Generator', icon: '🔧', category: 'Outils' },
+    { id: 'robots-txt', label: 'Robots.txt Optimizer', icon: '🤖', category: 'Outils' },
+    { id: 'bot-tracking', label: 'Suivi Bots IA', icon: '👁️', category: 'Outils' },
+    { id: 'blog-optimizer', label: 'Blog Optimiser', icon: '📰', category: 'Outils' },
+    { id: 'ai-response-layer', label: 'AI Response Layer', icon: '🧩', category: 'Outils' },
+    { id: 'llms-txt', label: 'Générateur llms.txt', icon: '📋', category: 'Outils' },
+    { id: 'answer-first-audit', label: 'Audit Answer-First', icon: '🎯', category: 'Outils' },
+    { id: 'ai-citation-simulator', label: 'Simulateur Citation IA', icon: '🤖', category: 'Outils' },
+    { id: 'eeat-builder', label: 'E-E-A-T Builder', icon: '🏆', category: 'Outils' },
+    { id: 'ai-monitoring', label: 'Monitoring IA', icon: '📡', category: 'Navigation' },
+    { id: 'directory', label: 'Annuaire Indexé', icon: '📚', category: 'Navigation' },
+    { id: 'recharge', label: 'GTO Gas Station', icon: '⛽', category: 'Navigation' },
+    { id: 'clients', label: 'Base Clients', icon: '👥', category: 'Navigation' },
+    { id: 'mission-orders', label: 'Ordres de Mission', icon: '📋', category: 'Navigation' },
+    { id: 'alerts', label: 'Alertes AEO', icon: '🔔', category: 'Navigation' },
+    { id: 'account', label: 'Compte & Plan', icon: '👤', category: 'Navigation' },
+    { id: 'affiliation', label: 'Programme Partenaire', icon: '🤝', category: 'Navigation' },
+    { id: 'integrations', label: 'Intégrations GA4 & Search Console', icon: '🔗', category: 'Navigation' },
+    { id: 'api-developer', label: 'API Developer Hub', icon: '⚡', category: 'Outils' },
+  ];
+
+  const filtered = query
+    ? commands.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
+    : commands;
+
+  const grouped = filtered.reduce((acc, cmd) => {
+    if (!acc[cmd.category]) acc[cmd.category] = [];
+    acc[cmd.category].push(cmd);
+    return acc;
+  }, {} as Record<string, typeof commands>);
+
+  // Highlight matched text in label
+  const highlightMatch = (label: string) => {
+    if (!query) return <span>{label}</span>;
+    const lowerLabel = label.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const idx = lowerLabel.indexOf(lowerQuery);
+    if (idx === -1) return <span>{label}</span>;
+    return (
+      <span>
+        {label.slice(0, idx)}
+        <span className="text-purple-400 font-semibold">{label.slice(idx, idx + query.length)}</span>
+        {label.slice(idx + query.length)}
+      </span>
+    );
+  };
+
+  return (
+    <div
+      className="relative w-full max-w-[560px] glass-modal rounded-2xl overflow-hidden"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.08]">
+        <Search size={18} className="text-gray-500 shrink-0" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Rechercher une page, un outil..."
+          className="flex-1 bg-transparent text-white text-[15px] placeholder-gray-600 outline-none"
+        />
+        <kbd className="hidden sm:flex items-center gap-1 px-2 py-0.5 text-[10px] text-gray-600 bg-white/[0.04] border border-white/[0.08] rounded-md font-mono">ESC</kbd>
+      </div>
+      <div className="max-h-[340px] overflow-y-auto py-2">
+        {Object.keys(grouped).length === 0 ? (
+          <div className="px-5 py-8 text-center text-gray-600 text-sm">Aucun résultat pour &ldquo;{query}&rdquo;</div>
+        ) : (
+          Object.entries(grouped).map(([category, cmds]) => (
+            <div key={category}>
+              <div className="px-5 py-2 text-[10px] font-bold text-gray-600 uppercase tracking-wider">{category}</div>
+              {cmds.map((cmd) => (
+                <button
+                  key={cmd.id}
+                  onClick={() => onNavigate(cmd.id)}
+                  className="w-full flex items-center gap-3 px-5 py-2.5 text-left hover:bg-white/[0.04] transition-colors group"
+                >
+                  <span className="text-base">{cmd.icon}</span>
+                  <span className="text-[14px] text-gray-300 group-hover:text-white transition-colors">{highlightMatch(cmd.label)}</span>
+                </button>
+              ))}
+            </div>
+          ))
+        )}
+      </div>
+      <div className="px-5 py-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-gray-600">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-[10px] font-mono">↑↓</kbd> naviguer</span>
+          <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-[10px] font-mono">↵</kbd> ouvrir</span>
+        </div>
+        <span>CitedBy.ai</span>
+      </div>
+    </div>
+  );
+};
+
+export default CommandPalettePanel;

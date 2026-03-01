@@ -1,0 +1,13 @@
+'use client';
+import dynamicImport from 'next/dynamic';
+import { useAppContext } from '@/lib/app-context';
+
+const BenchmarkPage = dynamicImport(
+  () => import('@/views/v3/BenchmarkPage'),
+  { ssr: false }
+);
+
+export default function BenchmarkPageWrapper() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return <BenchmarkPage onBack={goBack} user={user} onNavigate={navigateTo} />;
+}

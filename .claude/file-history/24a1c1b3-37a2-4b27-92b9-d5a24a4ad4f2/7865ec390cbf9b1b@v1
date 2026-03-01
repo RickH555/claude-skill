@@ -1,0 +1,126 @@
+# CitedBy.ai — Instructions Projet
+
+## Vue d'ensemble
+CitedBy.ai est un SaaS d'optimisation AEO (Answer Engine Optimization) construit avec Next.js 14 App Router. Il aide les entreprises a etre citees par les moteurs IA (ChatGPT, Perplexity, Gemini, etc.) via des outils d'analyse, de generation de contenu et de monitoring de reputation.
+
+## Stack technique
+- **Framework** : Next.js 14.2.35 (App Router, `app/` directory)
+- **Frontend** : React 18, Tailwind CSS 3.4, Lucide Icons
+- **Backend** : Next.js API Routes (`app/api/`)
+- **Base de donnees** : Supabase (Auth + PostgreSQL + RLS)
+- **AI** : Google Gemini (`@google/genai`) — modeles `gemini-2.5-flash` et `gemini-2.5-pro`
+- **Paiement** : Stripe (checkout, webhooks, portail client)
+- **i18n** : Systeme custom React Context (FR/EN/ES)
+- **Validation** : Zod + React Hook Form
+- **Charts** : Recharts
+
+## Architecture du projet
+
+```
+app/                    # Next.js App Router (PRODUCTION)
+  (public)/             # Pages publiques (landing)
+  (auth)/               # Pages auth (login, register)
+  (app)/app/            # Pages authentifiees (dashboard, projets)
+  api/                  # API Routes (stripe, runs)
+  auth/                 # Auth routes (signout)
+
+services/               # Logique metier AI (12 fichiers)
+  analyzer.ts           # Analyse AEO d'un site
+  content_writer.ts     # Generation de contenu optimise
+  reputation_service.ts # Monitoring reputation IA
+  smc.ts                # SMC Studio (Social Media Content)
+  schema_service.ts     # Generateur Schema.org
+  robots_service.ts     # Generateur robots.txt
+  generator.ts          # Generation de recommandations
+  criteria.ts           # Criteres d'evaluation AEO
+  llm_templates.ts      # Templates de prompts
+  database.ts           # Client Supabase
+  pdf_prompt.ts         # Export PDF
+  blog_prompt_db.ts     # Base de prompts blog
+
+i18n/                   # Systeme multilingue
+  types.ts              # Types Locale, TranslationDictionary
+  context.tsx           # I18nProvider + hooks
+  locales/fr.ts         # Dictionnaire francais
+  locales/en.ts         # Dictionnaire anglais
+  locales/es.ts         # Dictionnaire espagnol
+  LanguageSelector.tsx   # Composant dropdown langue
+  index.ts              # Barrel exports
+
+_legacy_pages/          # SPA legacy (exclu du build Next.js)
+  ContentWriter.tsx
+  GenerativeTools.tsx
+  Reputation.tsx
+```
+
+## Conventions de code
+
+### TypeScript
+- Strict mode active
+- Interfaces pour les props de composants (`interface XxxProps`)
+- Types union pour les enumerations (`type Locale = 'fr' | 'en' | 'es'`)
+- Zod pour la validation des donnees entrantes
+
+### React
+- Composants fonctionnels uniquement (`React.FC<Props>`)
+- Hooks custom pour la logique reutilisable
+- React Context pour l'etat global (i18n, auth)
+- Pas de bibliotheque d'etat externe (pas de Redux)
+
+### Tailwind CSS
+- Design dark theme (`bg-[#0f1115]` base, `bg-[#1a1d21]` cards)
+- Classes utilitaires directes, pas de CSS custom
+- Couleur primaire : `primary` (definie dans tailwind.config)
+- Glass panels : `border border-white/5 rounded-2xl`
+
+### API / Services
+- Tous les services AI lisent `process.env.API_KEY` (pas GEMINI_API_KEY)
+- Pattern : constructeur `GoogleGenAI` puis `ai.models.generateContent()`
+- JSON schema dans les appels Gemini pour typer les reponses
+- Fallback gracieux si API key absente (donnees mock)
+
+### i18n
+- Jamais de strings hardcodees dans les composants
+- Utiliser `const { t } = useTranslation()` puis `t.section.key`
+- Ajouter les cles dans les 3 fichiers locales (fr.ts, en.ts, es.ts)
+- `promptLang` pour injecter la langue dans les prompts AI
+
+## Variables d'environnement requises
+
+```env
+# AI
+API_KEY=                        # Google Gemini API Key
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=       # URL du projet Supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=  # Cle anonyme Supabase
+
+# Stripe
+STRIPE_SECRET_KEY=              # Cle secrete Stripe
+STRIPE_WEBHOOK_SECRET=          # Secret webhook Stripe
+NEXT_PUBLIC_STRIPE_PRO_PRICE_ID=  # Price ID plan Pro
+NEXT_PUBLIC_STRIPE_EXPERT_PRICE_ID= # Price ID plan Expert
+NEXT_PUBLIC_STRIPE_AGENCY_PRICE_ID= # Price ID plan Agency
+
+# App
+NEXT_PUBLIC_APP_URL=            # URL de l'application
+```
+
+## Commandes principales
+
+```bash
+npm run dev       # Serveur de developpement (port 3000)
+npm run build     # Build de production Next.js
+npm run start     # Serveur de production
+npm run lint      # Linting ESLint
+```
+
+## Regles importantes
+
+1. **Ne JAMAIS modifier** `settings.local.json` — fichier auto-genere
+2. **Ne JAMAIS committer** `.env.local` — contient les cles API
+3. **Toujours valider le build** apres modification (`npm run build`)
+4. **Les fichiers `_legacy_pages/`** sont exclus du build Next.js (via tsconfig) — ne pas les deplacer dans `app/`
+5. **Supabase RLS** est active — toutes les requetes DB passent par les policies
+6. **Stripe webhooks** doivent etre configures en production pour la gestion des abonnements
+7. **Gemini API** : toujours utiliser `process.env.API_KEY`, jamais `GEMINI_API_KEY`

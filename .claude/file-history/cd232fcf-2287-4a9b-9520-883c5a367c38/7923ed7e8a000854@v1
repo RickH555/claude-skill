@@ -1,0 +1,973 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { Project, User, AnalysisResult, GeneratedSolution } from '../types';
+import { Plus, Search, Globe, TrendingUp, Calendar, ArrowUpRight, BarChart3, ChevronDown, Zap, Activity, ArrowRight, Wrench, FileText, Shield, ExternalLink, Clock, LayoutDashboard, Bot, Lock, ChevronLeft, ChevronRight, Eye, RefreshCw, ClipboardList, ArrowLeft, ClipboardCheck, Archive, Code, ArrowUp, ArrowDown, CheckCircle2, XCircle, GitCompareArrows } from 'lucide-react';
+import ScoreRing from '../components/ScoreRing';
+import EngineBreakdown from '../components/EngineBreakdown';
+import { calculateEngineScores } from '../lib/engine-score-calculator';
+import { mapAnalysisResults, CRITERIA_LABELS } from '../lib/criteria-mapper';
+import { ENGINE_PROFILES } from '../config/engine-weights';
+import { Results } from './Results';
+import ActionPlan from './ActionPlan';
+import GenerationModal from '../components/GenerationModal';
+
+interface ProjectsProps {
+  onBack: () => void;
+  onNavigateToAnalysis: () => void;
+  user: User | null;
+  history: AnalysisResult[];
+  onViewAnalysis: (result: AnalysisResult, tab: 'overview' | 'details' | 'recommendations' | 'preview') => void;
+  projectCount: number;
+  maxProjects: number;
+  onNavigateToPlan: () => void;
+  onDeductCredits: (amount: number) => boolean;
+  onSaveSolution: (analysisId: string, recId: string, solution: GeneratedSolution) => void;
+  onNewAnalysis: () => void;
+  onNavigateToRecharge: () => void;
+  initialUrl?: string;
+  initialTab?: string;
+}
+
+// Helper to convert AnalysisResult to Project format
+const mapAnalysisToProject = (analysis: AnalysisResult, index: number): Project => {
+  const hostname = new URL(analysis.url).hostname;
+  return {
+    id: `proj_${index}_${hostname}`,
+    name: hostname,
+    domain: analysis.url,
+    status: 'active',
+    lastRun: analysis.timestamp,
+    visibilityScore: analysis.globalScore,
+    trend: analysis.globalScore > 70 ? 12 : (analysis.globalScore > 50 ? 5 : -5), // Simulé basé sur le score
+    nextRun: new Date(new Date(analysis.timestamp).getTime() + 86400000 * 7).toISOString()
+  };
+};
+
+const Projects: React.FC<ProjectsProps> = ({ onBack, onNavigateToAnalysis, user, history, onViewAnalysis, projectCount, maxProjects, onNavigateToPlan, onDeductCredits, onSaveSolution, onNewAnalysis, onNavigateToRecharge, initialUrl, initialTab }) => {
+  // Navigation internal state: monitoring | report | action-plan | rescan | archives
+  const [activeTab, setActiveTab] = useState<'monitoring' | 'report' | 'action-plan' | 'rescan' | 'archives'>(() => {
+    if (initialTab === 'archives') return 'archives';
+    if (initialTab === 'recommendations' || initialTab === 'action-plan') return 'action-plan';
+    if (initialTab === 'details' || initialTab === 'report') return 'report';
+    return 'monitoring';
+  });
+
+  useEffect(() => {
+    if (initialTab === 'archives') setActiveTab('archives');
+    else if (initialTab === 'recommendations') setActiveTab('action-plan');
+    else if (initialTab === 'details' || initialTab === 'report') setActiveTab('report');
+    else if (initialTab === 'overview') setActiveTab('monitoring');
+  }, [initialTab]);
+
+  // Use history to build project list, defaulting to mock if empty for demo
+  const projects = useMemo(() => {
+    if (history.length > 0) {
+      // Deduplicate by URL hostname, keeping the most recent
+      const uniqueMap = new Map<string, AnalysisResult>();
+      history.forEach(item => {
+        try {
+            const host = new URL(item.url).hostname;
+            if (!uniqueMap.has(host) || new Date(item.timestamp) > new Date(uniqueMap.get(host)!.timestamp)) {
+                uniqueMap.set(host, item);
+            }
+        } catch(e) {}
+      });
+      return Array.from(uniqueMap.values()).map((analysis, index) => mapAnalysisToProject(analysis, index));
+    } else {
+      // Mock data fallback if no history
+      return [
+        {
+          id: 'demo_1',
+          name: 'Exemple Site Demo',
+          domain: 'https://demo-site.com',
+          status: 'active',
+          lastRun: new Date().toISOString(),
+          visibilityScore: 45,
+          trend: 0,
+          nextRun: new Date(Date.now() + 86400000).toISOString()
+        }
+      ] as Project[];
+    }
+  }, [history]);
+
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => {
+    if (initialUrl && projects.length > 0) {
+        try {
+            const targetHost = new URL(initialUrl).hostname;
+            // The projects mapping uses hostname as name
+            const found = projects.find(p => p.name === targetHost);
+            if (found) return found.id;
+        } catch(e) {}
+    }
+    return projects[0]?.id || '';
+  });
+
+  const [selectedAnalysisState, setSelectedAnalysisState] = useState<AnalysisResult | null>(null);
+  
+  // States for viewing archive modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentSolution, setCurrentSolution] = useState<GeneratedSolution | null>(null);
+
+  const currentProject = projects.find(p => p.id === selectedProjectId) || projects[0];
+  
+  // Filter history for current project ONLY
+  const projectHistory = useMemo(() => {
+    return history
+      .filter(h => {
+          try { return new URL(h.url).hostname === currentProject.name; }
+          catch(e) { return false; }
+      })
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [history, currentProject]);
+
+  // Reset selected analysis when project changes
+  useEffect(() => {
+    setSelectedAnalysisState(null);
+  }, [selectedProjectId]);
+
+  // The analysis to display (either user-selected from table, or the latest one)
+  const activeAnalysis = selectedAnalysisState || projectHistory[0];
+
+  const handleOpenStoredSolution = (solution: GeneratedSolution) => {
+    setCurrentSolution(solution);
+    setIsModalOpen(true);
+  };
+
+  // Calculate Pillar Scores from real categories if available
+  const getPillarScores = () => {
+    if (!activeAnalysis) {
+      return {
+        tech: 50,
+        sem: 50,
+        auth: 50
+      };
+    }
+    
+    const cats = activeAnalysis.categories;
+    
+    // Aggregation logic
+    const techScore = Math.round(
+      ((cats['technical']?.score || 0) + (cats['ux']?.score || 0) + (cats['freshness']?.score || 0)) / 3
+    );
+    
+    const semScore = Math.round(
+      ((cats['semantic']?.score || 0) + (cats['content']?.score || 0) + (cats['geo']?.score || 0) + (cats['media']?.score || 0)) / 4
+    );
+    
+    const authScore = Math.round(
+      ((cats['entity']?.score || 0) + (cats['structured_data']?.score || 0) + (cats['trust']?.score || 0)) / 3
+    );
+
+    return { tech: techScore, sem: semScore, auth: authScore };
+  };
+
+  const pillarScores = getPillarScores();
+
+  // Engine scores for monitoring tab
+  const engineScores = useMemo(() => {
+    if (!activeAnalysis) return [];
+    const criteriaResults = mapAnalysisResults(activeAnalysis);
+    return calculateEngineScores(criteriaResults);
+  }, [activeAnalysis]);
+
+  // Comparison data between two most recent analyses
+  const comparisonData = useMemo(() => {
+    if (projectHistory.length < 2) return null;
+    const latest = projectHistory[0];
+    const previous = projectHistory[1];
+
+    const latestCriteria = mapAnalysisResults(latest);
+    const previousCriteria = mapAnalysisResults(previous);
+    const latestEngines = calculateEngineScores(latestCriteria);
+    const previousEngines = calculateEngineScores(previousCriteria);
+
+    const engineDeltas = latestEngines.map(le => {
+      const pe = previousEngines.find(p => p.engineId === le.engineId);
+      return {
+        engineId: le.engineId,
+        engineName: le.engineName,
+        engineIcon: le.engineIcon,
+        engineColor: le.engineColor,
+        before: pe?.score ?? 0,
+        after: le.score,
+        delta: le.score - (pe?.score ?? 0),
+      };
+    });
+
+    // Find fixed & regressed criteria
+    const fixed: string[] = [];
+    const regressed: string[] = [];
+    latestCriteria.forEach(lc => {
+      const pc = previousCriteria.find(p => p.id === lc.id);
+      if (pc && !pc.passed && lc.passed) fixed.push(lc.id);
+      if (pc && pc.passed && !lc.passed) regressed.push(lc.id);
+    });
+
+    return {
+      latest,
+      previous,
+      globalDelta: latest.globalScore - previous.globalScore,
+      engineDeltas,
+      fixed,
+      regressed,
+    };
+  }, [projectHistory]);
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-white'; // Purple implied by bg bar
+    if (score >= 60) return 'text-purple-400';
+    return 'text-blue-400'; // For variation
+  };
+
+  const getBarColor = (score: number) => {
+    if (score >= 80) return 'bg-purple-400';
+    if (score >= 60) return 'bg-purple-500';
+    return 'bg-blue-400';
+  };
+
+  const handleSwitchToReport = () => {
+    if (activeAnalysis) {
+        setActiveTab('report');
+    } else {
+        alert("Veuillez lancer une analyse pour voir le rapport.");
+        onNavigateToAnalysis();
+    }
+  };
+
+  const handleSwitchToActionPlan = () => {
+    if (activeAnalysis) {
+        setActiveTab('action-plan');
+    } else {
+        alert("Veuillez lancer une analyse pour voir le plan d'action.");
+        onNavigateToAnalysis();
+    }
+  };
+
+  const handleSwitchToRescan = () => {
+    if (activeAnalysis) {
+        setActiveTab('rescan');
+    } else {
+        alert("Veuillez lancer une analyse pour voir le suivi.");
+        onNavigateToAnalysis();
+    }
+  };
+
+  const handleSwitchToArchives = () => {
+    if (activeAnalysis) {
+        setActiveTab('archives');
+    } else {
+        alert("Veuillez lancer une analyse pour voir les archives.");
+        onNavigateToAnalysis();
+    }
+  };
+
+  const handleBackToMonitoring = () => {
+    setActiveTab('monitoring');
+  };
+
+  const isLimitReached = projectCount >= maxProjects;
+
+  // -- SHARED TABS BAR (rendered on all views) --
+  const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
+
+  const renderTabsBar = () => (
+    <div className="w-full px-4 pt-8">
+      {/* URL Selector — prominent, above tabs */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+        <div className="relative">
+          <button
+            onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
+            className="flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-purple-500/10 to-violet-500/10 hover:from-purple-500/20 hover:to-violet-500/20 border border-purple-500/30 rounded-2xl transition-all text-sm font-bold group"
+          >
+            <Globe size={16} className="text-purple-400" />
+            <span className="text-white truncate max-w-[280px]">{currentProject.name}</span>
+            <ChevronDown size={14} className={`text-purple-400 transition-transform ${isProjectDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {isProjectDropdownOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setIsProjectDropdownOpen(false)} />
+              <div className="absolute top-full left-0 mt-2 w-72 bg-[#1a1d24] border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 z-50 p-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                <p className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-gray-500 font-bold">Projets scannés</p>
+                {projects.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => { setSelectedProjectId(p.id); setIsProjectDropdownOpen(false); }}
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm flex items-center gap-2.5 transition-colors ${
+                      p.id === selectedProjectId
+                        ? 'bg-purple-500/15 text-purple-300 font-bold'
+                        : 'text-gray-300 hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    <Globe size={14} className={p.id === selectedProjectId ? 'text-purple-400' : 'text-gray-600'} />
+                    {p.name}
+                  </button>
+                ))}
+                <div className="border-t border-white/[0.06] mt-1.5 pt-1.5">
+                  <button
+                    onClick={() => { setIsProjectDropdownOpen(false); onNavigateToAnalysis(); }}
+                    className="w-full text-left px-3 py-2.5 rounded-xl text-sm text-gray-500 hover:text-white hover:bg-white/[0.06] flex items-center gap-2.5 transition-colors"
+                  >
+                    <Plus size={14} /> Scanner une nouvelle URL
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+        {currentProject && (
+          <span className="text-xs text-gray-500 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"></span>
+            Monitoring actif
+          </span>
+        )}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-6 mb-8 border-b border-white/[0.08] overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('monitoring')}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'monitoring'
+                ? 'border-primary text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Activity size={18} className={activeTab === 'monitoring' ? 'text-purple-400' : 'opacity-50'} />
+            Vue d'ensemble
+          </button>
+
+          <button
+            onClick={handleSwitchToReport}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'report'
+                ? 'border-primary text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <ClipboardList size={18} className={activeTab === 'report' ? 'text-purple-400' : 'opacity-50'} />
+            Rapport d'Audit
+          </button>
+
+          <button
+            onClick={handleSwitchToActionPlan}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'action-plan'
+                ? 'border-primary text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Zap size={18} className={activeTab === 'action-plan' ? 'text-purple-400 fill-primary' : 'opacity-50'} />
+            Plan d'Action
+            {activeAnalysis && activeAnalysis.recommendations.length > 0 && (
+                <span className="bg-primary text-black text-[10px] px-1.5 py-0.5 rounded-full ml-1.5">
+                    {activeAnalysis.recommendations.length}
+                </span>
+            )}
+          </button>
+
+          <button
+            onClick={handleSwitchToRescan}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'rescan'
+                ? 'border-primary text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <GitCompareArrows size={18} className={activeTab === 'rescan' ? 'text-purple-400' : 'opacity-50'} />
+            Re-scan & Suivi
+            {comparisonData && comparisonData.globalDelta !== 0 && (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold ${
+                comparisonData.globalDelta > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+              }`}>
+                {comparisonData.globalDelta > 0 ? '+' : ''}{comparisonData.globalDelta}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={handleSwitchToArchives}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'archives'
+                ? 'border-primary text-white'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Archive size={18} className={activeTab === 'archives' ? 'text-purple-400' : 'opacity-50'} />
+            Archives Solutions
+          </button>
+      </div>
+    </div>
+  );
+
+  // -- RENDER : REPORT VIEW (RESULTS) --
+  if (activeTab === 'report' && activeAnalysis) {
+      return (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              {renderTabsBar()}
+              <Results 
+                data={activeAnalysis} 
+                onBack={handleBackToMonitoring}
+                user={user}
+                onDeductCredits={onDeductCredits}
+                onSaveSolution={onSaveSolution}
+                onNewAnalysis={onNewAnalysis}
+              />
+          </div>
+      );
+  }
+
+  // -- RENDER : ACTION PLAN VIEW --
+  if (activeTab === 'action-plan' && activeAnalysis) {
+      return (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              {renderTabsBar()}
+              <ActionPlan 
+                data={activeAnalysis}
+                user={user}
+                onDeductCredits={onDeductCredits}
+                onSaveSolution={onSaveSolution}
+                onNavigateToAnalysis={onNewAnalysis}
+                onNavigateToRecharge={onNavigateToRecharge}
+              />
+          </div>
+      );
+  }
+
+  // -- RENDER : RE-SCAN & SUIVI VIEW --
+  if (activeTab === 'rescan' && activeAnalysis) {
+      return (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 w-full">
+              {renderTabsBar()}
+              <div className="px-4 pb-8">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 border border-purple-500/30">
+                        <GitCompareArrows size={20} />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-sans font-bold text-white">Re-scan & Suivi</h3>
+                        <p className="text-sm text-gray-500">Comparez vos audits et mesurez la progression de vos optimisations.</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={onNavigateToAnalysis}
+                    className="px-4 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-2xl hover:from-purple-600 hover:to-violet-700 transition-colors text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
+                  >
+                    <RefreshCw size={16} /> Lancer un re-scan
+                  </button>
+                </div>
+
+                {/* Before / After comparison */}
+                {comparisonData ? (
+                  <>
+                    {/* Global score comparison */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                      {/* Before */}
+                      <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] flex flex-col items-center">
+                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 font-medium">Audit précédent</p>
+                        <p className="text-[10px] text-gray-600 mb-2">{new Date(comparisonData.previous.timestamp).toLocaleDateString()}</p>
+                        <ScoreRing score={comparisonData.previous.globalScore} size={110} strokeWidth={8} noAnimation />
+                      </div>
+
+                      {/* Delta */}
+                      <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] flex flex-col items-center justify-center">
+                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-4 font-medium">Progression</p>
+                        <div className={`text-4xl font-bold ${comparisonData.globalDelta > 0 ? 'text-green-400' : comparisonData.globalDelta < 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                          {comparisonData.globalDelta > 0 ? '+' : ''}{comparisonData.globalDelta}
+                        </div>
+                        <div className="flex items-center gap-1 mt-2">
+                          {comparisonData.globalDelta > 0 && <ArrowUp size={16} className="text-green-400" />}
+                          {comparisonData.globalDelta < 0 && <ArrowDown size={16} className="text-red-400" />}
+                          <span className="text-sm text-gray-500">points</span>
+                        </div>
+                      </div>
+
+                      {/* After */}
+                      <div className="ninja-card p-6 rounded-2xl border border-purple-500/20 flex flex-col items-center bg-purple-500/5">
+                        <p className="text-xs text-purple-400 uppercase tracking-wider mb-3 font-medium">Dernier audit</p>
+                        <p className="text-[10px] text-gray-600 mb-2">{new Date(comparisonData.latest.timestamp).toLocaleDateString()}</p>
+                        <ScoreRing score={comparisonData.latest.globalScore} size={110} strokeWidth={8} noAnimation />
+                      </div>
+                    </div>
+
+                    {/* Engine deltas */}
+                    <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] mb-8">
+                      <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                        <BarChart3 size={16} className="text-purple-400" />
+                        Progression par moteur IA
+                      </h4>
+                      <div className="space-y-4">
+                        {comparisonData.engineDeltas.map(ed => (
+                          <div key={ed.engineId} className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 w-40 shrink-0">
+                              <span className="text-lg">{ed.engineIcon}</span>
+                              <span className="text-sm text-white font-medium truncate">{ed.engineName}</span>
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-gray-500 w-8 text-right">{ed.before}</span>
+                                <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden relative">
+                                  <div
+                                    className="h-full rounded-full absolute left-0 top-0 opacity-30"
+                                    style={{ width: `${ed.before}%`, backgroundColor: ed.engineColor }}
+                                  />
+                                  <div
+                                    className="h-full rounded-full absolute left-0 top-0"
+                                    style={{ width: `${ed.after}%`, backgroundColor: ed.engineColor }}
+                                  />
+                                </div>
+                                <span className="text-sm text-white font-bold w-8">{ed.after}</span>
+                                <span className={`text-xs font-bold w-10 text-right ${ed.delta > 0 ? 'text-green-400' : ed.delta < 0 ? 'text-red-400' : 'text-gray-500'}`}>
+                                  {ed.delta > 0 ? '+' : ''}{ed.delta}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Fixed & Regressed criteria */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Fixed */}
+                      <div className="ninja-card p-6 rounded-2xl border border-green-500/20">
+                        <h4 className="text-sm font-bold text-green-400 mb-4 flex items-center gap-2">
+                          <CheckCircle2 size={16} />
+                          Critères corrigés ({comparisonData.fixed.length})
+                        </h4>
+                        {comparisonData.fixed.length > 0 ? (
+                          <div className="space-y-2">
+                            {comparisonData.fixed.map(id => (
+                              <div key={id} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 size={14} className="text-green-400 shrink-0" />
+                                <span className="text-gray-300">{CRITERIA_LABELS[id] || id}</span>
+                                <span className="text-[10px] text-gray-600 ml-auto">{id}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500">Aucun critère corrigé entre les deux audits.</p>
+                        )}
+                      </div>
+
+                      {/* Regressed */}
+                      <div className="ninja-card p-6 rounded-2xl border border-red-500/20">
+                        <h4 className="text-sm font-bold text-red-400 mb-4 flex items-center gap-2">
+                          <XCircle size={16} />
+                          Régressions ({comparisonData.regressed.length})
+                        </h4>
+                        {comparisonData.regressed.length > 0 ? (
+                          <div className="space-y-2">
+                            {comparisonData.regressed.map(id => (
+                              <div key={id} className="flex items-center gap-2 text-sm">
+                                <XCircle size={14} className="text-red-400 shrink-0" />
+                                <span className="text-gray-300">{CRITERIA_LABELS[id] || id}</span>
+                                <span className="text-[10px] text-gray-600 ml-auto">{id}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500">Aucune régression détectée.</p>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="ninja-card p-12 rounded-2xl border border-dashed border-white/[0.08] flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 bg-white/[0.04] rounded-full flex items-center justify-center mb-4 text-gray-500">
+                      <GitCompareArrows size={32} />
+                    </div>
+                    <h4 className="text-lg font-medium text-white mb-2">Pas encore de comparaison disponible</h4>
+                    <p className="text-sm text-gray-500 max-w-sm mb-6">
+                      Lancez un deuxième scan de cette URL pour comparer les résultats avant/après et mesurer l'impact de vos optimisations.
+                    </p>
+                    <button
+                      onClick={onNavigateToAnalysis}
+                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-2xl hover:from-purple-600 hover:to-violet-700 transition-colors text-sm flex items-center gap-2"
+                    >
+                      <RefreshCw size={16} /> Lancer un re-scan
+                    </button>
+                  </div>
+                )}
+
+                {/* Timeline - all scans */}
+                {projectHistory.length > 1 && (
+                  <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] mt-8">
+                    <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                      <Clock size={16} className="text-gray-500" />
+                      Historique des scores
+                    </h4>
+                    <div className="flex items-end gap-1 h-32">
+                      {projectHistory.slice().reverse().map((analysis, idx) => {
+                        const maxScore = Math.max(...projectHistory.map(a => a.globalScore), 100);
+                        const barHeight = (analysis.globalScore / maxScore) * 100;
+                        const isLatest = idx === projectHistory.length - 1;
+                        return (
+                          <div key={idx} className="flex-1 flex flex-col items-center gap-1 group relative">
+                            <span className="text-[10px] text-gray-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity absolute -top-5">
+                              {analysis.globalScore}
+                            </span>
+                            <div
+                              className={`w-full max-w-[40px] rounded-t transition-all ${isLatest ? 'bg-purple-500' : 'bg-white/10 hover:bg-white/20'}`}
+                              style={{ height: `${barHeight}%` }}
+                            />
+                            <span className="text-[8px] text-gray-600 truncate max-w-full">
+                              {new Date(analysis.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+          </div>
+      );
+  }
+
+  // -- RENDER : ARCHIVES SOLUTIONS VIEW --
+  if (activeTab === 'archives' && activeAnalysis) {
+      return (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 w-full">
+              {renderTabsBar()}
+              <GenerationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                isLoading={false}
+                solution={currentSolution}
+              />
+              <div className="px-4 pb-8">
+
+              <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 border border-purple-500/30">
+                      <Archive size={20} />
+                  </div>
+                  <div>
+                      <h3 className="text-xl font-sans font-bold text-white">Archives Solutions</h3>
+                      <p className="text-sm text-gray-500">Retrouvez toutes les optimisations générées précédemment pour ce projet.</p>
+                  </div>
+              </div>
+
+              {activeAnalysis.generatedSolutions && Object.keys(activeAnalysis.generatedSolutions).length > 0 ? (
+                  <div className="grid md:grid-cols-2 gap-6">
+                      {Object.entries(activeAnalysis.generatedSolutions).map(([recId, sol], idx) => {
+                        const solution = sol as GeneratedSolution & { timestamp: string };
+                        return (
+                          <div key={recId} className="ninja-card p-5 rounded-2xl border border-white/[0.08] hover:border-purple-500/30 transition-all group cursor-pointer" onClick={() => handleOpenStoredSolution(solution)}>
+                              <div className="flex justify-between items-start mb-3">
+                                  <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${solution.type === 'code' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-pink-500/10 text-pink-400 border border-pink-500/20'}`}>
+                                      {solution.type === 'code' ? 'Code Technique' : 'Contenu Éditorial'}
+                                  </span>
+                                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                                      <Clock size={10} />
+                                      {new Date(solution.timestamp).toLocaleDateString()}
+                                  </span>
+                              </div>
+                              
+                              <h4 className="font-bold text-white mb-2 line-clamp-1">{solution.title}</h4>
+                              <p className="text-xs text-gray-500 mb-4 line-clamp-2">{solution.explanation}</p>
+                              
+                              <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
+                                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                                      {solution.type === 'code' ? <Code size={12} /> : <FileText size={12} />}
+                                      {solution.language}
+                                  </div>
+                                  <button className="text-xs font-bold text-purple-400 flex items-center gap-1 group-hover:underline">
+                                      <Eye size={12} /> Voir
+                                  </button>
+                              </div>
+                          </div>
+                      )})}
+                  </div>
+              ) : (
+                  <div className="ninja-card p-12 rounded-2xl border border-dashed border-white/[0.08] flex flex-col items-center justify-center text-center">
+                      <div className="w-16 h-16 bg-white/[0.04] rounded-full flex items-center justify-center mb-4 text-gray-500">
+                          <Archive size={32} />
+                      </div>
+                      <h4 className="text-lg font-medium text-white mb-2">Aucune archive disponible</h4>
+                      <p className="text-sm text-gray-500 max-w-sm mb-6">
+                          Les solutions que vous générez depuis l'onglet "Plan d'action" apparaîtront ici pour une consultation ultérieure.
+                      </p>
+                      <button 
+                        onClick={handleSwitchToActionPlan}
+                        className="text-purple-400 hover:text-white transition-colors text-sm font-bold flex items-center gap-2"
+                      >
+                        Générer ma première solution <ArrowRight size={14} />
+                      </button>
+                  </div>
+              )}
+              </div>
+          </div>
+      );
+  }
+
+  // -- RENDER : MONITORING DASHBOARD --
+  return (
+    <div className="w-full px-4 py-8 animate-in fade-in duration-500 min-h-screen">
+      
+      {/* HEADER: Project Selector & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+             <h1 className="text-3xl font-sans font-bold text-white">Monitoring AEO</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <p className="text-gray-500 flex items-center gap-2 text-sm">
+                <Globe size={14} /> {currentProject.domain}
+                <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                <span className="text-purple-300">Monitoring Actif</span>
+            </p>
+            <div className="h-4 w-px bg-white/[0.08]"></div>
+            <p className={`text-xs ${isLimitReached ? 'text-purple-400' : 'text-gray-500'}`}>
+                {projectCount} / {maxProjects} Projets (Quota Mensuel)
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+           <button 
+             onClick={isLimitReached ? onNavigateToPlan : onNavigateToAnalysis}
+             className={`px-4 py-2.5 font-bold rounded-2xl transition-colors text-sm flex items-center gap-2 shadow-lg ${
+                isLimitReached
+                ? 'bg-purple-500 hover:bg-purple-600 text-white shadow-purple-500/20'
+                : 'bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-600 hover:to-violet-700 shadow-primary/20'
+             }`}
+           >
+             {isLimitReached ? <Lock size={16} /> : <Search size={16} />} 
+             {isLimitReached ? 'Upgrade pour ajouter' : 'Scan Manuel'}
+           </button>
+        </div>
+      </div>
+
+      {/* TABS HEADER */}
+      {renderTabsBar()}
+
+      {/* SECTION 1: SCORING AEO (DYNAMIC DATA) */}
+      <div className="mb-8">
+         <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+            <h2 className="text-xl font-medium text-white flex flex-wrap items-center gap-2">
+                <Activity size={20} className="text-purple-400" />
+                Score AEO pour : 
+                <span className="text-purple-400 font-bold bg-purple-500/10 px-2 py-0.5 rounded text-base break-all">
+                    {activeAnalysis ? activeAnalysis.url.replace(/^https?:\/\/(www\.)?/, '') : 'Aucune URL'}
+                </span>
+                {activeAnalysis && <span className="text-sm text-gray-500 font-normal whitespace-nowrap">({new Date(activeAnalysis.timestamp).toLocaleDateString()})</span>}
+            </h2>
+            {activeAnalysis && activeAnalysis !== projectHistory[0] && (
+                <button 
+                    onClick={() => setSelectedAnalysisState(null)} 
+                    className="text-xs text-purple-400 hover:text-white transition-colors flex items-center gap-1 bg-white/[0.04] px-3 py-1.5 rounded-full border border-white/[0.08]"
+                >
+                    <RefreshCw size={12} /> Revenir à la dernière analyse
+                </button>
+            )}
+         </div>
+         
+         <div className="grid md:grid-cols-12 gap-6">
+            {/* Main Score */}
+            <div className="md:col-span-4 ninja-card p-8 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden border-primary/20">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full pointer-events-none"></div>
+               <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wider mb-6">Score de Visibilité Globale</h3>
+               <ScoreRing score={activeAnalysis ? activeAnalysis.globalScore : 0} size={160} strokeWidth={12} />
+               <div className="mt-6 flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-white/[0.1] rounded-full">
+                  <TrendingUp size={14} className="text-purple-300" />
+                  <span className="text-purple-300 text-sm font-bold">
+                    {currentProject.trend > 0 ? '+' : ''}{currentProject.trend}% ce mois-ci
+                  </span>
+               </div>
+            </div>
+
+            {/* Pillars Breakdown - Calculated from Real Categories */}
+            <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+               {/* Pilier 1: Technique */}
+               <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex flex-col justify-between h-full group hover:border-blue-500/30 transition-colors">
+                  <div>
+                     <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-gray-500 text-xs uppercase mb-1">Infrastrucure</p>
+                            <h4 className="text-white font-bold text-lg">Technique</h4>
+                        </div>
+                        <div className="p-2 bg-blue-500/10 rounded-full text-blue-400">
+                            <Wrench size={18} />
+                        </div>
+                     </div>
+                     <div className="space-y-3 mb-6">
+                        <div className="flex justify-between items-end">
+                           <span className={`text-3xl font-bold ${getScoreColor(pillarScores.tech)}`}>{pillarScores.tech}</span>
+                           <span className="text-xs text-gray-500 mb-1">/100</span>
+                        </div>
+                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                           <div className={`h-full ${getBarColor(pillarScores.tech)}`} style={{ width: `${pillarScores.tech}%` }}></div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2 min-h-[32px]">
+                           {pillarScores.tech >= 80 ? "Excellente réactivité serveur." : "Latence ou problèmes d'indexation détectés."}
+                        </p>
+                     </div>
+                  </div>
+                  <button 
+                    onClick={handleSwitchToActionPlan} 
+                    className="w-full py-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 rounded-full text-sm font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    Voir les solutions <ArrowRight size={14} />
+                  </button>
+               </div>
+
+               {/* Pilier 2: Sémantique */}
+               <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex flex-col justify-between h-full group hover:border-purple-500/30 transition-colors">
+                  <div>
+                     <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-gray-500 text-xs uppercase mb-1">Contenu</p>
+                            <h4 className="text-white font-bold text-lg">Sémantique</h4>
+                        </div>
+                        <div className="p-2 bg-purple-500/10 rounded-full text-purple-400">
+                            <FileText size={18} />
+                        </div>
+                     </div>
+                     <div className="space-y-3 mb-6">
+                        <div className="flex justify-between items-end">
+                           <span className={`text-3xl font-bold ${getScoreColor(pillarScores.sem)}`}>{pillarScores.sem}</span>
+                           <span className="text-xs text-gray-500 mb-1">/100</span>
+                        </div>
+                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                           <div className={`h-full ${getBarColor(pillarScores.sem)}`} style={{ width: `${pillarScores.sem}%` }}></div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2 min-h-[32px]">
+                           {pillarScores.sem >= 80 ? "Structure Answer-First valide." : "Manque de structure pour le parsing IA."}
+                        </p>
+                     </div>
+                  </div>
+                  <button
+                    onClick={handleSwitchToActionPlan}
+                    className="w-full py-2.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-white/[0.1] rounded-full text-sm font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    Voir les solutions <ArrowRight size={14} />
+                  </button>
+               </div>
+
+               {/* Pilier 3: Autorité */}
+               <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex flex-col justify-between h-full group hover:border-purple-500/30 transition-colors">
+                  <div>
+                     <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-gray-500 text-xs uppercase mb-1">Autorité</p>
+                            <h4 className="text-white font-bold text-lg">Entité Graph</h4>
+                        </div>
+                        <div className="p-2 bg-purple-500/10 rounded-full text-purple-300">
+                            <Shield size={18} />
+                        </div>
+                     </div>
+                     <div className="space-y-3 mb-6">
+                        <div className="flex justify-between items-end">
+                           <span className={`text-3xl font-bold ${getScoreColor(pillarScores.auth)}`}>{pillarScores.auth}</span>
+                           <span className="text-xs text-gray-500 mb-1">/100</span>
+                        </div>
+                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                           <div className={`h-full ${getBarColor(pillarScores.auth)}`} style={{ width: `${pillarScores.auth}%` }}></div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2 min-h-[32px]">
+                           {pillarScores.auth >= 80 ? "Entité clairement identifiée." : "Données structurées incomplètes."}
+                        </p>
+                     </div>
+                  </div>
+                  <button
+                    onClick={handleSwitchToActionPlan}
+                    className="w-full py-2.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-white/[0.1] rounded-full text-sm font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    Voir les solutions <ArrowRight size={14} />
+                  </button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      {/* ENGINE BREAKDOWN - Optimisation par moteur IA */}
+      {engineScores.length > 0 && (
+        <div className="mt-8">
+          <EngineBreakdown engineScores={engineScores} />
+        </div>
+      )}
+
+      {/* SECTION 2: HISTORIQUE DES ANALYSES */}
+      <div className="ninja-card rounded-2xl overflow-hidden border border-white/[0.08] mt-8">
+         <div className="p-6 border-b border-white/[0.08] flex justify-between items-center bg-white/[0.04]">
+            <h3 className="font-bold text-white flex items-center gap-2">
+               <Clock size={20} className="text-gray-500" /> Historique des analyses
+            </h3>
+            <div className="text-xs text-gray-500">
+               {projectHistory.length} audits conservés
+            </div>
+         </div>
+         
+         <div className="overflow-x-auto">
+            <table className="w-full text-left">
+               <thead>
+                  <tr className="bg-[#000000] text-xs text-gray-500 uppercase tracking-wider">
+                     <th className="px-6 py-4 font-medium">Date</th>
+                     <th className="px-6 py-4 font-medium">Score Global</th>
+                     <th className="px-6 py-4 font-medium">Technique</th>
+                     <th className="px-6 py-4 font-medium">Sémantique</th>
+                     <th className="px-6 py-4 font-medium">Autorité</th>
+                     <th className="px-6 py-4 font-medium text-right">Actions</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-white/5">
+                  {projectHistory.map((analysis, idx) => (
+                     <tr key={idx} className={`hover:bg-white/[0.02] transition-colors ${selectedAnalysisState === analysis ? 'bg-white/[0.04]' : ''}`}>
+                        <td className="px-6 py-4 text-sm text-gray-300">
+                           {new Date(analysis.timestamp).toLocaleDateString()} <span className="text-gray-600 text-xs ml-1">{new Date(analysis.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                           <span className={`font-bold ${getScoreColor(analysis.globalScore)}`}>{analysis.globalScore}</span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                           {Math.round(analysis.categories['technical']?.score || 0)}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                           {Math.round(analysis.categories['semantic']?.score || 0)}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                           {Math.round(analysis.categories['entity']?.score || 0)}
+                        </td>
+                        <td className="px-6 py-4 text-right flex justify-end gap-2">
+                           <button 
+                              onClick={() => {
+                                 setSelectedAnalysisState(analysis);
+                                 setActiveTab('report');
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="text-gray-500 hover:text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/[0.08] hover:bg-white/[0.04] transition-colors flex items-center gap-1"
+                           >
+                              <ClipboardList size={12} />
+                              Rapport
+                           </button>
+                           <button 
+                              onClick={() => {
+                                 setSelectedAnalysisState(analysis);
+                                 setActiveTab('action-plan');
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="text-purple-400 hover:text-white text-xs font-bold px-3 py-1.5 rounded-full border border-primary/20 hover:bg-purple-500/10 transition-colors flex items-center gap-1"
+                           >
+                              <Zap size={12} />
+                              Plan d'Action
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
+                  {projectHistory.length === 0 && (
+                     <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500 text-sm">
+                           Aucune analyse enregistrée pour ce projet.
+                        </td>
+                     </tr>
+                  )}
+               </tbody>
+            </table>
+         </div>
+      </div>
+
+    </div>
+  );
+};
+
+export default Projects;

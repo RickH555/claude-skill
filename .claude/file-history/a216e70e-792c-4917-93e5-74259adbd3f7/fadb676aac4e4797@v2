@@ -1,0 +1,140 @@
+import React, { useState } from 'react';
+import { AlertTriangle, Bell, BellOff, ChevronDown, ChevronUp, Filter, Shield, TrendingDown, Activity, Settings, CheckCircle, XCircle } from 'lucide-react';
+import { User } from '../types';
+
+interface AlertsAEOProps {
+  onBack: () => void;
+  user: User | null;
+  onNavigate: (view: string) => void;
+}
+
+type AlertItem = {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'critical' | 'warning' | 'info';
+  date: string;
+  engine: string;
+  read: boolean;
+  details?: string;
+};
+
+const AlertsAEO: React.FC<AlertsAEOProps> = ({ onBack, user, onNavigate }) => {
+  const [filter, setFilter] = useState<'all' | 'critical' | 'warning' | 'info'>('all');
+  const [expandedAlert, setExpandedAlert] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [emailAlerts, setEmailAlerts] = useState(true);
+  const [pushAlerts, setPushAlerts] = useState(false);
+
+  const alerts: AlertItem[] = [
+    { id: '1', title: 'Chute de visibilit\u00e9 d\u00e9tect\u00e9e sur ChatGPT', description: 'Votre score de citation a chut\u00e9 de 15 points en 24h.', severity: 'critical', date: 'Il y a 2h', engine: 'ChatGPT', read: false, details: 'Le score de citation pour votre marque sur ChatGPT est pass\u00e9 de 78% \u00e0 63%. Cela peut \u00eatre d\u00fb \u00e0 une mise \u00e0 jour du mod\u00e8le ou \u00e0 un changement dans le contenu index\u00e9. Recommandation : lancez un audit complet pour identifier les causes.' },
+    { id: '2', title: 'Nouvelle mention d\u00e9tect\u00e9e sur Claude', description: 'Votre marque a \u00e9t\u00e9 cit\u00e9e dans un nouveau contexte.', severity: 'info', date: 'Il y a 5h', engine: 'Claude', read: false, details: 'Claude mentionne d\u00e9sormais votre marque dans le contexte des solutions AEO, ce qui est positif pour votre visibilit\u00e9.' },
+    { id: '3', title: 'Quota GTO Gas bient\u00f4t \u00e9puis\u00e9', description: 'Il vous reste moins de 10 cr\u00e9dits.', severity: 'warning', date: 'Il y a 12h', engine: 'Syst\u00e8me', read: true },
+    { id: '4', title: 'Gemini ne cite plus votre marque', description: 'Perte compl\u00e8te de citation sur Gemini depuis 48h.', severity: 'critical', date: 'Hier', engine: 'Gemini', read: true, details: 'Gemini a cess\u00e9 de mentionner votre marque. Cela co\u00efncide avec une mise \u00e0 jour du mod\u00e8le. V\u00e9rifiez votre contenu Schema.org et FAQ.' },
+    { id: '5', title: 'Am\u00e9lioration du score Perplexity', description: 'Votre score a augment\u00e9 de 12 points.', severity: 'info', date: 'Il y a 2 jours', engine: 'Perplexity', read: true },
+    { id: '6', title: 'Structure FAQ manquante d\u00e9tect\u00e9e', description: '3 pages cl\u00e9s n\'ont pas de FAQ structur\u00e9e.', severity: 'warning', date: 'Il y a 3 jours', engine: 'Audit', read: true },
+  ];
+
+  const filteredAlerts = filter === 'all' ? alerts : alerts.filter(a => a.severity === filter);
+
+  const getSeverityIcon = (severity: string) => {
+    switch (severity) {
+      case 'critical': return <XCircle size={16} className="text-red-400" />;
+      case 'warning': return <AlertTriangle size={16} className="text-orange-400" />;
+      default: return <CheckCircle size={16} className="text-amber-400" />;
+    }
+  };
+
+  const getSeverityBg = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'border-red-500/20 bg-red-500/[0.03]';
+      case 'warning': return 'border-orange-500/20 bg-orange-500/[0.03]';
+      default: return 'border-white/[0.06] bg-white/[0.02]';
+    }
+  };
+
+  return (
+    <div className="w-full px-6 py-8 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Alertes <span className="gradient-text">AEO</span></h1>
+          <p className="text-gray-500 text-sm mt-1">{alerts.filter(a => !a.read).length} alertes non lues</p>
+        </div>
+        <button onClick={() => setShowSettings(!showSettings)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors bg-white/[0.04] border border-white/[0.08] rounded-full px-4 py-2">
+          <Settings size={14} /> Param\u00e8tres
+        </button>
+      </div>
+
+      {showSettings && (
+        <div className="ninja-card p-6 mb-6 animate-in slide-in-from-top-2 duration-200">
+          <h3 className="text-sm font-bold text-white mb-4">Pr\u00e9f\u00e9rences de notification</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-300">Alertes par email</span>
+              <button onClick={() => setEmailAlerts(!emailAlerts)} className={`w-10 h-5 rounded-full relative transition-colors ${emailAlerts ? 'bg-amber-500' : 'bg-white/[0.1]'}`}>
+                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${emailAlerts ? 'left-5' : 'left-0.5'}`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-300">Notifications push</span>
+              <button onClick={() => setPushAlerts(!pushAlerts)} className={`w-10 h-5 rounded-full relative transition-colors ${pushAlerts ? 'bg-amber-500' : 'bg-white/[0.1]'}`}>
+                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${pushAlerts ? 'left-5' : 'left-0.5'}`} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {(['all', 'critical', 'warning', 'info'] as const).map(f => (
+          <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${filter === f ? 'bg-amber-500/20 text-amber-300 border border-amber-500/20' : 'bg-white/[0.04] text-gray-500 border border-white/[0.06] hover:text-gray-300'}`}>
+            {f === 'all' ? 'Toutes' : f === 'critical' ? 'Critiques' : f === 'warning' ? 'Avertissements' : 'Infos'}
+            {f !== 'all' && <span className="ml-1.5 px-1.5 rounded-full bg-white/[0.06] text-[10px]">{alerts.filter(a => a.severity === f).length}</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* Alert List */}
+      <div className="space-y-3">
+        {filteredAlerts.map(alert => (
+          <div key={alert.id} className={`ninja-card overflow-hidden border ${getSeverityBg(alert.severity)} ${!alert.read ? 'ring-1 ring-amber-500/10' : ''}`}>
+            <button onClick={() => setExpandedAlert(expandedAlert === alert.id ? null : alert.id)} className="w-full p-4 flex items-start gap-3 text-left">
+              {getSeverityIcon(alert.severity)}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-semibold text-white truncate">{alert.title}</span>
+                  {!alert.read && <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />}
+                </div>
+                <p className="text-xs text-gray-500 truncate">{alert.description}</p>
+                <div className="flex items-center gap-3 mt-2">
+                  <span className="text-[10px] text-gray-600">{alert.date}</span>
+                  <span className="text-[10px] px-2 py-0.5 bg-white/[0.04] border border-white/[0.06] rounded-full text-gray-500">{alert.engine}</span>
+                </div>
+              </div>
+              {alert.details && (expandedAlert === alert.id ? <ChevronUp size={16} className="text-gray-500 shrink-0" /> : <ChevronDown size={16} className="text-gray-500 shrink-0" />)}
+            </button>
+            {expandedAlert === alert.id && alert.details && (
+              <div className="px-4 pb-4 border-t border-white/[0.06] pt-3 ml-7 animate-in slide-in-from-top-1 duration-200">
+                <p className="text-sm text-gray-400 leading-relaxed">{alert.details}</p>
+                <div className="flex gap-2 mt-3">
+                  <button onClick={() => onNavigate('analyze')} className="text-xs text-amber-400 hover:text-amber-300 font-medium">Lancer un audit &rarr;</button>
+                  <button onClick={() => onNavigate('monitoring')} className="text-xs text-gray-500 hover:text-gray-300 font-medium">Voir le monitoring &rarr;</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {filteredAlerts.length === 0 && (
+        <div className="ninja-card p-12 text-center">
+          <Bell size={32} className="text-gray-600 mx-auto mb-3" />
+          <p className="text-gray-500">Aucune alerte dans cette cat\u00e9gorie.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AlertsAEO;

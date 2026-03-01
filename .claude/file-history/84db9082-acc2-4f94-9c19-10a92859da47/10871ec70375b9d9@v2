@@ -1,0 +1,69 @@
+-- ============================================================================
+-- FIX: Infinite recursion in RLS policies on profiles table
+--
+-- Problem: "Users can view org members" policy does SELECT on profiles
+-- within a policy ON profiles → infinite recursion (error 42P17).
+-- Also, is_org_member() queries profiles without SECURITY DEFINER,
+-- triggering the same RLS policies.
+--
+-- Solution: Create SECURITY DEFINER helper functions that bypass RLS.
+-- ============================================================================
+
+-- 1. Create a helper that gets the current user's org_id (bypasses RLS)
+CREATE OR REPLACE FUNCTION public.get_user_org_id()
+RETURNS UUID
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT organization_id FROM public.profiles WHERE id = auth.uid()
+$$;
+
+-- 2. Replace is_org_member with SECURITY DEFINER version
+CREATE OR REPLACE FUNCTION public.is_org_member(org_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND organization_id = org_id
+  )
+$$;
+
+-- 3. Drop the recursive policy on profiles
+DROP POLICY IF EXISTS "Users can view org members" ON public.profiles;
+
+-- 4. Recreate using the SECURITY DEFINER helper (no recursion)
+CREATE POLICY "Users can view org members" ON public.profiles
+  FOR SELECT USING (
+    organization_id = public.get_user_org_id()
+  );
+
+-- 5. Fix organizations "Owners can update org" policy (also queries profiles directly)
+DROP POLICY IF EXISTS "Owners can update org" ON public.organizations;
+CREATE POLICY "Owners can update org" ON public.organizations
+  FOR UPDATE USING (
+    id = (
+      SELECT organization_id FROM public.profiles
+      WHERE id = auth.uid() AND role = 'owner'
+    )
+  );
+
+-- Note: The "Owners can update org" policy above still works because
+-- organizations RLS doesn't trigger profiles RLS recursively (different table).
+-- But is_org_member is now SECURITY DEFINER, so all other policies using it
+-- are also safe from recursion.
+
+-- 6. Fix api_keys "Admins can manage api keys" policy (same pattern)
+DROP POLICY IF EXISTS "Admins can manage api keys" ON public.api_keys;
+CREATE POLICY "Admins can manage api keys" ON public.api_keys
+  FOR ALL USING (
+    organization_id = (
+      SELECT p.organization_id FROM public.profiles p
+      WHERE p.id = auth.uid() AND p.role IN ('owner', 'admin')
+    )
+  );

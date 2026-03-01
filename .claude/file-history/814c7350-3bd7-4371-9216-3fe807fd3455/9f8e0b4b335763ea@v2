@@ -1,0 +1,70 @@
+import React from 'react';
+
+interface ButtonProps {
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  icon?: React.ElementType;
+  iconPosition?: 'left' | 'right';
+  loading?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+  className?: string;
+  type?: 'button' | 'submit' | 'reset';
+}
+
+const VARIANT_STYLES = {
+  primary: 'bg-[var(--accent)] text-white font-medium hover:bg-[var(--accent-hover)] active:opacity-90 disabled:opacity-50',
+  secondary: 'bg-transparent text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]',
+  ghost: 'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--glass-active)] hover:text-[var(--text-primary)]',
+  danger: 'bg-transparent text-[var(--error)] border border-[var(--error)]/20 hover:bg-[var(--error-subtle)]',
+};
+
+const SIZE_STYLES = {
+  sm: 'text-[13px] px-3 py-1.5 rounded-lg gap-1.5',
+  md: 'text-sm px-4 py-2 rounded-lg gap-2',
+  lg: 'text-sm px-5 py-2.5 rounded-lg gap-2',
+};
+
+const Spinner = () => (
+  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+  </svg>
+);
+
+export default function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  icon: Icon,
+  iconPosition = 'left',
+  loading = false,
+  disabled = false,
+  onClick,
+  className = '',
+  type = 'button',
+}: ButtonProps) {
+  const isDisabled = disabled || loading;
+
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={isDisabled}
+      className={`
+        inline-flex items-center justify-center font-medium
+        transition-all duration-150 press-effect
+        ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}
+        ${VARIANT_STYLES[variant]}
+        ${SIZE_STYLES[size]}
+        ${className}
+      `.trim()}
+    >
+      {loading && <Spinner />}
+      {!loading && Icon && iconPosition === 'left' && <Icon className="w-4 h-4" />}
+      <span className={loading ? 'opacity-70' : ''}>{children}</span>
+      {!loading && Icon && iconPosition === 'right' && <Icon className="w-4 h-4" />}
+    </button>
+  );
+}

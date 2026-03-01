@@ -1,0 +1,5 @@
+API_KEY=PLACEHOLDER_API_KEY
+
+# V3 — Citation Verification Engine (simulation mode if empty)
+VITE_OPENAI_API_KEY=
+VITE_PERPLEXITY_API_KEY=

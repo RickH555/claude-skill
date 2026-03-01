@@ -1,0 +1,8 @@
+'use client';
+import { useAppContext } from '@/lib/app-context';
+import TrackedQueriesPage from '@/views/v3/TrackedQueriesPage';
+
+export default function TrackedQueriesPageWrapper() {
+  const { goBack, user } = useAppContext();
+  return <TrackedQueriesPage onBack={goBack} user={user} />;
+}

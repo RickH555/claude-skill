@@ -1,0 +1,141 @@
+import { authenticateRequest, corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent, parseJsonBody, sha256Hex } from '../_shared/common.ts';
+
+interface IngestPayload {
+  sector: string;
+  source: string;
+  data: Array<Record<string, unknown>>;
+}
+
+const normalize = (value: unknown): string => String(value ?? '').trim().toLowerCase();
+
+/**
+ * Point d'entree ingestion n8n -> LeadRadar.
+ */
+Deno.serve(async (request: Request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+  try {
+    enforceRateLimit(`ingest:${ip}`, 100);
+
+    if (request.method !== 'POST') {
+      return jsonResponse({ error: 'Method not allowed' }, 405);
+    }
+
+    // Auth: service role (appel interne depuis scan-now/n8n) ou JWT utilisateur
+    const auth = await authenticateRequest(request);
+    if (auth.error) return auth.error;
+
+    const payload = await parseJsonBody<IngestPayload>(request);
+    if (!payload.sector || !payload.source || !Array.isArray(payload.data)) {
+      return jsonResponse({ error: 'Payload invalide' }, 400);
+    }
+    if (payload.data.length > 100) {
+      return jsonResponse({ error: 'Maximum 100 items par requete' }, 400);
+    }
+
+    const admin = createAdminClient();
+    await logAutomationEvent('scan_started', {
+      sector: payload.sector,
+      source: payload.source,
+      total_items: payload.data.length,
+    });
+
+    const { data: sourceRow } = await admin
+      .from('sources')
+      .select('id')
+      .eq('sector_id', payload.sector)
+      .ilike('name', `%${payload.source.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`)
+      .limit(1)
+      .maybeSingle<{ id: string }>();
+
+    let ingested = 0;
+    let duplicates = 0;
+    let errors = 0;
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error('Variables Supabase manquantes');
+    }
+
+    for (const item of payload.data) {
+      try {
+        const dedupBase = [
+          normalize(item.name ?? item.title ?? item.label),
+          normalize(item.location ?? item.city ?? item.address),
+          normalize(item.date ?? item.detected_at ?? item.created_at),
+          normalize(payload.source),
+          normalize(payload.sector),
+        ].join('|');
+        const dedupHash = await sha256Hex(dedupBase);
+
+        const { data: existing } = await admin
+          .from('prospects')
+          .select('id')
+          .eq('dedup_hash', dedupHash)
+          .limit(1)
+          .maybeSingle<{ id: string }>();
+        if (existing?.id) {
+          duplicates += 1;
+          continue;
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30_000);
+        const response = await fetch(`${supabaseUrl}/functions/v1/analyze`, {
+          method: 'POST',
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${serviceRoleKey}`,
+            apikey: serviceRoleKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sector: payload.sector,
+            source: payload.source,
+            source_id: sourceRow?.id ?? null,
+            raw_data: item,
+            dedup_hash: dedupHash,
+          }),
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          errors += 1;
+          const details = await response.text();
+          await logAutomationEvent('error', {
+            stage: 'ingest->analyze',
+            reason: details,
+          }, sourceRow?.id ?? null);
+          continue;
+        }
+        ingested += 1;
+      } catch (itemError) {
+        errors += 1;
+        await logAutomationEvent('error', {
+          stage: 'ingest-item',
+          reason: itemError instanceof Error ? itemError.message : 'unknown',
+        }, sourceRow?.id ?? null);
+      }
+    }
+
+    await logAutomationEvent('scan_completed', {
+      sector: payload.sector,
+      source: payload.source,
+      ingested,
+      duplicates,
+      errors,
+    }, sourceRow?.id ?? null);
+
+    return jsonResponse({ ingested, duplicates, errors });
+  } catch (error) {
+    await logAutomationEvent('error', {
+      stage: 'ingest',
+      reason: error instanceof Error ? error.message : 'unknown',
+    });
+    return jsonResponse({ error: error instanceof Error ? error.message : 'Erreur ingest' }, 500);
+  }
+});

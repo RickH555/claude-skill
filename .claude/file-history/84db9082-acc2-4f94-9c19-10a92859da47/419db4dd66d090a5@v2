@@ -1,0 +1,27 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServiceClient } from '@/lib/supabase/server';
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = createServiceClient();
+
+    const { data: survey, error } = await supabase
+      .from('surveys')
+      .select('id, title, description, questions, settings, status')
+      .eq('id', id)
+      .eq('status', 'active')
+      .single();
+
+    if (error || !survey) {
+      return NextResponse.json({ error: 'Survey not found or inactive' }, { status: 404 });
+    }
+
+    return NextResponse.json({ data: survey });
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "content": "BACKUP: commit + checksums des fichiers critiques",
+    "status": "completed",
+    "activeForm": "Creating backup and checksums"
+  },
+  {
+    "content": "Phase 1: Nettoyage (supprimer résidus .remote-tunnel-state.json)",
+    "status": "completed",
+    "activeForm": "Cleaning up residual files"
+  },
+  {
+    "content": "Phase 2: Créer config/ (engine-weights + credit-costs)",
+    "status": "completed",
+    "activeForm": "Creating config files"
+  },
+  {
+    "content": "Phase 3: Créer services/v3/ (5 services citation)",
+    "status": "completed",
+    "activeForm": "Creating V3 citation services"
+  },
+  {
+    "content": "Phase 4: Créer components/layout/ (TopNav, Sidebar, AppShell, PageHeader)",
+    "status": "completed",
+    "activeForm": "Creating layout components"
+  },
+  {
+    "content": "Phase 5: Réécrire App.tsx (routing Vercel-style)",
+    "status": "completed",
+    "activeForm": "Rewriting App.tsx routing"
+  },
+  {
+    "content": "Phase 6: Adapter les pages au nouveau layout",
+    "status": "in_progress",
+    "activeForm": "Adapting pages to new layout"
+  },
+  {
+    "content": "Phase 7: Styles globaux (Inter, overflow, scrollbar)",
+    "status": "pending",
+    "activeForm": "Adding global styles"
+  },
+  {
+    "content": "Vérification finale: build + checksums + structure",
+    "status": "pending",
+    "activeForm": "Running final verification"
+  }
+]

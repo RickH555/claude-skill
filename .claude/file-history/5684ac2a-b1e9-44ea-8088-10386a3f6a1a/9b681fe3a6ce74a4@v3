@@ -1,0 +1,305 @@
+import React, { useState } from 'react';
+import { User, Activity, Globe, TrendingUp, ArrowLeft, Search, X, ChevronRight, BarChart3, Zap, CreditCard, Check, Download, Star } from 'lucide-react';
+import { AnalysisResult } from '../types';
+
+interface DashboardProps {
+  onBack: () => void;
+  history: AnalysisResult[];
+  onView: (analysis: AnalysisResult) => void;
+}
+
+// Sub-component for the Prediction Chart
+const PredictionChart: React.FC<{ hostname: string; baseScore: number }> = ({ hostname, baseScore }) => {
+  return (
+    <div className="bg-black/40 rounded-xl p-6 border border-white/5 mt-4 animate-in fade-in slide-in-from-top-4 duration-500">
+      <div className="flex justify-between items-end mb-6">
+        <div>
+          <h4 className="text-lg font-serif font-bold text-white mb-1">Projection de Visibilité IA</h4>
+          <p className="text-xs text-gray-400">Simulation sur 6 mois basée sur le score actuel ({baseScore}/100)</p>
+        </div>
+        <div className="flex gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-gray-600"></div>
+            <span className="text-gray-400">SEO Classique</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+            <span className="text-primary font-medium">Avec CitedBy</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative h-64 w-full bg-gradient-to-b from-white/5 to-transparent rounded-lg border border-white/10 p-4 overflow-hidden">
+        {/* Grid Lines */}
+        <div className="absolute inset-0 flex flex-col justify-between p-4 opacity-10 pointer-events-none">
+          <div className="w-full h-px bg-white"></div>
+          <div className="w-full h-px bg-white"></div>
+          <div className="w-full h-px bg-white"></div>
+          <div className="w-full h-px bg-white"></div>
+          <div className="w-full h-px bg-white"></div>
+        </div>
+
+        <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 600 300">
+          <defs>
+            <linearGradient id={`grad-${hostname}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+
+          {/* Baseline (Standard SEO) - Flat/Slow growth */}
+          <path 
+            d="M0,250 C100,248 300,245 600,230" 
+            fill="none" 
+            stroke="#4b5563" 
+            strokeWidth="2" 
+            strokeDasharray="4,4"
+          />
+
+          {/* Predicted (CitedBy) - Exponential/S-Curve */}
+          <path 
+            d="M0,250 C150,250 250,150 600,50" 
+            fill={`url(#grad-${hostname})`} 
+            stroke="#10b981" 
+            strokeWidth="3" 
+            className="drop-shadow-[0_0_10px_rgba(16,185,129,0.4)]"
+          />
+
+          {/* Points */}
+          <circle cx="0" cy="250" r="4" fill="#10b981" />
+          <circle cx="600" cy="50" r="4" fill="#10b981" />
+
+          {/* Annotations */}
+          <text x="10" y="270" fill="#6b7280" fontSize="12">Aujourd'hui</text>
+          <text x="590" y="270" fill="#6b7280" fontSize="12" textAnchor="end">M+6</text>
+          
+          <g transform="translate(450, 80)">
+             <rect x="-10" y="-20" width="120" height="24" rx="4" fill="#064e3b" stroke="#10b981" strokeWidth="1" />
+             <text x="50" y="-4" fill="white" fontSize="11" textAnchor="middle" fontWeight="bold">+450% Citations</text>
+          </g>
+        </svg>
+      </div>
+      
+      <div className="mt-4 p-3 bg-white/5 rounded-lg border-l-2 border-primary">
+        <p className="text-sm text-gray-300">
+          <span className="text-primary font-bold">Analyse :</span> Pour <strong>{hostname}</strong>, l'indexation dans l'annuaire IA permettrait de passer d'une visibilité passive (liens bleus) à une recommandation active dans les réponses génératives.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const Dashboard: React.FC<DashboardProps> = ({ onBack, history, onView }) => {
+  const [showDomainModal, setShowDomainModal] = useState(false);
+  const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
+
+  // Calculate dynamic stats from history
+  const totalAnalyses = history.length;
+  
+  const avgScore = totalAnalyses > 0 
+    ? Math.round(history.reduce((acc, curr) => acc + curr.globalScore, 0) / totalAnalyses) 
+    : 0;
+
+  // Extract unique domains with their latest score
+  const uniqueDomainsMap = new Map<string, AnalysisResult>();
+  history.forEach(item => {
+    const hostname = new URL(item.url).hostname;
+    // Keep the most recent analysis for score reference
+    if (!uniqueDomainsMap.has(hostname) || new Date(item.timestamp) > new Date(uniqueDomainsMap.get(hostname)!.timestamp)) {
+      uniqueDomainsMap.set(hostname, item);
+    }
+  });
+  const uniqueDomainsList = Array.from(uniqueDomainsMap.values());
+  const uniqueDomainsCount = uniqueDomainsMap.size;
+
+  const stats = [
+    { 
+      label: 'Analyses totales', 
+      value: totalAnalyses.toString(), 
+      icon: <Activity className="text-primary" />,
+      action: null
+    },
+    { 
+      label: 'Score Moyen', 
+      value: totalAnalyses > 0 ? `${avgScore}/100` : '-', 
+      icon: <TrendingUp className="text-accent" />,
+      action: null
+    },
+    { 
+      label: 'Domaines suivis', 
+      value: uniqueDomainsCount.toString(), 
+      icon: <Globe className="text-blue-400" />,
+      action: () => setShowDomainModal(true),
+      highlight: true
+    },
+  ];
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-10 relative">
+      
+      {/* DOMAIN MODAL */}
+      {showDomainModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowDomainModal(false)}></div>
+          <div className="relative bg-[#0f1115] border border-white/10 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl">
+            
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+              <div>
+                <h2 className="text-2xl font-serif font-bold text-white">Portefeuille de Domaines</h2>
+                <p className="text-sm text-gray-400">Analyse prédictive et suivi de performance par domaine.</p>
+              </div>
+              <button onClick={() => setShowDomainModal(false)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <X size={20} className="text-gray-400 hover:text-white" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto custom-scrollbar">
+              {uniqueDomainsList.length > 0 ? (
+                <div className="space-y-4">
+                  {uniqueDomainsList.map((domainData, i) => {
+                    const hostname = new URL(domainData.url).hostname;
+                    const isExpanded = expandedDomain === hostname;
+                    
+                    return (
+                      <div key={i} className={`border border-white/10 rounded-xl overflow-hidden transition-all ${isExpanded ? 'bg-white/5' : 'bg-transparent hover:bg-white/5'}`}>
+                        <div 
+                          className="p-4 flex items-center justify-between cursor-pointer"
+                          onClick={() => setExpandedDomain(isExpanded ? null : hostname)}
+                        >
+                          <div className="flex items-center gap-4">
+                             <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-bold">
+                               {hostname.charAt(0).toUpperCase()}
+                             </div>
+                             <div>
+                               <h3 className="font-medium text-white">{hostname}</h3>
+                               <p className="text-xs text-gray-400">Dernier score : <span className={domainData.globalScore >= 70 ? 'text-emerald-400' : 'text-amber-400'}>{domainData.globalScore}/100</span></p>
+                             </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                             <span className="text-xs text-primary font-medium flex items-center gap-1 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                                <BarChart3 size={12} />
+                                {isExpanded ? 'Masquer' : 'Voir projection'}
+                             </span>
+                             <ChevronRight size={16} className={`text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                          </div>
+                        </div>
+
+                        {isExpanded && (
+                           <div className="px-4 pb-4 border-t border-white/10">
+                              <PredictionChart hostname={hostname} baseScore={domainData.globalScore} />
+                           </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <Globe size={48} className="mx-auto mb-4 opacity-20" />
+                  <p>Aucun domaine analysé pour le moment.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button onClick={onBack} className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors">
+        <ArrowLeft size={18} className="mr-2" /> Retour au menu
+      </button>
+
+      <h1 className="text-3xl font-serif font-bold mb-8">Tableau de bord</h1>
+
+      <div className="grid md:grid-cols-3 gap-6 mb-10">
+        {stats.map((stat, i) => (
+          <div 
+            key={i} 
+            className={`glass-panel p-6 rounded-xl flex items-center justify-between transition-all ${stat.highlight ? 'border-primary/50 shadow-[0_0_15px_rgba(16,185,129,0.1)] cursor-pointer hover:bg-white/10 group' : ''}`}
+            onClick={stat.action || undefined}
+          >
+            <div>
+              <p className="text-gray-400 text-sm mb-1 group-hover:text-white transition-colors">{stat.label}</p>
+              <p className="text-2xl font-bold">{stat.value}</p>
+              {stat.highlight && (
+                <span className="text-xs text-primary mt-1 inline-flex items-center gap-1">
+                  Voir projections <ChevronRight size={10} />
+                </span>
+              )}
+            </div>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${stat.highlight ? 'bg-primary/20 text-primary' : 'bg-white/5'}`}>
+              {stat.icon}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-8">
+        
+        {/* HISTORY TABLE (Full Width) */}
+        <div>
+           <div className="flex justify-between items-center mb-4">
+             <h2 className="text-xl font-medium">Historique des analyses</h2>
+           </div>
+           
+           <div className="glass-panel rounded-xl overflow-hidden min-h-[300px]">
+             {history.length > 0 ? (
+               <table className="w-full text-left">
+                 <thead className="bg-white/5 text-gray-400 text-sm">
+                   <tr>
+                     <th className="p-4 font-medium">URL</th>
+                     <th className="p-4 font-medium">Score</th>
+                     <th className="p-4 font-medium">Date</th>
+                     <th className="p-4 font-medium">Action</th>
+                   </tr>
+                 </thead>
+                 <tbody className="divide-y divide-white/5">
+                   {history.map((item, i) => (
+                     <tr key={i} className="hover:bg-white/5 transition-colors">
+                       <td className="p-4 truncate max-w-[300px] text-gray-300" title={item.url}>
+                         {item.url}
+                       </td>
+                       <td className="p-4">
+                          <span className={`font-bold ${item.globalScore >= 80 ? 'text-emerald-400' : item.globalScore >= 60 ? 'text-amber-400' : 'text-red-400'}`}>
+                            {item.globalScore}
+                          </span>
+                       </td>
+                       <td className="p-4 text-gray-500 text-sm">{formatDate(item.timestamp)}</td>
+                       <td className="p-4">
+                         <button 
+                            onClick={() => onView(item)}
+                            className="text-primary hover:underline text-sm font-medium"
+                         >
+                           Voir le rapport
+                         </button>
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             ) : (
+                <div className="flex flex-col items-center justify-center h-full py-12 text-gray-500">
+                  <Search size={48} className="mb-4 opacity-20" />
+                  <p>Aucune analyse effectuée pour le moment.</p>
+                  <button onClick={onBack} className="mt-4 text-primary hover:underline text-sm">
+                    Lancer une nouvelle analyse
+                  </button>
+                </div>
+             )}
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

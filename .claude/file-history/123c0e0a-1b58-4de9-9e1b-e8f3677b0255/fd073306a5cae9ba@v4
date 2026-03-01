@@ -1,0 +1,481 @@
+import { type FormEvent, useState } from 'react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import type { WebhookEvent } from '../../types/api-developer.ts'
+import {
+  getApiKeys,
+  createApiKey,
+  revokeApiKey,
+  regenerateApiKey,
+  truncateKey,
+  getWebhooks,
+  createWebhook,
+  toggleWebhook,
+  deleteWebhook,
+  getEndpoints,
+  getCurlExample,
+  getJsExample,
+  getPythonExample,
+  getUsageKPIs,
+  getUsageHistory,
+  getRateLimits,
+  getWebhookEventLabel,
+} from '../../services/api-developer.ts'
+
+type Tab = 'docs' | 'keys' | 'webhooks' | 'usage'
+type CodeLang = 'curl' | 'js' | 'python'
+
+const ALL_EVENTS: WebhookEvent[] = [
+  'audit.completed',
+  'monitoring.scan_completed',
+  'monitoring.alert',
+  'credits.low',
+  'citations.new',
+]
+
+export default function ApiDeveloper() {
+  const [tab, setTab] = useState<Tab>('docs')
+  const [keys, setKeys] = useState(getApiKeys)
+  const [webhooks, setWebhooks] = useState(getWebhooks)
+  const [newKeyName, setNewKeyName] = useState('')
+  const [newWhUrl, setNewWhUrl] = useState('')
+  const [newWhEvents, setNewWhEvents] = useState<WebhookEvent[]>([])
+  const [openEndpoint, setOpenEndpoint] = useState<string | null>(null)
+  const [codeLang, setCodeLang] = useState<CodeLang>('curl')
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const endpoints = getEndpoints()
+  const rateLimits = getRateLimits()
+  const usageKpis = getUsageKPIs()
+  const usageHistory = getUsageHistory()
+
+  function handleCreateKey(e: FormEvent) {
+    e.preventDefault()
+    if (!newKeyName.trim()) return
+    createApiKey(newKeyName.trim())
+    setKeys(getApiKeys())
+    setNewKeyName('')
+  }
+
+  function handleRevoke(id: string) {
+    revokeApiKey(id)
+    setKeys(getApiKeys())
+  }
+
+  function handleRegenerate(id: string) {
+    regenerateApiKey(id)
+    setKeys(getApiKeys())
+  }
+
+  function handleCreateWebhook(e: FormEvent) {
+    e.preventDefault()
+    if (!newWhUrl.trim() || newWhEvents.length === 0) return
+    createWebhook(newWhUrl.trim(), newWhEvents)
+    setWebhooks(getWebhooks())
+    setNewWhUrl('')
+    setNewWhEvents([])
+  }
+
+  function handleToggleWebhook(id: string) {
+    toggleWebhook(id)
+    setWebhooks(getWebhooks())
+  }
+
+  function handleDeleteWebhook(id: string) {
+    deleteWebhook(id)
+    setWebhooks(getWebhooks())
+  }
+
+  function toggleEvent(event: WebhookEvent) {
+    setNewWhEvents((prev) =>
+      prev.includes(event) ? prev.filter((e) => e !== event) : [...prev, event]
+    )
+  }
+
+  function copyToClipboard(text: string, id: string) {
+    navigator.clipboard.writeText(text)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  const tabs: { value: Tab; label: string }[] = [
+    { value: 'docs', label: 'Documentation' },
+    { value: 'keys', label: 'Cles API' },
+    { value: 'webhooks', label: 'Webhooks' },
+    { value: 'usage', label: 'Usage' },
+  ]
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">API Developer Hub</h2>
+
+      {/* Tab Bar */}
+      <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+        {tabs.map((t) => (
+          <button
+            key={t.value}
+            onClick={() => setTab(t.value)}
+            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              tab === t.value ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Documentation Tab */}
+      {tab === 'docs' && (
+        <div className="space-y-4">
+          {/* Rate Limits Banner */}
+          <div className="rounded-xl bg-blue-50 p-4">
+            <h3 className="text-sm font-semibold text-blue-900">Limites de requetes</h3>
+            <div className="mt-2 flex gap-6">
+              {rateLimits.map((rl) => (
+                <div key={rl.tier} className="text-sm">
+                  <span className="font-medium capitalize text-blue-800">{rl.tier}</span>
+                  <span className="ml-1 text-blue-600">{rl.limit.toLocaleString('fr-FR')}/jour</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Code Language Selector */}
+          <div className="flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
+            {(['curl', 'js', 'python'] as CodeLang[]).map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setCodeLang(lang)}
+                className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+                  codeLang === lang ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {lang === 'curl' ? 'cURL' : lang === 'js' ? 'JavaScript' : 'Python'}
+              </button>
+            ))}
+          </div>
+
+          {/* Endpoints Accordion */}
+          {endpoints.map((ep) => {
+            const isOpen = openEndpoint === ep.path
+            const codeExample =
+              codeLang === 'curl' ? getCurlExample(ep) : codeLang === 'js' ? getJsExample(ep) : getPythonExample(ep)
+
+            return (
+              <div key={ep.path} className="rounded-xl bg-white shadow-sm">
+                <button
+                  onClick={() => setOpenEndpoint(isOpen ? null : ep.path)}
+                  className="flex w-full items-center justify-between p-4 text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`rounded px-2 py-0.5 text-xs font-bold ${
+                        ep.method === 'GET' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                      }`}
+                    >
+                      {ep.method}
+                    </span>
+                    <span className="font-mono text-sm text-gray-900">{ep.path}</span>
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                      {ep.gasCost} Gas
+                    </span>
+                  </div>
+                  <span className="text-gray-400">{isOpen ? '▲' : '▼'}</span>
+                </button>
+
+                {isOpen && (
+                  <div className="border-t border-gray-100 p-4 space-y-4">
+                    <p className="text-sm text-gray-600">{ep.description}</p>
+
+                    {ep.params.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-900 mb-2">Parametres</h4>
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-3 py-2 text-left font-medium text-gray-600">Nom</th>
+                              <th className="px-3 py-2 text-left font-medium text-gray-600">Type</th>
+                              <th className="px-3 py-2 text-left font-medium text-gray-600">Requis</th>
+                              <th className="px-3 py-2 text-left font-medium text-gray-600">Description</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100">
+                            {ep.params.map((p) => (
+                              <tr key={p.name}>
+                                <td className="px-3 py-2 font-mono text-xs text-gray-900">{p.name}</td>
+                                <td className="px-3 py-2 text-gray-600">{p.type}</td>
+                                <td className="px-3 py-2">
+                                  {p.required ? (
+                                    <span className="text-green-600 text-xs font-medium">Oui</span>
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">Non</span>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 text-gray-600">{p.description}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* Code Example */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-semibold text-gray-900">Exemple</h4>
+                        <button
+                          onClick={() => copyToClipboard(codeExample, `code-${ep.path}`)}
+                          className="text-xs text-blue-600 hover:text-blue-800"
+                        >
+                          {copiedId === `code-${ep.path}` ? 'Copie !' : 'Copier'}
+                        </button>
+                      </div>
+                      <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-xs text-gray-100">
+                        {codeExample}
+                      </pre>
+                    </div>
+
+                    {/* Example Response */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">Reponse exemple</h4>
+                      <pre className="overflow-x-auto rounded-lg bg-gray-50 p-4 text-xs text-gray-700">
+                        {ep.exampleResponse}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* API Keys Tab */}
+      {tab === 'keys' && (
+        <div className="space-y-4">
+          {/* Create Key Form */}
+          <form onSubmit={handleCreateKey} className="flex gap-3 rounded-xl bg-white p-4 shadow-sm">
+            <input
+              type="text"
+              value={newKeyName}
+              onChange={(e) => setNewKeyName(e.target.value)}
+              placeholder="Nom de la cle (ex: Production, Staging...)"
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Creer une cle
+            </button>
+          </form>
+
+          {/* Keys Table */}
+          {keys.length === 0 ? (
+            <div className="rounded-xl bg-gray-50 p-8 text-center">
+              <p className="text-gray-500">Aucune cle API. Creez-en une pour commencer.</p>
+            </div>
+          ) : (
+            <div className="rounded-xl bg-white shadow-sm overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-gray-200 bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 font-medium text-gray-600">Nom</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Cle</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Creee le</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Statut</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {keys.map((k) => (
+                    <tr key={k.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium text-gray-900">{k.name}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs text-gray-600">{truncateKey(k.key)}</code>
+                          <button
+                            onClick={() => copyToClipboard(k.key, k.id)}
+                            className="text-xs text-blue-600 hover:text-blue-800"
+                          >
+                            {copiedId === k.id ? 'Copie !' : 'Copier'}
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-xs">
+                        {new Date(k.createdAt).toLocaleDateString('fr-FR')}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            k.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {k.status === 'active' ? 'Active' : 'Revoquee'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          {k.status === 'active' && (
+                            <button
+                              onClick={() => handleRevoke(k.id)}
+                              className="text-xs text-red-600 hover:text-red-800"
+                            >
+                              Revoquer
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleRegenerate(k.id)}
+                            className="text-xs text-blue-600 hover:text-blue-800"
+                          >
+                            Regenerer
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Webhooks Tab */}
+      {tab === 'webhooks' && (
+        <div className="space-y-4">
+          {/* Create Webhook Form */}
+          <form onSubmit={handleCreateWebhook} className="rounded-xl bg-white p-4 shadow-sm space-y-3">
+            <input
+              type="url"
+              value={newWhUrl}
+              onChange={(e) => setNewWhUrl(e.target.value)}
+              placeholder="https://votre-site.com/webhook"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+            <div className="flex flex-wrap gap-2">
+              {ALL_EVENTS.map((event) => (
+                <button
+                  key={event}
+                  type="button"
+                  onClick={() => toggleEvent(event)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                    newWhEvents.includes(event)
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {getWebhookEventLabel(event)}
+                </button>
+              ))}
+            </div>
+            <button
+              type="submit"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Ajouter le webhook
+            </button>
+          </form>
+
+          {/* Webhooks List */}
+          {webhooks.length === 0 ? (
+            <div className="rounded-xl bg-gray-50 p-8 text-center">
+              <p className="text-gray-500">Aucun webhook configure.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {webhooks.map((wh) => (
+                <div key={wh.id} className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-gray-900">{wh.url}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {wh.events.map((event) => (
+                        <span key={event} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                          {getWebhookEventLabel(event)}
+                        </span>
+                      ))}
+                    </div>
+                    {wh.lastDelivery && (
+                      <p className="text-xs text-gray-400">
+                        Derniere livraison : {new Date(wh.lastDelivery).toLocaleString('fr-FR')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleToggleWebhook(wh.id)}
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        wh.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                      }`}
+                    >
+                      {wh.active ? 'Actif' : 'Inactif'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteWebhook(wh.id)}
+                      className="text-xs text-red-600 hover:text-red-800"
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Usage Tab */}
+      {tab === 'usage' && (
+        <div className="space-y-4">
+          {/* KPIs */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Requetes / jour</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{usageKpis.requestsPerDay}</p>
+            </div>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Taux d'erreur</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{usageKpis.errorRate}%</p>
+            </div>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Latence moyenne</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{usageKpis.avgLatency}ms</p>
+            </div>
+          </div>
+
+          {/* Usage Chart */}
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">Requetes (30 derniers jours)</h3>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={usageHistory}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="success" name="Succes" fill="#22c55e" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="errors" name="Erreurs" fill="#ef4444" radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* SDK Section */}
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">SDK officiels</h3>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <p className="mb-2 text-sm font-medium text-gray-700">Node.js / JavaScript</p>
+                <pre className="rounded-lg bg-gray-900 p-3 text-xs text-gray-100">npm install @citedby/sdk</pre>
+              </div>
+              <div>
+                <p className="mb-2 text-sm font-medium text-gray-700">Python</p>
+                <pre className="rounded-lg bg-gray-900 p-3 text-xs text-gray-100">pip install citedby</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

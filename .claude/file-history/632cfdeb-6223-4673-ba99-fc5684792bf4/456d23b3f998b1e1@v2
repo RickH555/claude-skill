@@ -1,0 +1,53 @@
+/**
+ * Input sanitization utilities for API routes
+ */
+
+/**
+ * Strip HTML tags from a string to prevent XSS
+ */
+export function stripHtml(input: string): string {
+  return input.replace(/<[^>]*>/g, "")
+}
+
+/**
+ * Sanitize a string: trim, strip HTML, enforce max length
+ */
+export function sanitizeString(input: unknown, maxLength = 10_000): string {
+  if (typeof input !== "string") return ""
+  return stripHtml(input).trim().slice(0, maxLength)
+}
+
+/**
+ * Sanitize an object's string values recursively
+ */
+export function sanitizeInput<T extends Record<string, unknown>>(
+  obj: T,
+  maxStringLength = 10_000
+): T {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === "string") {
+      result[key] = sanitizeString(value, maxStringLength)
+    } else if (typeof value === "number" || typeof value === "boolean") {
+      result[key] = value
+    } else if (Array.isArray(value)) {
+      result[key] = value.map((item) =>
+        typeof item === "string"
+          ? sanitizeString(item, maxStringLength)
+          : item
+      )
+    } else if (value !== null && typeof value === "object") {
+      result[key] = sanitizeInput(value as Record<string, unknown>, maxStringLength)
+    } else {
+      result[key] = value
+    }
+  }
+  return result as T
+}
+
+/**
+ * Validate that a UUID string is properly formatted
+ */
+export function isValidUUID(str: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+}

@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite build)",
+      "Bash(npx claude-code-templates@latest:*)",
+      "WebSearch",
+      "Bash(echo:*)",
+      "Bash(gh auth status:*)",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(start http://localhost:3000)",
+      "Bash(node -e:*)",
+      "Bash(npx --yes playwright install:*)",
+      "Bash(npx --yes playwright screenshot:*)",
+      "Bash(dir:*)",
+      "Bash(npm install:*)",
+      "Bash(node:*)",
+      "Bash(npx next start:*)",
+      "Bash(taskkill:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "github",
+    "puppeteer",
+    "filesystem",
+    "memory",
+    "sequential-thinking"
+  ]
+}

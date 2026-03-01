@@ -1,0 +1,112 @@
+// services/v3/query-generator.ts
+
+import type { QueryType } from '../../types/v3-types';
+
+/**
+ * Utilise Gemini pour générer des requêtes cibles.
+ * Instance séparée de services/generator.ts.
+ */
+export async function generateTrackedQueries(
+  niche: string,
+  country: string,
+  brandName: string,
+  language: string = 'fr'
+): Promise<Array<{ text: string; type: QueryType; variations: string[] }>> {
+
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+  const prompt = `Tu es un expert en search marketing et AEO (Answer Engine Optimization).
+Génère exactement 15 requêtes types qu'un utilisateur poserait à un assistant IA (ChatGPT, Perplexity, Gemini) sur la thématique "${niche}" en "${country}".
+Pour chaque requête, donne aussi 3 variations de formulation différentes (mêmes intention, mots différents).
+Catégories à couvrir :
+- 5 requêtes informationnelles (ex: "c'est quoi...", "comment fonctionne...")
+- 4 requêtes comparatives (ex: "X vs Y", "meilleur X pour...")
+- 3 requêtes transactionnelles (ex: "où acheter...", "prix de...")
+- 3 requêtes de réputation (ex: "${brandName} avis", "${brandName} fiable ?")
+
+RÉPONDS UNIQUEMENT en JSON valide, sans markdown, sans backticks :
+{
+  "queries": [
+    {
+      "text": "requête principale",
+      "type": "informational",
+      "variations": ["variation 1", "variation 2", "variation 3"]
+    }
+  ]
+}
+
+Langue : ${language}`;
+
+  if (!apiKey) {
+    return getDefaultQueries(niche, country, brandName);
+  }
+
+  try {
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+    });
+
+    const text = response.text || '';
+    const cleanJson = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(cleanJson);
+    return parsed.queries || [];
+  } catch (error) {
+    console.error('Erreur génération requêtes:', error);
+    return getDefaultQueries(niche, country, brandName);
+  }
+}
+
+function getDefaultQueries(
+  niche: string, country: string, brandName: string
+): Array<{ text: string; type: QueryType; variations: string[] }> {
+  return [
+    {
+      text: `Meilleur ${niche} en ${country}`,
+      type: 'comparative',
+      variations: [
+        `Quel est le meilleur ${niche} en ${country} ?`,
+        `Top ${niche} ${country} recommandations`,
+        `Comparatif ${niche} ${country} 2026`,
+      ],
+    },
+    {
+      text: `${brandName} avis`,
+      type: 'reputation',
+      variations: [
+        `${brandName} est-il fiable ?`,
+        `Avis sur ${brandName} ${country}`,
+        `${brandName} recommandé ?`,
+      ],
+    },
+    {
+      text: `Où acheter ${niche} ${country}`,
+      type: 'transactional',
+      variations: [
+        `Acheter ${niche} en ligne ${country}`,
+        `${niche} pas cher ${country}`,
+        `Meilleur prix ${niche} ${country}`,
+      ],
+    },
+    {
+      text: `C'est quoi ${niche}`,
+      type: 'informational',
+      variations: [
+        `Comment fonctionne ${niche}`,
+        `${niche} définition et guide`,
+        `Tout savoir sur ${niche}`,
+      ],
+    },
+    {
+      text: `${niche} vs alternative`,
+      type: 'comparative',
+      variations: [
+        `Comparer les offres de ${niche} en ${country}`,
+        `${niche} comparatif des acteurs principaux`,
+        `Quel ${niche} choisir en ${country}`,
+      ],
+    },
+  ];
+}

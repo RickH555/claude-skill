@@ -1,0 +1,94 @@
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Footer } from '@/components/landing/footer';
+import { Badge } from '@/components/ui/badge';
+
+const releases = [
+  {
+    version: 'v1.2.0',
+    date: '2026-02-25',
+    tag: 'Latest',
+    changes: [
+      'AI Analysis tab now shows formatted results with sentiment chart, themes, and recommendations',
+      'Fixed public survey submission with anonymous access',
+      'Added 60s timeout for AI processing routes',
+      'Service client for public survey endpoints',
+    ],
+  },
+  {
+    version: 'v1.1.0',
+    date: '2026-02-24',
+    tag: 'Improvement',
+    changes: [
+      'Full FeedbackAI flow: create surveys, collect responses, run AI analysis',
+      'GPT-4o powered sentiment analysis, theme detection, and recommendations',
+      'Charts tab with bar charts, pie charts for all question types',
+      'Public survey pages with 6 question types',
+    ],
+  },
+  {
+    version: 'v1.0.0',
+    date: '2026-02-22',
+    tag: 'Launch',
+    changes: [
+      'Initial release of NexusAI platform',
+      'DocAI: Upload and process documents with GPT-4o Vision',
+      'FeedbackAI: Survey builder with multiple question types',
+      'Dashboard with usage tracking and team management',
+      'Supabase backend with Row-Level Security',
+      'Vercel deployment with Edge functions',
+      '3 pricing tiers: Free, Pro ($29/mo), Enterprise ($99/mo)',
+    ],
+  },
+];
+
+export default function ChangelogPage() {
+  return (
+    <div className="min-h-screen">
+      <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">N</span>
+              </div>
+              <span className="text-lg font-bold">NexusAI</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost"><Link href="/login">Sign In</Link></Button>
+              <Button asChild><Link href="/signup">Get Started</Link></Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="mx-auto max-w-3xl px-6 py-16">
+        <h1 className="text-4xl font-bold tracking-tight text-center">Changelog</h1>
+        <p className="mt-4 text-lg text-muted-foreground text-center">All the latest updates and improvements to NexusAI.</p>
+
+        <div className="mt-12 space-y-12">
+          {releases.map((release) => (
+            <div key={release.version} className="relative pl-8 border-l-2 border-primary/20">
+              <div className="absolute -left-2 top-0 h-4 w-4 rounded-full bg-primary" />
+              <div className="flex items-center gap-3 mb-3">
+                <h2 className="text-xl font-bold">{release.version}</h2>
+                <Badge variant={release.tag === 'Latest' ? 'default' : 'secondary'}>{release.tag}</Badge>
+                <span className="text-sm text-muted-foreground">{release.date}</span>
+              </div>
+              <ul className="space-y-2">
+                {release.changes.map((change, i) => (
+                  <li key={i} className="text-sm text-muted-foreground flex gap-2">
+                    <span className="text-primary mt-1">-</span>
+                    {change}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

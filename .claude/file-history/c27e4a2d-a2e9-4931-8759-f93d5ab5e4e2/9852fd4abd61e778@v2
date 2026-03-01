@@ -1,0 +1,80 @@
+'use client';
+
+import { useState } from 'react';
+import { QRCode } from 'react-qrcode-logo';
+import { createClient } from '@/lib/supabase/client';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import { toast } from 'sonner';
+import type { LoyaltyProgram } from '@/lib/supabase/types';
+
+interface QrGeneratorProps {
+  programs: LoyaltyProgram[];
+  merchantId: string;
+  appUrl: string;
+}
+
+export default function QrGenerator({ programs, merchantId, appUrl }: QrGeneratorProps) {
+  const [selectedProgram, setSelectedProgram] = useState(programs[0]?.id || '');
+  const [generatedUrl, setGeneratedUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const generate = async () => {
+    if (!selectedProgram) {
+      toast.error('Veuillez sélectionner un programme.');
+      return;
+    }
+    setLoading(true);
+    const supabase = createClient();
+    const { data, error } = await supabase.from('merchant_qr_codes').insert({
+      merchant_id: merchantId,
+      program_id: selectedProgram,
+      qr_url: `${appUrl}/scan/pending`,
+    }).select().single();
+
+    if (error) { toast.error(error.message); setLoading(false); return; }
+
+    const url = `${appUrl}/scan/${data.id}`;
+    await supabase.from('merchant_qr_codes').update({ qr_url: url }).eq('id', data.id);
+    setGeneratedUrl(url);
+    setLoading(false);
+    toast.success('QR code généré !');
+  };
+
+  if (programs.length === 0) {
+    return (
+      <Card className="text-center py-12">
+        <p className="text-[var(--text-tertiary)]">Créez d&apos;abord un programme de fidélité pour générer des QR codes.</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card padding="lg" className="max-w-md">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-medium text-[var(--text-secondary)]">Programme</label>
+            <select
+              value={selectedProgram}
+              onChange={e => setSelectedProgram(e.target.value)}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)]"
+            >
+              {programs.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </div>
+          <Button onClick={generate} loading={loading}>Générer un QR code</Button>
+        </div>
+      </Card>
+
+      {generatedUrl && (
+        <Card padding="lg" className="max-w-md text-center">
+          <div className="inline-block p-4 bg-white rounded-xl">
+            <QRCode value={generatedUrl} size={200} qrStyle="dots" eyeRadius={8} />
+          </div>
+          <p className="text-[12px] text-[var(--text-tertiary)] mt-3 break-all">{generatedUrl}</p>
+        </Card>
+      )}
+    </div>
+  );
+}

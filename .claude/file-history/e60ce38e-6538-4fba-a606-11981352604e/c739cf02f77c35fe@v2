@@ -1,0 +1,202 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
+
+const requestBuckets = new Map<string, { count: number; resetAt: number }>();
+
+/**
+ * Echappe les caracteres HTML speciaux pour prevenir XSS dans les emails.
+ */
+export const escapeHtml = (str: string): string =>
+  str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+export const corsHeaders: Record<string, string> = {
+  'Access-Control-Allow-Origin': Deno.env.get('APP_URL') || '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  'Content-Type': 'application/json',
+};
+
+/**
+ * Retourne une reponse JSON standardisee.
+ */
+export const jsonResponse = (body: unknown, status = 200): Response =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: corsHeaders,
+  });
+
+/**
+ * Parse sécurisé du body JSON.
+ */
+export const parseJsonBody = async <T>(request: Request): Promise<T> => {
+  const text = await request.text();
+  if (!text) {
+    throw new Error('Body JSON vide');
+  }
+  return JSON.parse(text) as T;
+};
+
+/**
+ * Client admin Supabase (SERVICE_ROLE uniquement côté serveur).
+ */
+export const createAdminClient = () => {
+  const url = Deno.env.get('SUPABASE_URL');
+  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!url || !key) {
+    throw new Error('SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY manquant');
+  }
+  return createClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+};
+
+/**
+ * Limite simple 100 req/min par cle.
+ */
+export const enforceRateLimit = (key: string, maxPerMinute = 100): void => {
+  const now = Date.now();
+  const existing = requestBuckets.get(key);
+  if (!existing || now >= existing.resetAt) {
+    requestBuckets.set(key, {
+      count: 1,
+      resetAt: now + 60_000,
+    });
+    return;
+  }
+  if (existing.count >= maxPerMinute) {
+    throw new Error('Rate limit depasse');
+  }
+  existing.count += 1;
+  requestBuckets.set(key, existing);
+};
+
+/**
+ * Extrait le bearer token de l'en-tete Authorization.
+ */
+export const getBearerToken = (request: Request): string | null => {
+  const authorizationHeader = request.headers.get('authorization');
+  if (!authorizationHeader) {
+    return null;
+  }
+  if (!authorizationHeader.toLowerCase().startsWith('bearer ')) {
+    return null;
+  }
+  return authorizationHeader.slice(7).trim() || null;
+};
+
+/**
+ * Authentifie une requete par JWT utilisateur.
+ * Retourne le user_id du token ou null si echec.
+ */
+export const authenticateUser = async (
+  request: Request,
+): Promise<{ userId: string | null; error: Response | null }> => {
+  const token = getBearerToken(request);
+  if (!token) {
+    return {
+      userId: null,
+      error: jsonResponse({ error: 'Token d\'authentification requis' }, 401),
+    };
+  }
+  const admin = createAdminClient();
+  const { data: userData, error: userError } = await admin.auth.getUser(token);
+  if (userError || !userData.user) {
+    return {
+      userId: null,
+      error: jsonResponse({ error: 'Session invalide' }, 401),
+    };
+  }
+  return { userId: userData.user.id, error: null };
+};
+
+/**
+ * Authentifie une requete par JWT utilisateur OU service role key (appels internes).
+ * Retourne le user_id du token (null si service role) ou une erreur.
+ */
+export const authenticateRequest = async (
+  request: Request,
+): Promise<{ userId: string | null; isServiceRole: boolean; error: Response | null }> => {
+  const token = getBearerToken(request);
+  if (!token) {
+    return {
+      userId: null,
+      isServiceRole: false,
+      error: jsonResponse({ error: 'Token d\'authentification requis' }, 401),
+    };
+  }
+  // Check if it's a service role key (internal server-to-server call)
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (serviceRoleKey && token === serviceRoleKey) {
+    return { userId: null, isServiceRole: true, error: null };
+  }
+  // Otherwise validate as user JWT
+  const admin = createAdminClient();
+  const { data: userData, error: userError } = await admin.auth.getUser(token);
+  if (userError || !userData.user) {
+    return {
+      userId: null,
+      isServiceRole: false,
+      error: jsonResponse({ error: 'Session invalide' }, 401),
+    };
+  }
+  return { userId: userData.user.id, isServiceRole: false, error: null };
+};
+
+/**
+ * Hash SHA-256 deterministe (hex).
+ */
+export const sha256Hex = async (value: string): Promise<string> => {
+  const data = new TextEncoder().encode(value);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  const bytes = Array.from(new Uint8Array(hash));
+  return bytes.map((byte) => byte.toString(16).padStart(2, '0')).join('');
+};
+
+/**
+ * Distance Haversine en kilometres.
+ */
+export const haversineKm = (
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number => {
+  const toRad = (deg: number): number => (deg * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
+};
+
+/**
+ * Journalise un evenement dans automation_logs.
+ */
+export const logAutomationEvent = async (
+  eventType:
+    | 'scan_started'
+    | 'scan_completed'
+    | 'prospect_found'
+    | 'prospect_scored'
+    | 'notification_sent'
+    | 'error',
+  details: Record<string, unknown>,
+  sourceId?: string | null,
+): Promise<void> => {
+  const admin = createAdminClient();
+  await admin.from('automation_logs').insert({
+    source_id: sourceId ?? null,
+    event_type: eventType,
+    details_json: details,
+  });
+};

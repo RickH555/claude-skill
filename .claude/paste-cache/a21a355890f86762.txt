@@ -1,0 +1,1236 @@
+# CITEDBY.AI — PROMPT ULTIME V4.0
+## INTÉGRATION MODULES #3 (B2B AI WRITING) + #4 (RÉPUTATION & SENTIMENT) + TOUS LES PROMPTS DE GÉNÉRATION
+
+> **MISSION** : Intégrer 2 nouveaux modules majeurs dans le SaaS CitedBy.ai existant (SaaSV13) et définir TOUS les prompts de génération IA pour chaque fonction du SaaS.
+> **APPROCHE** : Travailler DANS le projet existant → Ajouter les nouveaux fichiers → Modifier les fichiers listés → NE RIEN SUPPRIMER → Valider.
+> **CONTEXTE FONDATEUR** : Non-technique. Chaque commande doit être copy-paste ready. Pas de placeholders.
+
+---
+
+# ⛔ RÈGLE ABSOLUE N°1 — PRÉSERVATION DU PROJET
+
+```
+CHEMIN DU PROJET : C:\Users\User\Downloads\SaaSV13 - Rick
+```
+
+## INSTRUCTIONS NON-NÉGOCIABLES :
+
+1. **TRAVAILLE DANS LE DOSSIER EXISTANT** ci-dessus. Ne crée PAS un nouveau projet.
+2. **NE SUPPRIME AUCUN FICHIER EXISTANT.** Aucun. Jamais. Même s'il te semble inutile.
+3. **NE DÉPLACE AUCUN FICHIER** dans un dossier `_legacy`, `_old`, `_backup` ou similaire.
+4. **NE REFACTORISE PAS L'ARCHITECTURE.** Pas de migration Vite → Next.js, pas de réorganisation de dossiers.
+5. **AJOUTE UNIQUEMENT** les nouveaux fichiers listés dans ce prompt.
+6. **MODIFIE UNIQUEMENT** les fichiers explicitement listés dans la section "FICHIERS À MODIFIER".
+7. **CONSERVE 100%** du code existant dans les fichiers modifiés — ajoute du code, ne remplace pas.
+8. **À LA FIN** : le projet doit contenir TOUS les fichiers d'origine + les nouveaux fichiers. Le nombre total de fichiers doit être SUPÉRIEUR à celui de départ.
+
+## VÉRIFICATION OBLIGATOIRE (avant de commencer) :
+```bash
+# Compte les fichiers AVANT modification
+find "C:\Users\User\Downloads\SaaSV13 - Rick" -type f | wc -l
+# Note ce nombre. À la fin, le nombre doit être SUPÉRIEUR.
+```
+
+## VÉRIFICATION OBLIGATOIRE (après modification) :
+```bash
+# Vérifie que RIEN n'a été supprimé
+# Ces fichiers DOIVENT encore exister :
+ls services/analyzer.ts services/criteria.ts services/generator.ts services/smc.ts services/blog_prompt_db.ts services/llm_templates.ts services/schema_service.ts services/robots_service.ts services/pdf_prompt.ts services/database.ts
+ls pages/Home.tsx pages/Results.tsx pages/Dashboard.tsx pages/SMCStudio.tsx pages/SourceOfTruth.tsx pages/SchemaOrg.tsx pages/RobotsTxt.tsx pages/BlogOptimizer.tsx pages/GenerativeTools.tsx pages/Projects.tsx pages/Login.tsx pages/Plan.tsx pages/Recharge.tsx pages/Account.tsx pages/Clients.tsx pages/Affiliation.tsx pages/History.tsx pages/ActionPlan.tsx pages/PublisherRequest.tsx pages/Directory.tsx pages/DirectoryEntity.tsx pages/Analyze.tsx
+ls App.tsx types.ts index.tsx index.html
+ls components/ScoreRing.tsx components/CategoryCard.tsx components/RecommendationCard.tsx components/AICitationPreview.tsx components/GenerationModal.tsx components/SourceOfTruthModal.tsx
+# Compte les fichiers APRÈS modification — doit être > avant
+find "C:\Users\User\Downloads\SaaSV13 - Rick" -type f | wc -l
+```
+
+## SI TU NE RESPECTES PAS CES RÈGLES :
+Le projet sera cassé et inutilisable. Le fondateur n'est pas technique et ne pourra pas réparer.
+
+---
+
+## FICHIERS À CRÉER (NOUVEAUX UNIQUEMENT) :
+```
+services/content_writer.ts    ← MODULE #3 : AI Content Writer B2B
+services/reputation_service.ts ← MODULE #4 : Réputation & Sentiment IA
+pages/ContentWriter.tsx        ← Page UI du module #3
+pages/Reputation.tsx           ← Page UI du module #4
+```
+
+## FICHIERS À MODIFIER (AJOUTS UNIQUEMENT, PAS DE SUPPRESSION) :
+```
+types.ts                       ← AJOUTER les nouveaux types (ne rien supprimer)
+pages/GenerativeTools.tsx      ← AJOUTER 2 cards dans le tableau tools[]
+App.tsx                        ← AJOUTER imports + routing + menu pour les 2 nouvelles pages
+```
+
+---
+
+## ÉTAT DU PROJET (SaaSV13 - Rick)
+
+> ⚠️ **ATTENTION** : Une session Claude Code précédente a peut-être modifié la structure du projet (migration vers App Router, déplacement de pages dans `_legacy_pages/`, etc.).
+> Si c'est le cas : **RESTAURE D'ABORD** l'architecture d'origine en recopiant les fichiers de `_legacy_pages/` dans `pages/` et en s'assurant que `App.tsx` route bien vers `pages/*`.
+> Si le projet est dans son état d'origine (pages/ avec les composants React, App.tsx comme routeur SPA) : continue directement.
+
+### Stack Technique Actuelle
+- React + TypeScript + Vite
+- Tailwind CSS + Lucide Icons
+- Google Gemini API (`@google/genai`) pour la génération
+- Supabase (Auth + DB)
+- Stripe (Paiements)
+- Architecture pages/ + services/ + components/ + lib/
+
+### Modules Existants (NE PAS CASSER)
+1. **Analyseur AEO** — Analyse URL → Score 0-100 → 50 critères (`services/analyzer.ts`, `services/criteria.ts`)
+2. **Générateur de Solutions** — Pour chaque recommandation, génère du code/contenu correctif (`services/generator.ts`)
+3. **SMC Studio** — Création de contenu AEO : fiches, FAQ, briefs, articles (`services/smc.ts`, `pages/SMCStudio.tsx`)
+4. **Source of Truth** — Génération de fichier `llm.txt` canonique (`services/llm_templates.ts`, `pages/SourceOfTruth.tsx`)
+5. **Schema.org Generator** — Génération JSON-LD (`services/schema_service.ts`, `pages/SchemaOrg.tsx`)
+6. **Robots.txt Optimizer** — Optimisation crawl IA (`services/robots_service.ts`, `pages/RobotsTxt.tsx`)
+7. **Blog Optimizer** — Brief de rédaction + article complet (`services/blog_prompt_db.ts`, `pages/BlogOptimizer.tsx`)
+8. **Audit PDF** — Rapport d'audit exportable (`services/pdf_prompt.ts`)
+9. **Marketplace Publishers** — Mise en relation brands/publishers (`pages/PublisherRequest.tsx`)
+10. **Affiliation** — Programme d'affiliation (`pages/Affiliation.tsx`)
+11. **Clients** — Gestion clients agence (`pages/Clients.tsx`)
+
+### Types Existants (`types.ts`)
+```typescript
+User, Project, Recommendation, CategoryScore, RobotsTxtData,
+GeneratedSolution, AnalysisResult, HistoryItem, SourceOfTruthData, SMCContent
+```
+
+### Pattern de Génération IA Existant
+Toutes les fonctions de génération suivent ce pattern :
+```typescript
+import { GoogleGenAI } from "@google/genai";
+const getApiKey = () => { /* ... */ };
+// Fallback simulation si pas d'API key
+// Appel Gemini avec schema structuré ou system prompt
+// Retour typé
+```
+
+---
+
+# PARTIE 1 : NOUVEAU MODULE #3 — AI CONTENT WRITER B2B
+
+## Concept
+Un module de génération de contenu B2B spécialisé par vertical métier (e-commerce, SaaS, immobilier, restauration, santé). Contrairement à Jasper/Copy.ai, TOUT le contenu généré est **optimisé AEO** nativement via le framework C.I.T.E.D.B.Y.
+
+## Fichiers à Créer
+
+### 1. `services/content_writer.ts` [NEW]
+
+```typescript
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// ══════════════════════════════════════════════════════════════
+// TYPES
+// ══════════════════════════════════════════════════════════════
+
+export type ContentVertical = 'ecommerce' | 'saas' | 'immobilier' | 'restauration' | 'sante' | 'finance' | 'juridique' | 'education' | 'general';
+export type ContentType = 'product_description' | 'landing_page' | 'sales_email' | 'meta_tags' | 'social_post' | 'press_release' | 'case_study' | 'newsletter';
+
+export interface ContentWriterInput {
+  vertical: ContentVertical;
+  contentType: ContentType;
+  brandName: string;
+  brandUrl?: string;
+  productOrService: string;
+  targetAudience: string;
+  tone: 'professionnel' | 'decontracte' | 'autoritaire' | 'empathique' | 'technique';
+  language: 'fr' | 'en';
+  additionalContext?: string;
+}
+
+export interface GeneratedContent {
+  title: string;
+  content: string;
+  metaDescription?: string;
+  aeoScore: number;
+  aeoTips: string[];
+  schemaMarkup?: string;
+  alternativeVersions?: string[];
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROMPTS SYSTÈME PAR TYPE DE CONTENU
+// ══════════════════════════════════════════════════════════════
+
+export const CONTENT_WRITER_PROMPTS: Record<ContentType, string> = {
+
+  product_description: `
+# RÔLE
+Tu es un Expert Copywriter E-commerce & Spécialiste AEO (Answer Engine Optimization).
+Tu rédiges des descriptions produits qui convertissent ET qui sont conçues pour être citées par les IA (ChatGPT, Perplexity, Claude).
+
+# FRAMEWORK C.I.T.E.D.B.Y. À APPLIQUER
+- **C**lear Structure : Hiérarchie H1 > H2 > H3, paragraphes < 100 mots
+- **I**nformation Density : Chaque phrase apporte une donnée concrète (specs, chiffres, comparaisons)
+- **T**echnical Accuracy : Termes techniques précis, pas de fluff marketing
+- **E**xpert Positioning : Ton autoritaire, citations de normes/études si pertinent
+- **D**irect Answer : Première phrase = réponse directe à "Qu'est-ce que [produit] ?"
+- **B**acklink Worthy : Contenu assez riche pour être référencé
+- **Y**ielding Value : Le lecteur repart avec une info actionnable
+
+# FORMAT DE SORTIE
+1. **Titre H1** optimisé (inclure le nom du produit + bénéfice principal)
+2. **Accroche** (2 phrases max — LA phrase que les IA extrairont)
+3. **Description longue** (300-500 mots, structurée en H2/H3)
+4. **Spécifications** (format tableau Markdown)
+5. **FAQ Produit** (3-5 questions/réponses de 40-60 mots)
+6. **Meta Description** (150-160 caractères)
+7. **Schema.org Product** (JSON-LD complet)
+
+# RÈGLES
+- Commence TOUJOURS par une définition directe du produit
+- Intègre des données chiffrées (dimensions, poids, performance)
+- Utilise des comparaisons concrètes ("2x plus rapide que...")
+- Chaque H2 formulé comme une question
+- FAQ réponses : 40-60 mots, réponse directe, pas de "Eh bien..."
+`,
+
+  landing_page: `
+# RÔLE
+Tu es un Growth Copywriter Senior spécialisé en Landing Pages à haute conversion, expert AEO.
+
+# FRAMEWORK C.I.T.E.D.B.Y. À APPLIQUER
+Chaque section de la landing page doit être extractible par une IA comme réponse autonome.
+
+# FORMAT DE SORTIE OBLIGATOIRE
+
+## SECTION 1 : HERO
+- **Headline H1** : Bénéfice principal + mot-clé cible (max 10 mots)
+- **Sous-titre** : Développe le H1 en 1 phrase (max 25 mots)
+- **CTA Principal** : Texte du bouton + texte de réassurance sous le bouton
+- **Social Proof rapide** : 1 ligne (ex: "+2000 entreprises nous font confiance")
+
+## SECTION 2 : PROBLÈME / AGITATION
+- **H2 Question** : "Pourquoi [problème] coûte cher à votre entreprise ?"
+- **3 pain points** avec icône + titre + description (2 phrases chacun)
+
+## SECTION 3 : SOLUTION
+- **H2** : "Comment [produit] résout [problème]"
+- **3-4 features** : Titre + Description (1 paragraphe) + Bénéfice mesurable
+
+## SECTION 4 : PREUVES
+- **Témoignage client** (template avec nom, entreprise, résultat chiffré)
+- **Logos clients** (suggestion de placement)
+- **Chiffres clés** (3 métriques avec labels)
+
+## SECTION 5 : FAQ
+- 5 questions/réponses (40-60 mots par réponse)
+- Format Answer-First obligatoire
+
+## SECTION 6 : CTA FINAL
+- **H2** : Reformulation du bénéfice principal
+- **CTA** + garantie/réassurance
+
+## EXTRAS
+- Meta Description (150-160 car.)
+- Schema.org WebPage (JSON-LD)
+- Open Graph tags suggérés
+
+# RÈGLES
+- Chaque section est auto-suffisante (extractible par IA)
+- Aucune phrase > 25 mots
+- Données chiffrées dans chaque section
+- Ton : autoritaire mais accessible
+`,
+
+  sales_email: `
+# RÔLE
+Tu es un Expert en Cold Emailing B2B & Spécialiste en copywriting de conversion.
+
+# MISSION
+Génère une SÉQUENCE de 3 emails de prospection (Cold → Follow-up → Break-up) optimisée pour le taux de réponse.
+
+# FORMAT DE SORTIE
+
+## EMAIL 1 : PREMIER CONTACT
+- **Objet** : Court (< 6 mots), personnalisé, pas de spam words
+- **Ligne 1** : Personnalisation (référence au prospect ou son entreprise)
+- **Ligne 2-3** : Problème identifié + impact chiffré
+- **Ligne 4** : Ta solution en 1 phrase
+- **Ligne 5** : Preuve sociale rapide (1 résultat client)
+- **CTA** : Question ouverte simple (pas "Avez-vous 15 min ?")
+- **Signature** : Nom + Poste + Entreprise
+
+## EMAIL 2 : FOLLOW-UP (J+3)
+- **Objet** : "Re:" ou référence au premier email
+- **Corps** : Nouvel angle (étude de cas, stat, contenu utile)
+- **CTA** : Plus direct
+
+## EMAIL 3 : BREAK-UP (J+7)
+- **Objet** : "Dernière question" ou équivalent
+- **Corps** : Court (3-4 lignes max), léger, laisse la porte ouverte
+- **CTA** : "Est-ce que [problème] n'est plus une priorité ?"
+
+# RÈGLES
+- Aucun email > 150 mots
+- Pas de "J'espère que vous allez bien"
+- Pas de lien dans le premier email
+- Personnalisation obligatoire (variables {prenom}, {entreprise}, {secteur})
+- Ton : professionnel mais humain, jamais robotique
+`,
+
+  meta_tags: `
+# RÔLE
+Tu es un Spécialiste SEO/AEO expert en optimisation de balises meta.
+
+# MISSION
+Génère un KIT META COMPLET pour une page web, optimisé pour le SEO classique ET pour les citations par IA.
+
+# FORMAT DE SORTIE
+
+## 1. BALISES META ESSENTIELLES
+\`\`\`html
+<title>[Titre optimisé — 50-60 caractères]</title>
+<meta name="description" content="[150-160 caractères]">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="[URL]">
+\`\`\`
+
+## 2. OPEN GRAPH (Facebook/LinkedIn)
+\`\`\`html
+<meta property="og:title" content="[Titre]">
+<meta property="og:description" content="[Description]">
+<meta property="og:type" content="website">
+<meta property="og:url" content="[URL]">
+<meta property="og:image" content="[URL image suggérée]">
+\`\`\`
+
+## 3. TWITTER CARDS
+\`\`\`html
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="[Titre]">
+<meta name="twitter:description" content="[Description]">
+\`\`\`
+
+## 4. SCHEMA.ORG (JSON-LD)
+\`\`\`json
+{ "@context": "https://schema.org", ... }
+\`\`\`
+
+## 5. VARIANTES DE TITRES (A/B Testing)
+- Option A : [Focus bénéfice]
+- Option B : [Focus mot-clé]
+- Option C : [Focus question]
+
+## 6. TIPS AEO
+- Pourquoi ce titre sera extrait par les IA
+- Quelle partie de la meta description sera citée
+- Améliorations recommandées
+
+# RÈGLES
+- Title tag : 50-60 caractères, mot-clé en premier
+- Meta description : 150-160 caractères, inclure un CTA
+- Pas de keyword stuffing
+- Chaque balise doit être cohérente avec les autres
+`,
+
+  social_post: `
+# RÔLE
+Tu es un Social Media Manager Senior spécialisé en contenu B2B à forte valeur ajoutée.
+
+# MISSION
+Génère un KIT de posts pour les réseaux sociaux (LinkedIn, Twitter/X, Instagram) optimisés pour l'engagement ET pour être repris par les IA dans leurs réponses.
+
+# FORMAT DE SORTIE
+
+## POST LINKEDIN (1300-1500 caractères)
+- **Hook** (Ligne 1) : Stat choc OU question provocante OU affirmation contre-intuitive
+- **Corps** : Storytelling en 5-7 phrases courtes, 1 idée par ligne, espaces entre les lignes
+- **Preuve** : 1 donnée chiffrée ou exemple concret
+- **CTA** : Question ouverte qui génère des commentaires
+- **Hashtags** : 3-5 hashtags pertinents
+
+## POST TWITTER/X (280 caractères)
+- Version courte et percutante du même message
+- 1-2 hashtags max
+
+## LÉGENDE INSTAGRAM (< 2200 caractères)
+- Hook visuel (référence à l'image suggérée)
+- Contenu éducatif en 3-5 bullet points
+- CTA : "Enregistre ce post" ou "Tag quelqu'un qui..."
+- 15-20 hashtags en commentaire séparé
+
+## SUGGESTION D'IMAGE / VISUEL
+- Description du visuel idéal pour accompagner le post
+- Texte overlay suggéré
+- Palette de couleurs recommandée
+
+# RÈGLES
+- Le hook doit arrêter le scroll (< 2 secondes de lecture)
+- 1 seule idée par post
+- Données chiffrées obligatoires
+- Ton : expert accessible, jamais corporate ennuyeux
+- Pas de emojis excessifs (max 3 par post)
+`,
+
+  press_release: `
+# RÔLE
+Tu es un Expert Relations Presse & Communication Corporate, spécialiste AEO.
+
+# MISSION
+Génère un communiqué de presse professionnel, optimisé pour être repris par les journalistes ET indexé comme source fiable par les IA.
+
+# FORMAT DE SORTIE (Structure pyramide inversée)
+
+## EN-TÊTE
+- **COMMUNIQUÉ DE PRESSE** (mention)
+- **Date** : [Date du jour]
+- **Diffusion** : Immédiate
+
+## TITRE (H1)
+[Qui] + [Quoi] + [Impact/Bénéfice] — max 15 mots
+
+## SOUS-TITRE
+1 phrase qui développe le titre avec un chiffre clé
+
+## PARAGRAPHE 1 : LE LEAD (QUI, QUOI, QUAND, OÙ, POURQUOI)
+- 3-4 phrases max
+- Toutes les infos essentielles
+- C'EST CE PARAGRAPHE QUE LES IA EXTRAIRONT
+
+## PARAGRAPHE 2 : DÉVELOPPEMENT
+- Contexte et détails
+- Citation du dirigeant (entre guillemets)
+- Données chiffrées
+
+## PARAGRAPHE 3 : PREUVES ET RÉSULTATS
+- Résultats concrets
+- Témoignage client ou partenaire
+
+## PARAGRAPHE 4 : PERSPECTIVES
+- Prochaines étapes
+- Vision à moyen terme
+
+## À PROPOS DE [ENTREPRISE]
+Boilerplate de 50-80 mots (factuel, pas marketing)
+
+## CONTACT PRESSE
+Nom | Fonction | Email | Téléphone
+
+# RÈGLES
+- Ton : factuel, pas promotionnel
+- Chiffres obligatoires
+- Citations entre guillemets avec attribution
+- Max 500 mots total
+- Chaque paragraphe auto-suffisant
+`,
+
+  case_study: `
+# RÔLE
+Tu es un Content Strategist B2B expert en études de cas à haute conversion et optimisées AEO.
+
+# MISSION
+Génère une étude de cas structurée qui prouve la valeur de la solution ET qui sera citée par les IA comme preuve de résultats.
+
+# FORMAT DE SORTIE
+
+## EN-TÊTE
+- **Titre** : "[Client] augmente [métrique] de [X%] grâce à [Solution]"
+- **Résumé exécutif** : 3 phrases (Problème → Solution → Résultat) — C'EST LE SNIPPET IA
+
+## SECTION 1 : LE CLIENT
+- Nom, secteur, taille, localisation
+- Contexte business (2-3 phrases)
+
+## SECTION 2 : LE DÉFI
+- Problème principal (H2 question : "Pourquoi [client] avait besoin de...")
+- 3 pain points concrets avec impact chiffré
+- Citation du client sur le problème
+
+## SECTION 3 : LA SOLUTION
+- Comment la solution a été déployée
+- Timeline d'implémentation
+- Fonctionnalités clés utilisées (liste)
+
+## SECTION 4 : LES RÉSULTATS
+- **Tableau de KPIs** : Avant / Après / Variation (%)
+- 3 résultats phares en bullet points
+- Citation du client sur les résultats
+- ROI calculé
+
+## SECTION 5 : ENSEIGNEMENTS
+- 3 leçons tirées
+- Conseil pour entreprises similaires
+
+## CTA
+- "Obtenez des résultats similaires" + lien
+
+## SCHEMA.ORG
+- JSON-LD Article avec mentions de l'organisation
+
+# RÈGLES
+- Résultats chiffrés OBLIGATOIRES
+- Au moins 2 citations client
+- Ton : factuel, data-driven
+- Max 800 mots
+- Chaque section extractible comme réponse autonome
+`,
+
+  newsletter: `
+# RÔLE
+Tu es un Email Marketing Expert spécialisé en newsletters B2B à haute valeur ajoutée.
+
+# MISSION
+Génère une newsletter complète (sujet + corps + CTA) qui informe, éduque et convertit.
+
+# FORMAT DE SORTIE
+
+## OBJET DE L'EMAIL
+- Version A : [Curiosité/Question]
+- Version B : [Bénéfice direct]
+- Version C : [Chiffre + Impact]
+- **Preview text** : Complément de l'objet (40-90 caractères)
+
+## STRUCTURE DU CORPS
+
+### ACCROCHE (2-3 lignes)
+Hook personnel ou stat qui contextualise le sujet
+
+### SECTION PRINCIPALE (200-300 mots)
+-════════════════════
+
+export const VERTICAL_CONTEXT: Record<ContentVertical, string> = {
+  ecommerce: `
+CONTEXTE VERTICAL E-COMMERCE :
+- Vocabulaire : conversion, panier moyen, taux de rebond, fiche produit, marketplace
+- KPIs à mentionner : taux de conversion, CA, retours, satisfaction
+- Ton : orienté bénéfice client, urgence subtile, confiance
+- Sources types : études Shopify, Statista E-commerce, FEVAD
+- Format préféré : listes de bénéfices, tableaux comparatifs, FAQ acheteur`,
+
+  saas: `
+CONTEXTE VERTICAL SAAS :
+- Vocabulaire : MRR, ARR, churn, onboarding, feature, intégration, API, scalabilité
+- KPIs à mentionner : ROI, temps gagné, réduction coûts, adoption utilisateur
+- Ton : technique mais accessible, focus valeur business
+- Sources types : rapports Gartner, G2, Capterra, études McKinsey
+- Format préféré : comparaisons avant/après, workflows, démo chiffrée`,
+
+  immobilier: `
+CONTEXTE VERTICAL IMMOBILIER :
+- Vocabulaire : bien, mandat, estimation, DPE, loi Pinel, VEFA, copropriété
+- KPIs à mentionner : prix/m², délai de vente, rentabilité locative
+- Ton : professionnel, rassurant, expertise locale
+- Sources types : notaires de France, INSEE, FNAIM, SeLoger
+- Format préféré : descriptions détaillées, comparatifs quartiers, FAQ acheteur/vendeur`,
+
+  restauration: `
+CONTEXTE VERTICAL RESTAURATION :
+- Vocabulaire : carte, menu, circuit court, fait maison, terroir, réservation
+- KPIs à mentionner : note Google, avis, ticket moyen, fréquentation
+- Ton : chaleureux, authentique, gourmand
+- Sources types : Michelin, TripAdvisor, guides gastronomiques
+- Format préféré : descriptions sensorielles, storytelling produit, menus structurés`,
+
+  sante: `
+CONTEXTE VERTICAL SANTÉ :
+- Vocabulaire : diagnostic, traitement, prévention, patient, praticien, protocole
+- KPIs à mentionner : taux de satisfaction, délai de prise en charge
+- Ton : sérieux, empathique, scientifique mais accessible
+- Sources types : HAS, OMS, PubMed, Ameli.fr, études cliniques
+- Format préféré : FAQ patient, guides pratiques, informations structurées
+- ⚠️ JAMAIS de diagnostic médical, toujours renvoyer vers un professionnel`,
+
+  finance: `
+CONTEXTE VERTICAL FINANCE :
+- Vocabulaire : investissement, rendement, risque, portefeuille, compliance, KYC
+- KPIs à mentionner : rendement, TRI, ratio Sharpe, performance
+- Ton : autoritaire, précis, réglementaire
+- Sources types : AMF, Banque de France, BCE, rapports annuels
+- Format préféré : tableaux chiffrés, comparatifs produits, disclaimer légaux
+- ⚠️ Toujours inclure les mentions légales obligatoires`,
+
+  juridique: `
+CONTEXTE VERTICAL JURIDIQUE :
+- Vocabulaire : jurisprudence, article de loi, contentieux, médiation, conformité
+- Ton : formel, précis, référencé
+- Sources types : Légifrance, jurisprudence, doctrine
+- Format préféré : analyses structurées, références légales, FAQ client
+- ⚠️ Mentionner que ceci ne constitue pas un conseil juridique`,
+
+  education: `
+CONTEXTE VERTICAL ÉDUC═══
+
+const fallbackContent = async (input: ContentWriterInput): Promise<GeneratedContent> => {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  return {
+    title: `[SIMULATION] Contenu ${input.contentType} pour ${input.brandName}`,
+    content: `# Contenu généré en mode simulation\n\nCe contenu est une simulation car aucune clé API n'est détectée.\n\n**Marque** : ${input.brandName}\n**Type** : ${input.contentType}\n**Vertical** : ${input.vertical}\n**Audience** : ${input.targetAudience}\n\nPour obtenir un vrai résultat, configurez votre clé API Gemini.`,
+    aeoScore: 0,
+    aeoTips: ["Configurez votre clé API pour obtenir un score AEO réel."],
+    metaDescription: `${input.brandName} - ${input.productOrService} | Découvrez notre solution.`
+  };
+};
+
+export const generateContent = async (input: ContentWriterInput): Promise<GeneratedContent> => {
+  const apiKey = getApiKey();
+  if (!apiKey) return fallbackContent(input);
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const systemPrompt = CONTENT_WRITER_PROMPTS[input.contentType];
+    const verticalContext = VERTICAL_CONTEXT[input.vertical];
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        title: { type: Type.STRING, description: "Titre principal du contenu" },
+        content: { type: Type.STRING, description: "Le contenu complet au format Markdown" },
+        metaDescription: { type: Type.STRING, description: "Meta description SEO 150-160 caractères" },
+        aeoScore: { type: Type.NUMBER, description: "Score AEO estimé du contenu sur 100" },
+        aeoTips: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3-5 conseils pour améliorer le score AEO" },
+        schemaMarkup: { type: Type.STRING, description: "Schema.org JSON-LD adapté au contenu" }
+      },
+      required: ["title", "content", "aeoScore", "aeoTips"]
+    };
+
+    const userPrompt = `
+      ${verticalContext}
+
+      BRIEF DU CLIENT :
+      - Marque : ${input.brandName}
+      - URL : ${input.brandUrl || 'Non fournie'}
+      - Produit/Service : ${input.productOrService}
+      - Audience cible : ${input.targetAudience}
+      - Ton souhaité : ${input.tone}
+      - Langue : ${input.language === 'fr' ? 'Français' : 'English'}
+      ${input.additionalContext ? `- Contexte additionnel : ${input.additionalContext}` : ''}
+
+      Génère le contenu en respectant STRICTEMENT le format de sortie défini dans tes instructions.
+      Le contenu DOIT être en ${input.language === 'fr' ? 'français' : 'anglais'}.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemPrompt,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.4,
+      }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    return {
+      title: parsed.title,
+      content: parsed.content,
+      metaDescription: parsed.metaDescription || '',
+      aeoScore: parsed.aeoScore || 75,
+      aeoTips: parsed.aeoTips || [],
+      schemaMarkup: parsed.schemaMarkup || '',
+    };
+  } catch (error) {
+    console.error("Content Writer generation failed:", error);
+    return fallbackContent(input);
+  }
+};
+```
+
+### 2. `pages/ContentWriter.tsx` [NEW]
+
+Crée une page complète avec :
+
+**Interface utilisateur :**
+- Sélecteur de vertical métier (cards visuelles avec icônes)
+- Sélecteur de type de contenu (dropdown ou cards)
+- Formulaire : brandName, brandUrl, productOrService, targetAudience, tone, language
+- Bouton "Générer" avec animation loading
+- Zone de prévisualisation du contenu généré (Markdown rendu)
+- Score AEO affiché en anneau (réutiliser `ScoreRing`)
+- Liste des tips AEO
+- Boutons : "Copier", "Télécharger .md", "Régénérer"
+- Historique des générations (stockage local via `smcLibrary` pattern)
+
+**Design :**
+- Même style que `SMCStudio.tsx` (dark theme, cards `bg-[#1a1d21]`, borders `border-white/5`)
+- Couleur identitaire du module : `text-rose-400` / `bg-rose-500/10`
+- Icône : `Feather` de lucide-react
+
+---
+
+# PARTIE 2 : NOUVEAU MODULE #4 — RÉPUTATION & SENTIMENT IA
+
+## Concept
+Un module qui surveille comment les IA (ChatGPT, Perplexity, Claude, Gemini) **parlent d'une marque**, analyse le sentiment des citations, détecte les mentions positives/négatives, et génère des alertes + recommandations d'action.
+
+## Fichiers à Créer
+
+### 1. `services/reputation_service.ts` [NEW]
+
+```typescript
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// ══════════════════════════════════════════════════════════════
+// TYPES
+// ══════════════════════════════════════════════════════════════
+
+export interface ReputationScanInput {
+  brandName: string;
+  brandUrl?: string;
+  competitors?: string[];
+  industry: string;
+  keywords?: string[];
+}
+
+export interface AIMention {
+  id: string;
+  aiEngine: 'ChatGPT' | 'Perplexity' | 'Claude' | 'Gemini' | 'Copilot';
+  prompt: string;
+  mentionType: 'direct' | 'indirect' | 'comparison' | 'recommendation' | 'negative' | 'absent';
+  sentiment: 'positive' | 'neutral' | 'negative';
+  sentimentScore: number; // -100 à +100
+  excerpt: string;
+  context: string;
+  date: string;
+  competitorsMentioned?: string[];
+}
+
+export interface ReputationReport {
+  brandName: string;
+  overallSentiment: number; // -100 à +100
+  visibilityScore: number; // 0-100
+  totalMentions: number;
+  sentimentBreakdown: {
+    positive: number;
+    neutral: number;
+    negative: number;
+  };
+  topThemes: Array<{ theme: strin.
+
+⚠️ DISCLAIMER IMPORTANT : Cette analyse est une SIMULATION HEURISTIQUE basée sur des patterns connus de citation IA.
+Ce n'est PAS un scraping en temps réel des IA. C'est un INDICE DE VISIBILITÉ estimé.
+
+# CE QUE TU DOIS FAIRE
+
+1. **Analyse de la marque** : Identifie ce que les IA diraient probablement sur cette marque basé sur :
+   - Sa présence web connue
+   - Son secteur d'activité
+   - Sa notoriété estimée
+   - La qualité de son contenu (si URL fournie)
+
+2. **Simulation de mentions** : Génère des exemples réalistes de comment les IA pourraient mentionner cette marque dans :
+   - Des comparaisons de produits/services
+   - Des recommandations à des utilisateurs
+   - Des réponses à des questions sectorielles
+   - Des listes de "meilleurs" ou "top"
+
+3. **Analyse de sentiment** : Pour chaque mention simulée, évalue :
+   - Le sentiment global (-100 à +100)
+   - Le type de mention (directe, indirecte, comparaison, absente)
+   - Les thèmes associés
+
+4. **Détection de risques** : Identifie :
+   - Les questions où la marque est ABSENTE des réponses IA (risque majeur)
+   - Les questions où les concurrents sont cités mais PAS la marque
+   - Les associations négatives potentielles
+
+5. **Recommandations** : Génère des actions concrètes pour :
+   - Améliorer la visibilité IA
+   - Corriger les associations négatives
+   - Combler les lacunes de contenu
+
+# FORMAT DE SORTIE (JSON)
+Respecte strictement le schéma fourni.
+
+# RÈGLES
+- Reste RÉALISTE dans les simulations (pas de scores parfaits)
+- Mentionne TOUJOURS que c'est un indice de visibilité, pas une mesure exacte
+- Inclus au moins 5-8 mentions simulées
+- Score de sentiment global rarement > 70 ou < -70
+- Les recommandations doivent être ACTIONNABLES
+`;
+
+export const SENTIMENT_ANALYSIS_PROMPT = `
+# RÔLE
+Tu es un Expert en Analyse de Sentiment spécialisé dans le contexte des citations par IA.
+
+# MISSION
+Analyse le sentiment d'un texte de mention IA par rapport à une marque donnée.
+
+# CRITÈRES D'ÉVALUATION
+- **Positif** (+50 à +100) : Recommandation active, termes élogieux, position de leader
+- **Légèrement positif** (+1 à +49) : Mention factuelle favorable, inclusion dans une liste
+- **Neutre** (0) : Mention factuelle sans jugement
+- **Légèrement négatif** (-1 à -49) : Réserves mentionnées, alternatives suggérées
+- **Négatif** (-50 à -100) : Critique directe, déconseillé, problèmes soulignés
+
+# FACTEURS À CONSIDÉRER
+- Position dans la réponse (premier cité = plus positif)
+- Vocabulaire utilisé (superlatifs, réserves, nuances)
+- Présence de concurrents dans la même réponse
+- Contexte de la question (recommandation vs comparaison vs problème)
+`;
+
+export const RESPONSE_GENERATOR_PROMPT = `
+# RÔLE
+Tu es un Expert en Gestion de Crise & Communication Digitale, spécialisé dans la réputation algorithmique.
+
+# MISSION
+Génère une stratégie de réponse pour améliorer le sentiment d'une mention IA négative ou absente.
+
+# FORMAT
+Pour chaque alerte/problème :
+1. **Diagnostic** : Pourquoi l'IA dit ça / (resolve => setTimeout(resolve, 3000));
+  return {
+    brandName: input.brandName,
+    overallSentiment: 35,
+    visibilityScore: 42,
+    totalMentions: 6,
+    sentimentBreakdown: { positive: 2, neutral: 3, negative: 1 },
+    topThemes: [
+      { theme: `${input.industry} solutions`, count: 3, sentiment: 'positive' },
+      { theme: 'pricing', count: 2, sentiment: 'neutral' },
+      { theme: 'support client', count: 1, sentiment: 'negative' }
+    ],
+    competitorComparison: (input.competitors || []).map(c => ({
+      name: c, mentions: Math.floor(Math.random() * 10), sentiment: Math.floor(Math.random() * 80) - 20
+    })),
+    alerts: [
+      { severity: 'critical', message: `${input.brandName} absent des réponses IA sur "${input.industry} recommandations"`, action: "Créer du contenu Answer-First sur ce sujet" },
+      { severity: 'warning', message: "Sentiment neutre dominant — manque de différenciation", action: "Publier des études de cas chiffrées" },
+      { severity: 'info', message: "Concurrents mieux positionnés sur les comparaisons", action: "Créer une page de comparaison détaillée" }
+    ],
+    recommendations: [
+      "Créer un fichier llm.txt avec vos données de référence",
+      "Publier 3 articles Answer-First sur vos sujets clés",
+      "Ajouter Schema.org Organization + Product sur votre site",
+      "Obtenir des mentions dans des articles de presse/blogs autoritaires",
+      "Monitorer mensuellement l'évolution du score de visibilité"
+    ],
+    mentions: [
+      {
+        id: '1',
+        aiEngine: 'ChatGPT',
+        prompt: `Quels sont les meilleurs outils de ${input.industry} ?`,
+        mentionType: 'absent',
+        sentiment: 'negative',
+        sentimentScore: -30,
+        excerpt: `Les principaux outils recommandés sont [concurrent1], [concurrent2]...`,
+        context: `${input.brandName} n'est pas mentionné dans cette réponse.`,
+        date: new Date().toISOString()
+      }
+    ],
+    generatedAt: new Date().toISOString()
+  };
+};
+
+export const scanReputation = async (input: ReputationScanInput): Promise<ReputationReport> => {
+  const apiKey = getApiKey();
+  if (!apiKey) return fallbackReport(input);
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        overallSentiment: { type: Type.NUMBER },
+        visibilityScore: { type: Type.NUMBER },
+        totalMentions: { type: Type.NUMBER },
+        sentimentBreakdown: {
+          type: Type.OBJECT,
+          properties: {
+            positive: { type: Type.NUMBER },
+            neutral: { type: Type.NUMBER },
+            negative: { type: Type.NUMBER }
+          },
+          required: ["positive", "neutral", "negative"]
+        },
+        topThemes: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              theme: { type: Type.STRING },
+              count: { type: Type.NUMBER },
+              sentiment: { type: Type.STRING }
+            },
+            required: ["theme", "count", "sentiment"]
+          }
+        },
+        alerts: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              severity: { type: Type.STRING },
+              message: { type: Type.STRING },
+              action: { type: Type.STRING }
+            },
+            required: ["severity", "message", "action"]
+          }
+        },
+        recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+        mentions: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              aiEngine: { type: Type.STRING },
+              prompt: { type: Type.STRING },
+              mentionType: { type: Type.STRING },
+              sentiment: { type: Type.STRING },
+              sentimentScore: { type: Type.NUMBER },
+              excerpt: { type: Type.STRING },
+              context: { type: Type.STRING }
+            },
+            required: ["aiEngine", "prompt", "mentionType", "sentiment", "sentimentScore", "excerpt", "context"]
+          }
+        }
+      },
+      required: ["overallSentiment", "visibilityScore", "totalMentions", "sentimentBreakdown", "topThemes", "alerts", "recommendations", "mentions"]
+    };
+
+    const userPrompt = `
+      Analyse la réputation IA de cette marque :
+      
+      MARQUE : ${input.brandName}
+      URL : ${input.brandUrl || 'Non fournie'}
+      SECTEUR : ${input.industry}
+      CONCURRENTS : ${(input.competitors || []).join(', ') || 'Non spécifiés'}
+      MOTS-CLÉS SURVEILLÉS : ${(input.keywords || []).join(', ') || 'Non spécifiés'}
+      
+      Génère un rapport complet de réputation IA avec au minimum 6 mentions simulées.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: userPrompt,
+      config: {
+        systemInstruction: REPUTATION_SCAN_PROMPT,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.5,
+      }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    return {
+      brandName: input.brandName,
+      overallSentiment: parsed.overallSentiment,
+      visibilityScore: parsed.visibilityScore,
+      totalMentions: parsed.totalMentions,
+      sentimentBreakdown: parsed.sentimentBreakdown,
+      topThemes: parsed.topThemes,
+      competitorComparison: (input.competitors || []).map(c => ({
+        name: c, mentions: Math.floor(Math.random() * 10) + 1, sentiment: Math.floor(Math.random() * 80) - 20
+      })),
+      alerts: parsed.alerts,
+      recommendations: parsed.recommendations,
+      mentions: parsed.mentions.map((m: any, i: number) => ({
+        ...m,
+        id: String(i + 1),
+        date: new Date().toISOString()
+      })),
+      generatedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error("Reputation scan failed:", error);
+    return fallbackReport(input);
+  }
+};
+
+export const generateReputationResponse = async (alert: { message: string; action: string }, brandName: string): Promise<string> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    await new Promise(r => setTimeout(r, 1500));
+    return `# Plan d'Action [SIMULATION]\n\n## Problème\n${alert.message}\n\n## Actions Recommandées\n1. ${alert.action}\n2. Publier du contenu Answer-First\n3. Renforcer le Schema.org\n\n*Configurez votre clé API pour un plan d'action détaillé.*`;
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Marque: ${brandName}\nProblème détecté: ${alert.message}\nAction suggérée: ${alert.action}\n\nGénère un plan d'action détaillé pour corriger cette situation.`,
+      config: {
+        systemInstruction: RESPONSE_GENERATOR_PROMPT,
+        temperature: 0.4,
+      }
+    });
+    return response.text || "Erreur de génération.";
+  } catch (e) {
+    console.error(e);
+    return "Erreur lors de la génération du plan d'action.";
+  }
+};
+```
+
+### 2. `pages/Reputation.tsx` [NEW]
+
+Crée une page complète avec :
+
+**Interface utilisateur :**
+- **Formulaire de scan** : brandName, brandUrl, competitors (multi-input), industry (select), keywords (tags)
+- **Dashboard de résultats** :
+  - Score de visibilité IA (anneau, réutiliser `ScoreRing`)
+  - Jauge de sentiment (-100 à +100, gradient rouge → jaune → vert)
+  - Breakdown mentions (positive/neutre/négative en barres)
+  - Top thèmes (tags colorés par sentiment)
+  - Comparaison concurrents (tableau)
+- **Section Alertes** : Cards triées par sévérité (critical=rouge, warning=orange, info=bleu) avec bouton "Générer Plan d'Action"
+- **Liste des mentions** : Cards avec logo IA, prompt, excerpt, badge sentiment, score
+- **Recommandations** : Checklist actionnable
+- **Export** : Bouton "Télécharger Rapport PDF/MD"
+
+**Design :**
+- Même style dark theme
+- Couleur identitaire : `text-amber-400` / `bg-amber-500/10`
+- Icône : `Shield` de lucide-react
+
+---
+
+# PARTIE 3 : FICHIERS À MODIFIER
+
+## 1. `types.ts` — AJOUTER CES TYPES
+
+```typescript
+// === MODULE #3 : CONTENT WRITER ===
+export type ContentVertical = 'ecommerce' | 'saas' | 'immobilier' | 'restauration' | 'sante' | 'finance' | 'juridique' | 'education' | 'general';
+export type ContentType = 'product_description' | 'landing_page' | 'sales_email' | 'meta_tags' | 'social_post' | 'press_release' | 'case_study' | 'newsletter';
+
+export interface ContentWriterInput {
+  vertical: ContentVertical;
+  contentType: ContentType;
+  brandName: string;
+  brandUrl?: string;
+  productOrService: string;
+  targetAudience: string;
+  tone: 'professionnel' | 'decontracte' | 'autoritaire' | 'empathique' | 'technique';
+  language: 'fr' | 'en';
+  additionalContext?: string;
+}
+
+export interface GeneratedContent {
+  title: string;
+  content: string;
+  metaDescription?: string;
+  aeoScore: number;
+  aeoTips: string[];
+  schemaMarkup?: string;
+  alternativeVersions?: string[];
+}
+
+// === MODULE #4 : REPUTATION ===
+export interface ReputationScanInput {
+  brandName: string;
+  brandUrl?: string;
+  competitors?: string[];
+  industry: string;
+  keywords?: string[];
+}
+
+export interface AIMention {
+  id: string;
+  aiEngine: 'ChatGPT' | 'Perplexity' | 'Claude' | 'Gemini' | 'Copilot';
+  prompt: string;
+  mentionType: 'direct' | 'indirect' | 'comparison' | 'recommendation' | 'negative' | 'absent';
+  sentiment: 'positive' | 'neutral' | 'negative';
+  sentimentScore: number;
+  excerpt: string;
+  context: string;
+  date: string;
+  competitorsMentioned?: string[];
+}
+
+export interface ReputationReport {
+  brandName: string;
+  overallSentiment: number;
+  visibilityScore: number;
+  totalMentions: number;
+  sentimentBreakdown: { positive: number; neutral: number; negative: number };
+  topThemes: Array<{ theme: string; count: number; sentiment: 'positive' | 'neutral' | 'negative' }>;
+  competitorComparison?: Array<{ name: string; mentions: number; sentiment: number }>;
+  alerts: Array<{ severity: 'critical' | 'warning' | 'info'; message: string; action: string }>;
+  recommendations: string[];
+  mentions: AIMention[];
+  generatedAt: string;
+}
+```
+
+## 2. `pages/GenerativeTools.tsx` — AJOUTER LES 2 NOUVEAUX OUTILS
+
+Ajouter dans le tableau `tools` :
+```typescript
+{ id: 'content-writer', label: 'AI Content Writer', icon: Feather, color: 'text-rose-400', bg: 'bg-rose-500/10', desc: 'Rédaction B2B par vertical' },
+{ id: 'reputation', label: 'Réputation IA', icon: Shield, color: 'text-amber-400', bg: 'bg-amber-500/10', desc: 'Sentiment & mentions IA' },
+```
+
+Passer la grid de `lg:grid-cols-4` à `lg:grid-cols-3` (6 outils = 2 rangées de 3).
+
+## 3. `App.tsx` — AJOUTER LE ROUTING
+
+1. Importer les nouvelles pages :
+```typescript
+import ContentWriter from './pages/ContentWriter';
+import Reputation from './pages/Reputation';
+```
+
+2. Ajouter `'content-writer' | 'reputation'` au type de `currentView`
+
+3. Ajouter les cases dans le rendu conditionnel des vues
+
+4. Ajouter les entrées dans le menu latéral (section "Outils Génératifs")
+
+---
+
+# PARTIE 4 : RÉCAPITULATIF DE TOUS LES PROMPTS DU SAAS
+
+Voici la liste exhaustive de TOUS les prompts de génération IA utilisés dans CitedBy.ai, avec leur fichier source et leur fonction :
+
+| # | Prompt | Fichier | Fonction | Usage |
+|---|--------|---------|----------|-------|
+| 1 | `generateSolution` prompt | `services/generator.ts` | `generateSolution()` | Génère une solution corrective pour chaque recommandation AEO |
+| 2 | `BLOG_WRITER_SYSTEM_PROMPT` | `services/blog_prompt_db.ts` | `generateBlogArchitecture()` | Crée un brief de rédaction structuré AEO |
+| 3 | `FULL_ARTICLE_SYSTEM_PROMPT` | `services/blog_prompt_db.ts` | `generateFullArticle()` | Rédige un article complet Answer-First |
+| 4 | `DATA_ANALYST_SYSTEM_PROMPT` | `services/pdf_prompt.ts` | Export PDF d'audit | Structure le rapport d'audit professionnel |
+| 5 | SMC `generateFiche` prompt | `services/smc.ts` | `smcService.generateFiche()` | Crée une fiche produit/service |
+| 6 | SMC `generateFAQ` prompt | `services/smc.ts` | `smcService.generateFAQ()` | Génère une FAQ optimisée AEO |
+| 7 | SMC `generateBrief` prompt | `services/smc.ts` | `smcService.generateBrief()` | Crée un brief de contenu |
+| 8 | SMC `generateArticle` prompt | `services/smc.ts` | `smcService.generateArticle()` | Rédige un article depuis un brief |
+| 9 | `LLM_TRUTH_TEMPLATES.txt` | `services/llm_templates.ts` | Génération llm.txt | Fichier de vérité pour les LLMs (format texte) |
+| 10 | `LLM_TRUTH_TEMPLATES.json` | `services/llm_templates.ts` | Génération llm.json | Fichier de vérité pour les LLMs (format JSON) |
+| 11 | `CONTENT_WRITER_PROMPTS.product_description` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Description produit AEO par vertical |
+| 12 | `CONTENT_WRITER_PROMPTS.landing_page` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Landing page haute conversion |
+| 13 | `CONTENT_WRITER_PROMPTS.sales_email` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Séquence 3 emails de prospection |
+| 14 | `CONTENT_WRITER_PROMPTS.meta_tags` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Kit meta complet (OG, Twitter, Schema) |
+| 15 | `CONTENT_WRITER_PROMPTS.social_post` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Kit posts LinkedIn/X/Instagram |
+| 16 | `CONTENT_WRITER_PROMPTS.press_release` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Communiqué de presse structuré |
+| 17 | `CONTENT_WRITER_PROMPTS.case_study` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Étude de cas B2B data-driven |
+| 18 | `CONTENT_WRITER_PROMPTS.newsletter` | `services/content_writer.ts` **[NEW]** | `generateContent()` | Newsletter B2B complète |
+| 19 | `VERTICAL_CONTEXT[*]` (9 verticaux) | `services/content_writer.ts` **[NEW]** | Contexte injecté | Spécialisation par métier |
+| 20 | `REPUTATION_SCAN_PROMPT` | `services/reputation_service.ts` **[NEW]** | `scanReputation()` | Scan de réputation IA (simulation heuristique) |
+| 21 | `SENTIMENT_ANALYSIS_PROMPT` | `services/reputation_service.ts` **[NEW]** | Analyse de sentiment | Évalue le sentiment d'une mention |
+| 22 | `RESPONSE_GENERATOR_PROMPT` | `services/reputation_service.ts` **[NEW]** | `generateReputationResponse()` | Plan d'action pour corriger une alerte |
+
+---
+
+# PARTIE 5 : INSTRUCTIONS D'EXÉCUTION POUR CLAUDE CODE
+
+## CHEMIN DU PROJET
+```
+C:\Users\User\Downloads\SaaSV13 - Rick
+```
+
+## AVANT DE COMMENCER
+```bash
+cd "C:\Users\User\Downloads\SaaSV13 - Rick"
+# Compte les fichiers existants
+find . -type f -not -path "*/node_modules/*" -not -path "*/.next/*" -not -path "*/.git/*" | wc -l
+# NOTE CE NOMBRE : ____
+```
+
+## ORDRE D'EXÉCUTION
+
+```
+PHASE 1 : VÉRIFICATION (1 min)
+├── cd "C:\Users\User\Downloads\SaaSV13 - Rick"
+├── Vérifier que tous les fichiers existants sont présents
+├── Lire types.ts, App.tsx, pages/GenerativeTools.tsx
+└── Confirmer la compréhension de l'architecture SANS LA CHANGER
+
+PHASE 2 : TYPES (1 min)
+└── AJOUTER (append) les nouveaux types À LA FIN de types.ts
+    ⚠️ NE PAS supprimer ou modifier les types existants
+
+PHASE 3 : SERVICES (5 min)
+├── CRÉER services/content_writer.ts (nouveau fichier)
+└── CRÉER services/reputation_service.ts (nouveau fichier)
+    ⚠️ NE PAS modifier les services existants
+
+PHASE 4 : PAGES (10 min)
+├── CRÉER pages/ContentWriter.tsx (nouveau fichier)
+└── CRÉER pages/Reputation.tsx (nouveau fichier)
+    ⚠️ NE PAS modifier/déplacer les pages existantes
+
+PHASE 5 : INTÉGRATION (3 min)
+├── MODIFIER pages/GenerativeTools.tsx : AJOUTER 2 entries dans tools[]
+├── MODIFIER App.tsx : AJOUTER imports + cases dans le routing + entrées menu
+└── Vérifier que les imports Lucide sont corrects (Feather, Shield)
+    ⚠️ NE PAS refactoriser le routing existant
+
+PHASE 6 : VALIDATION (2 min)
+├── Vérifier que TOUS les fichiers d'origine existent encore
+├── Compter les fichiers : le total DOIT être > au nombre noté en Phase 1
+├── npx tsc --noEmit (0 erreurs)
+└── npm run build (0 erreurs si possible, sinon 0 erreurs TypeScript)
+```
+
+## GARDE-FOUS
+
+⛔ **NE PAS** (INTERDIT — CAUSES DE CASSE DU PROJET) :
+- **NE PAS supprimer, renommer ou déplacer** AUCUN fichier existant
+- **NE PAS migrer** l'architecture (pas de Vite → Next.js, pas de pages/ → app/)
+- **NE PAS créer** de dossiers `_legacy`, `_old`, `_backup`, `_deprecated`
+- **NE PAS modifier** `services/analyzer.ts`, `services/criteria.ts`, `services/generator.ts`
+- **NE PAS changer** le pattern d'authentification
+- **NE PAS modifier** les routes API Stripe
+- **NE PAS refactoriser** le code existant "pour l'améliorer"
+- **NE PAS promettre** que le scan de réputation est "en temps réel"
+- **NE PAS réorganiser** les imports ou la structure des fichiers existants
+
+✅ **TOUJOURS** :
+- Suivre le pattern existant (GoogleGenAI, getApiKey, fallback simulation)
+- Utiliser le même design system (dark theme, cards bg-[#1a1d21])
+- Typer correctement en TypeScript
+- Inclure des fallback simulations quand API key absente
+- Mentionner dans l'UI du module Réputation que c'est un "indice de visibilité estimé"
+
+## STATE FILE
+
+Après chaque phase terminée, mets à jour `docs/state.md` (dans le dossier du projet `C:\Users\User\Downloads\SaaSV13 - Rick\docs\`) :
+```markdown
+# STATE - CitedBy.ai V14
+
+## Modules
+- [x] Analyseur AEO
+- [x] Générateur Solutions
+- [x] SMC Studio
+- [x] Source of Truth
+- [x] Schema.org
+- [x] Robots.txt
+- [x] Blog Optimizer
+- [x] PDF Audit
+- [x] Marketplace
+- [x] Affiliation
+- [x] Clients
+- [ ] AI Content Writer B2B ← EN COURS
+- [ ] Réputation & Sentiment IA ← EN COURS
+
+## Dernière modification
+Date: [ISO]
+Phase: [1-6]
+Status: [en cours / terminé]
+```
+
+---
+
+*Prompt V4.0 — CitedBy.ai — Février 2026*
+*Intégration Modules #3 (AI Content Writer B2B) + #4 (Réputation & Sentiment IA)*
+*22 prompts de génération définis | 9 verticaux métier | Framework C.I.T.E.D.B.Y.*

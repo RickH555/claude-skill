@@ -1,0 +1,59 @@
+// Represents a single citation found across AI engines
+export interface CitationEntry {
+  id: string;
+  engine: 'chatgpt' | 'claude' | 'perplexity' | 'gemini';
+  query: string;          // The prompt that triggered the citation
+  position: number;       // Position in the AI response (1=first mentioned)
+  sentiment: 'positive' | 'neutral' | 'negative';
+  snippet: string;        // The text snippet where brand was cited
+  date: string;           // ISO date
+  url?: string;           // Source URL if available
+}
+
+// Results from a single AI engine scan
+export interface EngineResult {
+  engine: 'chatgpt' | 'claude' | 'perplexity' | 'gemini';
+  citations: number;
+  shareOfVoice: number;   // Percentage 0-100
+  sentiment: SentimentBreakdown;
+  trend: number;          // Percentage change vs previous period
+}
+
+// Sentiment breakdown
+export interface SentimentBreakdown {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
+
+// Competitor comparison data
+export interface CompetitorData {
+  name: string;
+  citations: number;
+  shareOfVoice: number;
+  trend: number;
+}
+
+// Full monitoring scan result
+export interface MonitoringResult {
+  brandName: string;
+  brandUrl: string;
+  scanDate: string;       // ISO date
+  period: '7d' | '30d' | '90d';
+  totalCitations: number;
+  shareOfVoice: number;   // Global share 0-100
+  overallSentiment: SentimentBreakdown;
+  trend: number;          // Global trend percentage
+  engineResults: EngineResult[];
+  recentCitations: CitationEntry[];
+  competitors: CompetitorData[];
+  // Time series data for the chart
+  timeSeriesData: Array<{
+    date: string;
+    citations: number;
+    chatgpt: number;
+    claude: number;
+    perplexity: number;
+    gemini: number;
+  }>;
+}

@@ -1,0 +1,288 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  Shield,
+  Loader2,
+  Sparkles,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  Info,
+  MessageSquare,
+  BarChart3,
+  ThumbsUp,
+  Minus,
+  ThumbsDown,
+} from 'lucide-react';
+import { PageHeader } from '@/components/page-header';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { KpiCard } from '@/components/kpi-card';
+import { ProgressBar } from '@/components/progress-bar';
+import { MOCK_REPUTATION_REPORT } from '@/lib/mock-data';
+
+export default function ReputationPage() {
+  const [brandName, setBrandName] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [scanning, setScanning] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleScan = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!brandName) return;
+    setScanning(true);
+    setShowResults(false);
+
+    setTimeout(() => {
+      setScanning(false);
+      setShowResults(true);
+    }, 3000);
+  };
+
+  const report = MOCK_REPUTATION_REPORT;
+
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <PageHeader
+        title="Reputation IA"
+        description="Analysez votre reputation dans les reponses des moteurs IA generatifs."
+        breadcrumbs={[
+          { label: 'App', href: '/app' },
+          { label: 'Outils Generatifs', href: '/app/generative-tools' },
+          { label: 'Reputation' },
+        ]}
+      />
+
+      {/* Form */}
+      {!showResults && (
+        <div className="max-w-xl mx-auto animate-fade-in-up">
+          <Card className="p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-emerald-500/10">
+                <Shield size={24} className="text-emerald-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Scanner votre reputation</h2>
+                <p className="text-xs text-white/40">Analyse sur 5 moteurs IA</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleScan} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-1.5">Nom de la marque</label>
+                <input
+                  type="text"
+                  value={brandName}
+                  onChange={(e) => setBrandName(e.target.value)}
+                  placeholder="Ex: CitedBy.ai"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-1.5">Industrie</label>
+                <input
+                  type="text"
+                  value={industry}
+                  onChange={(e) => setIndustry(e.target.value)}
+                  placeholder="Ex: SaaS, E-commerce, Finance..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                />
+              </div>
+              <Button type="submit" disabled={!brandName || scanning} className="w-full gap-2">
+                {scanning ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    Scan en cours (5 moteurs IA)...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={16} />
+                    Lancer le scan
+                  </>
+                )}
+              </Button>
+            </form>
+          </Card>
+        </div>
+      )}
+
+      {/* Results */}
+      {showResults && (
+        <div className="animate-fade-in-up space-y-8">
+          {/* KPIs */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <KpiCard
+              label="Sentiment global"
+              value={`${report.overallSentiment}%`}
+              change={5}
+              icon={<ThumbsUp size={16} />}
+            />
+            <KpiCard
+              label="Score visibilite"
+              value={`${report.visibilityScore}/100`}
+              change={8}
+              icon={<BarChart3 size={16} />}
+            />
+            <KpiCard
+              label="Mentions totales"
+              value={report.totalMentions.toString()}
+              change={12}
+              icon={<MessageSquare size={16} />}
+            />
+            <KpiCard
+              label="Moteurs IA"
+              value="5/5"
+              icon={<Shield size={16} />}
+            />
+          </div>
+
+          {/* Sentiment Breakdown */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card className="p-6">
+              <h3 className="text-sm font-bold text-white mb-4">Repartition du sentiment</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <ThumbsUp size={16} className="text-emerald-400 shrink-0" />
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs text-white/50">Positif</span>
+                      <span className="text-xs font-bold text-emerald-400">{report.sentimentBreakdown.positive}%</span>
+                    </div>
+                    <ProgressBar value={report.sentimentBreakdown.positive} max={100} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Minus size={16} className="text-white/40 shrink-0" />
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs text-white/50">Neutre</span>
+                      <span className="text-xs font-bold text-white/60">{report.sentimentBreakdown.neutral}%</span>
+                    </div>
+                    <ProgressBar value={report.sentimentBreakdown.neutral} max={100} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <ThumbsDown size={16} className="text-red-400 shrink-0" />
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs text-white/50">Negatif</span>
+                      <span className="text-xs font-bold text-red-400">{report.sentimentBreakdown.negative}%</span>
+                    </div>
+                    <ProgressBar value={report.sentimentBreakdown.negative} max={100} />
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Top Themes */}
+            <Card className="p-6">
+              <h3 className="text-sm font-bold text-white mb-4">Themes principaux</h3>
+              <div className="space-y-3">
+                {report.topThemes.map((theme) => {
+                  const sentimentColors = {
+                    positive: 'text-emerald-400',
+                    neutral: 'text-white/50',
+                    negative: 'text-red-400',
+                  };
+                  return (
+                    <div key={theme.theme} className="flex items-center justify-between p-3 bg-white/[0.02] rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-white font-medium">{theme.theme}</span>
+                        <Badge variant="secondary" className="text-[10px]">{theme.count} mentions</Badge>
+                      </div>
+                      <span className={`text-xs font-medium ${sentimentColors[theme.sentiment]}`}>
+                        {theme.sentiment === 'positive' ? '↑' : theme.sentiment === 'negative' ? '↓' : '—'} {theme.sentiment}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </div>
+
+          {/* Competitor Comparison */}
+          {report.competitorComparison && report.competitorComparison.length > 0 && (
+            <Card className="p-6">
+              <h3 className="text-sm font-bold text-white mb-4">Benchmark concurrentiel</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-primary/5 border border-primary/10 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <Badge variant="success" className="text-[10px]">Vous</Badge>
+                    <span className="text-sm font-bold text-white">{report.brandName}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-white/40">{report.totalMentions} mentions</span>
+                    <span className="text-xs font-bold text-primary">{report.overallSentiment}% sentiment</span>
+                  </div>
+                </div>
+                {report.competitorComparison.map((comp) => (
+                  <div key={comp.name} className="flex items-center justify-between p-3 bg-white/[0.02] rounded-xl">
+                    <span className="text-sm text-white/70">{comp.name}</span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-white/40">{comp.mentions} mentions</span>
+                      <span className={`text-xs font-bold ${comp.sentiment > report.overallSentiment ? 'text-red-400' : 'text-emerald-400'}`}>
+                        {comp.sentiment}% sentiment
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Alerts */}
+          <Card className="p-6">
+            <h3 className="text-sm font-bold text-white mb-4">Alertes</h3>
+            <div className="space-y-3">
+              {report.alerts.map((alert, i) => {
+                const icons = { critical: AlertTriangle, warning: AlertTriangle, info: Info };
+                const colors = {
+                  critical: 'bg-red-500/10 border-red-500/20 text-red-400',
+                  warning: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+                  info: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+                };
+                const AlertIcon = icons[alert.severity];
+                return (
+                  <div key={i} className={`p-4 rounded-xl border ${colors[alert.severity]}`}>
+                    <div className="flex items-start gap-3">
+                      <AlertIcon size={16} className="shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">{alert.message}</p>
+                        <p className="text-xs opacity-60 mt-1">Action: {alert.action}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Recommendations */}
+          <Card className="p-6">
+            <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+              <Sparkles size={14} className="text-primary" />
+              Recommandations
+            </h3>
+            <ul className="space-y-2">
+              {report.recommendations.map((rec, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-white/50 p-2">
+                  <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                  {rec}
+                </li>
+              ))}
+            </ul>
+          </Card>
+
+          <div className="flex justify-start">
+            <Button variant="outline" onClick={() => setShowResults(false)} className="gap-1.5">
+              Nouveau scan
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

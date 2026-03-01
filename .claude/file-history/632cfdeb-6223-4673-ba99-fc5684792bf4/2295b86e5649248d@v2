@@ -1,0 +1,169 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  FileText,
+  Sparkles,
+  Download,
+  Copy,
+  Check,
+  PenTool,
+  Globe,
+  Code,
+  FileJson,
+  Plus,
+} from "lucide-react";
+import { toast } from "sonner";
+
+interface ContentPack {
+  id: string;
+  type: string;
+  title: string;
+  preview: string;
+  status: "draft" | "review" | "published";
+  aeoScore: number;
+  createdAt: string;
+}
+
+// Mock data — will come from Supabase generated_contents
+const MOCK_PACKS: ContentPack[] = [
+  {
+    id: "1",
+    type: "landing_page",
+    title: "Page d'accueil optimisee AEO",
+    preview: "Decouvrez comment CitedBy.ai aide les entreprises a devenir la reference des intelligences artificielles...",
+    status: "published",
+    aeoScore: 87,
+    createdAt: "2024-05-18",
+  },
+  {
+    id: "2",
+    type: "schema_org",
+    title: "Schema.org Organization + WebSite",
+    preview: '{"@context": "https://schema.org", "@type": "Organization", "name": "CitedBy.ai"...}',
+    status: "review",
+    aeoScore: 95,
+    createdAt: "2024-05-19",
+  },
+  {
+    id: "3",
+    type: "robots_txt",
+    title: "robots.txt optimise IA",
+    preview: "User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /...",
+    status: "draft",
+    aeoScore: 92,
+    createdAt: "2024-05-20",
+  },
+];
+
+const TYPE_CONFIG: Record<string, { icon: React.ElementType; label: string }> = {
+  landing_page: { icon: PenTool, label: "Landing Page" },
+  schema_org: { icon: FileJson, label: "Schema.org" },
+  robots_txt: { icon: Code, label: "robots.txt" },
+  blog_post: { icon: FileText, label: "Article Blog" },
+  meta_tags: { icon: Globe, label: "Meta Tags" },
+};
+
+const STATUS_BADGES: Record<string, { label: string; variant: "secondary" | "warning" | "success" }> = {
+  draft: { label: "Brouillon", variant: "secondary" },
+  review: { label: "En revue", variant: "warning" },
+  published: { label: "Publie", variant: "success" },
+};
+
+export default function PacksPage() {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const handleCopy = (id: string, content: string) => {
+    navigator.clipboard.writeText(content);
+    setCopied(id);
+    toast.success("Copie dans le presse-papier");
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-serif font-bold text-white">Packs Contenu</h2>
+        <Button>
+          <Plus size={16} /> Generer du contenu
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Contenus generes</p>
+          <p className="text-3xl font-bold text-white">{MOCK_PACKS.length}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Score AEO moyen</p>
+          <p className="text-3xl font-bold text-emerald-400">
+            {Math.round(MOCK_PACKS.reduce((s, p) => s + p.aeoScore, 0) / MOCK_PACKS.length)}
+          </p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Publies</p>
+          <p className="text-3xl font-bold text-primary">
+            {MOCK_PACKS.filter((p) => p.status === "published").length}
+          </p>
+        </Card>
+      </div>
+
+      {/* Content Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {MOCK_PACKS.map((pack) => {
+          const typeInfo = TYPE_CONFIG[pack.type] || { icon: FileText, label: pack.type };
+          const statusInfo = STATUS_BADGES[pack.status];
+          const TypeIcon = typeInfo.icon;
+
+          return (
+            <Card key={pack.id} className="flex flex-col">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <TypeIcon size={16} className="text-primary" />
+                    <span className="text-xs text-white/40">{typeInfo.label}</span>
+                  </div>
+                  <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                </div>
+                <CardTitle className="text-base">{pack.title}</CardTitle>
+              </CardHeader>
+
+              <CardContent className="flex-1">
+                <div className="bg-white/[0.02] rounded-lg p-3 border border-white/5">
+                  <p className="text-xs text-white/50 font-mono line-clamp-3">{pack.preview}</p>
+                </div>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-xs text-white/30">{pack.createdAt}</span>
+                  <div className="flex items-center gap-1">
+                    <Sparkles size={12} className="text-primary" />
+                    <span className="text-xs font-medium text-primary">AEO {pack.aeoScore}/100</span>
+                  </div>
+                </div>
+              </CardContent>
+
+              <CardFooter className="gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="flex-1"
+                  onClick={() => handleCopy(pack.id, pack.preview)}
+                >
+                  {copied === pack.id ? <Check size={14} /> : <Copy size={14} />}
+                  {copied === pack.id ? "Copie" : "Copier"}
+                </Button>
+                <Button size="sm" variant="outline" className="flex-1">
+                  <Download size={14} /> Exporter
+                </Button>
+              </CardFooter>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

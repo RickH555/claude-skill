@@ -1,0 +1,42 @@
+[
+  {
+    "content": "Read PageHeader component to understand interface",
+    "status": "completed",
+    "activeForm": "Reading PageHeader component"
+  },
+  {
+    "content": "Process first batch: Dashboard, Analyze, GenerativeTools, SMCStudio, SourceOfTruth, SchemaOrg",
+    "status": "in_progress",
+    "activeForm": "Processing first batch of pages"
+  },
+  {
+    "content": "Process second batch: RobotsTxt, LlmsTxt, BlogOptimizer, ContentWriter, PublisherRequest, AiCitationSimulator",
+    "status": "pending",
+    "activeForm": "Processing second batch of pages"
+  },
+  {
+    "content": "Process third batch: AnswerFirstAudit, EeatBuilder, AiResponseLayer, AiMonitoring, AlertsAEO, Reputation",
+    "status": "pending",
+    "activeForm": "Processing third batch of pages"
+  },
+  {
+    "content": "Process fourth batch: BotTracking, Directory, Recharge, Clients, Affiliation, MissionOrders",
+    "status": "pending",
+    "activeForm": "Processing fourth batch of pages"
+  },
+  {
+    "content": "Process fifth batch: Messages, History, Integrations, ApiDeveloper",
+    "status": "pending",
+    "activeForm": "Processing fifth batch of pages"
+  },
+  {
+    "content": "Process skip pages (padding only): Results, Projects, DirectoryEntity, Account, ActionPlan, Plan",
+    "status": "pending",
+    "activeForm": "Processing skip pages"
+  },
+  {
+    "content": "Verify build succeeds",
+    "status": "pending",
+    "activeForm": "Verifying build succeeds"
+  }
+]

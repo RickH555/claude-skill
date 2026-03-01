@@ -1,0 +1,131 @@
+# Plan : Coherence d'affichage — Modals & Pages
+
+## Contexte
+
+Seul `GenerationModal` utilise `createPortal`, le scroll lock et un pattern flex robuste. Les 9 autres modals sont rendues inline (risque d'etre coupees par un parent `overflow`), ne verrouillent pas le scroll, et utilisent des z-index incoherents (z-[150], z-[9999]). L'objectif est de standardiser toutes les modals sur le meme pattern que GenerationModal.
+
+## Inventaire des modals
+
+| # | Modal | Fichier | Portal | Scroll Lock | z-index | Problemes |
+|---|-------|---------|--------|-------------|---------|-----------|
+| ✅ | GenerationModal | `components/GenerationModal.tsx` | ✅ | ✅ | z-[100] | Reference |
+| 1 | OnboardingModal | `components/OnboardingModal.tsx` | ❌ | ❌ | z-[150] | z incoherent |
+| 2 | ShortcutsModal | `components/ShortcutsModal.tsx` | ❌ | ❌ | z-[100] | — |
+| 3 | SourceOfTruthModal | `components/SourceOfTruthModal.tsx` | ❌ | ❌ | z-[100] | Header `p-6` trop large, manque `min-h-0` |
+| 4 | Account success | `pages/Account.tsx` (~L903) | ❌ | ❌ | z-[9999] | z excessif |
+| 5 | Plan success | `pages/Plan.tsx` (~L444) | ❌ | ❌ | z-[9999] | z excessif |
+| 6 | Directory alerts (×2) | `pages/Directory.tsx` | ❌ | ❌ | z-50 | — |
+| 7 | MissionOrders proof | `pages/MissionOrders.tsx` (~L823) | ❌ | ❌ | z-50 | — |
+| 8 | Clients modals (×2) | `pages/Clients.tsx` | ❌ | ❌ | z-50 | — |
+
+**CommandPalette** = panneau gere par App.tsx, pas une modal → pas concerne.
+
+## Corrections fichier par fichier
+
+### Pattern standard applique a chaque modal
+
+```tsx
+// 1. Ajouter aux imports
+import { createPortal } from 'react-dom';
+// 2. Ajouter useEffect aux imports React si absent
+
+// 3. Scroll lock
+useEffect(() => {
+  if (isOpen) { document.body.style.overflow = 'hidden'; }
+  return () => { document.body.style.overflow = ''; };
+}, [isOpen]);
+
+// 4. Wrapper fixe standardise
+<div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+  <div className="relative bg-[#0f1115] border border-white/[0.08] rounded-2xl ...">
+    ...
+  </div>
+</div>
+
+// 5. Render via portal
+return createPortal(modalContent, document.body);
+```
+
+---
+
+### 1. `components/OnboardingModal.tsx`
+- Ajouter `import { createPortal } from 'react-dom'` + `useEffect`
+- Ajouter useEffect scroll lock (conditionne sur `show`)
+- z-[150] → z-[100]
+- Backdrop : standardiser a `bg-black/80 backdrop-blur-sm`
+- Wrapper le return avec `createPortal(..., document.body)`
+
+### 2. `components/ShortcutsModal.tsx`
+- Ajouter `import { createPortal } from 'react-dom'` + `useEffect`
+- Ajouter useEffect scroll lock
+- Backdrop : standardiser
+- Wrapper le return avec `createPortal(..., document.body)`
+
+### 3. `components/SourceOfTruthModal.tsx`
+- Ajouter `import { createPortal } from 'react-dom'`
+- Ajouter useEffect scroll lock
+- Header : `p-6` → `px-6 py-4` (coherence GenerationModal)
+- Body content div : ajouter `min-h-0`
+- Wrapper le return avec `createPortal(..., document.body)`
+
+### 4. `pages/Account.tsx` (modal succes ~L903)
+- Ajouter `import { createPortal } from 'react-dom'`
+- Ajouter useEffect scroll lock (conditionne sur `showSuccess`)
+- z-[9999] → z-[100]
+- Remplacer le wrapper `div style={{ position: fixed, ... }}` par le pattern `className="fixed inset-0 z-[100] ..."`
+- Backdrop : standardiser
+- Wrapper le return de la modal avec `createPortal`
+
+### 5. `pages/Plan.tsx` (modal succes ~L444)
+- Meme traitement qu'Account.tsx
+- z-[9999] → z-[100]
+
+### 6. `pages/Directory.tsx` (2 modals : limitAlert + actionPlanAlert)
+- Ajouter `import { createPortal } from 'react-dom'`
+- Ajouter useEffect scroll lock pour chaque modal (conditionne sur les states respectifs)
+- z-50 → z-[100]
+- Backdrop : standardiser
+- Wrapper chaque modal avec `createPortal`
+
+### 7. `pages/MissionOrders.tsx` (modal proof ~L823)
+- Ajouter `import { createPortal } from 'react-dom'`
+- Ajouter useEffect scroll lock
+- z-50 → z-[100]
+- Backdrop : standardiser
+- Wrapper avec `createPortal`
+
+### 8. `pages/Clients.tsx` (2 modals : limitAlert + newClient)
+- Ajouter `import { createPortal } from 'react-dom'`
+- Ajouter useEffect scroll lock
+- z-50 → z-[100]
+- Backdrop : standardiser
+- Wrapper chaque modal avec `createPortal`
+
+## Fichiers modifies (8)
+
+1. `components/OnboardingModal.tsx`
+2. `components/ShortcutsModal.tsx`
+3. `components/SourceOfTruthModal.tsx`
+4. `pages/Account.tsx`
+5. `pages/Plan.tsx`
+6. `pages/Directory.tsx`
+7. `pages/MissionOrders.tsx`
+8. `pages/Clients.tsx`
+
+## Verification
+
+1. `npm run build` → 0 erreurs
+2. Ouvrir chaque modal dans le navigateur :
+   - OnboardingModal : se declenche au premier login
+   - ShortcutsModal : raccourci `?` ou bouton
+   - SourceOfTruthModal : depuis page Source of Truth
+   - Account/Plan success : apres souscription plan
+   - Directory alerts : clic sur actions limitees
+   - MissionOrders proof : upload de preuve
+   - Clients modals : ajout client / alerte limite
+3. Pour chaque modal verifier :
+   - La modal s'affiche correctement centree
+   - Le scroll de la page derriere est verrouille
+   - Le clic sur le backdrop ferme la modal
+   - Le scroll reprend normalement apres fermeture

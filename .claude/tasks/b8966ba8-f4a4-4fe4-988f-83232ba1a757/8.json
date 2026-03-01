@@ -1,0 +1,9 @@
+{
+  "id": "8",
+  "subject": "Task 3-4: Design system + root layout",
+  "description": "Create globals.css with full CitedBy.io design system, theme-context.tsx, utils.ts, root layout with Geist fonts",
+  "activeForm": "Setting up design system",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

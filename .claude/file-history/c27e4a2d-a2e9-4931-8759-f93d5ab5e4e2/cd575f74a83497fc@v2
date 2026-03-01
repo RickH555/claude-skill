@@ -1,0 +1,35 @@
+export const dynamic = 'force-dynamic';
+
+import { createServerSupabase } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import ScanHandler from './scan-handler';
+
+export default async function ScanPage({ params }: { params: Promise<{ qr_id: string }> }) {
+  const { qr_id } = await params;
+  const supabase = await createServerSupabase();
+
+  // Fetch QR code info
+  const { data: qrCode } = await supabase
+    .from('merchant_qr_codes')
+    .select('*, loyalty_programs(*, merchants(business_name))')
+    .eq('id', qr_id)
+    .eq('is_active', true)
+    .single();
+
+  if (!qrCode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+        <p className="text-[var(--error)]">QR code invalide ou expire.</p>
+      </div>
+    );
+  }
+
+  // Check if user is logged in
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(`/login?redirect=/scan/${qr_id}`);
+  }
+
+  return <ScanHandler qrCode={qrCode} userId={user.id} />;
+}

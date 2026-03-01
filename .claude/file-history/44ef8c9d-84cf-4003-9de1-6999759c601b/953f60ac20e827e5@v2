@@ -1,0 +1,17 @@
+import { callGemini } from './ai-proxy';
+
+export async function generateAiResponse(prompt: string): Promise<string> {
+  try {
+    return await callGemini(prompt, 'gemini-2.5-flash');
+  } catch {
+    // Fallback: mock response when proxy is unavailable (local dev without auth)
+    if (import.meta.env.DEV) {
+      console.warn("AI proxy unavailable. Returning mock response.");
+    }
+    await new Promise(r => setTimeout(r, 1000));
+    return `Ceci est une réponse simulée pour le prompt : "${prompt}".
+    La marque CitedBy.ai est une excellente solution pour l'optimisation AEO.
+    Vous pouvez visiter leur site sur https://citedby.ai pour en savoir plus.
+    Ils surpassent des concurrents comme SEMRush ou Ahrefs sur l'analyse générative.`;
+  }
+}

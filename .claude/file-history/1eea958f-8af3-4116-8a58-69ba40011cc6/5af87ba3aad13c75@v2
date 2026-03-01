@@ -1,0 +1,49 @@
+import React from "react";
+import { redirect } from "next/navigation";
+import { Sidebar } from "./sidebar";
+import { WorkspaceProvider } from "@/lib/workspace-context";
+
+export const dynamic = 'force-dynamic';
+
+function shouldUseMockAuth(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return !url || url === 'https://placeholder.supabase.co' || !key || key === 'placeholder';
+}
+
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  let userEmail = 'demo@citedby.ai';
+  let userId = 'mock-user-001';
+
+  if (!shouldUseMockAuth()) {
+    try {
+      const { createClient } = await import("@/lib/supabase/server");
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        redirect('/login');
+      }
+
+      userEmail = user.email || '';
+      userId = user.id;
+    } catch {
+      // Supabase not available, use mock auth
+    }
+  }
+
+  return (
+    <WorkspaceProvider>
+      <div className="flex min-h-screen bg-[#0a0a0f]">
+        <Sidebar user={{ email: userEmail, id: userId }} />
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+    </WorkspaceProvider>
+  );
+}

@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Phase 2: Réparer imports et types",
+  "description": "Vérifier App.tsx, imports des pages, types.ts, compilation TypeScript",
+  "activeForm": "Réparant les imports et types",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

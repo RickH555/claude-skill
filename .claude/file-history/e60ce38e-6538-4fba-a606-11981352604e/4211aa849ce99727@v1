@@ -1,0 +1,55 @@
+import Stripe from 'https://esm.sh/stripe@15.12.0?target=denonext';
+import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, parseJsonBody } from '../_shared/common.ts';
+
+interface PortalPayload {
+  user_id: string;
+}
+
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY manquante');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2024-04-10',
+});
+
+/**
+ * Cree une session Stripe Customer Portal.
+ */
+Deno.serve(async (request: Request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+  try {
+    enforceRateLimit(`portal:${ip}`, 100);
+    if (request.method !== 'POST') {
+      return jsonResponse({ error: 'Method not allowed' }, 405);
+    }
+    const payload = await parseJsonBody<PortalPayload>(request);
+    if (!payload.user_id) {
+      return jsonResponse({ error: 'user_id requis' }, 400);
+    }
+
+    const admin = createAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', payload.user_id)
+      .single<{ stripe_customer_id: string | null }>();
+    if (profileError || !profile?.stripe_customer_id) {
+      throw new Error('Aucun customer Stripe lie a ce compte');
+    }
+
+    const appUrl = Deno.env.get('APP_URL') ?? 'http://localhost:5173';
+    const session = await stripe.billingPortal.sessions.create({
+      customer: profile.stripe_customer_id,
+      return_url: `${appUrl}/reglages`,
+    });
+
+    return jsonResponse({ url: session.url });
+  } catch (error) {
+    return jsonResponse({ error: error instanceof Error ? error.message : 'Erreur portal' }, 500);
+  }
+});

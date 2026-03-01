@@ -1,0 +1,34 @@
+-- ============================================================
+-- CitedBy.ai — Alerts System
+-- Run this after schema.sql
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS alerts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  run_id UUID REFERENCES analysis_runs(id) ON DELETE SET NULL,
+  severity TEXT NOT NULL CHECK (severity IN ('critical', 'warning', 'info', 'success')),
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  action TEXT,
+  is_read BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_alerts_workspace ON alerts(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_alerts_unread ON alerts(workspace_id, is_read) WHERE is_read = FALSE;
+
+ALTER TABLE alerts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Members can view alerts"
+  ON alerts FOR SELECT
+  USING (workspace_id IN (SELECT workspace_id FROM workspace_users WHERE user_id = auth.uid()));
+
+CREATE POLICY "System can create alerts"
+  ON alerts FOR INSERT
+  WITH CHECK (workspace_id IN (SELECT workspace_id FROM workspace_users WHERE user_id = auth.uid() AND role IN ('owner', 'admin', 'editor')));
+
+CREATE POLICY "Members can mark alerts as read"
+  ON alerts FOR UPDATE
+  USING (workspace_id IN (SELECT workspace_id FROM workspace_users WHERE user_id = auth.uid()));

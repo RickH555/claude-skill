@@ -1,0 +1,64 @@
+# ===============================
+# LeadRadar - Frontend (Vite)
+# ===============================
+VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+VITE_APP_URL=http://localhost:5173
+
+# ===============================
+# LeadRadar - Supabase / Edge Functions
+# ===============================
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_FUNCTIONS_URL=https://YOUR_PROJECT.functions.supabase.co
+
+# ===============================
+# Gemini AI
+# ===============================
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+VITE_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+
+# ===============================
+# V3 — Citation Verification Engine
+# ===============================
+VITE_OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+VITE_PERPLEXITY_API_KEY=YOUR_PERPLEXITY_API_KEY
+
+# ===============================
+# Stripe
+# ===============================
+STRIPE_SECRET_KEY=sk_live_or_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_PRICE_CREDITS_20=price_xxx_credits20
+STRIPE_PRICE_CREDITS_50=price_xxx_credits50
+STRIPE_PRICE_CREDITS_120=price_xxx_credits120
+STRIPE_PRICE_CREDITS_300=price_xxx_credits300
+
+# ===============================
+# Email (Resend)
+# ===============================
+RESEND_API_KEY=re_xxx
+RESEND_FROM_EMAIL=LeadRadar <alerts@leadradar.io>
+
+# ===============================
+# App & URLs
+# ===============================
+APP_URL=http://localhost:5173
+DOMAIN=leadradar.io
+
+# ===============================
+# n8n Workflow Sources
+# ===============================
+N8N_WEBHOOK_URL=https://n8n.example.com/webhook/leadradar
+N8N_WEBHOOK_TOKEN=optional_shared_secret
+N8N_LOG_WEBHOOK_URL=https://n8n.example.com/webhook/leadradar-log
+PAP_API_URL=https://api.example.com/pap
+DVF_API_URL=https://api.gouv.fr/dvf
+LINKEDIN_SIGNAL_API_URL=https://api.linkedin.com/v2/search
+LINKEDIN_API_TOKEN=linkedin_token
+SITADEL2_API_URL=https://api.gouv.fr/sitadel2
+BOAMP_API_URL=https://api.boamp.fr/v1
+LEADRADAR_DEFAULT_CITY=Paris
+LEADRADAR_DEFAULT_ZIP=75000
+LEADRADAR_DEFAULT_REGION=Ile-de-France

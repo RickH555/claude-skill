@@ -1,0 +1,818 @@
+import React, { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
+import { User, AnalysisResult, SMCContent, GeneratedSolution } from './types';
+import { analyzeUrl } from './services/analyzer';
+import { db } from './services/database';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Analyze from './pages/Analyze';
+
+// Lazy-loaded pages for bundle optimization
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const GenerativeTools = lazy(() => import('./pages/GenerativeTools'));
+const Results = lazy(() => import('./pages/Results').then(m => ({ default: m.Results })));
+const HistoryView = lazy(() => import('./pages/History'));
+const SMCStudio = lazy(() => import('./pages/SMCStudio'));
+const SourceOfTruth = lazy(() => import('./pages/SourceOfTruth'));
+const SchemaOrg = lazy(() => import('./pages/SchemaOrg'));
+const PublisherRequest = lazy(() => import('./pages/PublisherRequest'));
+const RobotsTxt = lazy(() => import('./pages/RobotsTxt'));
+const Directory = lazy(() => import('./pages/Directory'));
+const DirectoryEntity = lazy(() => import('./pages/DirectoryEntity'));
+const Recharge = lazy(() => import('./pages/Recharge'));
+const Plan = lazy(() => import('./pages/Plan'));
+const Projects = lazy(() => import('./pages/Projects'));
+const Account = lazy(() => import('./pages/Account'));
+const Clients = lazy(() => import('./pages/Clients'));
+const Affiliation = lazy(() => import('./pages/Affiliation'));
+const ContentWriter = lazy(() => import('./pages/ContentWriter'));
+const Reputation = lazy(() => import('./pages/Reputation'));
+const BotTracking = lazy(() => import('./pages/BotTracking'));
+import {
+  LogOut, Zap, Github, Twitter, Linkedin, Home as HomeIcon, LayoutDashboard,
+  Globe, ScanLine, Menu, CreditCard, FolderOpen, FileText, FileCode, History,
+  Fuel, User as UserIcon, PenTool, Code, ClipboardList, ChevronDown, ChevronRight,
+  Archive, CheckSquare, Sparkles, Users, MessageSquare, Bell, ShoppingBag,
+  Settings, Construction, BarChart3, Wrench, Share2, Feather, Shield
+} from 'lucide-react';
+import { I18nProvider, useTranslation, LanguageSelector } from './i18n';
+
+const PLAN_LIMITS = {
+  free: 1,
+  pro: 3,
+  enterprise: 1000 // Illimité en pratique
+};
+
+const App: React.FC = () => {
+  return (
+    <I18nProvider>
+      <AppContent />
+    </I18nProvider>
+  );
+};
+
+const AppContent: React.FC = () => {
+  const { t, tf, locale } = useTranslation();
+  const [currentView, setCurrentView] = useState<'home' | 'analyze' | 'results' | 'directory' | 'directory-entity' | 'login' | 'projects' | 'source-of-truth' | 'robots-txt' | 'history' | 'recharge' | 'account' | 'plan' | 'publisher-request' | 'schema-org' | 'smc-studio' | 'dashboard' | 'generative-tools' | 'clients' | 'affiliation' | 'messages' | 'alerts' | 'content-writer' | 'reputation' | 'bot-tracking'>('home');
+  const [viewHistory, setViewHistory] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0); // Used to force remount of components
+  
+  const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+  const [history, setHistory] = useState<AnalysisResult[]>([]);
+  
+  // Load history from DB on mount
+  useEffect(() => {
+    const loadedHistory = db.getAll();
+    setHistory(loadedHistory);
+  }, []);
+
+  // Bibliothèques de contenu généré
+  const [smcLibrary, setSmcLibrary] = useState<SMCContent[]>([]); 
+  const [truthLibrary, setTruthLibrary] = useState<SMCContent[]>([]);
+  const [schemaLibrary, setSchemaLibrary] = useState<SMCContent[]>([]);
+  const [robotsLibrary, setRobotsLibrary] = useState<SMCContent[]>([]);
+
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [resultsTab, setResultsTab] = useState<'overview' | 'details' | 'archives' | 'recommendations'>('overview');
+  const [publisherRequestData, setPublisherRequestData] = useState<{ topic: string, url: string, brief: string } | null>(null);
+  const [initialRechargePackId, setInitialRechargePackId] = useState<number | null>(null);
+  const [initialPlanTab, setInitialPlanTab] = useState<'my-plan' | 'pricing' | 'billing'>('my-plan');
+  
+  // État pour gérer l'ouverture des sections du menu (Accordion exclusif)
+  const [sectionsState, setSectionsState] = useState({
+    optimization: false,
+    tools: false
+  });
+
+  // Default user is NULL to allow testing the login flow
+  const [user, setUser] = useState<User | null>(null);
+
+  // Calcul du nombre de projets consommé sur le mois en cours (Renouvellement mensuel)
+  const monthlyProjectCount = useMemo(() => {
+    if (history.length === 0) return 0;
+
+    // Définir le début du cycle de facturation (simulé au 1er du mois courant)
+    const now = new Date();
+    const billingCycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // 1. Identifier la date de création (première analyse) de chaque domaine
+    const projectCreationDates = new Map<string, Date>();
+    
+    history.forEach(h => {
+        let hostname;
+        try { hostname = new URL(h.url).hostname; } catch(e) { hostname = h.url; }
+        
+        const analysisDate = new Date(h.timestamp);
+        
+        if (!projectCreationDates.has(hostname)) {
+            projectCreationDates.set(hostname, analysisDate);
+        } else {
+            // On garde la date la plus ancienne trouvée pour ce domaine
+            if (analysisDate < projectCreationDates.get(hostname)!) {
+                projectCreationDates.set(hostname, analysisDate);
+            }
+        }
+    });
+
+    // 2. Compter uniquement les projets dont la "création" est postérieure au début du cycle
+    let count = 0;
+    projectCreationDates.forEach((creationDate) => {
+        if (creationDate >= billingCycleStart) {
+            count++;
+        }
+    });
+    
+    return count;
+  }, [history]);
+
+  const navigateTo = (view: typeof currentView) => {
+    // Si on navigue vers autre chose que recharge, on reset l'ID du pack
+    if (view !== 'recharge') {
+        setInitialRechargePackId(null);
+    }
+    // Reset l'onglet du plan si on ne va pas vers le plan
+    if (view !== 'plan') {
+        setInitialPlanTab('my-plan');
+    }
+    setViewHistory(prev => [...prev, currentView]);
+    setCurrentView(view);
+    setRefreshKey(prev => prev + 1); // Force remount to reset internal state of views
+  };
+
+  const goBack = () => {
+    if (viewHistory.length > 0) {
+      const newHistory = [...viewHistory];
+      const prevView = newHistory.pop();
+      setViewHistory(newHistory);
+      if (prevView) {
+        setCurrentView(prevView as any);
+        setRefreshKey(prev => prev + 1);
+      }
+    } else {
+      setCurrentView('home'); // Default fallback
+      setRefreshKey(prev => prev + 1);
+    }
+  };
+
+  const toggleSection = (section: keyof typeof sectionsState) => {
+    setSectionsState(prev => {
+      const isAlreadyOpen = prev[section];
+      return {
+        optimization: false,
+        tools: false,
+        [section]: !isAlreadyOpen
+      };
+    });
+  };
+
+  const handleHomeClick = () => {
+    navigateTo('home');
+    setSectionsState({
+      optimization: false,
+      tools: false
+    });
+  };
+
+  const handleDashboardClick = () => {
+    navigateTo('dashboard');
+    setSectionsState({
+      optimization: false,
+      tools: false
+    });
+  };
+
+  const handleRechargeClick = () => {
+    navigateTo('recharge');
+    setSectionsState({
+      optimization: false,
+      tools: false
+    });
+  };
+
+  const handleDirectRecharge = (packId: number) => {
+    setInitialRechargePackId(packId);
+    navigateTo('recharge');
+  };
+
+  const handleAnalyze = async (url: string) => {
+    // Vérification de la limite de projets (Quota mensuel)
+    if (user) {
+        const limit = PLAN_LIMITS[user.plan] || 1;
+        let hostname = url;
+        try { hostname = new URL(url).hostname; } catch(e) {}
+
+        // On vérifie si c'est un projet déjà existant dans l'historique global
+        const isExistingProject = history.some(h => {
+            try { return new URL(h.url).hostname === hostname; } 
+            catch(e) { return false; }
+        });
+
+        // Si c'est un tout nouveau projet et qu'on a atteint la limite MENSUELLE
+        // Les anciens projets ne comptent pas dans cette limite
+        if (!isExistingProject && monthlyProjectCount >= limit) {
+            // Redirection directe vers la page Plan
+            alert(`Limite de nouveaux projets atteinte pour ce mois (${monthlyProjectCount}/${limit}). Passez au plan supérieur pour ajouter plus de projets.`);
+            navigateTo('plan');
+            return;
+        }
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const result = await analyzeUrl(url);
+      setAnalysisData(result);
+      
+      // Update history via DB service
+      const updatedHistory = db.add(result);
+      setHistory(updatedHistory);
+      
+      // Redirection vers Monitoring AEO (Projects)
+      navigateTo('projects');
+      setSectionsState({
+        optimization: false,
+        tools: false
+      });
+    } catch (error) {
+      console.error("Analysis failed", error);
+      alert("Erreur lors de l'analyse. Veuillez réessayer.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // Used for Admin/User private analysis view
+  const handleViewAnalysis = (result: AnalysisResult, tab: any = 'overview') => {
+    setAnalysisData(result);
+    setResultsTab(tab);
+    // Redirect to Projects (Monitoring AEO) instead of Results (Report)
+    navigateTo('projects');
+    setSectionsState({
+        optimization: true,
+        tools: false
+    });
+  };
+
+  // New handler for Public Directory View
+  const handleViewDirectoryEntity = (result: AnalysisResult) => {
+    setAnalysisData(result);
+    navigateTo('directory-entity');
+  };
+
+  const handleSubMenuNavigation = (tab: 'overview' | 'details' | 'archives') => {
+    if (analysisData) {
+      setResultsTab(tab);
+      navigateTo('results');
+    } else if (history.length > 0) {
+      handleViewAnalysis(history[0], tab);
+    } else {
+      alert("Veuillez d'abord lancer une analyse pour accéder au plan d'actions.");
+      navigateTo('analyze');
+    }
+  };
+
+  const handleUpdateAnalysis = (index: number, updatedData: Partial<AnalysisResult>) => {
+    const updatedHistory = db.update(index, updatedData);
+    setHistory(updatedHistory);
+  };
+
+  const handleSaveSolution = useCallback((analysisId: string, recommendationId: string, solution: GeneratedSolution) => {
+    const timestamp = new Date().toISOString();
+    const solutionWithMeta = { ...solution, timestamp };
+
+    setAnalysisData(prev => {
+        if (!prev || prev.timestamp !== analysisId) return prev;
+        
+        return {
+            ...prev,
+            generatedSolutions: {
+                ...(prev.generatedSolutions || {}),
+                [recommendationId]: solutionWithMeta
+            }
+        };
+    });
+
+    // We need to find the index in the history to update the DB
+    setHistory(prevHistory => {
+        const index = prevHistory.findIndex(item => item.timestamp === analysisId);
+        if (index !== -1) {
+            const updatedItem = {
+                ...prevHistory[index],
+                generatedSolutions: {
+                    ...(prevHistory[index].generatedSolutions || {}),
+                    [recommendationId]: solutionWithMeta
+                }
+            };
+            // Persist using db service
+            const newHistory = [...prevHistory];
+            newHistory[index] = updatedItem;
+            // Note: calling db.update relies on index which matches prevHistory order if initialized from DB
+            db.update(index, updatedItem);
+            return newHistory;
+        }
+        return prevHistory;
+    });
+  }, []); 
+
+  // Helpers pour ajouter du contenu aux bibliothèques
+  const handleAddToSmcLibrary = (item: SMCContent) => setSmcLibrary(prev => [item, ...prev]);
+  const handleAddToTruthLibrary = (item: SMCContent) => setTruthLibrary(prev => [item, ...prev]);
+  const handleAddToSchemaLibrary = (item: SMCContent) => setSchemaLibrary(prev => [item, ...prev]);
+  const handleAddToRobotsLibrary = (item: SMCContent) => setRobotsLibrary(prev => [item, ...prev]);
+
+  const handleNavigateToPublisher = (data: { topic: string, url: string, brief: string }) => {
+    setPublisherRequestData(data);
+    navigateTo('publisher-request');
+  };
+
+  const handleNavigateToDirectory = () => {
+    navigateTo('directory');
+  };
+
+  const handleDeductCredits = (amount: number): boolean => {
+    if (!user) {
+        if(confirm("Vous devez être connecté pour effectuer cette action. Se connecter maintenant ?")) {
+            navigateTo('login');
+        }
+        return false;
+    }
+    
+    if (user.credits < amount) {
+        // Redirection explicite vers la section GTO Gas (Recharge)
+        alert(`Solde GTO Gas insuffisant pour générer cette solution.\n\nIl vous manque ${amount - user.credits} crédits.\n\nRedirection vers la station de recharge...`);
+        navigateTo('recharge');
+        return false;
+    }
+    
+    setUser(prev => prev ? { ...prev, credits: prev.credits - amount } : null);
+    return true;
+  };
+
+  const handleRecharge = (amount: number, planLevel: 'free' | 'pro' | 'enterprise') => {
+    if (!user) return;
+    
+    setUser({ 
+        ...user, 
+        credits: user.credits + amount,
+        plan: planLevel 
+    });
+    
+    // Si c'est une recharge depuis la page de recharge, on ne force pas le retour, l'UX est gérée dans Recharge.tsx
+  };
+
+  const handleUpgradePlan = (newPlan: 'free' | 'pro' | 'enterprise') => {
+    if (!user) return;
+    setUser({ ...user, plan: newPlan });
+  };
+
+  const handleLogin = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    // On réinitialise l'historique pour éviter que le bouton retour ne renvoie au login
+    // et on force la navigation vers le dashboard
+    setViewHistory(['home']); 
+    setCurrentView('analyze'); // Redirection vers Nouvel Audit
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCurrentView('home');
+    setViewHistory([]);
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const NavItem = ({ view, label, icon: Icon, onClick, active }: { view?: typeof currentView, label: string, icon: React.ElementType, onClick?: () => void, active?: boolean }) => {
+    const handleClick = onClick ? onClick : () => view && navigateTo(view);
+    const isActive = active !== undefined ? active : (view && currentView === view);
+    
+    return (
+      <button 
+        onClick={handleClick}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base transition-all duration-200 group font-serif tracking-wide ${
+          isActive
+            ? 'bg-white/10 text-primary font-bold border border-white/5 shadow-sm' 
+            : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'
+        }`}
+      >
+        <Icon size={18} className={isActive ? "text-primary" : "text-gray-500 group-hover:text-white"} />
+        <span className="">{label}</span>
+      </button>
+    );
+  };
+
+  const PlaceholderView = ({ title, icon: Icon }: { title: string, icon: React.ElementType }) => (
+    <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 animate-in fade-in zoom-in duration-300">
+      <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white/10">
+        <Icon size={48} className="text-gray-500 opacity-50" />
+      </div>
+      <h2 className="text-3xl font-serif font-bold text-white mb-4">{title}</h2>
+      <p className="text-gray-400 max-w-md mb-8">
+        {t.common.featureInDev}
+      </p>
+      <button
+        onClick={() => navigateTo('dashboard')}
+        className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all flex items-center gap-2 font-medium"
+      >
+        <LayoutDashboard size={18} /> {t.common.returnToDashboard}
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans text-gray-100 selection:bg-primary/30 bg-[#050208]">
+      {/* Top Navigation Bar */}
+      <nav className="border-b border-purple-500/10 bg-[#050208]/80 backdrop-blur-md sticky top-0 z-50 h-16">
+        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+          <div 
+            className="flex items-center gap-2 cursor-pointer" 
+            onClick={() => navigateTo('home')}
+          >
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold font-serif text-xl shadow-lg shadow-purple-500/30">
+              C
+            </div>
+            <span className="font-serif text-xl font-bold tracking-tight hidden sm:block text-white">CitedBy.ai</span>
+          </div>
+
+          <div className="flex items-center gap-6">
+            {user ? (
+              <div className="flex items-center gap-4">
+                <LanguageSelector compact />
+                <button
+                  onClick={() => navigateTo('recharge')}
+                  className="hidden md:flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 hover:border-primary/50 hover:bg-primary/10 transition-colors group"
+                  title="Recharger GTO Gas"
+                >
+                  <Fuel size={14} className="text-primary fill-primary group-hover:animate-pulse" />
+                  <span className="text-sm font-bold text-white group-hover:text-primary">{user.credits}</span>
+                </button>
+                <div className="h-8 w-px bg-white/10 hidden md:block"></div>
+                <div className="flex items-center gap-3">
+                   <div 
+                     className="text-right hidden sm:block cursor-pointer"
+                     onClick={() => navigateTo('account')}
+                   >
+                     <p className="text-sm font-medium text-white leading-none hover:text-primary transition-colors">{user.name}</p>
+                     <p className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">{user.plan.toUpperCase()}</p>
+                   </div>
+                   <button 
+                    title="Mon Compte" 
+                    onClick={() => navigateTo('account')} 
+                    className="w-9 h-9 rounded-full bg-surface border border-white/10 text-white font-bold flex items-center justify-center hover:border-primary transition-colors"
+                   >
+                     {user.name.charAt(0).toUpperCase()}
+                   </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <LanguageSelector compact />
+                <button
+                  onClick={() => navigateTo('login')}
+                  className="text-sm font-bold bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-400 hover:to-violet-500 px-5 py-2 rounded-lg transition-all shadow-[0_0_20px_rgba(168,85,247,0.25)]"
+                >
+                  {t.nav.login}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <div className="flex-grow flex flex-col md:flex-row max-w-7xl mx-auto w-full relative">
+        {user && (
+          <aside className="hidden md:flex w-72 flex-col pr-6 py-6 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="bg-[#0c0815] border border-purple-500/10 rounded-2xl p-4 space-y-2 shadow-2xl shadow-purple-950/20 overflow-y-auto custom-scrollbar">
+               
+               <NavItem label={t.nav.home} icon={HomeIcon} view="home" />
+               <NavItem label={t.nav.newAudit} icon={ScanLine} view="analyze" />
+               <NavItem label={t.nav.dashboard} icon={LayoutDashboard} view="dashboard" />
+               <NavItem label={t.nav.monitoringAEO} icon={Wrench} view="projects" active={['projects', 'results'].includes(currentView)} />
+               <NavItem label={t.nav.generativeTools} icon={Sparkles} view="generative-tools" active={['generative-tools', 'smc-studio', 'source-of-truth', 'schema-org', 'robots-txt', 'content-writer', 'reputation', 'bot-tracking'].includes(currentView)} />
+               <NavItem label={t.nav.indexedDirectory} icon={Globe} view="directory" active={['directory', 'directory-entity'].includes(currentView)} />
+               <NavItem label={t.nav.gtoGas} icon={Fuel} view="recharge" />
+               <NavItem label={t.nav.affiliation} icon={Share2} view="affiliation" />
+
+               <div className="my-4 border-t border-white/10 mx-4"></div>
+
+               <NavItem label={t.nav.planBilling} icon={CreditCard} view="plan" />
+               <NavItem label={t.nav.myAccount} icon={UserIcon} view="account" />
+            </div>
+          </aside>
+        )}
+
+        <main className="flex-1 w-full min-w-0 pb-20 md:pb-0">
+          <Suspense fallback={<div className="flex items-center justify-center h-[60vh]"><div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div></div>}>
+          {currentView === 'home' && (
+            <Home 
+                key={`home-${refreshKey}`}
+                onNavigate={(view) => navigateTo(view)} 
+                user={user} 
+                onDirectRecharge={handleDirectRecharge}
+            />
+          )}
+
+          {currentView === 'login' && (
+            <Login key={`login-${refreshKey}`} onLogin={handleLogin} onBack={goBack} />
+          )}
+
+          {currentView === 'dashboard' && (
+            <Dashboard 
+                key={`dashboard-${refreshKey}`}
+                onBack={goBack} 
+                history={history} 
+                onView={handleViewAnalysis}
+                onNavigate={navigateTo}
+            />
+          )}
+
+          {currentView === 'generative-tools' && (
+            <GenerativeTools key={`generative-tools-${refreshKey}`} onNavigate={navigateTo} />
+          )}
+
+          {currentView === 'analyze' && (
+            <Analyze key={`analyze-${refreshKey}`} onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+          )}
+          
+          {currentView === 'results' && analysisData && (
+            <Results 
+              key={`results-${refreshKey}`}
+              data={analysisData} 
+              onBack={goBack} 
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              onSaveSolution={handleSaveSolution}
+              initialTab={resultsTab as any}
+              onNewAnalysis={() => navigateTo('analyze')}
+            />
+          )}
+
+          {currentView === 'history' && (
+            <HistoryView
+              key={`history-${refreshKey}`}
+              onBack={goBack}
+              history={history}
+              onView={handleViewAnalysis}
+            />
+          )}
+
+          {currentView === 'smc-studio' && (
+            <SMCStudio 
+              key={`smc-studio-${refreshKey}`}
+              onBack={goBack} 
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              library={smcLibrary}
+              onAddToLibrary={handleAddToSmcLibrary}
+              onNavigateToPublisher={handleNavigateToPublisher}
+              onNavigateToDirectory={handleNavigateToDirectory}
+            />
+          )}
+
+          {currentView === 'source-of-truth' && (
+            <SourceOfTruth 
+              key={`source-of-truth-${refreshKey}`}
+              onBack={goBack} 
+              history={history}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              savedFiles={truthLibrary}
+              onSaveFile={handleAddToTruthLibrary}
+            />
+          )}
+
+          {currentView === 'schema-org' && (
+            <SchemaOrg 
+              key={`schema-org-${refreshKey}`}
+              onBack={goBack} 
+              history={history}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              savedFiles={schemaLibrary}
+              onSaveFile={handleAddToSchemaLibrary}
+            />
+          )}
+
+          {currentView === 'publisher-request' && (
+            <PublisherRequest 
+              key={`publisher-request-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              data={publisherRequestData}
+            />
+          )}
+
+          {currentView === 'robots-txt' && (
+            <RobotsTxt 
+              key={`robots-txt-${refreshKey}`}
+              onBack={goBack} 
+              history={history}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+              onUpdateAnalysis={handleUpdateAnalysis}
+              savedFiles={robotsLibrary}
+              onSaveFile={handleAddToRobotsLibrary}
+            />
+          )}
+
+          {currentView === 'directory' && (
+            <Directory 
+              key={`directory-${refreshKey}`}
+              onBack={goBack} 
+              onViewEntity={handleViewDirectoryEntity}
+              onNavigateToPlan={() => {
+                setInitialPlanTab('pricing');
+                navigateTo('plan');
+              }}
+            />
+          )}
+
+          {/* Nouvelle vue Directory Entity (Public Profile) */}
+          {currentView === 'directory-entity' && analysisData && (
+            <DirectoryEntity 
+              key={`directory-entity-${refreshKey}`}
+              data={analysisData}
+              onBack={goBack}
+            />
+          )}
+
+          {currentView === 'recharge' && (
+            <Recharge 
+              key={`recharge-${refreshKey}`}
+              onBack={goBack} 
+              onRecharge={handleRecharge}
+              user={user}
+              onNavigate={navigateTo} 
+              initialPackId={initialRechargePackId}
+            />
+          )}
+
+          {currentView === 'plan' && (
+            <Plan 
+              key={`plan-${refreshKey}`}
+              onBack={goBack} 
+              user={user}
+              onUpgrade={handleUpgradePlan}
+              initialTab={initialPlanTab}
+            />
+          )}
+
+          {currentView === 'projects' && (
+            <Projects 
+              key={`projects-${refreshKey}`}
+              onBack={goBack} 
+              onNavigateToAnalysis={() => navigateTo('analyze')}
+              user={user}
+              history={history}
+              onViewAnalysis={handleViewAnalysis}
+              projectCount={monthlyProjectCount}
+              maxProjects={user ? PLAN_LIMITS[user.plan] : 1}
+              onNavigateToPlan={() => navigateTo('plan')}
+              onDeductCredits={handleDeductCredits}
+              onSaveSolution={handleSaveSolution}
+              onNewAnalysis={() => navigateTo('analyze')}
+              onNavigateToRecharge={() => navigateTo('recharge')}
+              initialUrl={analysisData?.url}
+              initialTab={resultsTab}
+            />
+          )}
+
+          {currentView === 'account' && (
+            <Account 
+              key={`account-${refreshKey}`}
+              user={user} 
+              onLogout={handleLogout}
+              onNavigate={navigateTo}
+            />
+          )}
+
+          {/* Client Database View */}
+          {currentView === 'clients' && (
+            <Clients 
+              key={`clients-${refreshKey}`}
+              onBack={goBack}
+              onNavigate={navigateTo}
+            />
+          )}
+
+          {/* Affiliation Database View */}
+          {currentView === 'affiliation' && (
+            <Affiliation
+              key={`affiliation-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+
+          {/* AI Content Writer B2B */}
+          {currentView === 'content-writer' && (
+            <ContentWriter
+              key={`content-writer-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* Reputation & Sentiment IA */}
+          {currentView === 'reputation' && (
+            <Reputation
+              key={`reputation-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+              onDeductCredits={handleDeductCredits}
+            />
+          )}
+
+          {/* Bot Tracking - Activation & Suivi des Bots IA */}
+          {currentView === 'bot-tracking' && (
+            <BotTracking
+              key={`bot-tracking-${refreshKey}`}
+              onBack={goBack}
+              user={user}
+            />
+          )}
+
+          {/* Placeholders pour les nouvelles sections */}
+          {currentView === 'messages' && <PlaceholderView title="Messagerie" icon={MessageSquare} />}
+          {currentView === 'alerts' && <PlaceholderView title="Alertes AEO" icon={Bell} />}
+          </Suspense>
+        </main>
+      </div>
+
+      {user && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#050208]/90 backdrop-blur-lg border-t border-purple-500/10 z-50 pb-safe">
+          <div className="flex justify-around items-center h-16 px-2">
+            {[
+              { view: 'dashboard', icon: LayoutDashboard, label: t.nav.dash },
+              { view: 'projects', icon: FolderOpen, label: t.nav.projects },
+              { view: 'analyze', icon: ScanLine, label: t.nav.audit },
+              { view: 'account', icon: UserIcon, label: t.nav.account }
+            ].map((item) => (
+              <button
+                key={item.view}
+                onClick={() => navigateTo(item.view as any)}
+                className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
+                  currentView === item.view ? 'text-primary' : 'text-gray-500'
+                }`}
+              >
+                <item.icon size={20} className={currentView === item.view ? 'fill-primary/20' : ''} />
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <footer className={`border-t border-purple-500/10 bg-[#030106] mt-auto ${user ? 'pb-20 md:pb-0' : ''}`}>
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="grid md:grid-cols-4 gap-12 mb-12">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold font-serif text-xl">
+                  C
+                </div>
+                <span className="font-serif text-xl font-bold tracking-tight text-white">CitedBy.ai</span>
+              </div>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                {t.footer.tagline}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-white mb-6">{t.footer.product}</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><button onClick={() => navigateTo('analyze')} className="hover:text-primary transition-colors text-left">{t.footer.freeAudit}</button></li>
+                <li><button onClick={() => navigateTo('directory')} className="hover:text-primary transition-colors text-left">{t.footer.indexDirectory}</button></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.devApi}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-white mb-6">{t.footer.aeoResources}</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.schemaGuide}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.llmFunctioning}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.aiComparison}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.techBlog}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-white mb-6">{t.footer.company}</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.about}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.contact}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.legal}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.privacy}</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+            <p>{t.footer.copyright}</p>
+            <div className="flex gap-2 items-center mt-4 md:mt-0">
+               <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+               {t.common.operationalSystems}
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;

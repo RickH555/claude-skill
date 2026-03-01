@@ -1,0 +1,12 @@
+import PageHeader from '@/components/layout/PageHeader';
+import ProgramForm from '@/components/merchant/ProgramForm';
+
+export default function NewProgramPage() {
+  // MVP: use a placeholder merchant ID; will be replaced with real auth
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Nouveau programme" description="Créez un programme de fidélité." />
+      <ProgramForm merchantId="placeholder" />
+    </div>
+  );
+}

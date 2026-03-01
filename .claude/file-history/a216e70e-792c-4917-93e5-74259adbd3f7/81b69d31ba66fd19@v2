@@ -1,0 +1,384 @@
+import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { Search, Star, Filter, X, Shield, Award, CheckCircle, Clock, Users, Globe, ExternalLink, ShoppingBag, ChevronDown, MapPin, Calendar, Briefcase, TrendingUp, Zap, ArrowRight, Check } from 'lucide-react';
+import { User } from '../types';
+import { Agency, MarketplaceService, MarketplaceReview, Purchase } from '../types/marketplace';
+import { MOCK_AGENCIES, MOCK_SERVICES, MOCK_REVIEWS, MOCK_PURCHASES, getReviewsByAgency, getReviewsByService, getServicesByAgency } from '../services/marketplace';
+
+interface MarketplaceAgenceProps {
+  onBack: () => void;
+  user: User | null;
+}
+
+const MarketplaceAgence: React.FC<MarketplaceAgenceProps> = ({ onBack, user }) => {
+  const [activeTab, setActiveTab] = useState<'agencies' | 'services' | 'purchases'>('agencies');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCertification, setSelectedCertification] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  // Modals
+  const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
+  const [selectedService, setSelectedService] = useState<MarketplaceService | null>(null);
+  const [showPurchaseConfirm, setShowPurchaseConfirm] = useState(false);
+  const [purchaseOption, setPurchaseOption] = useState<'standard' | 'premium'>('standard');
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+
+  const agencies = MOCK_AGENCIES;
+  const services = MOCK_SERVICES;
+  const purchases = MOCK_PURCHASES;
+
+  const filteredAgencies = useMemo(() => {
+    return agencies.filter(a => {
+      const matchesSearch = a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCert = selectedCertification === 'all' || a.certification === selectedCertification;
+      return matchesSearch && matchesCert;
+    });
+  }, [agencies, searchQuery, selectedCertification]);
+
+  const filteredServices = useMemo(() => {
+    return services.filter(s => {
+      const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCat = selectedCategory === 'all' || s.category === selectedCategory;
+      return matchesSearch && matchesCat;
+    });
+  }, [services, searchQuery, selectedCategory]);
+
+  const getCertBadge = (cert: string) => {
+    switch (cert) {
+      case 'gold': return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/20"><Award size={10} /> Gold</span>;
+      case 'silver': return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-400/20 text-gray-300 border border-gray-400/20"><Award size={10} /> Silver</span>;
+      case 'bronze': return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-700/20 text-orange-400 border border-orange-700/20"><Award size={10} /> Bronze</span>;
+      default: return null;
+    }
+  };
+
+  const renderStars = (rating: number) => (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star key={i} size={12} className={i <= Math.round(rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-700'} />
+      ))}
+    </div>
+  );
+
+  const handlePurchase = () => {
+    setPurchaseSuccess(true);
+    setTimeout(() => { setPurchaseSuccess(false); setShowPurchaseConfirm(false); setSelectedService(null); }, 2500);
+  };
+
+  // ── AGENCY MODAL ──
+  const AgencyModal = selectedAgency && createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setSelectedAgency(null)}>
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#13131d] border border-white/[0.1] rounded-2xl shadow-2xl" onClick={e => e.stopPropagation()}>
+        <button onClick={() => setSelectedAgency(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white z-10"><X size={18} /></button>
+        <div className="p-8">
+          <div className="flex items-start gap-5 mb-6">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-700/20 border border-amber-500/20 flex items-center justify-center text-2xl shrink-0">{selectedAgency.logo}</div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-xl font-bold text-white">{selectedAgency.name}</h2>
+                {getCertBadge(selectedAgency.certification)}
+              </div>
+              <div className="flex items-center gap-3 text-sm text-gray-400">
+                {renderStars(selectedAgency.rating)}
+                <span>{selectedAgency.rating.toFixed(1)} ({selectedAgency.reviewCount} avis)</span>
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-400 text-sm leading-relaxed mb-6">{selectedAgency.description}</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="p-3 bg-white/[0.03] rounded-xl border border-white/[0.06] text-center"><div className="text-lg font-bold text-white">{selectedAgency.completedProjects}</div><div className="text-[10px] text-gray-500">Projets</div></div>
+            <div className="p-3 bg-white/[0.03] rounded-xl border border-white/[0.06] text-center"><div className="text-lg font-bold text-amber-400">{selectedAgency.satisfactionRate}%</div><div className="text-[10px] text-gray-500">Satisfaction</div></div>
+            <div className="p-3 bg-white/[0.03] rounded-xl border border-white/[0.06] text-center"><div className="text-lg font-bold text-white">{selectedAgency.avgDeliveryDays}j</div><div className="text-[10px] text-gray-500">D\u00e9lai moyen</div></div>
+            <div className="p-3 bg-white/[0.03] rounded-xl border border-white/[0.06] text-center"><div className="text-lg font-bold text-white">{selectedAgency.memberSince}</div><div className="text-[10px] text-gray-500">Membre depuis</div></div>
+          </div>
+
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-white mb-2">Sp\u00e9cialit\u00e9s</h4>
+            <div className="flex flex-wrap gap-2">
+              {selectedAgency.specialties.map(s => <span key={s} className="px-3 py-1 text-[11px] bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">{s}</span>)}
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-white mb-3">Services propos\u00e9s</h4>
+            <div className="space-y-2">
+              {services.filter(s => s.agencyId === selectedAgency.id).map(s => (
+                <button key={s.id} onClick={() => { setSelectedAgency(null); setSelectedService(s); }} className="w-full text-left p-3 bg-white/[0.02] border border-white/[0.06] rounded-xl hover:bg-white/[0.04] transition-colors flex items-center justify-between">
+                  <div><div className="text-sm font-medium text-white">{s.name}</div><div className="text-[10px] text-gray-500">{s.category}</div></div>
+                  <div className="text-sm font-bold text-amber-400">{s.price}\u20ac</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-bold text-white mb-3">Avis clients</h4>
+            <div className="space-y-3">
+              {getReviewsByAgency(selectedAgency.id).map(r => (
+                <div key={r.id} className="p-3 bg-white/[0.02] border border-white/[0.06] rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2"><span className="text-sm font-medium text-white">{r.authorName}</span>{renderStars(r.rating)}</div>
+                    <span className="text-[10px] text-gray-600">{r.date}</span>
+                  </div>
+                  <p className="text-xs text-gray-400">{r.comment}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {selectedAgency.website && (
+            <a href={selectedAgency.website} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 text-sm text-amber-400 hover:text-amber-300"><ExternalLink size={14} /> Visiter le site</a>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+
+  // ── SERVICE MODAL ──
+  const ServiceModal = selectedService && !showPurchaseConfirm && createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setSelectedService(null)}>
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#13131d] border border-white/[0.1] rounded-2xl shadow-2xl" onClick={e => e.stopPropagation()}>
+        <button onClick={() => setSelectedService(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white z-10"><X size={18} /></button>
+        <div className="p-8">
+          <div className="mb-6">
+            {selectedService.popular && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/20 mb-3"><Zap size={10} /> Populaire</span>}
+            <h2 className="text-xl font-bold text-white mb-1">{selectedService.name}</h2>
+            <p className="text-sm text-gray-500">par <span className="text-amber-400">{selectedService.agencyName}</span></p>
+          </div>
+          <p className="text-gray-400 text-sm leading-relaxed mb-6">{selectedService.description}</p>
+
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-white mb-2">Inclus dans le service</h4>
+            <ul className="space-y-2">
+              {selectedService.includes.map((inc, i) => <li key={i} className="flex items-center gap-2 text-sm text-gray-400"><Check size={14} className="text-amber-400 shrink-0" />{inc}</li>)}
+            </ul>
+          </div>
+
+          <div className="flex items-center gap-4 mb-6 text-sm text-gray-500">
+            <span className="flex items-center gap-1"><Clock size={14} /> {selectedService.deliveryDays} jours</span>
+            <span className="flex items-center gap-1">{renderStars(selectedService.rating)} {selectedService.rating.toFixed(1)}</span>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-6">
+            {selectedService.tags.map(t => <span key={t} className="px-2 py-0.5 text-[10px] bg-white/[0.04] border border-white/[0.06] rounded-full text-gray-500">{t}</span>)}
+          </div>
+
+          {/* Pricing Options */}
+          <div className="space-y-3 mb-6">
+            <button onClick={() => { setPurchaseOption('standard'); setShowPurchaseConfirm(true); }} className="w-full p-4 bg-white/[0.03] border border-white/[0.08] rounded-xl text-left hover:border-amber-500/30 transition-all flex items-center justify-between group">
+              <div><div className="text-sm font-bold text-white">Standard</div><div className="text-xs text-gray-500">Livraison en {selectedService.deliveryDays} jours</div></div>
+              <div className="text-lg font-bold text-amber-400">{selectedService.price}\u20ac</div>
+            </button>
+            {selectedService.premiumPrice && (
+              <button onClick={() => { setPurchaseOption('premium'); setShowPurchaseConfirm(true); }} className="w-full p-4 bg-amber-500/[0.05] border border-amber-500/20 rounded-xl text-left hover:border-amber-500/40 transition-all flex items-center justify-between group">
+                <div><div className="text-sm font-bold text-white flex items-center gap-2">Premium <Zap size={12} className="text-amber-400" /></div><div className="text-xs text-gray-500">Livraison prioritaire + suivi</div></div>
+                <div className="text-lg font-bold text-amber-300">{selectedService.premiumPrice}\u20ac</div>
+              </button>
+            )}
+          </div>
+
+          <div>
+            <h4 className="text-sm font-bold text-white mb-3">Avis</h4>
+            <div className="space-y-2">
+              {getReviewsByService(selectedService.id).slice(0, 3).map(r => (
+                <div key={r.id} className="p-3 bg-white/[0.02] border border-white/[0.06] rounded-xl">
+                  <div className="flex items-center gap-2 mb-1"><span className="text-sm font-medium text-white">{r.authorName}</span>{renderStars(r.rating)}</div>
+                  <p className="text-xs text-gray-400">{r.comment}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+
+  // ── PURCHASE CONFIRM MODAL ──
+  const PurchaseConfirmModal = showPurchaseConfirm && selectedService && createPortal(
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4" onClick={() => { setShowPurchaseConfirm(false); setPurchaseSuccess(false); }}>
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      <div className="relative w-full max-w-md bg-[#13131d] border border-white/[0.1] rounded-2xl shadow-2xl p-8" onClick={e => e.stopPropagation()}>
+        {purchaseSuccess ? (
+          <div className="text-center py-4 animate-in fade-in zoom-in duration-300">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4"><CheckCircle size={32} className="text-green-400" /></div>
+            <h3 className="text-xl font-bold text-white mb-2">Commande confirm\u00e9e !</h3>
+            <p className="text-gray-400 text-sm">L'agence a \u00e9t\u00e9 notifi\u00e9e et vous contactera sous 24h.</p>
+          </div>
+        ) : (
+          <>
+            <h3 className="text-lg font-bold text-white mb-4">Confirmer l'achat</h3>
+            <div className="p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl mb-4">
+              <div className="text-sm font-medium text-white">{selectedService.name}</div>
+              <div className="text-xs text-gray-500 mt-1">par {selectedService.agencyName}</div>
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.06]">
+                <span className="text-sm text-gray-400">Option {purchaseOption}</span>
+                <span className="text-lg font-bold text-amber-400">{purchaseOption === 'premium' && selectedService.premiumPrice ? selectedService.premiumPrice : selectedService.price}\u20ac</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => { setShowPurchaseConfirm(false); setPurchaseSuccess(false); }} className="flex-1 py-2.5 rounded-full border border-white/[0.1] text-gray-300 font-medium hover:bg-white/[0.04] transition-all text-sm">Annuler</button>
+              <button onClick={handlePurchase} className="flex-1 btn-gradient py-2.5 font-bold text-sm flex items-center justify-center gap-2"><ShoppingBag size={14} /> Acheter</button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>,
+    document.body
+  );
+
+  return (
+    <div className="w-full px-6 py-8 animate-in fade-in duration-500">
+      {AgencyModal}
+      {ServiceModal}
+      {PurchaseConfirmModal}
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Marketplace <span className="gradient-text">Agences</span></h1>
+          <p className="text-gray-500 text-sm mt-1">D\u00e9couvrez des agences certifi\u00e9es et services AEO professionnels</p>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-white/[0.03] rounded-xl p-1 mb-6 w-fit">
+        {(['agencies', 'services', 'purchases'] as const).map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)} className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab ? 'bg-amber-500/20 text-amber-300 border border-amber-500/20' : 'text-gray-500 hover:text-gray-300'}`}>
+            {tab === 'agencies' ? 'Agences Certifi\u00e9es' : tab === 'services' ? 'Services AEO' : 'Mes Achats'}
+          </button>
+        ))}
+      </div>
+
+      {/* Search + Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={activeTab === 'agencies' ? 'Rechercher une agence...' : 'Rechercher un service...'} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-600 focus:border-amber-500/50 outline-none transition-all" />
+        </div>
+        {activeTab === 'agencies' && (
+          <select value={selectedCertification} onChange={e => setSelectedCertification(e.target.value)} className="bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-gray-300 focus:border-amber-500/50 outline-none">
+            <option value="all">Toutes certifications</option><option value="gold">Gold</option><option value="silver">Silver</option><option value="bronze">Bronze</option>
+          </select>
+        )}
+        {activeTab === 'services' && (
+          <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)} className="bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-gray-300 focus:border-amber-500/50 outline-none">
+            <option value="all">Toutes cat\u00e9gories</option><option value="audit">Audit</option><option value="optimization">Optimisation</option><option value="content">Contenu</option><option value="monitoring">Monitoring</option><option value="strategy">Strat\u00e9gie</option><option value="training">Formation</option>
+          </select>
+        )}
+      </div>
+
+      {/* AGENCIES TAB */}
+      {activeTab === 'agencies' && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAgencies.map(agency => (
+            <button key={agency.id} onClick={() => setSelectedAgency(agency)} className="ninja-card p-6 text-left hover:-translate-y-1 transition-all group">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-700/10 border border-amber-500/10 flex items-center justify-center text-xl shrink-0">{agency.logo}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">{agency.name}</span>
+                    {getCertBadge(agency.certification)}
+                  </div>
+                  <div className="flex items-center gap-1">{renderStars(agency.rating)} <span className="text-xs text-gray-500 ml-1">({agency.reviewCount})</span></div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-2">{agency.description}</p>
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {agency.specialties.slice(0, 3).map(s => <span key={s} className="px-2 py-0.5 text-[10px] bg-white/[0.04] border border-white/[0.06] rounded-full text-gray-500">{s}</span>)}
+                {agency.specialties.length > 3 && <span className="px-2 py-0.5 text-[10px] text-gray-600">+{agency.specialties.length - 3}</span>}
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-gray-600 pt-3 border-t border-white/[0.06]">
+                <span>{agency.completedProjects} projets</span>
+                <span>{agency.satisfactionRate}% satisfaction</span>
+                <span>~{agency.avgDeliveryDays}j</span>
+              </div>
+              {agency.featured && <div className="absolute top-0 right-0 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-amber-700 text-[9px] font-bold rounded-bl-xl rounded-tr-[0.85rem] text-white uppercase">Featured</div>}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* SERVICES TAB */}
+      {activeTab === 'services' && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredServices.map(service => (
+            <button key={service.id} onClick={() => setSelectedService(service)} className="ninja-card p-6 text-left hover:-translate-y-1 transition-all group relative">
+              {service.popular && <div className="absolute top-0 right-6 px-2 py-0.5 bg-gradient-to-r from-amber-500 to-amber-700 text-[9px] font-bold rounded-b-lg text-white">Populaire</div>}
+              <div className="mb-3">
+                <span className="px-2 py-0.5 text-[10px] bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">{service.category}</span>
+              </div>
+              <h3 className="text-sm font-bold text-white mb-1 group-hover:text-amber-300 transition-colors">{service.name}</h3>
+              <p className="text-xs text-gray-500 mb-1">par <span className="text-amber-400">{service.agencyName}</span></p>
+              <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-2">{service.description}</p>
+              <div className="flex items-center gap-3 mb-4 text-[11px] text-gray-600">
+                <span className="flex items-center gap-1"><Clock size={10} /> {service.deliveryDays}j</span>
+                <span className="flex items-center gap-1">{renderStars(service.rating)} {service.rating.toFixed(1)}</span>
+              </div>
+              <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
+                <div className="flex flex-wrap gap-1">
+                  {service.tags.slice(0, 2).map(t => <span key={t} className="px-1.5 py-0.5 text-[9px] bg-white/[0.04] border border-white/[0.06] rounded text-gray-600">{t}</span>)}
+                </div>
+                <span className="text-base font-bold text-amber-400">{service.price}\u20ac</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* PURCHASES TAB */}
+      {activeTab === 'purchases' && (
+        <div className="ninja-card p-6">
+          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><ShoppingBag size={18} className="text-amber-400" /> Historique des achats</h3>
+          {purchases.length === 0 ? (
+            <div className="text-center py-12">
+              <ShoppingBag size={32} className="text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 mb-4">Vous n'avez pas encore d'achats.</p>
+              <button onClick={() => setActiveTab('services')} className="btn-gradient px-6 py-2.5 font-bold text-sm">D\u00e9couvrir les services</button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead><tr className="text-gray-500 border-b border-white/[0.06]"><th className="pb-3 font-medium">Service</th><th className="pb-3 font-medium">Agence</th><th className="pb-3 font-medium">Date</th><th className="pb-3 font-medium">Option</th><th className="pb-3 font-medium">Montant</th><th className="pb-3 font-medium">Statut</th></tr></thead>
+                <tbody>
+                  {purchases.map(p => (
+                    <tr key={p.id} className="border-b border-white/[0.06] last:border-0">
+                      <td className="py-3 text-gray-300 font-medium">{p.serviceName}</td>
+                      <td className="py-3 text-gray-500">{p.agencyName}</td>
+                      <td className="py-3 text-gray-500">{p.date}</td>
+                      <td className="py-3"><span className={`px-2 py-0.5 text-[10px] rounded-full font-bold ${p.option === 'premium' ? 'bg-amber-500/20 text-amber-400' : 'bg-white/[0.06] text-gray-400'}`}>{p.option}</span></td>
+                      <td className="py-3 text-white font-bold">{p.amount}\u20ac</td>
+                      <td className="py-3">
+                        <span className={`px-2 py-0.5 text-[10px] rounded-full font-bold ${
+                          p.status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                          p.status === 'in_progress' ? 'bg-amber-500/20 text-amber-400' :
+                          p.status === 'delivered' ? 'bg-blue-500/20 text-blue-400' :
+                          p.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-red-500/20 text-red-400'
+                        }`}>
+                          {p.status === 'completed' ? 'Termin\u00e9' : p.status === 'in_progress' ? 'En cours' : p.status === 'delivered' ? 'Livr\u00e9' : p.status === 'pending' ? 'En attente' : 'Rembours\u00e9'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {(activeTab === 'agencies' && filteredAgencies.length === 0) || (activeTab === 'services' && filteredServices.length === 0) ? (
+        <div className="ninja-card p-12 text-center">
+          <Search size={32} className="text-gray-600 mx-auto mb-3" />
+          <p className="text-gray-500">Aucun r\u00e9sultat trouv\u00e9. Essayez avec d'autres termes.</p>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export default MarketplaceAgence;

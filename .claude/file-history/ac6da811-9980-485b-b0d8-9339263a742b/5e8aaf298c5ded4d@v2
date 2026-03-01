@@ -1,0 +1,100 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { AuthorProfile, GeneratedCredentials } from "../../types/eeat";
+import { PROMPT_CREDENTIALS } from "./prompts";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackSimulation = async (profile: AuthorProfile): Promise<GeneratedCredentials> => {
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  const eduHtml = profile.education.length > 0
+    ? `<div class="mb-6"><h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Formation</h4><div class="space-y-2">${profile.education.map(e => `<div class="flex items-start gap-3 p-3 bg-[#0a0a0a] rounded-lg border border-white/5"><div class="p-1.5 bg-blue-500/10 rounded-lg"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg></div><div><p class="text-sm font-semibold text-gray-200">${e.degree} en ${e.field}</p><p class="text-xs text-gray-500">${e.institution} — ${e.year}${e.honors ? ` (${e.honors})` : ''}</p></div></div>`).join('')}</div></div>`
+    : '';
+
+  const credsHtml = profile.credentials.length > 0
+    ? `<div class="mb-6"><h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Certifications & Licences</h4><div class="space-y-2">${profile.credentials.map(c => `<div class="flex items-start gap-3 p-3 bg-[#0a0a0a] rounded-lg border border-white/5"><div class="p-1.5 bg-purple-500/10 rounded-lg"><svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><div><p class="text-sm font-semibold text-gray-200">${c.name}</p><p class="text-xs text-gray-500">${c.issuer}${c.year ? ` — ${c.year}` : ''}</p></div></div>`).join('')}</div></div>`
+    : '';
+
+  const certsHtml = profile.certifications.length > 0
+    ? `<div class="mb-6"><h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Certifications Professionnelles</h4><div class="flex flex-wrap gap-2">${profile.certifications.map(c => `<span class="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs text-emerald-300">${c.name} (${c.issuer})</span>`).join('')}</div></div>`
+    : '';
+
+  const awardsHtml = profile.awards && profile.awards.length > 0
+    ? `<div class="mb-6"><h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Recompenses</h4><div class="space-y-2">${profile.awards.map(a => `<div class="flex items-center gap-3 p-3 bg-amber-500/5 border border-amber-500/10 rounded-lg"><span class="text-amber-400">🏆</span><div><p class="text-sm font-semibold text-gray-200">${a.name}</p><p class="text-xs text-gray-500">${a.issuer} — ${a.year}</p></div></div>`).join('')}</div></div>`
+    : '';
+
+  const pubsHtml = profile.publications && profile.publications.length > 0
+    ? `<div class="mb-6"><h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Publications</h4><div class="space-y-2">${profile.publications.map(p => `<div class="flex items-start gap-3 p-3 bg-[#0a0a0a] rounded-lg border border-white/5"><span class="text-cyan-400">📄</span><div><p class="text-sm font-semibold text-gray-200">${p.title}</p><p class="text-xs text-gray-500">${p.publisher || ''} — ${p.date} (${p.type})</p></div></div>`).join('')}</div></div>`
+    : '';
+
+  const html = `<div class="space-y-2"><div class="mb-6"><h3 class="text-xl font-bold text-white">${profile.name}</h3><p class="text-sm text-purple-400">${profile.jobTitle} — ${profile.organization}</p><p class="text-xs text-gray-500 mt-1">${profile.yearsExperience} ans d'experience • ${profile.specializations.join(', ')}</p></div>${eduHtml}${credsHtml}${certsHtml}${awardsHtml}${pubsHtml}</div>`;
+
+  const schemaOrg = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": profile.name,
+    "jobTitle": profile.jobTitle,
+    "worksFor": { "@type": "Organization", "name": profile.organization },
+    ...(profile.education.length > 0 && {
+      "alumniOf": profile.education.map(e => ({
+        "@type": "EducationalOrganization",
+        "name": e.institution,
+      }))
+    }),
+    ...(profile.credentials.length > 0 && {
+      "hasCredential": profile.credentials.map(c => ({
+        "@type": "EducationalOccupationalCredential",
+        "name": c.name,
+        "credentialCategory": c.type,
+        "recognizedBy": { "@type": "Organization", "name": c.issuer },
+      }))
+    }),
+    ...(profile.awards && profile.awards.length > 0 && {
+      "award": profile.awards.map(a => a.name)
+    }),
+    "knowsAbout": profile.specializations,
+  }, null, 2);
+
+  return { html, schemaOrg };
+};
+
+export const generateCredentials = async (profile: AuthorProfile): Promise<GeneratedCredentials> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.warn("API_KEY not found, using simulation.");
+    return fallbackSimulation(profile);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        html: { type: Type.STRING, description: "Bloc HTML des credentials avec Tailwind" },
+        schemaOrg: { type: Type.STRING, description: "Schema.org Person JSON-LD avec hasCredential, alumniOf, award" },
+      },
+      required: ["html", "schemaOrg"],
+    };
+
+    const prompt = `${PROMPT_CREDENTIALS}\n\n## PROFIL\n${JSON.stringify(profile, null, 2)}\n\nGenere le bloc HTML et le Schema.org.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.2 }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(output);
+  } catch (error) {
+    console.error("Credentials generation failed:", error);
+    return fallbackSimulation(profile);
+  }
+};

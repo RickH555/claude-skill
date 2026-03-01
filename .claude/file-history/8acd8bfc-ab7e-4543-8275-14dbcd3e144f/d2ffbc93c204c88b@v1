@@ -1,0 +1,18 @@
+import Stripe from 'stripe';
+
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-04-10',
+  typescript: true,
+});
+
+export const PLANS = {
+  starter: 'price_starter_monthly', // Remplace par ton ID de prix Stripe réel
+  pro: 'price_pro_monthly',         // Remplace par ton ID de prix Stripe réel
+  agency: 'price_agency_monthly',   // Remplace par ton ID de prix Stripe réel
+};
+
+export function getPlanFromPriceId(priceId: string): 'starter' | 'pro' | 'agency' {
+  if (priceId === PLANS.agency) return 'agency';
+  if (priceId === PLANS.pro) return 'pro';
+  return 'starter';
+}

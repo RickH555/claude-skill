@@ -1,0 +1,143 @@
+'use client';
+
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import { Check } from 'lucide-react';
+import { toast } from 'sonner';
+import { useState } from 'react';
+
+const PLANS = [
+  {
+    key: 'free' as const,
+    name: 'Free',
+    price: '0€',
+    period: '/mois',
+    features: [
+      '1 programme de fidelite',
+      '1 QR code',
+      "Jusqu'a 50 clients",
+      'Dashboard basique',
+    ],
+  },
+  {
+    key: 'pro' as const,
+    name: 'Pro',
+    price: '29€',
+    period: '/mois',
+    popular: true,
+    features: [
+      '5 programmes de fidelite',
+      'QR codes illimites',
+      "Jusqu'a 500 clients",
+      'Analytiques avancees',
+      'Campagnes marketing',
+      'Support prioritaire',
+    ],
+  },
+  {
+    key: 'business' as const,
+    name: 'Business',
+    price: '79€',
+    period: '/mois',
+    features: [
+      'Programmes illimites',
+      'QR codes illimites',
+      'Clients illimites',
+      'Analytiques avancees',
+      'Campagnes marketing',
+      'API REST',
+      'Support dedie',
+      'Multi-etablissements',
+    ],
+  },
+];
+
+export default function PlanSelector({ currentPlan }: { currentPlan: string }) {
+  const [upgrading, setUpgrading] = useState<string | null>(null);
+
+  const handleUpgrade = async (planKey: string) => {
+    if (planKey === 'free') return;
+    setUpgrading(planKey);
+
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planKey }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Erreur');
+        setUpgrading(null);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      toast.error('Erreur de connexion');
+      setUpgrading(null);
+    }
+  };
+
+  return (
+    <div className="grid md:grid-cols-3 gap-6">
+      {PLANS.map((plan, i) => {
+        const isCurrent = currentPlan === plan.key;
+        return (
+          <Card
+            key={plan.key}
+            className={`relative stagger-enter stagger-${i + 1} ${plan.popular ? 'ring-2 ring-[var(--accent)]' : ''}`}
+            padding="lg"
+          >
+            {plan.popular && (
+              <Badge variant="accent" className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                Populaire
+              </Badge>
+            )}
+
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">{plan.name}</h3>
+              <div className="mt-2">
+                <span className="text-3xl font-bold text-[var(--text-primary)]">{plan.price}</span>
+                <span className="text-[13px] text-[var(--text-tertiary)]">{plan.period}</span>
+              </div>
+            </div>
+
+            <ul className="space-y-3 mb-6">
+              {plan.features.map(feature => (
+                <li key={feature} className="flex items-start gap-2 text-[13px] text-[var(--text-secondary)]">
+                  <Check className="w-4 h-4 text-[var(--accent)] mt-0.5 shrink-0" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            {isCurrent ? (
+              <Button variant="secondary" disabled className="w-full">
+                Plan actuel
+              </Button>
+            ) : plan.key === 'free' ? (
+              <Button variant="ghost" disabled className="w-full">
+                Plan gratuit
+              </Button>
+            ) : (
+              <Button
+                variant={plan.popular ? 'primary' : 'secondary'}
+                className="w-full"
+                loading={upgrading === plan.key}
+                onClick={() => handleUpgrade(plan.key)}
+              >
+                {currentPlan === 'free' ? 'Choisir' : 'Changer'}
+              </Button>
+            )}
+          </Card>
+        );
+      })}
+    </div>
+  );
+}

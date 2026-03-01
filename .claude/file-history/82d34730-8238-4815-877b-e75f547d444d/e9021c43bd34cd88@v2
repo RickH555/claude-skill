@@ -1,0 +1,675 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { Project, User, AnalysisResult, GeneratedSolution } from '../types';
+import { Plus, Search, Globe, TrendingUp, Calendar, ArrowUpRight, BarChart3, ChevronDown, Zap, Activity, ArrowRight, Wrench, FileText, Shield, ExternalLink, Clock, LayoutDashboard, Bot, Lock, ChevronLeft, ChevronRight, Eye, RefreshCw, ClipboardList, ArrowLeft, ClipboardCheck, Archive, Code } from 'lucide-react';
+import ScoreRing from '../components/ScoreRing';
+import { Results } from './Results';
+import ActionPlan from './ActionPlan';
+import GenerationModal from '../components/GenerationModal';
+
+interface ProjectsProps {
+  onBack: () => void;
+  onNavigateToAnalysis: () => void;
+  user: User | null;
+  history: AnalysisResult[];
+  onViewAnalysis: (result: AnalysisResult, tab: 'overview' | 'details' | 'recommendations' | 'preview') => void;
+  projectCount: number;
+  maxProjects: number;
+  onNavigateToPlan: () => void;
+  onDeductCredits: (amount: number) => boolean;
+  onSaveSolution: (analysisId: string, recId: string, solution: GeneratedSolution) => void;
+  onNewAnalysis: () => void;
+  onNavigateToRecharge: () => void;
+  initialUrl?: string;
+  initialTab?: string;
+}
+
+// Helper to convert AnalysisResult to Project format
+const mapAnalysisToProject = (analysis: AnalysisResult, index: number): Project => {
+  const hostname = new URL(analysis.url).hostname;
+  return {
+    id: `proj_${index}_${hostname}`,
+    name: hostname,
+    domain: analysis.url,
+    status: 'active',
+    lastRun: analysis.timestamp,
+    visibilityScore: analysis.globalScore,
+    trend: analysis.globalScore > 70 ? 12 : (analysis.globalScore > 50 ? 5 : -5), // Simulé basé sur le score
+    nextRun: new Date(new Date(analysis.timestamp).getTime() + 86400000 * 7).toISOString()
+  };
+};
+
+const Projects: React.FC<ProjectsProps> = ({ onBack, onNavigateToAnalysis, user, history, onViewAnalysis, projectCount, maxProjects, onNavigateToPlan, onDeductCredits, onSaveSolution, onNewAnalysis, onNavigateToRecharge, initialUrl, initialTab }) => {
+  // Navigation internal state: monitoring | report | action-plan | archives
+  const [activeTab, setActiveTab] = useState<'monitoring' | 'report' | 'action-plan' | 'archives'>(() => {
+    if (initialTab === 'archives') return 'archives';
+    if (initialTab === 'recommendations' || initialTab === 'action-plan') return 'action-plan';
+    if (initialTab === 'details' || initialTab === 'report') return 'report';
+    return 'monitoring';
+  });
+
+  useEffect(() => {
+    if (initialTab === 'archives') setActiveTab('archives');
+    else if (initialTab === 'recommendations') setActiveTab('action-plan');
+    else if (initialTab === 'details' || initialTab === 'report') setActiveTab('report');
+    else if (initialTab === 'overview') setActiveTab('monitoring');
+  }, [initialTab]);
+
+  // Use history to build project list, defaulting to mock if empty for demo
+  const projects = useMemo(() => {
+    if (history.length > 0) {
+      // Deduplicate by URL hostname, keeping the most recent
+      const uniqueMap = new Map<string, AnalysisResult>();
+      history.forEach(item => {
+        try {
+            const host = new URL(item.url).hostname;
+            if (!uniqueMap.has(host) || new Date(item.timestamp) > new Date(uniqueMap.get(host)!.timestamp)) {
+                uniqueMap.set(host, item);
+            }
+        } catch(e) {}
+      });
+      return Array.from(uniqueMap.values()).map((analysis, index) => mapAnalysisToProject(analysis, index));
+    } else {
+      // Mock data fallback if no history
+      return [
+        {
+          id: 'demo_1',
+          name: 'Exemple Site Demo',
+          domain: 'https://demo-site.com',
+          status: 'active',
+          lastRun: new Date().toISOString(),
+          visibilityScore: 45,
+          trend: 0,
+          nextRun: new Date(Date.now() + 86400000).toISOString()
+        }
+      ] as Project[];
+    }
+  }, [history]);
+
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => {
+    if (initialUrl && projects.length > 0) {
+        try {
+            const targetHost = new URL(initialUrl).hostname;
+            // The projects mapping uses hostname as name
+            const found = projects.find(p => p.name === targetHost);
+            if (found) return found.id;
+        } catch(e) {}
+    }
+    return projects[0]?.id || '';
+  });
+
+  const [selectedAnalysisState, setSelectedAnalysisState] = useState<AnalysisResult | null>(null);
+  
+  // States for viewing archive modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentSolution, setCurrentSolution] = useState<GeneratedSolution | null>(null);
+
+  const currentProject = projects.find(p => p.id === selectedProjectId) || projects[0];
+  
+  // Filter history for current project ONLY
+  const projectHistory = useMemo(() => {
+    return history
+      .filter(h => {
+          try { return new URL(h.url).hostname === currentProject.name; }
+          catch(e) { return false; }
+      })
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [history, currentProject]);
+
+  // Reset selected analysis when project changes
+  useEffect(() => {
+    setSelectedAnalysisState(null);
+  }, [selectedProjectId]);
+
+  // The analysis to display (either user-selected from table, or the latest one)
+  const activeAnalysis = selectedAnalysisState || projectHistory[0];
+
+  const handleOpenStoredSolution = (solution: GeneratedSolution) => {
+    setCurrentSolution(solution);
+    setIsModalOpen(true);
+  };
+
+  // Calculate Pillar Scores from real categories if available
+  const getPillarScores = () => {
+    if (!activeAnalysis) {
+      return {
+        tech: 50,
+        sem: 50,
+        auth: 50
+      };
+    }
+    
+    const cats = activeAnalysis.categories;
+    
+    // Aggregation logic
+    const techScore = Math.round(
+      ((cats['technical']?.score || 0) + (cats['ux']?.score || 0) + (cats['freshness']?.score || 0)) / 3
+    );
+    
+    const semScore = Math.round(
+      ((cats['semantic']?.score || 0) + (cats['content']?.score || 0) + (cats['geo']?.score || 0) + (cats['media']?.score || 0)) / 4
+    );
+    
+    const authScore = Math.round(
+      ((cats['entity']?.score || 0) + (cats['structured_data']?.score || 0) + (cats['trust']?.score || 0)) / 3
+    );
+
+    return { tech: techScore, sem: semScore, auth: authScore };
+  };
+
+  const pillarScores = getPillarScores();
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-white'; // Purple implied by bg bar
+    if (score >= 60) return 'text-purple-400';
+    return 'text-blue-400'; // For variation
+  };
+
+  const getBarColor = (score: number) => {
+    if (score >= 80) return 'bg-purple-400';
+    if (score >= 60) return 'bg-purple-500';
+    return 'bg-blue-400';
+  };
+
+  const handleSwitchToReport = () => {
+    if (activeAnalysis) {
+        setActiveTab('report');
+    } else {
+        alert("Veuillez lancer une analyse pour voir le rapport.");
+        onNavigateToAnalysis();
+    }
+  };
+
+  const handleSwitchToActionPlan = () => {
+    if (activeAnalysis) {
+        setActiveTab('action-plan');
+    } else {
+        alert("Veuillez lancer une analyse pour voir le plan d'action.");
+        onNavigateToAnalysis();
+    }
+  };
+
+  const handleSwitchToArchives = () => {
+    if (activeAnalysis) {
+        setActiveTab('archives');
+    } else {
+        alert("Veuillez lancer une analyse pour voir les archives.");
+        onNavigateToAnalysis();
+    }
+  };
+
+  const handleBackToMonitoring = () => {
+    setActiveTab('monitoring');
+  };
+
+  const isLimitReached = projectCount >= maxProjects;
+
+  // -- RENDER : REPORT VIEW (RESULTS) --
+  if (activeTab === 'report' && activeAnalysis) {
+      return (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="max-w-6xl mx-auto px-4 py-4 mb-4">
+                  <button 
+                    onClick={handleBackToMonitoring}
+                    className="flex items-center text-gray-400 hover:text-white transition-colors mb-4 group"
+                  >
+                    <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                    Retour au Tableau de bord
+                  </button>
+              </div>
+              <Results 
+                data={activeAnalysis} 
+                onBack={handleBackToMonitoring}
+                user={user}
+                onDeductCredits={onDeductCredits}
+                onSaveSolution={onSaveSolution}
+                onNewAnalysis={onNewAnalysis}
+              />
+          </div>
+      );
+  }
+
+  // -- RENDER : ACTION PLAN VIEW --
+  if (activeTab === 'action-plan' && activeAnalysis) {
+      return (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="max-w-6xl mx-auto px-4 py-4 mb-4">
+                  <button 
+                    onClick={handleBackToMonitoring}
+                    className="flex items-center text-gray-400 hover:text-white transition-colors mb-4 group"
+                  >
+                    <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                    Retour au Tableau de bord
+                  </button>
+              </div>
+              <ActionPlan 
+                data={activeAnalysis}
+                user={user}
+                onDeductCredits={onDeductCredits}
+                onSaveSolution={onSaveSolution}
+                onNavigateToAnalysis={onNewAnalysis}
+                onNavigateToRecharge={onNavigateToRecharge}
+              />
+          </div>
+      );
+  }
+
+  // -- RENDER : ARCHIVES SOLUTIONS VIEW --
+  if (activeTab === 'archives' && activeAnalysis) {
+      return (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 max-w-6xl mx-auto px-4 py-8">
+              <GenerationModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                isLoading={false}
+                solution={currentSolution}
+              />
+
+              <button 
+                onClick={handleBackToMonitoring}
+                className="flex items-center text-gray-400 hover:text-white transition-colors mb-8 group"
+              >
+                <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                Retour au Tableau de bord
+              </button>
+
+              <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-300 border border-purple-500/30">
+                      <Archive size={20} />
+                  </div>
+                  <div>
+                      <h3 className="text-xl font-sans font-bold text-white">Archives Solutions</h3>
+                      <p className="text-sm text-gray-400">Retrouvez toutes les optimisations générées précédemment pour ce projet.</p>
+                  </div>
+              </div>
+
+              {activeAnalysis.generatedSolutions && Object.keys(activeAnalysis.generatedSolutions).length > 0 ? (
+                  <div className="grid md:grid-cols-2 gap-6">
+                      {Object.entries(activeAnalysis.generatedSolutions).map(([recId, sol], idx) => {
+                        const solution = sol as GeneratedSolution & { timestamp: string };
+                        return (
+                          <div key={recId} className="ninja-card p-5 rounded-xl border border-white/10 hover:border-purple-500/30 transition-all group cursor-pointer" onClick={() => handleOpenStoredSolution(solution)}>
+                              <div className="flex justify-between items-start mb-3">
+                                  <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${solution.type === 'code' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-pink-500/10 text-pink-400 border border-pink-500/20'}`}>
+                                      {solution.type === 'code' ? 'Code Technique' : 'Contenu Éditorial'}
+                                  </span>
+                                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                                      <Clock size={10} />
+                                      {new Date(solution.timestamp).toLocaleDateString()}
+                                  </span>
+                              </div>
+                              
+                              <h4 className="font-bold text-white mb-2 line-clamp-1">{solution.title}</h4>
+                              <p className="text-xs text-gray-400 mb-4 line-clamp-2">{solution.explanation}</p>
+                              
+                              <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                                      {solution.type === 'code' ? <Code size={12} /> : <FileText size={12} />}
+                                      {solution.language}
+                                  </div>
+                                  <button className="text-xs font-bold text-primary flex items-center gap-1 group-hover:underline">
+                                      <Eye size={12} /> Voir
+                                  </button>
+                              </div>
+                          </div>
+                      )})}
+                  </div>
+              ) : (
+                  <div className="ninja-card p-12 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center">
+                      <div className="w-16 h-16 bg-purple-500/5 rounded-full flex items-center justify-center mb-4 text-gray-500">
+                          <Archive size={32} />
+                      </div>
+                      <h4 className="text-lg font-medium text-white mb-2">Aucune archive disponible</h4>
+                      <p className="text-sm text-gray-400 max-w-sm mb-6">
+                          Les solutions que vous générez depuis l'onglet "Plan d'action" apparaîtront ici pour une consultation ultérieure.
+                      </p>
+                      <button 
+                        onClick={handleSwitchToActionPlan}
+                        className="text-primary hover:text-white transition-colors text-sm font-bold flex items-center gap-2"
+                      >
+                        Générer ma première solution <ArrowRight size={14} />
+                      </button>
+                  </div>
+              )}
+          </div>
+      );
+  }
+
+  // -- RENDER : MONITORING DASHBOARD --
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-500 min-h-screen">
+      
+      {/* HEADER: Project Selector & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+             <h1 className="text-3xl font-sans font-bold text-white">Monitoring <span className="gradient-text">AEO</span></h1>
+             <div className="relative group">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/5 hover:bg-purple-500/10 border border-white/10 rounded-lg transition-colors text-sm font-medium">
+                   {currentProject.name} <ChevronDown size={14} className="text-gray-500" />
+                </button>
+                {/* Dropdown */}
+                <div className="absolute top-full left-0 mt-2 w-56 bg-[#1a1d24] border border-white/10 rounded-xl shadow-xl z-50 hidden group-hover:block p-1">
+                   {projects.map(p => (
+                      <button 
+                        key={p.id}
+                        onClick={() => setSelectedProjectId(p.id)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm ${p.id === selectedProjectId ? 'bg-primary/10 text-primary' : 'text-gray-300 hover:bg-purple-500/5'}`}
+                      >
+                        {p.name}
+                      </button>
+                   ))}
+                   <div className="border-t border-white/5 mt-1 pt-1">
+                      <button onClick={onNavigateToAnalysis} className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-purple-500/5 flex items-center gap-2">
+                         <Plus size={12} /> Ajouter un projet
+                      </button>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <p className="text-gray-400 flex items-center gap-2 text-sm">
+                <Globe size={14} /> {currentProject.domain} 
+                <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                <span className="text-purple-300">Monitoring Actif</span>
+            </p>
+            <div className="h-4 w-px bg-white/10"></div>
+            <p className={`text-xs ${isLimitReached ? 'text-purple-400' : 'text-gray-500'}`}>
+                {projectCount} / {maxProjects} Projets (Quota Mensuel)
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+           <button 
+             onClick={isLimitReached ? onNavigateToPlan : onNavigateToAnalysis}
+             className={`px-4 py-2.5 font-bold rounded-xl transition-colors text-sm flex items-center gap-2 shadow-lg ${
+                isLimitReached
+                ? 'bg-purple-500 hover:bg-purple-600 text-white shadow-purple-500/20'
+                : 'bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-600 hover:to-violet-700 shadow-primary/20'
+             }`}
+           >
+             {isLimitReached ? <Lock size={16} /> : <Search size={16} />} 
+             {isLimitReached ? 'Upgrade pour ajouter' : 'Scan Manuel'}
+           </button>
+        </div>
+      </div>
+
+      {/* TABS HEADER - ADJUSTED SIZE */}
+      <div className="flex gap-6 mb-8 border-b border-white/10 overflow-x-auto">
+          <button 
+            onClick={() => setActiveTab('monitoring')}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'monitoring' 
+                ? 'border-primary text-white' 
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Activity size={18} className={activeTab === 'monitoring' ? 'text-primary' : 'opacity-50'} />
+            Vue d'ensemble
+          </button>
+          
+          <button 
+            onClick={handleSwitchToReport}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'report' 
+                ? 'border-primary text-white' 
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <ClipboardList size={18} className={activeTab === 'report' ? 'text-primary' : 'opacity-50'} />
+            Rapport d'Audit
+          </button>
+
+          <button 
+            onClick={handleSwitchToActionPlan}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'action-plan' 
+                ? 'border-primary text-white' 
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Zap size={18} className={activeTab === 'action-plan' ? 'text-primary fill-primary' : 'opacity-50'} />
+            Plan d'Action
+            {activeAnalysis && activeAnalysis.recommendations.length > 0 && (
+                <span className="bg-primary text-black text-[10px] px-1.5 py-0.5 rounded-full ml-1.5">
+                    {activeAnalysis.recommendations.length}
+                </span>
+            )}
+          </button>
+
+          <button 
+            onClick={handleSwitchToArchives}
+            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'archives' 
+                ? 'border-primary text-white' 
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Archive size={18} className={activeTab === 'archives' ? 'text-primary' : 'opacity-50'} />
+            Archives Solutions
+          </button>
+      </div>
+
+      {/* SECTION 1: SCORING AEO (DYNAMIC DATA) */}
+      <div className="mb-8">
+         <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+            <h2 className="text-xl font-medium text-white flex flex-wrap items-center gap-2">
+                <Activity size={20} className="text-primary" />
+                Score AEO pour : 
+                <span className="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded text-base break-all">
+                    {activeAnalysis ? activeAnalysis.url.replace(/^https?:\/\/(www\.)?/, '') : 'Aucune URL'}
+                </span>
+                {activeAnalysis && <span className="text-sm text-gray-500 font-normal whitespace-nowrap">({new Date(activeAnalysis.timestamp).toLocaleDateString()})</span>}
+            </h2>
+            {activeAnalysis && activeAnalysis !== projectHistory[0] && (
+                <button 
+                    onClick={() => setSelectedAnalysisState(null)} 
+                    className="text-xs text-primary hover:text-white transition-colors flex items-center gap-1 bg-purple-500/5 px-3 py-1.5 rounded-lg border border-white/10"
+                >
+                    <RefreshCw size={12} /> Revenir à la dernière analyse
+                </button>
+            )}
+         </div>
+         
+         <div className="grid md:grid-cols-12 gap-6">
+            {/* Main Score */}
+            <div className="md:col-span-4 ninja-card p-8 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden border-primary/20">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full pointer-events-none"></div>
+               <h3 className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-6">Score de Visibilité Globale</h3>
+               <ScoreRing score={activeAnalysis ? activeAnalysis.globalScore : 0} size={160} strokeWidth={12} />
+               <div className="mt-6 flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full">
+                  <TrendingUp size={14} className="text-purple-300" />
+                  <span className="text-purple-300 text-sm font-bold">
+                    {currentProject.trend > 0 ? '+' : ''}{currentProject.trend}% ce mois-ci
+                  </span>
+               </div>
+            </div>
+
+            {/* Pillars Breakdown - Calculated from Real Categories */}
+            <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+               {/* Pilier 1: Technique */}
+               <div className="ninja-card p-5 rounded-xl border border-white/10 flex flex-col justify-between h-full group hover:border-blue-500/30 transition-colors">
+                  <div>
+                     <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-gray-400 text-xs uppercase mb-1">Infrastrucure</p>
+                            <h4 className="text-white font-bold text-lg">Technique</h4>
+                        </div>
+                        <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
+                            <Wrench size={18} />
+                        </div>
+                     </div>
+                     <div className="space-y-3 mb-6">
+                        <div className="flex justify-between items-end">
+                           <span className={`text-3xl font-bold ${getScoreColor(pillarScores.tech)}`}>{pillarScores.tech}</span>
+                           <span className="text-xs text-gray-500 mb-1">/100</span>
+                        </div>
+                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                           <div className={`h-full ${getBarColor(pillarScores.tech)}`} style={{ width: `${pillarScores.tech}%` }}></div>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2 min-h-[32px]">
+                           {pillarScores.tech >= 80 ? "Excellente réactivité serveur." : "Latence ou problèmes d'indexation détectés."}
+                        </p>
+                     </div>
+                  </div>
+                  <button 
+                    onClick={handleSwitchToActionPlan} 
+                    className="w-full py-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    Voir les solutions <ArrowRight size={14} />
+                  </button>
+               </div>
+
+               {/* Pilier 2: Sémantique */}
+               <div className="ninja-card p-5 rounded-xl border border-white/10 flex flex-col justify-between h-full group hover:border-purple-500/30 transition-colors">
+                  <div>
+                     <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-gray-400 text-xs uppercase mb-1">Contenu</p>
+                            <h4 className="text-white font-bold text-lg">Sémantique</h4>
+                        </div>
+                        <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                            <FileText size={18} />
+                        </div>
+                     </div>
+                     <div className="space-y-3 mb-6">
+                        <div className="flex justify-between items-end">
+                           <span className={`text-3xl font-bold ${getScoreColor(pillarScores.sem)}`}>{pillarScores.sem}</span>
+                           <span className="text-xs text-gray-500 mb-1">/100</span>
+                        </div>
+                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                           <div className={`h-full ${getBarColor(pillarScores.sem)}`} style={{ width: `${pillarScores.sem}%` }}></div>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2 min-h-[32px]">
+                           {pillarScores.sem >= 80 ? "Structure Answer-First valide." : "Manque de structure pour le parsing IA."}
+                        </p>
+                     </div>
+                  </div>
+                  <button
+                    onClick={handleSwitchToActionPlan}
+                    className="w-full py-2.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    Voir les solutions <ArrowRight size={14} />
+                  </button>
+               </div>
+
+               {/* Pilier 3: Autorité */}
+               <div className="ninja-card p-5 rounded-xl border border-white/10 flex flex-col justify-between h-full group hover:border-purple-500/30 transition-colors">
+                  <div>
+                     <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-gray-400 text-xs uppercase mb-1">Autorité</p>
+                            <h4 className="text-white font-bold text-lg">Entité Graph</h4>
+                        </div>
+                        <div className="p-2 bg-purple-500/10 rounded-lg text-purple-300">
+                            <Shield size={18} />
+                        </div>
+                     </div>
+                     <div className="space-y-3 mb-6">
+                        <div className="flex justify-between items-end">
+                           <span className={`text-3xl font-bold ${getScoreColor(pillarScores.auth)}`}>{pillarScores.auth}</span>
+                           <span className="text-xs text-gray-500 mb-1">/100</span>
+                        </div>
+                        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                           <div className={`h-full ${getBarColor(pillarScores.auth)}`} style={{ width: `${pillarScores.auth}%` }}></div>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2 min-h-[32px]">
+                           {pillarScores.auth >= 80 ? "Entité clairement identifiée." : "Données structurées incomplètes."}
+                        </p>
+                     </div>
+                  </div>
+                  <button
+                    onClick={handleSwitchToActionPlan}
+                    className="w-full py-2.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/20 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    Voir les solutions <ArrowRight size={14} />
+                  </button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      {/* SECTION 2: HISTORIQUE DES ANALYSES */}
+      <div className="ninja-card rounded-2xl overflow-hidden border border-white/10 mt-8">
+         <div className="p-6 border-b border-white/10 flex justify-between items-center bg-purple-500/5">
+            <h3 className="font-bold text-white flex items-center gap-2">
+               <Clock size={20} className="text-gray-400" /> Historique des analyses
+            </h3>
+            <div className="text-xs text-gray-500">
+               {projectHistory.length} audits conservés
+            </div>
+         </div>
+         
+         <div className="overflow-x-auto">
+            <table className="w-full text-left">
+               <thead>
+                  <tr className="bg-black text-xs text-gray-500 uppercase tracking-wider">
+                     <th className="px-6 py-4 font-medium">Date</th>
+                     <th className="px-6 py-4 font-medium">Score Global</th>
+                     <th className="px-6 py-4 font-medium">Technique</th>
+                     <th className="px-6 py-4 font-medium">Sémantique</th>
+                     <th className="px-6 py-4 font-medium">Autorité</th>
+                     <th className="px-6 py-4 font-medium text-right">Actions</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-white/5">
+                  {projectHistory.map((analysis, idx) => (
+                     <tr key={idx} className={`hover:bg-white/[0.02] transition-colors ${selectedAnalysisState === analysis ? 'bg-primary/5' : ''}`}>
+                        <td className="px-6 py-4 text-sm text-gray-300">
+                           {new Date(analysis.timestamp).toLocaleDateString()} <span className="text-gray-600 text-xs ml-1">{new Date(analysis.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                           <span className={`font-bold ${getScoreColor(analysis.globalScore)}`}>{analysis.globalScore}</span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-400">
+                           {Math.round(analysis.categories['technical']?.score || 0)}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-400">
+                           {Math.round(analysis.categories['semantic']?.score || 0)}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-400">
+                           {Math.round(analysis.categories['entity']?.score || 0)}
+                        </td>
+                        <td className="px-6 py-4 text-right flex justify-end gap-2">
+                           <button 
+                              onClick={() => {
+                                 setSelectedAnalysisState(analysis);
+                                 setActiveTab('report');
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="text-gray-400 hover:text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-white/10 hover:bg-purple-500/5 transition-colors flex items-center gap-1"
+                           >
+                              <ClipboardList size={12} />
+                              Rapport
+                           </button>
+                           <button 
+                              onClick={() => {
+                                 setSelectedAnalysisState(analysis);
+                                 setActiveTab('action-plan');
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="text-primary hover:text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary/10 transition-colors flex items-center gap-1"
+                           >
+                              <Zap size={12} />
+                              Plan d'Action
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
+                  {projectHistory.length === 0 && (
+                     <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center text-gray-500 text-sm">
+                           Aucune analyse enregistrée pour ce projet.
+                        </td>
+                     </tr>
+                  )}
+               </tbody>
+            </table>
+         </div>
+      </div>
+
+    </div>
+  );
+};
+
+export default Projects;

@@ -1,0 +1,886 @@
+     1→     1→import React, { useState, useRef, useCallback } from 'react';
+     2→     2→import { Sparkles, TrendingUp, Target, Award, MousePointerClick, ArrowRight, ScanLine, Code2, Globe2, Fuel, Zap, Star, Check, Search, Bot, BrainCircuit, Database, Share2, Layers, Infinity, Radio, Globe, Droplet, Loader2, Gift, Shield, UserCheck, GraduationCap, BadgeCheck } from 'lucide-react';
+     3→     3→import { User } from '../types';
+     4→     4→import ScoreRing from '../components/ScoreRing';
+     5→     5→import { auditAnswerFirst, AnswerFirstAuditResult } from '../services/answer-first-audit';
+     6→     6→
+     7→     7→interface HomeProps {
+     8→     8→  onNavigate: (view: 'analyze' | 'login' | 'recharge' | 'directory' | 'waitlist') => void;
+     9→     9→  user: User | null;
+    10→    10→  onDirectRecharge?: (packId: number) => void;
+    11→    11→}
+    12→    12→
+    13→    13→const Home: React.FC<HomeProps> = ({ onNavigate, user, onDirectRecharge }) => {
+    14→    14→
+    15→    15→  // ── Score Gratuit State ──
+    16→    16→  const [brandName, setBrandName] = useState('');
+    17→    17→  const [siteUrl, setSiteUrl] = useState('');
+    18→    18→  const [isAnalyzing, setIsAnalyzing] = useState(false);
+    19→    19→  const [auditResult, setAuditResult] = useState<AnswerFirstAuditResult | null>(null);
+    20→    20→  const [auditError, setAuditError] = useState<string | null>(null);
+    21→    21→  const resultsRef = useRef<HTMLDivElement>(null);
+    22→    22→
+    23→    23→  // ── Free Audit Gating ──
+    24→    24→  const [freeAuditUsed, setFreeAuditUsed] = useState(() => {
+    25→    25→    return localStorage.getItem('citedby_free_audit_used') === 'true';
+    26→    26→  });
+    27→    27→
+    28→    28→  // Derive E-E-A-T pillar scores from the 6 audit categories
+    29→    29→  const eeatPillars = auditResult ? [
+    30→    30→    { label: 'Experience', icon: <UserCheck size={16} />, score: Math.round((auditResult.categories.contentFreshness.score + auditResult.categories.answerFirst.score) / 2) },
+    31→    31→    { label: 'Expertise', icon: <GraduationCap size={16} />, score: Math.round((auditResult.categories.faqStructure.score + auditResult.categories.semanticHtml.score) / 2) },
+    32→    32→    { label: 'Authority', icon: <BadgeCheck size={16} />, score: Math.round((auditResult.categories.schemaOrg.score + auditResult.categories.metaOptimization.score) / 2) },
+    33→    33→    { label: 'Trust', icon: <Shield size={16} />, score: Math.round((auditResult.categories.metaOptimization.score + auditResult.categories.schemaOrg.score + auditResult.categories.answerFirst.score) / 3) },
+    34→    34→  ] : [];
+    35→    35→
+    36→    36→  const handleFreeAudit = useCallback(async () => {
+    37→    37→    // If free audit already used, redirect to signup
+    38→    38→    if (freeAuditUsed) {
+    39→    39→      onNavigate('login');
+    40→    40→      return;
+    41→    41→    }
+    42→    42→
+    43→    43→    if (!brandName.trim() || !siteUrl.trim()) {
+    44→    44→      setAuditError('Veuillez remplir les deux champs.');
+    45→    45→      return;
+    46→    46→    }
+    47→    47→    // Basic URL validation
+    48→    48→    let finalUrl = siteUrl.trim();
+    49→    49→    if (!/^https?:\/\//i.test(finalUrl)) {
+    50→    50→      finalUrl = 'https://' + finalUrl;
+    51→    51→    }
+    52→    52→    try {
+    53→    53→      new URL(finalUrl);
+    54→    54→    } catch {
+    55→    55→      setAuditError('URL invalide. Exemple : https://www.example.com');
+    56→    56→      return;
+    57→    57→    }
+    58→    58→
+    59→    59→    setAuditError(null);
+    60→    60→    setAuditResult(null);
+    61→    61→    setIsAnalyzing(true);
+    62→    62→
+    63→    63→    try {
+    64→    64→      const result = await auditAnswerFirst(finalUrl, brandName.trim());
+    65→    65→      setAuditResult(result);
+    66→    66→      // Mark free audit as used
+    67→    67→      localStorage.setItem('citedby_free_audit_used', 'true');
+    68→    68→      setFreeAuditUsed(true);
+    69→    69→      // Scroll to results after a small delay for render
+    70→    70→      setTimeout(() => {
+    71→    71→        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    72→    72→      }, 150);
+    73→    73→    } catch (err) {
+    74→    74→      setAuditError('Une erreur est survenue lors de l\'analyse. Veuillez reessayer.');
+    75→    75→    } finally {
+    76→    76→      setIsAnalyzing(false);
+    77→    77→    }
+    78→    78→  }, [brandName, siteUrl, freeAuditUsed, onNavigate]);
+    79→    79→
+    80→    80→  const getScoreLabel = (score: number): string => {
+    81→    81→    if (score >= 80) return 'Excellent';
+    82→    82→    if (score >= 60) return 'Bon';
+    83→    83→    if (score >= 40) return 'Moyen';
+    84→    84→    if (score >= 20) return 'Faible';
+    85→    85→    return 'Critique';
+    86→    86→  };
+    87→    87→
+    88→    88→  const getScoreColor = (score: number): string => {
+    89→    89→    if (score >= 80) return 'text-purple-400';
+    90→    90→    if (score >= 60) return 'text-violet-400';
+    91→    91→    if (score >= 40) return 'text-amber-400';
+    92→    92→    return 'text-red-400';
+    93→    93→  };
+    94→    94→
+    95→    95→  const getBarColor = (score: number): string => {
+    96→    96→    if (score >= 80) return 'bg-purple-500';
+    97→    97→    if (score >= 60) return 'bg-violet-500';
+    98→    98→    if (score >= 40) return 'bg-amber-500';
+    99→    99→    return 'bg-red-500';
+   100→   100→  };
+   101→   101→
+   102→   102→  const handleStartAnalysis = () => {
+   103→   103→    if (user) {
+   104→   104→      onNavigate('analyze');
+   105→   105→    } else {
+   106→   106→      onNavigate('login');
+   107→   107→    }
+   108→   108→  };
+   109→   109→
+   110→   110→  const handleSelectPlan = (packId: number) => {
+   111→   111→    if (user) {
+   112→   112→      if (onDirectRecharge) {
+   113→   113→        onDirectRecharge(packId);
+   114→   114→      } else {
+   115→   115→        onNavigate('recharge');
+   116→   116→      }
+   117→   117→    } else {
+   118→   118→      onNavigate('login');
+   119→   119→    }
+   120→   120→  };
+   121→   121→
+   122→   122→  const plans = [
+   123→   123→    {
+   124→   124→      id: 1,
+   125→   125→      name: "Le Jerrican",
+   126→   126→      credits: 50,
+   127→   127→      price: 15,
+   128→   128→      icon: <Droplet size={24} />,
+   129→   129→      popular: false,
+   130→   130→      features: ["Id\u00e9al pour tester", "1 Audit complet", "Valable 1 an"]
+   131→   131→    },
+   132→   132→    {
+   133→   133→      id: 2,
+   134→   134→      name: "La Pompe",
+   135→   135→      credits: 200,
+   136→   136→      price: 49,
+   137→   137→      icon: <Fuel size={24} />,
+   138→   138→      popular: true,
+   139→   139→      features: ["Pour optimiser s\u00e9rieusement", "Support prioritaire", "+10% Bonus offert"]
+   140→   140→    },
+   141→   141→    {
+   142→   142→      id: 3,
+   143→   143→      name: "La Citerne",
+   144→   144→      credits: 1000,
+   145→   145→      price: 199,
+   146→   146→      icon: <Database size={24} />,
+   147→   147→      popular: false,
+   148→   148→      features: ["Usage intensif / Agence", "Acc\u00e8s API Beta", "+20% Bonus offert"]
+   149→   149→    }
+   150→   150→  ];
+   151→   151→
+   152→   152→  return (
+   153→   153→    <div className="w-full max-w-[1440px] mx-auto px-6 pt-16 pb-32 page-enter">
+   154→   154→
+   155→   155→      {/* ── HERO SECTION ── */}
+   156→   156→      <div className="text-center mb-32 relative">
+   157→   157→        {/* Ambient glow */}
+   158→   158→        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-purple-600/8 blur-[150px] rounded-full -z-10 pointer-events-none"></div>
+   159→   159→
+   160→   160→        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-gray-400 text-xs font-medium tracking-wide uppercase mb-10">
+   161→   161→          <Sparkles size={12} className="text-purple-400" />
+   162→   162→          <span>Plateforme AEO / GEO</span>
+   163→   163→        </div>
+   164→   164→
+   165→   165→        <h1 className="text-5xl sm:text-6xl md:text-[5.5rem] font-sans font-bold tracking-tight text-white leading-[1.05] mb-8">
+   166→   166→          Analysez & Optimisez<br />
+   167→   167→          votre pr{'\u00e9'}sence dans les<br />
+   168→   168→          <span className="text-purple-400">r{'\u00e9'}sultats de recherche IA</span>
+   169→   169→        </h1>
+   170→   170→
+   171→   171→        <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed mb-12 font-light">
+   172→   172→          La premi{'\u00e8'}re plateforme d'Answer Engine Optimization. Mesurez, corrigez et boostez votre visibilit{'\u00e9'} dans les r{'\u00e9'}ponses de ChatGPT, Perplexity, Gemini, Claude, Copilot et AI Overviews.
+   173→   173→        </p>
+   174→   174→
+   175→   175→        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+   176→   176→          <button onClick={handleStartAnalysis} className="btn-gradient text-base px-8 py-3.5 flex items-center gap-2.5 shadow-lg shadow-purple-600/20 hover:shadow-purple-600/30">
+   177→   177→            Lancer un Audit Gratuit <ArrowRight size={18} />
+   178→   178→          </button>
+   179→   179→          <button onClick={() => onNavigate('directory')} className="px-8 py-3.5 rounded-full border border-white/[0.06] text-gray-300 text-base font-medium hover:bg-white/[0.03] hover:border-white/[0.15] transition-all">
+   180→   180→            Explorer l'Annuaire
+   181→   181→          </button>
+   182→   182→          <button
+   183→   183→            onClick={() => onNavigate('waitlist')}
+   184→   184→            className="px-6 py-3 border border-purple-500/30 text-purple-400 rounded-xl hover:bg-purple-500/10 transition font-medium"
+   185→   185→          >
+   186→   186→            Join the Waitlist
+   187→   187→          </button>
+   188→   188→        </div>
+   189→   189→      </div>
+   190→   190→
+   191→   191→      {/* ── SECTION AEO / GEO ── */}
+   192→   192→      <div className="mt-20 md:mt-28 max-w-5xl mx-auto px-6 mb-32">
+   193→   193→        <h2 className="text-center text-2xl md:text-3xl font-semibold tracking-tight">
+   194→   194→          <span className="text-white">Qu'est-ce que l'</span>
+   195→   195→          <span className="text-purple-400">AEO</span>
+   196→   196→          <span className="text-white"> / </span>
+   197→   197→          <span className="text-purple-400">GEO</span>
+   198→   198→          <span className="text-white"> ?</span>
+   199→   199→        </h2>
+   200→   200→
+   201→   201→        <p className="text-center max-w-3xl mx-auto mt-5 text-[15px] md:text-[16px] text-zinc-400 leading-relaxed">
+   202→   202→          L'Answer Engine Optimization (AEO) — aussi appel{'\u00e9'} Generative Engine Optimization (GEO) — est la discipline qui consiste {'\u00e0'} optimiser votre contenu web pour {'\u00ea'}tre cit{'\u00e9'}, recommand{'\u00e9'} et r{'\u00e9'}f{'\u00e9'}renc{'\u00e9'} par les moteurs de r{'\u00e9'}ponse IA comme ChatGPT, Perplexity et Gemini.
+   203→   203→        </p>
+   204→   204→
+   205→   205→        {/* SEO vs AEO comparison */}
+   206→   206→        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-10">
+   207→   207→          {/* Card SEO */}
+   208→   208→          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 md:p-7">
+   209→   209→            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-500/10 border border-zinc-500/20 text-[12px] font-semibold text-zinc-400 uppercase tracking-wider">
+   210→   210→              SEO classique
+   211→   211→            </span>
+   212→   212→            <h3 className="text-lg font-semibold text-zinc-300 mt-4">
+   213→   213→              Optimiser pour les r{'\u00e9'}sultats de recherche Google
+   214→   214→            </h3>
+   215→   215→            <p className="text-[14px] text-zinc-500 mt-3 leading-relaxed">
+   216→   216→              L'objectif est de positionner votre page dans les 10 liens bleus de la premi{'\u00e8'}re page Google.
+   217→   217→            </p>
+   218→   218→            <div className="mt-4 flex items-center gap-2 text-[13px] text-zinc-500">
+   219→   219→              {'\u{1F4CF}'} M{'\u00e9'}trique : <span className="text-zinc-300 font-medium">Position dans la SERP</span>
+   220→   220→            </div>
+   221→   221→            <div className="mt-4 p-3 rounded-lg bg-white/[0.02] border border-white/[0.04] text-[12px] font-mono text-zinc-600 leading-relaxed">
+   222→   222→              <div>&nbsp;&nbsp;1. site-concurrent.com</div>
+   223→   223→              <div>&nbsp;&nbsp;2. wikipedia.org</div>
+   224→   224→              <div>&nbsp;&nbsp;3. votre-site.com {'\u2190'} vous {'\u00ea'}tes ici</div>
+   225→   225→              <div>&nbsp;&nbsp;4. autre-site.com</div>
+   226→   226→              <div>&nbsp;&nbsp;...</div>
+   227→   227→            </div>
+   228→   228→          </div>
+   229→   229→
+   230→   230→          {/* Card AEO */}
+   231→   231→          <div className="bg-white/[0.03] border border-purple-500/20 rounded-2xl p-6 md:p-7 ring-1 ring-purple-500/[0.07]">
+   232→   232→            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-[12px] font-semibold text-purple-400 uppercase tracking-wider">
+   233→   233→              AEO / GEO
+   234→   234→            </span>
+   235→   235→            <h3 className="text-lg font-semibold text-white mt-4">
+   236→   236→              Optimiser pour les r{'\u00e9'}ponses des IA g{'\u00e9'}n{'\u00e9'}ratives
+   237→   237→            </h3>
+   238→   238→            <p className="text-[14px] text-zinc-400 mt-3 leading-relaxed">
+   239→   239→              L'objectif est que votre marque soit directement cit{'\u00e9'}e et recommand{'\u00e9'}e dans la r{'\u00e9'}ponse que l'IA g{'\u00e9'}n{'\u00e8'}re pour l'utilisateur.
+   240→   240→            </p>
+   241→   241→            <div className="mt-4 flex items-center gap-2 text-[13px] text-zinc-400">
+   242→   242→              {'\u{1F4CA}'} M{'\u00e9'}trique : <span className="text-purple-400 font-medium">Taux de citation dans les r{'\u00e9'}ponses IA</span>
+   243→   243→            </div>
+   244→   244→            <div className="mt-4 p-3 rounded-lg bg-purple-500/[0.04] border border-purple-500/[0.08] text-[13px] text-zinc-400 leading-relaxed">
+   245→   245→              <div>{'\u{1F4AC}'} "Pour l'optimisation AEO, je recommande</div>
+   246→   246→              <div>&nbsp;&nbsp;&nbsp;&nbsp;CitedBy.ai qui analyse 50 crit{'\u00e8'}res sur</div>
+   247→   247→              <div>&nbsp;&nbsp;&nbsp;&nbsp;trois moteurs IA et g{'\u00e9'}n{'\u00e8'}re des solutions</div>
+   248→   248→              <div>&nbsp;&nbsp;&nbsp;&nbsp;pr{'\u00ea'}tes {'\u00e0'} impl{'\u00e9'}menter."</div>
+   249→   249→              <div className="text-right mt-2">
+   250→   250→                <span className="text-[12px] text-emerald-400 italic">— ChatGPT</span>
+   251→   251→              </div>
+   252→   252→            </div>
+   253→   253→          </div>
+   254→   254→        </div>
+   255→   255→
+   256→   256→        {/* 6 AI engine cards */}
+   257→   257→        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-8">
+   258→   258→          {[
+   259→   259→            { name: 'ChatGPT', color: 'bg-emerald-500', desc: 'Cite les sources fiables avec FAQ structur\u00e9es et donn\u00e9es factuelles' },
+   260→   260→            { name: 'Perplexity', color: 'bg-blue-500', desc: 'Affiche les URLs sources et privil\u00e9gie les contenus frais et sourc\u00e9s' },
+   261→   261→            { name: 'Gemini', color: 'bg-purple-500', desc: 'Exploite Schema.org, les donn\u00e9es structur\u00e9es et Knowledge Graph' },
+   262→   262→            { name: 'Claude', color: 'bg-orange-500', desc: 'Favorise les contenus nuanc\u00e9s, factuels et bien structur\u00e9s' },
+   263→   263→            { name: 'Copilot', color: 'bg-cyan-500', desc: 'Int\u00e9gr\u00e9 \u00e0 Windows/Edge/Office, cite via l\'index Bing' },
+   264→   264→            { name: 'AI Overviews', color: 'bg-amber-500', desc: 'R\u00e9sum\u00e9s IA en haut des SERP Google avec extraits enrichis' },
+   265→   265→          ].map((engine, i) => (
+   266→   266→            <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 text-center hover:bg-white/[0.05] hover:border-white/[0.08] transition-all duration-200">
+   267→   267→              <div className={`w-3 h-3 rounded-full mx-auto ${engine.color}`} />
+   268→   268→              <div className="text-[14px] font-semibold text-white mt-3">{engine.name}</div>
+   269→   269→              <p className="text-[13px] text-zinc-500 mt-2 leading-relaxed">{engine.desc}</p>
+   270→   270→            </div>
+   271→   271→          ))}
+   272→   272→        </div>
+   273→   273→
+   274→   274→        {/* Conclusion */}
+   275→   275→        <div className="text-center max-w-3xl mx-auto mt-10">
+   276→   276→          <p className="text-[15px] text-zinc-400 leading-relaxed">
+   277→   277→            <span className="text-white font-medium">CitedBy.ai</span> vous donne le score AEO de votre site sur chacun de ces moteurs, et g{'\u00e9'}n{'\u00e8'}re les corrections pour am{'\u00e9'}liorer votre taux de citation.
+   278→   278→          </p>
+   279→   279→          <div className="mt-6 flex justify-center">
+   280→   280→            <button
+   281→   281→              onClick={() => {
+   282→   282→                document.getElementById('score-gratuit')?.scrollIntoView({ behavior: 'smooth' });
+   283→   283→              }}
+   284→   284→              className="text-purple-400 border border-purple-500/20 bg-purple-500/[0.05] px-6 py-2.5 rounded-lg text-[14px] font-medium hover:bg-purple-500/[0.1] transition-all duration-150"
+   285→   285→            >
+   286→   286→              Analyser mon site {'\u2192'}
+   287→   287→            </button>
+   288→   288→          </div>
+   289→   289→        </div>
+   290→   290→      </div>
+   291→   291→
+   292→   292→      {/* ── SCORE GRATUIT DE VISIBILITE IA ── */}
+   293→   293→      <div className="mb-32 relative" id="score-gratuit">
+   294→   294→        {/* Ambient glow */}
+   295→   295→        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-purple-600/[0.06] blur-[180px] rounded-full -z-10 pointer-events-none"></div>
+   296→   296→
+   297→   297→        {/* Section header */}
+   298→   298→        <div className="text-center mb-12">
+   299→   299→          {/* GRATUIT Banner */}
+   300→   300→          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-violet-600/20 border border-purple-500/30 text-white text-sm font-bold tracking-wide uppercase mb-8 shadow-lg shadow-purple-600/10">
+   301→   301→            <Gift size={16} className="text-purple-400" />
+   302→   302→            <span>100% GRATUIT</span>
+   303→   303→            <span className="text-purple-400">&mdash;</span>
+   304→   304→            <span className="text-purple-300">Sans inscription</span>
+   305→   305→          </div>
+   306→   306→
+   307→   307→          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+   308→   308→            Votre Score de <span className="gradient-text">Visibilit{'\u00e9'} IA</span>
+   309→   309→          </h2>
+   310→   310→          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+   311→   311→            D{'\u00e9'}couvrez en 30 secondes comment les IA g{'\u00e9'}n{'\u00e9'}ratives per{'\u00e7'}oivent votre marque. Aucun compte requis.
+   312→   312→          </p>
+   313→   313→        </div>
+   314→   314→
+   315→   315→        {/* Form + Results Container */}
+   316→   316→        <div className="max-w-3xl mx-auto">
+   317→   317→          {/* Form Card */}
+   318→   318→          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 md:p-10 relative overflow-hidden">
+   319→   319→            {/* Decorative gradient line at top */}
+   320→   320→            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+   321→   321→
+   322→   322→            <form
+   323→   323→              onSubmit={(e) => { e.preventDefault(); handleFreeAudit(); }}
+   324→   324→              className="space-y-5"
+   325→   325→            >
+   326→   326→              <div className="grid md:grid-cols-2 gap-4">
+   327→   327→                <div>
+   328→   328→                  <label className="block text-sm font-medium text-gray-300 mb-2">Nom de marque</label>
+   329→   329→                  <input
+   330→   330→                    type="text"
+   331→   331→                    value={brandName}
+   332→   332→                    onChange={(e) => setBrandName(e.target.value)}
+   333→   333→                    placeholder="Ex: CitedBy"
+   334→   334→                    className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white placeholder-gray-600 outline-none transition-all focus:border-purple-500/50 focus:bg-white/[0.06] focus:shadow-[0_0_20px_rgba(168,85,247,0.08)]"
+   335→   335→                    disabled={isAnalyzing}
+   336→   336→                  />
+   337→   337→                </div>
+   338→   338→                <div>
+   339→   339→                  <label className="block text-sm font-medium text-gray-300 mb-2">URL du site</label>
+   340→   340→                  <input
+   341→   341→                    type="text"
+   342→   342→                    value={siteUrl}
+   343→   343→                    onChange={(e) => setSiteUrl(e.target.value)}
+   344→   344→                    placeholder="Ex: https://www.citedby.ai"
+   345→   345→                    className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white placeholder-gray-600 outline-none transition-all focus:border-purple-500/50 focus:bg-white/[0.06] focus:shadow-[0_0_20px_rgba(168,85,247,0.08)]"
+   346→   346→                    disabled={isAnalyzing}
+   347→   347→                  />
+   348→   348→                </div>
+   349→   349→              </div>
+   350→   350→
+   351→   351→              {auditError && (
+   352→   352→                <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">{auditError}</p>
+   353→   353→              )}
+   354→   354→
+   355→   355→              <button
+   356→   356→                type="submit"
+   357→   357→                disabled={isAnalyzing}
+   358→   358→                className={`w-full py-4 text-base font-bold flex items-center justify-center gap-3 transition-all rounded-full ${
+   359→   359→                  freeAuditUsed
+   360→   360→                    ? 'bg-zinc-700 text-zinc-500 cursor-not-allowed'
+   361→   361→                    : 'btn-gradient shadow-lg shadow-purple-600/20 hover:shadow-purple-600/30 disabled:opacity-60 disabled:cursor-not-allowed'
+   362→   362→                }`}
+   363→   363→              >
+   364→   364→                {isAnalyzing ? (
+   365→   365→                  <>
+   366→   366→                    <Loader2 size={20} className="animate-spin" />
+   367→   367→                    Analyse en cours...
+   368→   368→                  </>
+   369→   369→                ) : freeAuditUsed ? (
+   370→   370→                  <>
+   371→   371→                    <ArrowRight size={20} />
+   372→   372→                    Cr{'\u00e9'}er un compte pour continuer
+   373→   373→                  </>
+   374→   374→                ) : (
+   375→   375→                  <>
+   376→   376→                    <Sparkles size={20} />
+   377→   377→                    Analyser gratuitement
+   378→   378→                  </>
+   379→   379→                )}
+   380→   380→              </button>
+   381→   381→
+   382→   382→              <p className="text-center text-xs text-[var(--text-disabled)]">
+   383→   383→                Aucune carte bancaire requise. 0 GTO Gas consomm{'\u00e9'}. R{'\u00e9'}sultat instantan{'\u00e9'}.
+   384→   384→              </p>
+   385→   385→            </form>
+   386→   386→          </div>
+   387→   387→
+   388→   388→          {/* Loading Animation */}
+   389→   389→          {isAnalyzing && (
+   390→   390→            <div className="mt-8 bg-white/[0.03] border border-white/[0.06] rounded-xl p-10 flex flex-col items-center justify-center gap-5">
+   391→   391→              <div className="relative">
+   392→   392→                <div className="w-24 h-24 rounded-full border-4 border-[var(--border-subtle)]"></div>
+   393→   393→                <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-transparent border-t-purple-500 animate-spin"></div>
+   394→   394→                <div className="absolute inset-0 flex items-center justify-center">
+   395→   395→                  <ScanLine size={28} className="text-purple-400 animate-pulse" />
+   396→   396→                </div>
+   397→   397→              </div>
+   398→   398→              <div className="text-center">
+   399→   399→                <p className="text-white font-semibold mb-1">Scan en cours...</p>
+   400→   400→                <p className="text-sm text-gray-500">Nous interrogeons les LLMs pour {'\u00e9'}valuer votre marque</p>
+   401→   401→              </div>
+   402→   402→              {/* Animated category tags */}
+   403→   403→              <div className="flex flex-wrap justify-center gap-2">
+   404→   404→                {['Answer-First', 'Schema.org', 'FAQ', 'S\u00e9mantique', 'Fra\u00eecheur', 'Meta'].map((label, i) => (
+   405→   405→                  <div
+   406→   406→                    key={label}
+   407→   407→                    className="px-3 py-1 rounded-full text-[10px] font-medium bg-white/[0.03] border border-[var(--border-subtle)] text-gray-500"
+   408→   408→                    style={{ animation: `pulse 1.5s ease-in-out ${i * 0.25}s infinite` }}
+   409→   409→                  >
+   410→   410→                    {label}
+   411→   411→                  </div>
+   412→   412→                ))}
+   413→   413→              </div>
+   414→   414→            </div>
+   415→   415→          )}
+   416→   416→
+   417→   417→          {/* Results Section */}
+   418→   418→          {auditResult && !isAnalyzing && (
+   419→   419→            <div ref={resultsRef} className="mt-8 space-y-6">
+   420→   420→              {/* Main Score Card */}
+   421→   421→              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 md:p-10 relative overflow-hidden">
+   422→   422→                {/* GRATUIT tag */}
+   423→   423→                <div className="absolute top-0 right-0 px-5 py-1.5 bg-gradient-to-r from-purple-500 to-violet-600 text-xs font-bold rounded-bl-2xl rounded-tr-[1rem] text-white uppercase tracking-wider">
+   424→   424→                  GRATUIT
+   425→   425→                </div>
+   426→   426→
+   427→   427→                <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+   428→   428→                  {/* ScoreRing */}
+   429→   429→                  <div className="flex flex-col items-center gap-3 shrink-0">
+   430→   430→                    <ScoreRing score={auditResult.globalScore} size={160} strokeWidth={10} />
+   431→   431→                    <div className={`text-sm font-bold ${getScoreColor(auditResult.globalScore)}`}>
+   432→   432→                      {getScoreLabel(auditResult.globalScore)}
+   433→   433→                    </div>
+   434→   434→                  </div>
+   435→   435→
+   436→   436→                  {/* E-E-A-T Pillars */}
+   437→   437→                  <div className="flex-1 w-full">
+   438→   438→                    <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+   439→   439→                      <Shield size={18} className="text-purple-400" />
+   440→   440→                      Piliers E-E-A-T
+   441→   441→                    </h3>
+   442→   442→                    <div className="space-y-4">
+   443→   443→                      {eeatPillars.map((pillar) => (
+   444→   444→                        <div key={pillar.label}>
+   445→   445→                          <div className="flex items-center justify-between mb-1.5">
+   446→   446→                            <div className="flex items-center gap-2">
+   447→   447→                              <span className="text-purple-400">{pillar.icon}</span>
+   448→   448→                              <span className="text-sm font-medium text-gray-300">{pillar.label}</span>
+   449→   449→                            </div>
+   450→   450→                            <span className={`text-sm font-bold ${getScoreColor(pillar.score)}`}>{pillar.score}/100</span>
+   451→   451→                          </div>
+   452→   452→                          <div className="w-full h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
+   453→   453→                            <div
+   454→   454→                              className={`h-full rounded-full transition-all duration-1000 ease-out ${getBarColor(pillar.score)}`}
+   455→   455→                              style={{ width: `${pillar.score}%` }}
+   456→   456→                            ></div>
+   457→   457→                          </div>
+   458→   458→                        </div>
+   459→   459→                      ))}
+   460→   460→                    </div>
+   461→   461→                  </div>
+   462→   462→                </div>
+   463→   463→              </div>
+   464→   464→
+   465→   465→              {/* Summary Card */}
+   466→   466→              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8">
+   467→   467→                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+   468→   468→                  <Target size={18} className="text-purple-400" />
+   469→   469→                  Synth{'\u00e8'}se
+   470→   470→                </h3>
+   471→   471→                <p className="text-gray-400 leading-relaxed text-[15px] mb-6">{auditResult.summary}</p>
+   472→   472→
+   473→   473→                {auditResult.topRecommendations.length > 0 && (
+   474→   474→                  <div>
+   475→   475→                    <h4 className="text-sm font-bold text-gray-300 mb-3 uppercase tracking-wider">Recommandations prioritaires</h4>
+   476→   476→                    <ul className="space-y-2.5">
+   477→   477→                      {auditResult.topRecommendations.map((rec, i) => (
+   478→   478→                        <li key={i} className="flex items-start gap-3 text-sm text-gray-400">
+   479→   479→                          <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 mt-0.5">
+   480→   480→                            <span className="text-[10px] font-bold text-purple-400">{i + 1}</span>
+   481→   481→                          </div>
+   482→   482→                          {rec}
+   483→   483→                        </li>
+   484→   484→                      ))}
+   485→   485→                    </ul>
+   486→   486→                  </div>
+   487→   487→                )}
+   488→   488→              </div>
+   489→   489→
+   490→   490→              {/* CTA Card */}
+   491→   491→              <div className="gradient-border p-8 text-center relative overflow-hidden">
+   492→   492→                {/* Grid pattern */}
+   493→   493→                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+   494→   494→                <div className="relative z-10">
+   495→   495→                  <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+   496→   496→                    D{'\u00e9'}bloquez l'analyse <span className="gradient-text">compl{'\u00e8'}te</span>
+   497→   497→                  </h3>
+   498→   498→                  <p className="text-gray-500 mb-6 max-w-lg mx-auto">
+   499→   499→                    Cr{'\u00e9'}ez votre compte pour acc{'\u00e9'}der {'\u00e0'} l'audit d{'\u00e9'}taill{'\u00e9'} avec recommandations personnalis{'\u00e9'}es, outils de correction et monitoring continu.
+   500→   500→                  </p>
+   501→   501→                  <button
+   502→   502→                    onClick={() => onNavigate('login')}
+   503→   503→                    className="btn-gradient text-base px-8 py-3.5 inline-flex items-center gap-2.5 shadow-lg shadow-purple-600/20 hover:shadow-purple-600/30"
+   504→   504→                  >
+   505→   505→                    Cr{'\u00e9'}ez votre compte pour l'analyse compl{'\u00e8'}te <ArrowRight size={18} />
+   506→   506→                  </button>
+   507→   507→                </div>
+   508→   508→              </div>
+   509→   509→            </div>
+   510→   510→          )}
+   511→   511→        </div>
+   512→   512→      </div>
+   513→   513→
+   514→   514→      {/* ── STATS BAR ── */}
+   515→   515→      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-32">
+   516→   516→        {[
+   517→   517→          { value: '50%', label: 'des recherches vont vers l\'IA', sublabel: 'd\'ici 2026' },
+   518→   518→          { value: '24h', label: 'pour \u00eatre cit\u00e9', sublabel: 'premier audit' },
+   519→   519→          { value: '0', label: 'clic n\u00e9cessaire', sublabel: 'r\u00e9ponse directe' },
+   520→   520→          { value: '3x', label: 'plus de conversions', sublabel: 'vs SEO classique' },
+   521→   521→        ].map((stat, i) => (
+   522→   522→          <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 text-center group hover:-translate-y-1 transition-all duration-300" style={{ animationDelay: `${i * 150}ms`, animation: `slide-in-from-bottom 0.5s ease-out ${i * 150}ms both` }}>
+   523→   523→            <div className="text-3xl md:text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
+   524→   524→            <p className="text-sm text-gray-300 font-medium">{stat.label}</p>
+   525→   525→            <p className="text-xs text-[var(--text-disabled)] mt-1">{stat.sublabel}</p>
+   526→   526→          </div>
+   527→   527→        ))}
+   528→   528→      </div>
+   529→   529→
+   530→   530→      {/* ── FEATURES GRID ── */}
+   531→   531→      <div className="mb-32">
+   532→   532→        <div className="text-center mb-14">
+   533→   533→          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+   534→   534→            Vos outils de <span className="gradient-text">visibilit{'\u00e9'} IA</span>
+   535→   535→          </h2>
+   536→   536→          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+   537→   537→            Tout ce dont vous avez besoin pour dominer les r{'\u00e9'}ponses g{'\u00e9'}n{'\u00e9'}ratives.
+   538→   538→          </p>
+   539→   539→        </div>
+   540→   540→
+   541→   541→        <div className="grid md:grid-cols-3 gap-5">
+   542→   542→          {[
+   543→   543→            {
+   544→   544→              icon: <ScanLine size={28} />,
+   545→   545→              title: "Simulateur de Perception",
+   546→   546→              desc: "Visualisez comment les LLMs (GPT-4, Claude 3) 'voient' votre entit\u00e9 en temps r\u00e9el."
+   547→   547→            },
+   548→   548→            {
+   549→   549→              icon: <Code2 size={28} />,
+   550→   550→              title: "Code S\u00e9mantique",
+   551→   551→              desc: "G\u00e9n\u00e9rez automatiquement les donn\u00e9es structur\u00e9es (JSON-LD) que les robots pr\u00e9f\u00e8rent."
+   552→   552→            },
+   553→   553→            {
+   554→   554→              icon: <Globe2 size={28} />,
+   555→   555→              title: "Annuaire Index\u00e9",
+   556→   556→              desc: "Inscrivez votre marque dans le Knowledge Graph CitedBy pour forcer la d\u00e9couverte."
+   557→   557→            }
+   558→   558→          ].map((item, i) => (
+   559→   559→            <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 group cursor-default">
+   560→   560→              <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6 text-purple-400 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all duration-300">
+   561→   561→                {item.icon}
+   562→   562→              </div>
+   563→   563→              <h3 className="text-xl font-bold mb-3 text-white group-hover:text-purple-300 transition-colors">{item.title}</h3>
+   564→   564→              <p className="text-gray-500 leading-relaxed text-[15px]">{item.desc}</p>
+   565→   565→            </div>
+   566→   566→          ))}
+   567→   567→        </div>
+   568→   568→      </div>
+   569→   569→
+   570→   570→      {/* ── SEO vs AEO COMPARISON ── */}
+   571→   571→      <div className="mb-32">
+   572→   572→        <div className="text-center mb-14">
+   573→   573→          <h2 className="text-3xl md:text-5xl font-sans font-bold mb-5 text-white tracking-tight">
+   574→   574→            Le Changement de <span className="gradient-text">Paradigme</span>
+   575→   575→          </h2>
+   576→   576→          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+   577→   577→            Nous passons de l'{'\u00e8'}re de la recherche (Google) {'\u00e0'} l'{'\u00e8'}re de la r{'\u00e9'}ponse (IA).
+   578→   578→          </p>
+   579→   579→        </div>
+   580→   580→
+   581→   581→        <div className="grid md:grid-cols-2 gap-6 relative">
+   582→   582→          {/* VS Badge */}
+   583→   583→          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white/[0.03] border border-white/[0.06] rounded-full flex items-center justify-center font-bold text-white z-10 text-lg shadow-xl shadow-black/50">
+   584→   584→            VS
+   585→   585→          </div>
+   586→   586→
+   587→   587→          {/* SEO Classic Card */}
+   588→   588→          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 md:p-10 opacity-60 hover:opacity-90 transition-opacity">
+   589→   589→            <div className="flex items-center gap-4 mb-8">
+   590→   590→              <div className="p-3 bg-white/[0.03] rounded-xl text-gray-500">
+   591→   591→                <Search size={24} />
+   592→   592→              </div>
+   593→   593→              <h3 className="text-2xl font-bold text-gray-400">SEO Classique</h3>
+   594→   594→            </div>
+   595→   595→            <ul className="space-y-5">
+   596→   596→              {[
+   597→   597→                "Optimise pour des mots-cl\u00e9s.",
+   598→   598→                "Vise la liste de liens (SERP).",
+   599→   599→                "Trafic de \"navigation\" (Clicks).",
+   600→   600→                "Contenu long pour retenir l'utilisateur."
+   601→   601→              ].map((text, i) => (
+   602→   602→                <li key={i} className="flex items-start gap-3 text-gray-500">
+   603→   603→                  <div className="w-1.5 h-1.5 rounded-full bg-gray-600 mt-2.5 shrink-0"></div>
+   604→   604→                  <span>{text}</span>
+   605→   605→                </li>
+   606→   606→              ))}
+   607→   607→            </ul>
+   608→   608→          </div>
+   609→   609→
+   610→   610→          {/* AEO Card - Gradient Border */}
+   611→   611→          <div className="gradient-border p-8 md:p-10 relative">
+   612→   612→            <div className="absolute top-0 right-0 px-5 py-1.5 btn-gradient text-xs font-bold rounded-bl-2xl rounded-tr-[1rem]">Le Futur</div>
+   613→   613→            <div className="flex items-center gap-4 mb-8">
+   614→   614→              <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400">
+   615→   615→                <Bot size={24} />
+   616→   616→              </div>
+   617→   617→              <h3 className="text-2xl font-bold text-white">AEO & GEO</h3>
+   618→   618→            </div>
+   619→   619→            <ul className="space-y-5">
+   620→   620→              {[
+   621→   621→                "Optimise pour des entit\u00e9s et des faits.",
+   622→   622→                "Vise la r\u00e9ponse unique (Citations).",
+   623→   623→                "Trafic de \"conviction\" (Autorit\u00e9).",
+   624→   624→                "Format \"Answer-First\" structur\u00e9 pour les LLMs."
+   625→   625→              ].map((text, i) => (
+   626→   626→                <li key={i} className="flex items-start gap-3 text-gray-300">
+   627→   627→                  <Check size={16} className="text-purple-400 mt-1 shrink-0" />
+   628→   628→                  <span>{text}</span>
+   629→   629→                </li>
+   630→   630→              ))}
+   631→   631→            </ul>
+   632→   632→          </div>
+   633→   633→        </div>
+   634→   634→      </div>
+   635→   635→
+   636→   636→      {/* ── THE 3 PILLARS ── */}
+   637→   637→      <div className="mb-32">
+   638→   638→        <div className="text-center mb-14">
+   639→   639→          <h2 className="text-3xl md:text-5xl font-sans font-bold mb-5 text-white tracking-tight">
+   640→   640→            Les 3 Piliers de <span className="gradient-text">l'Autorit{'\u00e9'} IA</span>
+   641→   641→          </h2>
+   642→   642→          <p className="text-gray-500 max-w-xl mx-auto text-lg">Comment CitedBy structure votre pr{'\u00e9'}sence pour convaincre les algorithmes.</p>
+   643→   643→        </div>
+   644→   644→
+   645→   645→        <div className="grid md:grid-cols-3 gap-5">
+   646→   646→          {[
+   647→   647→            {
+   648→   648→              icon: <Database size={28} />,
+   649→   649→              title: "1. Identit\u00e9 (Graph)",
+   650→   650→              desc: "Les IA ne raisonnent pas en pages web, mais en concepts. Nous d\u00e9finissons votre \"Entit\u00e9 Nomm\u00e9e\" dans le Knowledge Graph pour que GPT sache exactement qui vous \u00eates."
+   651→   651→            },
+   652→   652→            {
+   653→   653→              icon: <BrainCircuit size={28} />,
+   654→   654→              title: "2. S\u00e9mantique (RAG)",
+   655→   655→              desc: "Pour \u00eatre cit\u00e9, votre contenu doit \u00eatre \"ing\u00e9rable\". Nous transformons votre site avec le pattern Answer-First et des donn\u00e9es structur\u00e9es JSON-LD."
+   656→   656→            },
+   657→   657→            {
+   658→   658→              icon: <Share2 size={28} />,
+   659→   659→              title: "3. Ubiquit\u00e9 (Signal)",
+   660→   660→              desc: "Une IA confirme une information en la croisant. Nous multiplions les signaux de corroboration via notre Annuaire AEO et optimisons vos fichiers techniques."
+   661→   661→            }
+   662→   662→          ].map((pillar, i) => (
+   663→   663→            <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 group relative overflow-hidden">
+   664→   664→              {/* Hover glow */}
+   665→   665→              <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-600/0 group-hover:bg-purple-600/5 blur-3xl rounded-full transition-all duration-500"></div>
+   666→   666→              <div className="relative z-10">
+   667→   667→                <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-6 group-hover:bg-purple-500/20 transition-colors">
+   668→   668→                  {pillar.icon}
+   669→   669→                </div>
+   670→   670→                <h3 className="text-xl font-bold text-white mb-4">{pillar.title}</h3>
+   671→   671→                <p className="text-gray-500 text-[15px] leading-relaxed mb-6">{pillar.desc}</p>
+   672→   672→                <div className="h-[2px] w-10 bg-white/10 rounded-full group-hover:w-16 group-hover:bg-purple-500/50 transition-all duration-500"></div>
+   673→   673→              </div>
+   674→   674→            </div>
+   675→   675→          ))}
+   676→   676→        </div>
+   677→   677→      </div>
+   678→   678→
+   679→   679→      {/* ── PROCESS SECTION ── */}
+   680→   680→      <div className="mb-32 w-full">
+   681→   681→        <div className="gradient-border p-8 md:p-12 relative overflow-hidden">
+   682→   682→          {/* Grid pattern */}
+   683→   683→          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
+   684→   684→
+   685→   685→          <div className="relative z-10">
+   686→   686→            <h3 className="text-2xl md:text-3xl font-bold text-center mb-12 text-white">Votre parcours d'optimisation</h3>
+   687→   687→
+   688→   688→            <div className="space-y-0">
+   689→   689→              {[
+   690→   690→                {
+   691→   691→                  step: '01',
+   692→   692→                  title: 'Analyse de Perception',
+   693→   693→                  desc: 'Notre scanner interroge les principaux LLMs pour \u00e9tablir votre score de visibilit\u00e9 actuel et identifier les "trous" dans leur connaissance de votre marque.',
+   694→   694→                  active: true
+   695→   695→                },
+   696→   696→                {
+   697→   697→                  step: '02',
+   698→   698→                  title: 'G\u00e9n\u00e9ration du "Source of Truth"',
+   699→   699→                  desc: 'Nous cr\u00e9ons les fichiers llm.txt et llm.json qui serviront de r\u00e9f\u00e9rence canonique pour les robots d\'indexation.',
+   700→   700→                  active: false
+   701→   701→                },
+   702→   702→                {
+   703→   703→                  step: '03',
+   704→   704→                  title: 'Monitoring Continu',
+   705→   705→                  desc: 'Les mod\u00e8les d\'IA changent chaque semaine. CitedBy surveille vos positions et vous alerte si une hallucination concernant votre marque appara\u00eet.',
+   706→   706→                  active: false
+   707→   707→                }
+   708→   708→              ].map((item, i) => (
+   709→   709→                <div key={i} className="flex gap-6 md:gap-8">
+   710→   710→                  <div className="flex flex-col items-center">
+   711→   711→                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+   712→   712→                      item.active
+   713→   713→                        ? 'btn-gradient shadow-lg shadow-purple-600/30'
+   714→   714→                        : 'bg-white/[0.03] border border-white/[0.06] text-gray-400'
+   715→   715→                    }`}>
+   716→   716→                      {item.step}
+   717→   717→                    </div>
+   718→   718→                    {i < 2 && <div className="w-px h-full bg-white/[0.06] my-2"></div>}
+   719→   719→                  </div>
+   720→   720→                  <div className="pb-10">
+   721→   721→                    <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>
+   722→   722→                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+   723→   723→                  </div>
+   724→   724→                </div>
+   725→   725→              ))}
+   726→   726→            </div>
+   727→   727→          </div>
+   728→   728→        </div>
+   729→   729→      </div>
+   730→   730→
+   731→   731→      {/* ── TESTIMONIALS ── */}
+   732→   732→      <div className="mb-32">
+   733→   733→        <div className="text-center mb-14">
+   734→   734→          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+   735→   735→            Ils nous font <span className="gradient-text">confiance</span>
+   736→   736→          </h2>
+   737→   737→          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+   738→   738→            Des marques de toutes tailles optimisent leur visibilit{'\u00e9'} IA avec CitedBy.
+   739→   739→          </p>
+   740→   740→        </div>
+   741→   741→
+   742→   742→        <div className="grid md:grid-cols-3 gap-5 mb-12">
+   743→   743→          {[
+   744→   744→            {
+   745→   745→              quote: "En 3 semaines, notre marque est pass\u00e9e de 0 citation \u00e0 \u00eatre recommand\u00e9e par ChatGPT sur nos mots-cl\u00e9s principaux. Le ROI est incroyable.",
+   746→   746→              name: "Marie Dubois",
+   747→   747→              role: "CMO, TechFlow SaaS",
+   748→   748→              avatar: "M",
+   749→   749→              rating: 5
+   750→   750→            },
+   751→   751→            {
+   752→   752→              quote: "L'outil Schema.org et le Source of Truth ont compl\u00e8tement transform\u00e9 notre pr\u00e9sence. Claude nous cite maintenant comme r\u00e9f\u00e9rence dans notre secteur.",
+   753→   753→              name: "Thomas Martin",
+   754→   754→              role: "Head of SEO, GreenGarden",
+   755→   755→              avatar: "T",
+   756→   756→              rating: 5
+   757→   757→            },
+   758→   758→            {
+   759→   759→              quote: "Le dashboard de monitoring est une mine d'or. On voit en temps r\u00e9el quand un bot IA crawle nos pages et comment notre score \u00e9volue.",
+   760→   760→              name: "Sophie Laurent",
+   761→   761→              role: "Directrice Digitale, OmniMedia",
+   762→   762→              avatar: "S",
+   763→   763→              rating: 5
+   764→   764→            }
+   765→   765→          ].map((testimonial, i) => (
+   766→   766→            <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 flex flex-col">
+   767→   767→              <div className="flex gap-1 mb-5">
+   768→   768→                {Array.from({ length: testimonial.rating }).map((_, j) => (
+   769→   769→                  <Star key={j} size={16} className="text-amber-400 fill-amber-400" />
+   770→   770→                ))}
+   771→   771→              </div>
+   772→   772→              <p className="text-gray-300 text-[15px] leading-relaxed flex-1 mb-6">"{testimonial.quote}"</p>
+   773→   773→              <div className="flex items-center gap-3 pt-4 border-t border-[var(--border-subtle)]">
+   774→   774→                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">
+   775→   775→                  {testimonial.avatar}
+   776→   776→                </div>
+   777→   777→                <div>
+   778→   778→                  <p className="text-white font-semibold text-sm">{testimonial.name}</p>
+   779→   779→                  <p className="text-gray-500 text-xs">{testimonial.role}</p>
+   780→   780→                </div>
+   781→   781→              </div>
+   782→   782→            </div>
+   783→   783→          ))}
+   784→   784→        </div>
+   785→   785→
+   786→   786→        {/* Trust Badges */}
+   787→   787→        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 py-8 border-y border-[var(--border-subtle)]">
+   788→   788→          {[
+   789→   789→            { label: 'RGPD Compliant', icon: '\u{1F6E1}\uFE0F' },
+   790→   790→            { label: 'SSL Chiffr\u00e9', icon: '\u{1F512}' },
+   791→   791→            { label: '99.9% Uptime', icon: '\u26A1' },
+   792→   792→            { label: 'Support 24/7', icon: '\u{1F4AC}' },
+   793→   793→            { label: 'Made in France', icon: '\u{1F1EB}\u{1F1F7}' },
+   794→   794→          ].map((badge, i) => (
+   795→   795→            <div key={i} className="flex items-center gap-2 text-gray-500 text-sm">
+   796→   796→              <span className="text-lg">{badge.icon}</span>
+   797→   797→              <span className="font-medium">{badge.label}</span>
+   798→   798→            </div>
+   799→   799→          ))}
+   800→   800→        </div>
+   801→   801→      </div>
+   802→   802→
+   803→   803→      {/* ── PRICING SECTION ── */}
+   804→   804→      <div className="mb-12 relative">
+   805→   805→        {/* Background glow */}
+   806→   806→        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-purple-600/5 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
+   807→   807→
+   808→   808→        <div className="text-center mb-14">
+   809→   809→          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-gray-400 text-xs font-medium tracking-wide uppercase mb-6">
+   810→   810→            <Fuel size={12} className="text-purple-400" />
+   811→   811→            <span>Carburant Algorithmique</span>
+   812→   812→          </div>
+   813→   813→          <h2 className="text-3xl md:text-5xl font-sans font-bold text-white tracking-tight mb-5">
+   814→   814→            Rechargez votre <span className="gradient-text">GTO Gas</span>
+   815→   815→          </h2>
+   816→   816→          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+   817→   817→            Notre monnaie virtuelle pour ex{'\u00e9'}cuter les audits, g{'\u00e9'}n{'\u00e9'}rer les correctifs et valider votre entit{'\u00e9'}.
+   818→   818→          </p>
+   819→   819→        </div>
+   820→   820→
+   821→   821→        <div className="grid md:grid-cols-3 gap-5 w-full items-stretch">
+   822→   822→          {plans.map((plan, idx) => (
+   823→   823→            <div
+   824→   824→              key={idx}
+   825→   825→              className={`relative bg-white/[0.03] border border-white/[0.06] rounded-xl p-8 flex flex-col h-full ${
+   826→   826→                plan.popular
+   827→   827→                  ? '!border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.08)] md:scale-105 z-10'
+   828→   828→                  : ''
+   829→   829→              }`}
+   830→   830→            >
+   831→   831→              {plan.popular && (
+   832→   832→                <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-gradient text-xs font-bold px-5 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-purple-600/30">
+   833→   833→                  Le Choix Expert
+   834→   834→                </div>
+   835→   835→              )}
+   836→   836→
+   837→   837→              <div className="mb-6 flex items-center justify-between pt-2">
+   838→   838→                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+   839→   839→                  plan.popular
+   840→   840→                    ? 'bg-gradient-to-br from-purple-500 to-violet-600 text-white'
+   841→   841→                    : 'bg-purple-500/10 text-gray-500'
+   842→   842→                }`}>
+   843→   843→                  {plan.icon}
+   844→   844→                </div>
+   845→   845→                <div className="text-right">
+   846→   846→                  <span className="block text-3xl font-bold gradient-text">{plan.credits}</span>
+   847→   847→                  <span className="text-[11px] text-[var(--text-disabled)] uppercase font-bold tracking-wider">Cr{'\u00e9'}dits Gas</span>
+   848→   848→                </div>
+   849→   849→              </div>
+   850→   850→
+   851→   851→              <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+   852→   852→              <div className="flex items-baseline gap-1 mb-8">
+   853→   853→                <span className="text-4xl font-bold text-white">{plan.price}{'\u20ac'}</span>
+   854→   854→                <span className="text-sm text-[var(--text-disabled)]">HT</span>
+   855→   855→              </div>
+   856→   856→
+   857→   857→              <ul className="space-y-3.5 mb-8 flex-1">
+   858→   858→                {plan.features.map((feat, i) => (
+   859→   859→                  <li key={i} className="flex items-start gap-3 text-[15px] text-gray-400">
+   860→   860→                    <Check size={16} className={`mt-0.5 shrink-0 ${plan.popular ? 'text-purple-400' : 'text-[var(--text-disabled)]'}`} />
+   861→   861→                    {feat}
+   862→   862→                  </li>
+   863→   863→                ))}
+   864→   864→              </ul>
+   865→   865→
+   866→   866→              <button
+   867→   867→                onClick={() => handleSelectPlan(plan.id)}
+   868→   868→                className={`w-full py-3.5 rounded-full font-bold flex items-center justify-center gap-2 transition-all text-[15px] ${
+   869→   869→                  plan.popular
+   870→   870→                    ? 'btn-gradient shadow-lg shadow-purple-600/20'
+   871→   871→                    : 'bg-white/[0.03] border border-white/[0.06] text-gray-300 hover:bg-white/[0.07] hover:border-white/[0.12]'
+   872→   872→                }`}
+   873→   873→              >
+   874→   874→                {user ? 'Recharger' : 'Cr\u00e9er un compte'} <ArrowRight size={16} />
+   875→   875→              </button>
+   876→   876→            </div>
+   877→   877→          ))}
+   878→   878→        </div>
+   879→   879→      </div>
+   880→   880→
+   881→   881→    </div>
+   882→   882→  );
+   883→   883→};
+   884→   884→
+   885→   885→export default Home;
+   886→   886→

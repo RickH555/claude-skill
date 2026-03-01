@@ -1,0 +1,293 @@
+import Stripe from 'https://esm.sh/stripe@15.12.0?target=denonext';
+import { authenticateRequest, corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent, parseJsonBody } from '../_shared/common.ts';
+
+interface AutoRechargePayload {
+  user_id: string;
+  minimum_required_credits?: number;
+  reason?: string;
+}
+
+interface ProfileAutoRechargeRow {
+  id: string;
+  stripe_customer_id: string | null;
+  credits_balance: number;
+  credits_total_purchased: number;
+  auto_recharge_enabled: boolean;
+  auto_recharge_pack_id: 'pack_20' | 'pack_50' | 'pack_120' | 'pack_300' | null;
+  auto_recharge_trigger_threshold: number;
+  auto_recharge_max_per_month: number;
+  auto_recharge_count_month: number;
+  auto_recharge_month_ref: string | null;
+}
+
+interface PackConfig {
+  id: 'pack_20' | 'pack_50' | 'pack_120' | 'pack_300';
+  creditsTotal: number;
+  amountCents: number;
+  priceId: string;
+}
+
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY manquante');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2024-04-10',
+});
+
+const getPackConfigs = (): PackConfig[] => [
+  {
+    id: 'pack_20',
+    creditsTotal: 20,
+    amountCents: 2900,
+    priceId: Deno.env.get('STRIPE_PRICE_CREDITS_20') ?? '',
+  },
+  {
+    id: 'pack_50',
+    creditsTotal: 55,
+    amountCents: 6900,
+    priceId: Deno.env.get('STRIPE_PRICE_CREDITS_50') ?? '',
+  },
+  {
+    id: 'pack_120',
+    creditsTotal: 135,
+    amountCents: 14900,
+    priceId: Deno.env.get('STRIPE_PRICE_CREDITS_120') ?? '',
+  },
+  {
+    id: 'pack_300',
+    creditsTotal: 350,
+    amountCents: 32900,
+    priceId: Deno.env.get('STRIPE_PRICE_CREDITS_300') ?? '',
+  },
+];
+
+const monthStartIso = (date = new Date()): string => {
+  const monthStart = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
+  return monthStart.toISOString().slice(0, 10);
+};
+
+const normalizeMonthRef = (value: string | null | undefined): string | null => {
+  if (!value) {
+    return null;
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return monthStartIso(parsed);
+};
+
+const resolvePaymentMethodId = async (customerId: string): Promise<string | null> => {
+  const customer = await stripe.customers.retrieve(customerId);
+  if ('deleted' in customer && customer.deleted) {
+    return null;
+  }
+  const defaultPm = customer.invoice_settings?.default_payment_method;
+  if (typeof defaultPm === 'string' && defaultPm) {
+    return defaultPm;
+  }
+  const listed = await stripe.paymentMethods.list({
+    customer: customerId,
+    type: 'card',
+    limit: 1,
+  });
+  const fallback = listed.data[0]?.id ?? null;
+  if (fallback) {
+    await stripe.customers.update(customerId, {
+      invoice_settings: {
+        default_payment_method: fallback,
+      },
+    });
+  }
+  return fallback;
+};
+
+/**
+ * Recharge auto one-shot sur carte sauvegardee Stripe.
+ */
+Deno.serve(async (request: Request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+  let userIdForLog: string | null = null;
+
+  try {
+    enforceRateLimit(`auto-recharge:${ip}`, 100);
+    if (request.method !== 'POST') {
+      return jsonResponse({ error: 'Method not allowed' }, 405);
+    }
+
+    // Auth: JWT utilisateur ou service role (appel interne depuis distribute)
+    const auth = await authenticateRequest(request);
+    if (auth.error) return auth.error;
+
+    const payload = await parseJsonBody<AutoRechargePayload>(request);
+    if (!payload.user_id) {
+      return jsonResponse({ error: 'user_id requis' }, 400);
+    }
+    userIdForLog = payload.user_id;
+
+    // Si JWT utilisateur, verifier que user_id correspond
+    if (auth.userId && auth.userId !== payload.user_id) {
+      return jsonResponse({ error: 'Action interdite' }, 403);
+    }
+
+    const admin = createAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from('profiles')
+      .select(
+        'id, stripe_customer_id, credits_balance, credits_total_purchased, auto_recharge_enabled, auto_recharge_pack_id, auto_recharge_trigger_threshold, auto_recharge_max_per_month, auto_recharge_count_month, auto_recharge_month_ref',
+      )
+      .eq('id', payload.user_id)
+      .single<ProfileAutoRechargeRow>();
+    if (profileError || !profile) {
+      throw new Error('Profil introuvable');
+    }
+
+    if (!profile.auto_recharge_enabled) {
+      return jsonResponse({
+        recharged: false,
+        reason: 'auto_recharge_disabled',
+        credits_balance: profile.credits_balance,
+      });
+    }
+
+    const required = Math.max(1, Number(payload.minimum_required_credits ?? profile.auto_recharge_trigger_threshold));
+    if (profile.credits_balance >= required) {
+      return jsonResponse({
+        recharged: false,
+        reason: 'enough_balance',
+        credits_balance: profile.credits_balance,
+      });
+    }
+
+    if (!profile.stripe_customer_id) {
+      throw new Error('Aucun customer Stripe configure pour auto-recharge');
+    }
+
+    const packId = profile.auto_recharge_pack_id ?? 'pack_50';
+    const pack = getPackConfigs().find((item) => item.id === packId);
+    if (!pack || !pack.priceId) {
+      throw new Error('Pack auto-recharge non configure cote Stripe');
+    }
+
+    const currentMonth = monthStartIso();
+    const storedMonth = normalizeMonthRef(profile.auto_recharge_month_ref);
+    let monthlyCount = profile.auto_recharge_count_month;
+    if (storedMonth !== currentMonth) {
+      monthlyCount = 0;
+      await admin
+        .from('profiles')
+        .update({
+          auto_recharge_count_month: 0,
+          auto_recharge_month_ref: currentMonth,
+        })
+        .eq('id', profile.id);
+    }
+
+    if (monthlyCount >= profile.auto_recharge_max_per_month) {
+      return jsonResponse({
+        recharged: false,
+        reason: 'monthly_limit_reached',
+        credits_balance: profile.credits_balance,
+      });
+    }
+
+    const paymentMethodId = await resolvePaymentMethodId(profile.stripe_customer_id);
+    if (!paymentMethodId) {
+      throw new Error('Aucun moyen de paiement valide pour auto-recharge');
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: pack.amountCents,
+      currency: 'eur',
+      customer: profile.stripe_customer_id,
+      payment_method: paymentMethodId,
+      confirm: true,
+      off_session: true,
+      description: `LeadRadar auto-recharge ${pack.id}`,
+      metadata: {
+        user_id: profile.id,
+        pack_id: pack.id,
+        credits_total: String(pack.creditsTotal),
+        reason: payload.reason ?? 'automatic_low_balance',
+      },
+    });
+
+    if (paymentIntent.status !== 'succeeded') {
+      throw new Error(`Paiement auto-recharge non confirme (${paymentIntent.status})`);
+    }
+
+    const nextBalance = profile.credits_balance + pack.creditsTotal;
+    const nextPurchased = profile.credits_total_purchased + pack.creditsTotal;
+    const nowIso = new Date().toISOString();
+    const nextCount = monthlyCount + 1;
+
+    const { error: updateError } = await admin
+      .from('profiles')
+      .update({
+        credits_balance: nextBalance,
+        credits_total_purchased: nextPurchased,
+        auto_recharge_count_month: nextCount,
+        auto_recharge_month_ref: currentMonth,
+        auto_recharge_last_at: nowIso,
+        updated_at: nowIso,
+      })
+      .eq('id', profile.id);
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+
+    await admin.from('credit_transactions').insert({
+      user_id: profile.id,
+      transaction_type: 'purchase',
+      credits_delta: pack.creditsTotal,
+      credits_balance_after: nextBalance,
+      amount_eur: pack.amountCents / 100,
+      unit_price_eur: Number(((pack.amountCents / 100) / pack.creditsTotal).toFixed(2)),
+      stripe_payment_intent_id: paymentIntent.id,
+      description: `Auto-recharge ${pack.id}`,
+      metadata_json: {
+        auto_recharge: true,
+        pack_id: pack.id,
+        reason: payload.reason ?? 'automatic_low_balance',
+      },
+    });
+
+    await admin.from('notifications').insert({
+      user_id: profile.id,
+      prospect_id: null,
+      type: 'credit_purchase',
+      title: 'Auto-recharge effectuee',
+      body: `Recharge automatique reussie: +${pack.creditsTotal} credits.`,
+    });
+
+    await logAutomationEvent('scan_completed', {
+      stage: 'auto_recharge',
+      user_id: profile.id,
+      pack_id: pack.id,
+      credits_added: pack.creditsTotal,
+      new_balance: nextBalance,
+      payment_intent_id: paymentIntent.id,
+    });
+
+    return jsonResponse({
+      recharged: true,
+      credits_added: pack.creditsTotal,
+      credits_balance: nextBalance,
+      auto_recharge_count_month: nextCount,
+    });
+  } catch (error) {
+    await logAutomationEvent('error', {
+      stage: 'auto_recharge',
+      user_id: userIdForLog,
+      reason: error instanceof Error ? error.message : 'unknown',
+    });
+
+    return jsonResponse({ error: error instanceof Error ? error.message : 'Erreur auto-recharge' }, 500);
+  }
+});

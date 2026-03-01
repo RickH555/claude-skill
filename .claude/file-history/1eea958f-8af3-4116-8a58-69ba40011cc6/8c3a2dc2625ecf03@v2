@@ -1,0 +1,236 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  FileText,
+  HelpCircle,
+  BookOpen,
+  Briefcase,
+  Copy,
+  Check,
+  Loader2,
+  Sparkles,
+  Clock,
+} from 'lucide-react';
+import { PageHeader } from '@/components/page-header';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { MOCK_SMC_CONTENTS } from '@/lib/mock-data';
+
+const TOOLS = [
+  {
+    id: 'fiche',
+    label: 'Fiche Entreprise',
+    description: 'Generez une fiche optimisee pour les IA avec vos informations cles.',
+    icon: Briefcase,
+    color: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+  },
+  {
+    id: 'faq',
+    label: 'FAQ Optimisee',
+    description: 'Creez une FAQ structuree avec Schema.org FAQPage.',
+    icon: HelpCircle,
+    color: 'text-purple-400',
+    bg: 'bg-purple-500/10',
+  },
+  {
+    id: 'article',
+    label: 'Article AEO',
+    description: 'Redigez un article optimise pour etre cite par les IA.',
+    icon: BookOpen,
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/10',
+  },
+];
+
+export default function SMCStudioPage() {
+  const [activeTab, setActiveTab] = useState('studio');
+  const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [topic, setTopic] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerate = () => {
+    if (!selectedTool || !topic) return;
+    setGenerating(true);
+    setGeneratedContent(null);
+
+    setTimeout(() => {
+      const mockResults: Record<string, string> = {
+        fiche: `# Fiche Entreprise — ${topic}\n\n## Description\n${topic} est une entreprise innovante specialisee dans son domaine d'activite. Fondee pour repondre aux besoins croissants du marche, elle accompagne ses clients avec des solutions sur mesure.\n\n## Services principaux\n- Conseil strategique et accompagnement\n- Solutions technologiques innovantes\n- Formation et certification\n- Support technique 24/7\n\n## Chiffres cles\n- +500 clients actifs\n- 98% de satisfaction client\n- Present dans 3 pays\n- Equipe de 45 experts`,
+        faq: `# FAQ — ${topic}\n\n## Q: Qu'est-ce que ${topic} ?\nR: ${topic} est une solution complete qui permet aux entreprises d'optimiser leur presence digitale et d'ameliorer leur visibilite aupres des moteurs de reponse IA.\n\n## Q: Comment fonctionne ${topic} ?\nR: ${topic} utilise une technologie proprietaire d'analyse et d'optimisation pour evaluer et ameliorer votre contenu.\n\n## Q: Quels sont les tarifs ?\nR: ${topic} propose plusieurs formules adaptees a chaque besoin, a partir de 49€/mois pour le plan Starter.`,
+        article: `# ${topic} : Guide Complet pour 2024\n\nDans un monde ou l'IA transforme la maniere dont les utilisateurs cherchent l'information, ${topic} devient un enjeu strategique pour les entreprises.\n\n## Pourquoi c'est important\nLes moteurs de reponse IA comme ChatGPT, Perplexity et Gemini citent de plus en plus de sources dans leurs reponses. Etre cite signifie gagner en visibilite et en credibilite.\n\n## Les 5 strategies cles\n1. **Structurer son contenu** avec des reponses directes\n2. **Utiliser le Schema.org** pour enrichir les donnees\n3. **Creer des FAQ** extractibles par les IA\n4. **Optimiser le robots.txt** pour les bots IA\n5. **Monitorer les citations** avec des outils dedies`,
+      };
+      setGeneratedContent(mockResults[selectedTool] || '');
+      setGenerating(false);
+    }, 2000);
+  };
+
+  const handleCopy = () => {
+    if (generatedContent) {
+      navigator.clipboard.writeText(generatedContent);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <PageHeader
+        title="SMC Studio"
+        description="Generez des contenus strategiques optimises pour les moteurs de reponse IA."
+        breadcrumbs={[
+          { label: 'App', href: '/app' },
+          { label: 'Outils Generatifs', href: '/app/generative-tools' },
+          { label: 'SMC Studio' },
+        ]}
+      />
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-8">
+          <TabsTrigger value="studio">Studio</TabsTrigger>
+          <TabsTrigger value="library">Bibliotheque ({MOCK_SMC_CONTENTS.length})</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="studio">
+          <div className="grid lg:grid-cols-12 gap-8 animate-fade-in-up">
+            {/* Tool Selection */}
+            <div className="lg:col-span-5 space-y-4">
+              <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider mb-3">
+                Choisissez un outil
+              </h3>
+              {TOOLS.map((tool) => {
+                const Icon = tool.icon;
+                const isSelected = selectedTool === tool.id;
+                return (
+                  <button
+                    key={tool.id}
+                    onClick={() => setSelectedTool(tool.id)}
+                    className={`w-full text-left p-4 rounded-xl border transition-all ${
+                      isSelected
+                        ? 'bg-primary/10 border-primary/30'
+                        : 'bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={`p-2 rounded-lg ${tool.bg}`}>
+                        <Icon size={18} className={tool.color} />
+                      </div>
+                      <span className="font-medium text-white">{tool.label}</span>
+                      {isSelected && <Badge variant="success" className="ml-auto text-[10px]">Selectionne</Badge>}
+                    </div>
+                    <p className="text-xs text-white/40 pl-11">{tool.description}</p>
+                  </button>
+                );
+              })}
+
+              {/* Input */}
+              {selectedTool && (
+                <div className="space-y-3 pt-4 animate-fade-in-up">
+                  <label className="block text-sm font-medium text-white/70">
+                    Sujet / Nom de l&apos;entreprise
+                  </label>
+                  <input
+                    type="text"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    placeholder="Ex: CitedBy.ai, Mon entreprise..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                  />
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={!topic || generating}
+                    className="w-full gap-2"
+                  >
+                    {generating ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} />
+                        Generation en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={16} />
+                        Generer
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Output */}
+            <div className="lg:col-span-7">
+              {generatedContent ? (
+                <Card className="p-6 animate-fade-in-up">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={16} className="text-primary" />
+                      <span className="text-sm font-bold text-white">Contenu genere</span>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
+                      {copied ? <Check size={14} /> : <Copy size={14} />}
+                      {copied ? 'Copie !' : 'Copier'}
+                    </Button>
+                  </div>
+                  <div className="bg-white/[0.02] border border-white/5 rounded-xl p-5 max-h-[500px] overflow-y-auto">
+                    <pre className="whitespace-pre-wrap text-sm text-white/70 font-sans leading-relaxed">
+                      {generatedContent}
+                    </pre>
+                  </div>
+                </Card>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+                    <FileText size={24} className="text-white/20" />
+                  </div>
+                  <p className="text-white/30 text-sm">
+                    Selectionnez un outil et entrez un sujet pour generer du contenu
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="library">
+          <div className="space-y-4 animate-fade-in-up">
+            {MOCK_SMC_CONTENTS.map((content) => {
+              const typeIcons: Record<string, typeof FileText> = {
+                fiche: Briefcase,
+                faq: HelpCircle,
+                article: BookOpen,
+                brief: FileText,
+              };
+              const TypeIcon = typeIcons[content.type] || FileText;
+
+              return (
+                <Card key={content.id} className="p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2.5 rounded-xl bg-white/5 shrink-0">
+                      <TypeIcon size={18} className="text-white/40" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-sm font-bold text-white truncate">{content.title}</h3>
+                        <Badge variant="secondary" className="text-[10px] shrink-0">{content.type}</Badge>
+                      </div>
+                      <p className="text-xs text-white/40 line-clamp-2 mb-2">{content.content}</p>
+                      <div className="flex items-center gap-1.5 text-[10px] text-white/30">
+                        <Clock size={10} />
+                        {new Date(content.timestamp).toLocaleDateString('fr-FR')}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

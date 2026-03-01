@@ -1,0 +1,66 @@
+# Plan : Fusion Account + Plan en une seule page
+
+## Contexte
+L'utilisateur veut fusionner les pages "Mon Compte" (`Account.tsx`) et "Plan & Factures" (`Plan.tsx`) en une seule page unifiée, y ajouter un compteur de projets consommés et une offre d'upgrade.
+
+## Fichiers à modifier
+- `pages/Account.tsx` — **Réécriture complète** (page fusionnée)
+- `pages/Plan.tsx` — Conservé mais non utilisé (ne pas supprimer, règle CLAUDE.md)
+- `App.tsx` — Supprimer la route `plan`, rediriger les navigations `plan` → `account`
+- Sidebar dans `App.tsx` — Retirer l'entrée "Plan & Factures", renommer "Mon Compte" → "Mon Compte & Plan"
+
+## Architecture de la page fusionnée
+
+### Header
+- Titre "Mon Compte" avec avatar
+- Bouton déconnexion (rouge)
+
+### 3 onglets
+
+**Onglet 1 : Profil**
+- Carte profil (avatar, nom, email, badge plan)
+- Formulaire infos personnelles (nom, email, workspace)
+- Clés API & intégrations
+- Préférences de notification
+- Zone danger (suppression compte)
+
+**Onglet 2 : Abonnement & Projets**
+- **Compteur de projets** (barre de progression : X/Y projets utilisés ce mois, style KPI)
+- **Offre upgrade** (bannière CTA prominente si plan free/pro)
+- Plan actuel (détails, statut, date renouvellement)
+- Solde GTO Gas avec bouton recharger
+- 3 cartes pricing (Starter/Pro/Agency) pour changer d'offre
+
+**Onglet 3 : Facturation**
+- Moyen de paiement (carte affichée)
+- Adresse de facturation
+- Historique des factures (table avec PDF)
+
+## Modifications App.tsx
+1. Supprimer le lazy import de `Plan`
+2. Supprimer la route `{currentView === 'plan' && ...}`
+3. Changer la prop d'Account pour recevoir `onUpgrade`, `projectCount`, `maxProjects`, `initialTab`
+4. Rediriger toute navigation vers `plan` → `account` (y compris depuis Directory)
+5. Sidebar : une seule entrée `account` avec label "Compte & Plan"
+6. Retirer `plan` du type union de `currentView`
+
+## Props de la page fusionnée
+```tsx
+interface AccountProps {
+  user: User | null;
+  onLogout: () => void;
+  onNavigate: (view: any) => void;
+  onUpgrade: (plan: 'free' | 'pro' | 'enterprise') => void;
+  projectCount: number;
+  maxProjects: number;
+  initialTab?: 'profile' | 'subscription' | 'billing';
+}
+```
+
+## Vérification
+1. `npm run build` — doit passer sans erreur
+2. `npm test` — 17/17 tests passent
+3. Navigation sidebar : un seul item "Compte & Plan" qui ouvre la page fusionnée
+4. Toutes les redirections vers `plan` arrivent bien sur l'onglet "Abonnement"
+5. Le compteur de projets affiche correctement X/Y
+6. L'offre upgrade apparaît si le plan actuel n'est pas Enterprise

@@ -1,0 +1,108 @@
+# Plan : Ajouter Google AI Overviews comme moteur IA tracke
+
+## Contexte
+Google AI Overviews represente 13% des requetes desktop en 2026. Tous les concurrents leaders (Profound, Semrush, Goodie AI, Peec AI) le trackent deja. C'est une lacune critique pour CitedBy.ai. L'objectif est d'ajouter "AI Overviews" comme 5eme moteur IA dans tout le systeme.
+
+## Couleur choisie
+**Rose/Red** `#f43f5e` (rose-500) — distinct de tous les moteurs existants :
+- ChatGPT: emerald `#10b981`
+- Claude: purple `#a855f7`
+- Perplexity: blue `#3b82f6`
+- Gemini: amber `#f59e0b`
+- Copilot: cyan `#06b6d4`
+- **AI Overviews: rose `#f43f5e`** (NEW)
+
+## Fichiers a modifier (13 fichiers)
+
+### 1. Types (2 fichiers)
+
+**`types/ai-monitoring.ts`** (L6, L46-53)
+- L6: Ajouter `'AI Overviews'` au type `AIEngine`
+- L46-53: Ajouter `aiOverviews: number` a `TimeSeriesPoint`
+
+**`types/integrations.ts`** (L20-27)
+- Ajouter `aiOverviews: number` a `TrafficDataPoint`
+
+### 2. Services (3 fichiers)
+
+**`services/ai-monitoring.ts`** (L63, L148-158, L112, L234)
+- L63: Ajouter `'AI Overviews'` au tableau `engines`
+- L148: Ajouter `const aiOverviews = seededInt(daySeed, 340, 0, 4);`
+- L154: Ajouter `aiOverviews` dans le return de timeSeries et dans le calcul `citations`
+- L112: `engineIndex = i % 5` (au lieu de 4)
+- L234+: Mettre a jour le prompt Gemini API pour mentionner 5 moteurs
+
+**`services/ai-citation-simulator.ts`** (L17, L119-124, L172, L245-246)
+- L17: Ajouter `'AI Overviews'` au type engine de `AIEngineResponse`
+- Ajouter une reponse simulee `aiOverviewsResponse` (style: encart factuel avec liens bleus, format snippet/answer box)
+- L119-124: Ajouter `aiOverviewsResponse` au tableau `engines`
+- L172: Ajouter `'AI Overviews'` dans l'enum du schema Gemini
+- L245-246: Mettre a jour la description du prompt (5 moteurs)
+
+**`services/integrations.ts`** (L115-128, L130-177)
+- L115-128: Ajouter `aiOverviews: randomBetween(25, 120)` dans la generation de trafic
+- L130-177: Ajouter une ligne "AI Overviews" dans la table d'attribution
+
+**`services/reputation_service.ts`**
+- Ajouter une mention mock "AI Overviews" dans les donnees fallback
+
+### 3. Pages (8 fichiers)
+
+**`pages/AiMonitoring.tsx`** (L28-40, L229, L317, L758-801)
+- L28-33: Ajouter `'AI Overviews': '#f43f5e'` dans `ENGINE_COLORS`
+- L35-40: Ajouter `'AI Overviews': 'bg-rose-500/10 text-rose-400 border-rose-500/20'` dans `ENGINE_BG`
+- L229: Mettre a jour le texte descriptif pour mentionner "AI Overviews"
+- L317: Ajouter `'AI Overviews'` dans le tableau de badges
+- L758+: Ajouter gradient `colorAiOverviews` + composant `<Area>` pour AI Overviews
+
+**`pages/AiCitationSimulator.tsx`** (L18-23, L143, L190, L201, L294)
+- L18-23: Ajouter `'AI Overviews': { color: 'text-rose-400', bg: 'bg-rose-500/10', gradient: 'from-rose-500/20 to-rose-600/5' }` dans `ENGINE_STYLES`
+- L143: Mettre a jour le texte descriptif
+- L190: Ajouter `'AI Overviews'` dans le tableau d'icones de chargement
+- L201: "5 moteurs" au lieu de "4 moteurs"
+- L294: Mettre a jour le texte d'etat vide
+
+**`pages/Integrations.tsx`** (L54-68)
+- Ajouter `'AI Overviews': { color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' }` dans `SOURCE_STYLES`
+- Ajouter `aiOverviews: '#f43f5e'` dans `CHART_COLORS`
+- Ajouter un composant `<Area>` ou `<Bar>` pour AI Overviews dans le chart
+
+**`pages/Reputation.tsx`** (L13-19)
+- Ajouter `'AI Overviews': 'bg-rose-500/20 text-rose-400'` dans `AI_LOGOS`
+
+**`pages/Dashboard.tsx`**
+- Mettre a jour les textes mentionnant les moteurs IA (si applicable)
+
+**`pages/GenerativeTools.tsx`** (L49, L51)
+- Mettre a jour les descriptions d'outils qui mentionnent "ChatGPT, Claude, Perplexity, Gemini"
+
+**`pages/Home.tsx`**
+- Mettre a jour le copy du landing page mentionnant les moteurs IA
+
+**`pages/BotTracking.tsx`**
+- Verifier que "Google-Extended" est bien present (deja le cas, c'est le crawler de Gemini/AI Overviews — pas de modif necessaire mais ajouter une note "Utilise aussi pour AI Overviews")
+
+## Logique specifique AI Overviews
+
+AI Overviews n'est PAS un chatbot comme les 4 autres — c'est un encart dans les resultats de recherche Google. La simulation doit refleter cela :
+- **Format** : Encart factuel avec bullet points, pas de conversation
+- **Style** : Reponse courte et synthetique, avec liens sources
+- **Specificite** : Position dans les SERP, pas dans un chat
+- **Mention type** : Plus souvent "direct" ou "comparison" (Google cite souvent les sources)
+
+## Ordre d'implementation
+
+1. Types (`ai-monitoring.ts`, `integrations.ts`) — fondations
+2. Services (`ai-monitoring.ts`, `ai-citation-simulator.ts`, `integrations.ts`, `reputation_service.ts`) — logique
+3. Pages monitoring + simulator + integrations + reputation — UI
+4. Pages secondaires (Dashboard, Home, GenerativeTools, BotTracking) — textes
+
+## Verification
+
+1. `npm run build` — 0 erreurs TypeScript
+2. Puppeteer : verifier visuellement que "AI Overviews" apparait dans :
+   - Monitoring IA (badges moteurs, chart avec 5e couleur rose)
+   - Simulateur Citation IA (5e carte moteur)
+   - Integrations (chart trafic, table attribution)
+   - Reputation (mentions AI Overviews)
+3. Coherence des couleurs rose partout

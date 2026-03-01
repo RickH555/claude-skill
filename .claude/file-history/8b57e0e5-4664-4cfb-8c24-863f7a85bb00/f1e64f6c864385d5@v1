@@ -1,0 +1,9 @@
+'use client';
+export const dynamic = 'force-dynamic';
+import { useAppContext } from '@/lib/app-context';
+import CalibrationPage from '@/views/v3/CalibrationPage';
+
+export default function CalibrationPageWrapper() {
+  const { goBack, user } = useAppContext();
+  return <CalibrationPage onBack={goBack} user={user} />;
+}

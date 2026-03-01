@@ -1,0 +1,9 @@
+{
+  "id": "17",
+  "subject": "Install all MVP dependencies (Supabase, Stripe, TailwindCSS, etc.)",
+  "description": "Install @supabase/supabase-js, @supabase/ssr, stripe, lucide-react, sonner, react-qrcode-logo, clsx as deps. Install tailwindcss, @tailwindcss/postcss, postcss, autoprefixer, eslint, eslint-config-next as devDeps.",
+  "activeForm": "Installing MVP dependencies",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

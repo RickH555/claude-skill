@@ -1,0 +1,72 @@
+// components/layout/AppShell.tsx
+// Layout 2 niveaux — TopNav (7 sections) + Sidebar contextuelle + Contenu
+// Flex layout contraint à 1440px — pas de fixed positioning sur desktop
+
+import React from 'react';
+import TopNav from './TopNav';
+import Sidebar from './Sidebar';
+
+interface AppShellProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+  activePage: string;
+  onPageChange: (page: string) => void;
+  credits: number;
+  plan: string;
+  user: { name: string; email: string } | null;
+  onOpenCommandPalette?: () => void;
+  onLogoClick?: () => void;
+  children: React.ReactNode;
+}
+
+export default function AppShell({
+  activeSection,
+  onSectionChange,
+  activePage,
+  onPageChange,
+  credits,
+  plan,
+  user,
+  onOpenCommandPalette,
+  onLogoClick,
+  children,
+}: AppShellProps) {
+  const hasSidebar = activeSection !== 'dashboard';
+
+  return (
+    <div className="h-screen flex flex-col bg-[var(--bg-base)]">
+
+      {/* BARRE HORIZONTALE — in-flow, sticky */}
+      <TopNav
+        activeSection={activeSection}
+        onSectionChange={onSectionChange}
+        credits={credits}
+        user={user}
+        onOpenCommandPalette={onOpenCommandPalette}
+        onLogoClick={onLogoClick}
+      />
+
+      {/* BODY — sidebar + contenu */}
+      <div className="flex flex-1 min-h-0">
+
+        {/* SIDEBAR — in-flow sur desktop, overlay sur mobile */}
+        <Sidebar
+          section={activeSection}
+          activePage={activePage}
+          onPageChange={onPageChange}
+          onSectionChange={onSectionChange}
+          credits={credits}
+          plan={plan}
+          onLogoClick={onLogoClick}
+        />
+
+        {/* CONTENU PRINCIPAL */}
+        <main className="flex-1 min-w-0 overflow-y-auto">
+          <div className={`${hasSidebar ? 'max-w-6xl' : 'max-w-7xl'} mx-auto p-6 md:p-8`}>
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

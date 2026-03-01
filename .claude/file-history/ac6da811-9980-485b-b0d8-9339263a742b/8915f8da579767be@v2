@@ -1,0 +1,204 @@
+// ═══════════════════════════════════════════════════════════════
+// E-E-A-T BUILDER — Types
+// Experience, Expertise, Authoritativeness, Trustworthiness
+// ═══════════════════════════════════════════════════════════════
+
+// === AUTHOR / PERSON ===
+
+export interface AuthorProfile {
+  name: string;
+  jobTitle: string;
+  organization: string;
+  yearsExperience: number;
+  specializations: string[];
+  notableProjects?: string[];
+  credentials: Credential[];
+  certifications: Certification[];
+  education: Education[];
+  publications?: Publication[];
+  awards?: Award[];
+  socialProfiles: SocialProfile[];
+  mediaAppearances?: MediaMention[];
+  photoUrl?: string;
+}
+
+export interface Credential {
+  type: 'degree' | 'certification' | 'license' | 'membership';
+  name: string;
+  issuer: string;
+  year?: number;
+  url?: string;
+}
+
+export interface Education {
+  degree: string;
+  field: string;
+  institution: string;
+  year: number;
+  honors?: string;
+}
+
+export interface Certification {
+  name: string;
+  issuer: string;
+  dateObtained: string;
+  dateExpires?: string;
+  credentialUrl?: string;
+}
+
+export interface Publication {
+  title: string;
+  type: 'book' | 'article' | 'paper' | 'study';
+  publisher?: string;
+  date: string;
+  url?: string;
+}
+
+export interface Award {
+  name: string;
+  issuer: string;
+  year: number;
+  description?: string;
+}
+
+export interface SocialProfile {
+  platform: 'linkedin' | 'twitter' | 'github' | 'youtube' | 'other';
+  url: string;
+  followers?: number;
+}
+
+export interface MediaMention {
+  outlet: string;
+  title: string;
+  date: string;
+  url?: string;
+  type: 'interview' | 'quote' | 'feature' | 'podcast';
+}
+
+// === ORGANIZATION ===
+
+export interface OrganizationProfile {
+  name: string;
+  legalName?: string;
+  type: 'Organization' | 'LocalBusiness' | 'Corporation';
+  foundingDate: string;
+  industry: string;
+  employeeCount?: { min: number; max: number };
+  specializations: string[];
+  servicesOffered: string[];
+  certifications: Certification[];
+  awards: Award[];
+  partnerships: string[];
+  mediaAppearances: MediaMention[];
+  clients?: string[];
+  reviews: ReviewAggregate[];
+  guarantees: string[];
+  accreditations: string[];
+  address: Address;
+  phone?: string;
+  email: string;
+  socialProfiles: SocialProfile[];
+  logoUrl?: string;
+  siteUrl: string;
+}
+
+export interface ReviewAggregate {
+  platform: 'google' | 'trustpilot' | 'facebook' | 'yelp' | 'other';
+  rating: number;
+  count: number;
+  url?: string;
+}
+
+export interface Address {
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+}
+
+// === TRUST SIGNALS ===
+
+export interface TrustSignalsConfig {
+  certifications: { name: string; issuer: string; verifyUrl?: string }[];
+  securityBadges: { type: 'ssl' | 'pci' | 'gdpr' | 'secure_payment'; provider?: string }[];
+  guarantees: { type: 'money_back' | 'satisfaction' | 'warranty' | 'free_returns'; duration?: string; details: string }[];
+  socialProof: { metric: string; description?: string }[];
+  pressMentions: { outlet: string; quote?: string; url?: string }[];
+  reviews: ReviewAggregate[];
+}
+
+// === E-E-A-T AUDIT ===
+
+export interface EeatAuditResult {
+  url: string;
+  scores: {
+    overall: number;
+    experience: number;
+    expertise: number;
+    authoritativeness: number;
+    trustworthiness: number;
+  };
+  findings: {
+    category: 'experience' | 'expertise' | 'authority' | 'trust';
+    status: 'present' | 'missing' | 'incomplete';
+    element: string;
+    impact: 'high' | 'medium' | 'low';
+    recommendation?: string;
+  }[];
+  priorityActions: {
+    action: string;
+    impact: number;
+    effort: 'low' | 'medium' | 'high';
+    tool: string;
+  }[];
+  summary: string;
+}
+
+// === GENERATED OUTPUTS ===
+
+export interface GeneratedAuthorBio {
+  bioShort: string;
+  bioLong: string;
+  schemaOrg: string;
+  htmlBlock: string;
+}
+
+export interface GeneratedAboutPage {
+  html: string;
+  schemaOrg: string;
+  sections: {
+    hero: string;
+    story: string;
+    team: string;
+    values: string;
+    numbers: string;
+    certifications: string;
+    cta: string;
+  };
+}
+
+export interface GeneratedTrustBlock {
+  html: string;
+  schemaOrg: string;
+}
+
+export interface GeneratedCredentials {
+  html: string;
+  schemaOrg: string;
+}
+
+export interface GeneratedCitationBlock {
+  html: string;
+  schemaOrg: string;
+}
+
+// === CREDIT COSTS ===
+
+export const EEAT_CREDITS = {
+  authorBio: 3,
+  aboutPage: 8,
+  trustSignals: 5,
+  credentials: 3,
+  citationBlock: 2,
+  audit: 5,
+} as const;

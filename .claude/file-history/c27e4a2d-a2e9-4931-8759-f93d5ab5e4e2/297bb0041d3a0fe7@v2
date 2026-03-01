@@ -1,0 +1,31 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import Card from '@/components/ui/Card';
+import PlanGate from '@/components/merchant/PlanGate';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function CampaignsPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('plan')
+    .eq('id', user!.id)
+    .single();
+
+  const allowed = merchant?.plan === 'pro' || merchant?.plan === 'business';
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Campagnes" description="Créez et gérez vos campagnes marketing." />
+      <PlanGate allowed={allowed} requiredPlan="Pro">
+        <Card className="text-center py-12">
+          <p className="text-[var(--text-tertiary)]">Les campagnes marketing arrivent bientôt.</p>
+          <p className="text-[12px] text-[var(--text-tertiary)] mt-2">Envoyez des notifications et offres spéciales à vos clients.</p>
+        </Card>
+      </PlanGate>
+    </div>
+  );
+}

@@ -1,0 +1,147 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
+import { useWorkspace } from "@/lib/workspace-context";
+import { toast } from "sonner";
+import { UserPlus, Shield, Mail, MoreVertical } from "lucide-react";
+
+interface TeamMember {
+  id: string;
+  email: string;
+  role: "owner" | "admin" | "editor" | "viewer";
+  joinedAt: string;
+}
+
+// Mock data — will be replaced by Supabase query
+const MOCK_MEMBERS: TeamMember[] = [
+  { id: "1", email: "admin@citedby.ai", role: "owner", joinedAt: "2024-01-15" },
+];
+
+const ROLE_LABELS: Record<string, { label: string; variant: "default" | "success" | "warning" | "secondary" }> = {
+  owner: { label: "Proprietaire", variant: "warning" },
+  admin: { label: "Admin", variant: "success" },
+  editor: { label: "Editeur", variant: "default" },
+  viewer: { label: "Lecteur", variant: "secondary" },
+};
+
+export default function TeamPage() {
+  const { workspace } = useWorkspace();
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("editor");
+  const [sending, setSending] = useState(false);
+
+  const handleInvite = async () => {
+    if (!inviteEmail) {
+      toast.error("Veuillez entrer un email");
+      return;
+    }
+    setSending(true);
+    // TODO: Insert into workspace_users with invited_email
+    await new Promise((r) => setTimeout(r, 500));
+    toast.success(`Invitation envoyee a ${inviteEmail}`);
+    setInviteEmail("");
+    setShowInvite(false);
+    setSending(false);
+  };
+
+  const canManageTeam = workspace?.role === "owner" || workspace?.role === "admin";
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+      <header className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-serif font-bold text-white mb-2">Equipe</h1>
+          <p className="text-white/50">Gerez les membres de votre espace de travail.</p>
+        </div>
+        {canManageTeam && (
+          <Button onClick={() => setShowInvite(true)}>
+            <UserPlus size={16} /> Inviter
+          </Button>
+        )}
+      </header>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield size={18} className="text-primary" />
+            Membres ({MOCK_MEMBERS.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1">
+            {MOCK_MEMBERS.map((member) => {
+              const roleInfo = ROLE_LABELS[member.role];
+              return (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between py-3 px-3 rounded-xl hover:bg-white/5 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar fallback={member.email} size="sm" />
+                    <div>
+                      <p className="text-sm font-medium text-white">{member.email}</p>
+                      <p className="text-xs text-white/40">
+                        Membre depuis {new Date(member.joinedAt).toLocaleDateString("fr-FR")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={roleInfo.variant}>{roleInfo.label}</Badge>
+                    {canManageTeam && member.role !== "owner" && (
+                      <button className="text-white/30 hover:text-white">
+                        <MoreVertical size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Invite Modal */}
+      <Modal isOpen={showInvite} onClose={() => setShowInvite(false)} size="sm">
+        <ModalHeader onClose={() => setShowInvite(false)}>
+          <h2 className="text-lg font-bold text-white">Inviter un membre</h2>
+        </ModalHeader>
+        <ModalBody className="space-y-4">
+          <Input
+            label="Adresse email"
+            type="email"
+            placeholder="colleague@entreprise.com"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            icon={<Mail size={16} />}
+          />
+          <Select
+            label="Role"
+            value={inviteRole}
+            onChange={(e) => setInviteRole(e.target.value)}
+            options={[
+              { value: "admin", label: "Admin — Acces complet" },
+              { value: "editor", label: "Editeur — Creer et modifier" },
+              { value: "viewer", label: "Lecteur — Consultation uniquement" },
+            ]}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="ghost" onClick={() => setShowInvite(false)}>
+            Annuler
+          </Button>
+          <Button onClick={handleInvite} isLoading={sending}>
+            Envoyer l'invitation
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+}

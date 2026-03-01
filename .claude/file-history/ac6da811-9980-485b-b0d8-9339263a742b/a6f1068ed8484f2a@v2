@@ -1,0 +1,88 @@
+// ================================================================
+// AI RESPONSE LAYER — Types & Interfaces
+// 4 outils : Hub Central, Query Pages, Recommend JSON, Sitemap AI
+// ================================================================
+
+// ── Configuration du site ──
+export interface SiteConfig {
+  name: string;
+  url: string;
+  description: string;
+  entity: string; // "Organization" | "LocalBusiness" | "Person" etc.
+  contact: {
+    email: string;
+    phone?: string;
+    address?: string;
+  };
+  logo?: string;
+  socialLinks?: string[];
+}
+
+// ── Configuration Query Page ──
+export interface QueryPageConfig {
+  type: 'informational' | 'commercial' | 'navigational' | 'transactional';
+  targetQuestion: string;
+  targetKeywords: string[];
+  slug: string;
+  answerBox: string; // Réponse directe (2-3 phrases)
+  faqItems: Array<{ question: string; answer: string }>;
+  cta: {
+    label: string;
+    url: string;
+  };
+}
+
+// ── Configuration Produit (pour recommend.json) ──
+export interface ProductConfig {
+  id: string;
+  name: string;
+  shortDescription: string;
+  pricing: {
+    amount: number;
+    currency: string;
+    model: 'one-time' | 'subscription' | 'freemium' | 'contact';
+  };
+  idealFor: string[];
+  links: {
+    product: string;
+    demo?: string;
+    docs?: string;
+    pricing?: string;
+  };
+}
+
+// ── Outputs Générés ──
+
+export interface HubOutput {
+  html: string;
+  title: string;
+  description: string;
+  schemaMarkup: string;
+}
+
+export interface QueryPageOutput {
+  html: string;
+  slug: string;
+  title: string;
+  description: string;
+  schemaMarkup: string;
+}
+
+export interface RecommendJsonOutput {
+  json: string;
+  productCount: number;
+  schemaType: string;
+}
+
+export interface SitemapAiOutput {
+  xml: string;
+  urlCount: number;
+}
+
+// ── Credit Costs ──
+export const AI_LAYER_CREDITS = {
+  hub: 5,
+  queryPage: 8,
+  recommendJson: 5,
+  sitemapAi: 3,
+} as const;

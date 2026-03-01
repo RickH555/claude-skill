@@ -1,0 +1,716 @@
+import React, { useState } from 'react';
+import { User, SMCContent } from '../types';
+import { smcService } from '../services/smc';
+import { ArrowLeft, FileText, HelpCircle, PenTool, Sparkles, Copy, Download, Check, Loader2, Layout, MessageSquare, BookOpen, Library, Clock, AlignLeft, Link as LinkIcon, Bot, Archive, ChevronRight, Award, Globe, ArrowRight, Eye } from 'lucide-react';
+
+interface Props {
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  library: SMCContent[];
+  onAddToLibrary: (item: SMCContent) => void;
+  onNavigateToPublisher?: (data: { topic: string, url: string, brief: string }) => void;
+  onNavigateToDirectory?: () => void;
+}
+
+type ToolType = 'home' | 'fiche' | 'faq' | 'article';
+type Tab = 'studio' | 'library';
+
+const SMCStudio: React.FC<Props> = ({ onBack, user, onDeductCredits, library, onAddToLibrary, onNavigateToPublisher, onNavigateToDirectory }) => {
+  const [activeTab, setActiveTab] = useState<Tab>('studio');
+  const [currentTool, setCurrentTool] = useState<ToolType>('home');
+  const [result, setResult] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // --- States pour l'outil Article (Flux Blog Optimizer) ---
+  const [articleStep, setArticleStep] = useState<'brief' | 'writing' | 'done'>('brief');
+  const [briefContent, setBriefContent] = useState('');
+  
+  // Form States
+  const [ficheData, setFicheData] = useState({ name: '', features: '' });
+  const [faqData, setFaqData] = useState({ topic: '', context: '' });
+  const [articleData, setArticleData] = useState({ title: '', url: '', tone: 'Professionnel' }); // URL & Tone used for Brief gen
+
+  const COSTS = {
+    fiche: 1,
+    faq: 1,
+    brief: 1, // Brief d'article
+    article: 3 // Rédaction complète
+  };
+
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = (filename: string, content: string) => {
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleNavigateToPublisherAction = () => {
+    if (onNavigateToPublisher) {
+        onNavigateToPublisher({
+            topic: articleData.title,
+            url: articleData.url,
+            brief: briefContent // Le PublisherRequest se base sur le brief
+        });
+    }
+  };
+
+  const handleRestoreFromLibrary = (item: SMCContent) => {
+    // 1. Déterminer l'outil
+    let tool: ToolType = 'home';
+    if (item.type === 'fiche') tool = 'fiche';
+    else if (item.type === 'faq') tool = 'faq';
+    else if (item.type === 'article' || item.type === 'brief') tool = 'article';
+
+    setCurrentTool(tool);
+
+    // 2. Restaurer le contenu et l'état
+    if (item.type === 'article') {
+        setResult(item.content);
+        setArticleStep('done');
+        // Tentative de récupération du titre depuis "Article: Titre - Date"
+        const titleClean = item.title.split(' - ')[0].replace('Article: ', '').trim();
+        setArticleData(prev => ({ ...prev, title: titleClean }));
+        // Si possible, on pourrait essayer de retrouver le brief parent via meta, mais ici on affiche juste le résultat
+    } else if (item.type === 'brief') {
+        setBriefContent(item.content);
+        setArticleStep('writing');
+        const titleClean = item.title.split(' - ')[0].replace('Brief: ', '').trim();
+        setArticleData(prev => ({ ...prev, title: titleClean }));
+    } else {
+        setResult(item.content);
+        // Restauration contextuelle basique pour les formulaires
+        if (item.type === 'fiche') {
+             const nameClean = item.title.split(' - ')[0].replace('Fiche: ', '').trim();
+             setFicheData(prev => ({ ...prev, name: nameClean }));
+        }
+        if (item.type === 'faq') {
+             const topicClean = item.title.split(' - ')[0].replace('FAQ: ', '').trim();
+             setFaqData(prev => ({ ...prev, topic: topicClean }));
+        }
+    }
+
+    // 3. Basculer vers l'onglet Studio
+    setActiveTab('studio');
+  };
+
+  // Generic generator for simple tools (Fiche, FAQ)
+  const runSimpleGeneration = async (type: 'fiche' | 'faq', cost: number, generator: () => Promise<string>, titlePrefix: string) => {
+    if (onDeductCredits(cost)) {
+      setIsGenerating(true);
+      setResult('');
+      try {
+        const content = await generator();
+        setResult(content);
+        
+        // Save to Library
+        const newItem: SMCContent = {
+            id: `smc_${Date.now()}`,
+            type,
+            title: `${titlePrefix} - ${new Date().toLocaleTimeString()}`,
+            content,
+            timestamp: new Date().toISOString()
+        };
+        onAddToLibrary(newItem);
+
+      } catch (e) {
+        console.error(e);
+        alert("Une erreur est survenue.");
+      } finally {
+        setIsGenerating(false);
+      }
+    }
+  };
+
+  // --- Article Generation Logic (2 Steps) ---
+
+  const handleGenerateBrief = async () => {
+    if (!articleData.title && !articleData.url) {
+        alert("Sujet ou URL requis.");
+        return;
+    }
+
+    if (onDeductCredits(COSTS.brief)) {
+        setIsGenerating(true);
+        try {
+            const brief = await smcService.generateBrief(articleData.title, articleData.url);
+            setBriefContent(brief);
+            setArticleStep('writing'); // Move to step 2
+            
+            // Save Brief to Library
+            onAddToLibrary({
+                id: `brief_${Date.now()}`,
+                type: 'brief',
+                title: `Brief: ${articleData.title || 'Architecture Article'}`,
+                content: brief,
+                timestamp: new Date().toISOString()
+            });
+
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors du brief.");
+        } finally {
+            setIsGenerating(false);
+        }
+    }
+  };
+
+  const handleWriteFullArticle = async () => {
+    if (onDeductCredits(COSTS.article)) {
+        setIsGenerating(true);
+        try {
+            const article = await smcService.generateFullArticle(briefContent, articleData.title);
+            setResult(article);
+            setArticleStep('done'); // Move to step 3
+
+            // Save Article to Library
+            onAddToLibrary({
+                id: `art_${Date.now()}`,
+                type: 'article',
+                title: `Article: ${articleData.title || 'Rédaction Complète'}`,
+                content: article,
+                timestamp: new Date().toISOString(),
+                meta: { briefId: `brief_${Date.now()}` } // Link to brief loosely
+            });
+
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors de la rédaction.");
+        } finally {
+            setIsGenerating(false);
+        }
+    }
+  };
+
+  const renderHome = () => (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold text-white">SMC <span className="gradient-text">Studio</span></h1>
+        <p className="text-gray-400 max-w-xl mx-auto">
+          Smart Marketing Content : Votre usine de production de contenu optimisé pour les Answer Engines.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        {/* Card Fiche */}
+        <button
+          onClick={() => setCurrentTool('fiche')}
+          className="ninja-card p-8 hover:border-blue-500/50 hover:bg-white/[0.04] transition-all group text-left relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Layout size={80} />
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 transition-transform">
+            <FileText size={24} />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">Fiche Produit</h3>
+          <p className="text-sm text-gray-400 mb-6">Générez des fiches techniques structurées et vendeuses.</p>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">
+            <Sparkles size={10} /> 1 Crédit
+          </div>
+        </button>
+
+        {/* Card FAQ */}
+        <button
+          onClick={() => setCurrentTool('faq')}
+          className="ninja-card p-8 hover:border-purple-500/50 hover:bg-white/[0.04] transition-all group text-left relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <MessageSquare size={80} />
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 transition-transform">
+            <HelpCircle size={24} />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">Générateur FAQ</h3>
+          <p className="text-sm text-gray-400 mb-6">Créez des questions/réponses pertinentes pour rassurer vos clients.</p>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold border border-purple-500/20">
+            <Sparkles size={10} /> 1 Crédit
+          </div>
+        </button>
+
+        {/* Card Article */}
+        <button
+          onClick={() => setCurrentTool('article')}
+          className="ninja-card p-8 hover:border-purple-500/50 hover:bg-white/[0.04] transition-all group text-left relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+            <BookOpen size={80} />
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 transition-transform">
+            <PenTool size={24} />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">Rédaction Article</h3>
+          <p className="text-sm text-gray-400 mb-6">Workflow complet : Architecture (Brief) puis Rédaction AEO.</p>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold border border-purple-500/20">
+            <Sparkles size={10} /> 1 + 3 Crédits
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderToolArchives = (tool: ToolType) => {
+    const archives = library.filter(item => {
+        if (tool === 'article') return item.type === 'article' || item.type === 'brief';
+        return item.type === tool;
+    });
+
+    if (archives.length === 0) return null;
+
+    return (
+        <div className="border-t border-white/10 pt-10 animate-in fade-in slide-in-from-bottom-8">
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2">
+                    <Archive size={20} className="text-gray-400" /> 
+                    Archives {tool === 'fiche' ? 'Fiches Produits' : tool === 'faq' ? 'FAQs' : 'Articles & Briefs'}
+                </h3>
+                <span className="text-xs text-gray-500 bg-purple-500/5 px-2 py-1 rounded-full">{archives.length} fichiers</span>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+                {archives.map((item) => (
+                    <div key={item.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-primary/30 transition-all group flex flex-col">
+                        <div className="flex justify-between items-start mb-3">
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider 
+                                ${item.type === 'article' ? 'bg-purple-400/10 text-purple-300 border border-purple-400/20' : 
+                                  item.type === 'brief' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 
+                                  'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                                {item.type.toUpperCase()}
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                                <Clock size={10} /> {new Date(item.timestamp).toLocaleDateString()}
+                            </span>
+                        </div>
+                        
+                        <h4 className="font-bold text-white mb-2 line-clamp-2 min-h-[3rem] text-sm">{item.title}</h4>
+                        
+                        <div className="bg-[#050208] p-3 rounded border border-white/5 mb-4 flex-1 overflow-hidden relative h-24">
+                            <p className="text-[10px] text-gray-500 font-mono line-clamp-4 leading-relaxed">{item.content}</p>
+                            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[#050208] to-transparent"></div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2 border-t border-white/5">
+                            <button 
+                                onClick={() => handleRestoreFromLibrary(item)}
+                                className="flex-1 py-1.5 bg-primary/10 hover:bg-primary/20 rounded text-[10px] font-bold text-primary transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Eye size={10} /> Ouvrir
+                            </button>
+                            <button 
+                                onClick={() => handleCopy(item.content)}
+                                className="flex-1 py-1.5 bg-purple-500/5 hover:bg-white/10 rounded text-[10px] font-medium text-gray-300 transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Copy size={10} /> Copier
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+  };
+
+  const renderTool = () => {
+    let title = '', color = '', icon = null;
+    
+    switch(currentTool) {
+      case 'fiche': title = 'Fiche Produit'; color = 'text-blue-400'; icon = <FileText />; break;
+      case 'faq': title = 'Générateur FAQ'; color = 'text-purple-400'; icon = <HelpCircle />; break;
+      case 'article': title = 'Rédaction Article'; color = 'text-purple-400'; icon = <PenTool />; break;
+    }
+
+    // Contenu à afficher dans la fenêtre de droite
+    const displayContent = currentTool === 'article' 
+        ? (articleStep === 'done' ? result : briefContent) 
+        : result;
+
+    return (
+      <div className="flex flex-col gap-12 animate-in slide-in-from-right duration-300">
+        <div className="grid lg:grid-cols-12 gap-8 h-full min-h-[600px]">
+          
+          {/* Left: Input Form */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="ninja-card p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`p-2 rounded-lg bg-purple-500/10 ${color}`}>{icon}</div>
+                <h2 className="text-xl font-bold text-white">{title}</h2>
+              </div>
+
+              {currentTool === 'fiche' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-2">Nom du produit / service</label>
+                    <input
+                      type="text"
+                      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl p-3 text-white focus:border-blue-500/50 outline-none"
+                      placeholder="Ex: SuperVacuum 3000"
+                      value={ficheData.name}
+                      onChange={(e) => setFicheData({...ficheData, name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-2">Caractéristiques / Notes en vrac</label>
+                    <textarea
+                      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl p-3 text-white focus:border-blue-500/50 outline-none h-40 resize-none"
+                      placeholder="- Aspiration 200W&#10;- Silencieux&#10;- Batterie 1h"
+                      value={ficheData.features}
+                      onChange={(e) => setFicheData({...ficheData, features: e.target.value})}
+                    />
+                  </div>
+                  <button
+                    onClick={() => runSimpleGeneration('fiche', COSTS.fiche, () => smcService.generateFiche(ficheData.name, ficheData.features), `Fiche: ${ficheData.name}`)}
+                    disabled={isGenerating || !ficheData.name}
+                    className="w-full py-3 btn-gradient !rounded-full transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles size={18} />}
+                    Générer ({COSTS.fiche} Crédit)
+                  </button>
+                </div>
+              )}
+
+              {currentTool === 'faq' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-2">Sujet Principal</label>
+                    <input
+                      type="text"
+                      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl p-3 text-white focus:border-purple-500/50 outline-none"
+                      placeholder="Ex: Politique de retour"
+                      value={faqData.topic}
+                      onChange={(e) => setFaqData({...faqData, topic: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-400 block mb-2">Contexte / Éléments à inclure</label>
+                    <textarea
+                      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl p-3 text-white focus:border-purple-500/50 outline-none h-40 resize-none"
+                      placeholder="30 jours pour changer d'avis. Frais de retour gratuits si défectueux."
+                      value={faqData.context}
+                      onChange={(e) => setFaqData({...faqData, context: e.target.value})}
+                    />
+                  </div>
+                  <button 
+                    onClick={() => runSimpleGeneration('faq', COSTS.faq, () => smcService.generateFAQ(faqData.topic, faqData.context), `FAQ: ${faqData.topic}`)}
+                    disabled={isGenerating || !faqData.topic}
+                    className="w-full py-3 btn-gradient !rounded-full transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles size={18} />}
+                    Générer ({COSTS.faq} Crédit)
+                  </button>
+                </div>
+              )}
+
+              {/* INTEGRATED BLOG OPTIMIZER FLOW */}
+              {currentTool === 'article' && (
+                <div className="space-y-6">
+                  {/* Steps Indicator */}
+                  <div className="flex items-center gap-2 text-xs mb-4">
+                      <span className={`px-2 py-1 rounded ${articleStep === 'brief' ? 'bg-purple-500 text-white' : 'bg-white/10 text-gray-500'}`}>1. Brief</span>
+                      <ChevronRight size={12} className="text-gray-600"/>
+                      <span className={`px-2 py-1 rounded ${articleStep === 'writing' ? 'bg-purple-500 text-white' : 'bg-white/10 text-gray-500'}`}>2. Validation</span>
+                      <ChevronRight size={12} className="text-gray-600"/>
+                      <span className={`px-2 py-1 rounded ${articleStep === 'done' ? 'bg-purple-400 text-white' : 'bg-white/10 text-gray-500'}`}>3. Article</span>
+                  </div>
+
+                  <div className="space-y-4">
+                      <div>
+                          <label className="text-sm text-gray-400 block mb-2 flex items-center gap-2">
+                              <AlignLeft size={16} /> Sujet / Mot-clé
+                          </label>
+                          <input
+                              type="text"
+                              className="w-full bg-[#111111] border border-white/[0.08] rounded-xl p-3 text-white focus:border-purple-500/50 outline-none"
+                              placeholder="Ex: Avantages AEO"
+                              value={articleData.title}
+                              onChange={(e) => setArticleData({...articleData, title: e.target.value})}
+                              disabled={articleStep !== 'brief'}
+                          />
+                      </div>
+                      <div>
+                          <label className="text-sm text-gray-400 block mb-2 flex items-center gap-2">
+                              <LinkIcon size={16} /> URL Source (Optionnel)
+                          </label>
+                          <input
+                              type="url"
+                              className="w-full bg-[#111111] border border-white/[0.08] rounded-xl p-3 text-white focus:border-purple-500/50 outline-none"
+                              placeholder="https://..."
+                              value={articleData.url}
+                              onChange={(e) => setArticleData({...articleData, url: e.target.value})}
+                              disabled={articleStep !== 'brief'}
+                          />
+                      </div>
+
+                      {articleStep === 'brief' && (
+                          <button 
+                              onClick={handleGenerateBrief}
+                              disabled={isGenerating || (!articleData.title && !articleData.url)}
+                              className="w-full py-3 btn-gradient !rounded-full transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                          >
+                              {isGenerating ? <Loader2 className="animate-spin" /> : <FileText size={18} />}
+                              Générer le Brief ({COSTS.brief} Crédit)
+                          </button>
+                      )}
+
+                      {articleStep === 'writing' && (
+                          <div className="space-y-4 pt-2 border-t border-white/5 animate-in fade-in">
+                              <p className="text-xs text-gray-400">Le brief est prêt. Vous pouvez maintenant lancer la rédaction complète.</p>
+                              <button 
+                                  onClick={handleWriteFullArticle}
+                                  disabled={isGenerating}
+                                  className="w-full py-3 btn-gradient !rounded-full transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
+                              >
+                                  {isGenerating ? <Loader2 className="animate-spin" /> : <PenTool size={18} />}
+                                  Rédiger l'Article ({COSTS.article} Crédits)
+                              </button>
+                              <button 
+                                  onClick={() => setArticleStep('brief')}
+                                  className="w-full py-2 text-gray-400 hover:text-white text-xs underline"
+                              >
+                                  Modifier les paramètres
+                              </button>
+                          </div>
+                      )}
+
+                      {articleStep === 'done' && (
+                          <div className="space-y-6 animate-in slide-in-from-bottom-2 duration-500">
+                              {/* Success Message */}
+                              <div className="text-center py-4 bg-purple-400/10 rounded-xl border border-purple-400/20">
+                                  <Check size={32} className="text-purple-400 mx-auto mb-2" />
+                                  <p className="text-purple-300 font-bold">Article Généré !</p>
+                                  <p className="text-xs text-purple-300/70 mt-1">Sauvegardé dans la bibliothèque</p>
+                                  <div className="flex justify-center gap-4 mt-2">
+                                      <button 
+                                          onClick={() => setActiveTab('library')}
+                                          className="text-xs text-purple-300/70 hover:text-purple-200 underline flex items-center gap-1"
+                                      >
+                                          <Library size={12} /> Accès rapide Bibliothèque
+                                      </button>
+                                  </div>
+                              </div>
+
+                              <div className="pt-4 border-t border-white/5">
+                                  <h4 className="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2">
+                                      <Sparkles size={12} /> Aller plus loin
+                                  </h4>
+                                  
+                                  <div className="space-y-3">
+                                      {/* Publisher Option */}
+                                      <button
+                                          onClick={handleNavigateToPublisherAction}
+                                          className="w-full bg-gradient-to-r from-purple-500/10 to-purple-700/10 border border-purple-500/30 p-3 rounded-xl flex items-center justify-between group hover:border-purple-500/50 transition-all text-left"
+                                      >
+                                          <div className="flex items-center gap-3">
+                                              <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400 group-hover:text-purple-300">
+                                                  <Award size={18} />
+                                              </div>
+                                              <div>
+                                                  <span className="block text-sm font-bold text-white group-hover:text-purple-100">Publisher Expert</span>
+                                                  <span className="block text-[10px] text-gray-400">Relecture humaine & publication</span>
+                                              </div>
+                                          </div>
+                                          <ChevronRight size={16} className="text-purple-500/50 group-hover:text-purple-400" />
+                                      </button>
+
+                                      {/* Directory Option */}
+                                      <button
+                                          onClick={onNavigateToDirectory}
+                                          className="w-full bg-gradient-to-r from-purple-500/10 to-purple-700/10 border border-purple-500/30 p-3 rounded-xl flex items-center justify-between group hover:border-purple-500/50 transition-all text-left"
+                                      >
+                                          <div className="flex items-center gap-3">
+                                              <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400 group-hover:text-purple-300">
+                                                  <Globe size={18} />
+                                              </div>
+                                              <div>
+                                                  <span className="block text-sm font-bold text-white group-hover:text-purple-100">La Source</span>
+                                                  <span className="block text-[10px] text-gray-400">Indexation Annuaire IA</span>
+                                              </div>
+                                          </div>
+                                          <ChevronRight size={16} className="text-purple-500/50 group-hover:text-purple-400" />
+                                      </button>
+                                  </div>
+                              </div>
+
+                              <button 
+                                  onClick={() => { setArticleStep('brief'); setBriefContent(''); setResult(''); setArticleData({ title: '', url: '', tone: 'Professionnel' }); }}
+                                  className="w-full text-xs text-white bg-white/10 px-3 py-2 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-2"
+                              >
+                                  <ArrowRight size={12} /> Commencer un nouvel article
+                              </button>
+                          </div>
+                      )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right: Output */}
+          <div className="lg:col-span-8 flex flex-col h-full">
+            <div className="flex-1 ninja-card overflow-hidden flex flex-col shadow-2xl">
+              <div className="p-4 border-b border-white/[0.08] bg-white/[0.02] flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-300">
+                      {currentTool === 'article' 
+                          ? (articleStep === 'brief' ? 'En attente...' : articleStep === 'writing' ? 'Brief Généré' : 'Article Complet') 
+                          : 'Résultat généré'}
+                    </span>
+                    {currentTool === 'article' && articleStep === 'writing' && <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">Étape 1/2 validée</span>}
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleCopy(displayContent)} 
+                    disabled={!displayContent}
+                    className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                    title="Copier"
+                  >
+                    {copied ? <Check size={18} className="text-purple-300" /> : <Copy size={18} />}
+                  </button>
+                  <button 
+                    onClick={() => handleDownload(`${currentTool}_export.md`, displayContent)} 
+                    disabled={!displayContent}
+                    className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                    title="Télécharger"
+                  >
+                    <Download size={18} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 p-8 overflow-y-auto bg-[#0a0a0a] custom-scrollbar">
+                {isGenerating ? (
+                  <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-4">
+                    <Loader2 size={48} className={`animate-spin ${color}`} />
+                    <p className="animate-pulse">
+                      {currentTool === 'article' && articleStep === 'writing' ? "Rédaction de l'article expert..." : "L'IA génère votre contenu..."}
+                    </p>
+                  </div>
+                ) : displayContent ? (
+                  <pre className="whitespace-pre-wrap font-mono text-sm text-gray-300 leading-relaxed selection:bg-white/10">
+                    {displayContent}
+                  </pre>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-gray-600 border-2 border-dashed border-white/5 rounded-lg m-4">
+                    <Sparkles size={48} className="opacity-20 mb-4" />
+                    <p>Le contenu généré apparaîtra ici.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Section Archives Solutions (Nouveauté) */}
+        {renderToolArchives(currentTool)}
+      </div>
+    );
+  };
+
+  const renderLibrary = () => (
+    <div className="animate-in fade-in slide-in-from-right duration-300">
+        <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-2">Archives <span className="gradient-text">Solutions</span></h2>
+            <p className="text-gray-400">Retrouvez tous vos contenus générés (Fiches, FAQ, Briefs, Articles).</p>
+        </div>
+
+        {library.length === 0 ? (
+            <div className="text-center py-20 ninja-card border-dashed">
+                <Archive size={48} className="mx-auto text-gray-600 mb-4" />
+                <p className="text-gray-400">Aucun contenu dans la bibliothèque.</p>
+                <button onClick={() => setActiveTab('studio')} className="mt-4 text-primary hover:underline">Créer du contenu</button>
+            </div>
+        ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {library.map((item) => (
+                    <div key={item.id} className="glass-panel p-5 rounded-xl border border-white/10 hover:border-primary/30 transition-all group flex flex-col">
+                        <div className="flex justify-between items-start mb-3">
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider 
+                                ${item.type === 'article' ? 'bg-purple-400/10 text-purple-300 border border-purple-400/20' : 
+                                  item.type === 'brief' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 
+                                  'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                                {item.type.toUpperCase()}
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                                <Clock size={10} /> {new Date(item.timestamp).toLocaleDateString()}
+                            </span>
+                        </div>
+                        
+                        <h4 className="font-bold text-white mb-2 line-clamp-2 min-h-[3rem]">{item.title}</h4>
+                        
+                        <div className="bg-[#050208] p-3 rounded border border-white/5 mb-4 flex-1 overflow-hidden relative">
+                            <p className="text-xs text-gray-500 font-mono line-clamp-4">{item.content}</p>
+                            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[#050208] to-transparent"></div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2 border-t border-white/5">
+                            <button 
+                                onClick={() => handleRestoreFromLibrary(item)}
+                                className="flex-1 py-2 bg-primary/10 hover:bg-primary/20 rounded text-xs font-medium text-primary transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Eye size={12} /> Ouvrir
+                            </button>
+                            <button 
+                                onClick={() => handleCopy(item.content)}
+                                className="flex-1 py-2 bg-purple-500/5 hover:bg-white/10 rounded text-xs font-medium text-gray-300 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Copy size={12} /> Copier
+                            </button>
+                            <button 
+                                onClick={() => handleDownload(`${item.type}_${item.id}.md`, item.content)}
+                                className="flex-1 py-2 bg-purple-500/5 hover:bg-white/10 rounded text-xs font-medium text-gray-300 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <Download size={12} /> MD
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+  );
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen">
+      <div className="flex justify-between items-center mb-8">
+        <button 
+            onClick={activeTab === 'studio' && currentTool !== 'home' ? () => setCurrentTool('home') : onBack} 
+            className="flex items-center text-gray-400 hover:text-white transition-colors"
+        >
+            <ArrowLeft size={18} className="mr-2" /> 
+            {activeTab === 'studio' && currentTool !== 'home' ? 'Retour au studio' : 'Retour'}
+        </button>
+
+        {/* Tabs Switcher */}
+        <div className="flex bg-[#111111] p-1 rounded-full border border-white/[0.08]">
+            <button
+                onClick={() => setActiveTab('studio')}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeTab === 'studio' ? 'btn-gradient !py-2 !px-6' : 'text-gray-500 hover:text-gray-300'}`}
+            >
+                <Sparkles size={16} /> Studio
+            </button>
+            <button
+                onClick={() => setActiveTab('library')}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${activeTab === 'library' ? 'btn-gradient !py-2 !px-6' : 'text-gray-500 hover:text-gray-300'}`}
+            >
+                <Library size={16} /> Bibliothèque <span className="bg-white/10 px-1.5 py-0.5 rounded-full text-[10px]">{library.length}</span>
+            </button>
+        </div>
+      </div>
+
+      {activeTab === 'studio' ? (currentTool === 'home' ? renderHome() : renderTool()) : renderLibrary()}
+    </div>
+  );
+};
+
+export default SMCStudio;

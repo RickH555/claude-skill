@@ -1,0 +1,9 @@
+{
+  "id": "24",
+  "subject": "Create Supabase config and database migration",
+  "description": "Create supabase/config.toml and supabase/migrations/001_complete_schema.sql with full schema, RLS policies, and plan enforcement",
+  "activeForm": "Creating database migration files",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

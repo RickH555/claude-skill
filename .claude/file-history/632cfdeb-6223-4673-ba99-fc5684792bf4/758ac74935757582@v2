@@ -1,0 +1,85 @@
+"use client"
+
+import React, { createContext, useContext, useEffect, useState } from "react"
+import { createClient } from "@/lib/supabase/client"
+
+interface WorkspaceData {
+  id: string
+  name: string
+  slug: string
+  plan: string
+  plan_status: string
+  credits_remaining: number
+  role: string
+}
+
+interface WorkspaceContextValue {
+  workspace: WorkspaceData | null
+  isLoading: boolean
+  reload: () => void
+}
+
+const WorkspaceContext = createContext<WorkspaceContextValue>({
+  workspace: null,
+  isLoading: true,
+  reload: () => {},
+})
+
+export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
+  const [workspace, setWorkspace] = useState<WorkspaceData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const loadWorkspace = async () => {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setWorkspace(null)
+        setIsLoading(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from("workspace_users")
+        .select("role, workspaces(id, name, slug, plan, plan_status, credits_remaining)")
+        .eq("user_id", user.id)
+        .limit(1)
+        .single()
+
+      if (error || !data) {
+        setWorkspace(null)
+        setIsLoading(false)
+        return
+      }
+
+      const ws = data.workspaces as unknown as Record<string, unknown>
+      setWorkspace({
+        id: ws.id as string,
+        name: ws.name as string,
+        slug: ws.slug as string,
+        plan: ws.plan as string,
+        plan_status: ws.plan_status as string,
+        credits_remaining: ws.credits_remaining as number,
+        role: data.role,
+      })
+    } catch {
+      setWorkspace(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadWorkspace()
+  }, [])
+
+  return (
+    <WorkspaceContext.Provider value={{ workspace, isLoading, reload: loadWorkspace }}>
+      {children}
+    </WorkspaceContext.Provider>
+  )
+}
+
+export function useWorkspace() {
+  return useContext(WorkspaceContext)
+}

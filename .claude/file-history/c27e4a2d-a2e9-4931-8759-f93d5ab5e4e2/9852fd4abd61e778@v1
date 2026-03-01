@@ -1,0 +1,33 @@
+'use client';
+
+import { useState } from 'react';
+import { QRCode } from 'react-qrcode-logo';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+
+export default function QrGenerator() {
+  const [url, setUrl] = useState('');
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+  const generate = () => {
+    const id = crypto.randomUUID();
+    setUrl(`${appUrl}/scan/${id}`);
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card padding="lg" className="max-w-md">
+        <Button onClick={generate}>Générer un QR code</Button>
+      </Card>
+
+      {url && (
+        <Card padding="lg" className="max-w-md text-center">
+          <div className="inline-block p-4 bg-white rounded-xl">
+            <QRCode value={url} size={200} qrStyle="dots" eyeRadius={8} />
+          </div>
+          <p className="text-[12px] text-[var(--text-tertiary)] mt-3 break-all">{url}</p>
+        </Card>
+      )}
+    </div>
+  );
+}

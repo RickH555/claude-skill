@@ -1,0 +1,187 @@
+"use client";
+
+import { useState } from "react";
+import { Play, TrendingUp, Quote, Activity, Lightbulb, ArrowUpRight } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { VisibilityTrendChart } from "@/components/charts/visibility-trend-chart";
+import { EngineBreakdownChart } from "@/components/charts/engine-breakdown-chart";
+import { CompetitorChart } from "@/components/charts/competitor-chart";
+import { toast } from "sonner";
+
+// Mock data — will come from Supabase
+const MOCK_TREND_DATA = [
+  { date: "Sem 1", score: 42, citations: 2, mentions: 5 },
+  { date: "Sem 2", score: 48, citations: 3, mentions: 8 },
+  { date: "Sem 3", score: 55, citations: 5, mentions: 12 },
+  { date: "Sem 4", score: 65, citations: 7, mentions: 15 },
+];
+
+const MOCK_ENGINE_DATA = [
+  { engine: "ChatGPT", score: 72, mentions: 15, citations: 5 },
+  { engine: "Perplexity", score: 58, mentions: 8, citations: 3 },
+  { engine: "Gemini", score: 45, mentions: 5, citations: 1 },
+  { engine: "Claude", score: 61, mentions: 10, citations: 4 },
+  { engine: "Copilot", score: 33, mentions: 2, citations: 0 },
+];
+
+const MOCK_COMPETITOR_DATA = [
+  { name: "Mon Site", mentions: 15 },
+  { name: "Concurrent A", mentions: 22 },
+  { name: "Concurrent B", mentions: 8 },
+  { name: "Concurrent C", mentions: 5 },
+];
+
+interface RunSummary {
+  globalScore: number
+  totalPrompts: number
+  citationsFound: number
+  mentionsFound: number
+  engineScores: Record<string, { score: number; mentions: number; citations: number }>
+  alerts: Array<{ severity: string; message: string; action: string }>
+}
+
+export default function ProjectOverviewPage({ params }: { params: { id: string } }) {
+  const [isRunning, setIsRunning] = useState(false);
+  const [lastRun, setLastRun] = useState<RunSummary | null>(null);
+
+  const handleRunAnalysis = async () => {
+    setIsRunning(true);
+    toast.loading("Analyse en cours...", { id: "run" });
+
+    try {
+      const res = await fetch("/api/runs/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: params.id }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setLastRun(data.summary);
+        toast.success(
+          `Analyse terminee ! Score: ${data.summary.globalScore}/100 — ${data.summary.citationsFound} citations, ${data.summary.mentionsFound} mentions`,
+          { id: "run", duration: 5000 }
+        );
+      } else {
+        toast.error(data.error || "Erreur lors de l'analyse", { id: "run" });
+      }
+    } catch {
+      toast.error("Erreur de connexion", { id: "run" });
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const displayScore = lastRun?.globalScore ?? 65;
+  const displayCitations = lastRun?.citationsFound ?? 5;
+  const displayMentions = lastRun?.mentionsFound ?? 12;
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-serif font-bold text-white">Vue d'ensemble</h2>
+        <Button onClick={handleRunAnalysis} isLoading={isRunning}>
+          <Play size={16} /> {isRunning ? "Analyse en cours..." : "Lancer un Scan"}
+        </Button>
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Score AEO</p>
+          <p className="text-3xl font-bold text-white">{displayScore}<span className="text-sm text-white/30">/100</span></p>
+          <span className="text-xs text-emerald-400 flex items-center gap-0.5 mt-1">
+            <ArrowUpRight size={10} /> +12%
+          </span>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Mentions Marque</p>
+          <p className="text-3xl font-bold text-white">{displayMentions}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Citations URL</p>
+          <p className="text-3xl font-bold text-emerald-400">{displayCitations}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Recommandations</p>
+          <p className="text-3xl font-bold text-amber-400">8</p>
+        </Card>
+      </div>
+
+      {/* Charts */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp size={16} className="text-primary" />
+              Evolution sur 30 jours
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <VisibilityTrendChart data={MOCK_TREND_DATA} metric="score" />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Activity size={16} className="text-primary" />
+              Score par moteur IA
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EngineBreakdownChart data={MOCK_ENGINE_DATA} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Competitor Benchmark */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Quote size={16} className="text-primary" />
+            Part de voix vs concurrents
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CompetitorChart data={MOCK_COMPETITOR_DATA} brandName="Mon Site" />
+        </CardContent>
+      </Card>
+
+      {/* Alerts from last run */}
+      {lastRun?.alerts && lastRun.alerts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Lightbulb size={16} className="text-primary" />
+              Alertes du dernier scan
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {lastRun.alerts.map((alert, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                  <Badge
+                    variant={
+                      alert.severity === "critical" ? "destructive" :
+                      alert.severity === "warning" ? "warning" : "default"
+                    }
+                  >
+                    {alert.severity}
+                  </Badge>
+                  <div>
+                    <p className="text-sm text-white">{alert.message}</p>
+                    <p className="text-xs text-white/40 mt-0.5">{alert.action}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

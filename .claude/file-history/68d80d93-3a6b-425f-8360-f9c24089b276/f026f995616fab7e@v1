@@ -1,0 +1,202 @@
+import {
+  Integration,
+  IntegrationType,
+  AttributionKPI,
+  TrafficDataPoint,
+  AttributionRow,
+  AIQuery,
+} from '../types/integrations';
+
+const STORAGE_KEY = 'citedby_integrations';
+
+// --- Persistence helpers ---
+
+function loadIntegrations(): Integration[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveIntegrations(list: Integration[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+// --- Public API ---
+
+export function getIntegrations(): Integration[] {
+  return loadIntegrations();
+}
+
+export async function connectIntegration(
+  type: IntegrationType
+): Promise<Integration> {
+  // Simulate a 2-second OAuth flow
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  const isGA4 = type === 'ga4';
+  const randomId = crypto.randomUUID?.() ?? `int_${Date.now()}`;
+
+  const mockEmails = [
+    'analytics@citedby.ai',
+    'marketing@monsite.com',
+    'data-team@startup.io',
+    'webmaster@agence-digitale.fr',
+  ];
+  const email = mockEmails[Math.floor(Math.random() * mockEmails.length)];
+
+  const ga4Properties = [
+    'properties/345678901 - citedby.ai',
+    'properties/234567890 - mon-ecommerce.fr',
+    'properties/456789012 - app.saas-tool.com',
+  ];
+  const scSites = [
+    'https://citedby.ai',
+    'https://www.mon-ecommerce.fr',
+    'https://app.saas-tool.com',
+  ];
+
+  const property = isGA4
+    ? ga4Properties[Math.floor(Math.random() * ga4Properties.length)]
+    : scSites[Math.floor(Math.random() * scSites.length)];
+
+  const integration: Integration = {
+    id: randomId,
+    type,
+    name: isGA4 ? 'Google Analytics 4' : 'Google Search Console',
+    email,
+    property,
+    connectedAt: new Date().toISOString(),
+    status: 'connected',
+  };
+
+  const current = loadIntegrations().filter((i) => i.type !== type);
+  current.push(integration);
+  saveIntegrations(current);
+
+  return integration;
+}
+
+export function disconnectIntegration(id: string): void {
+  const current = loadIntegrations().filter((i) => i.id !== id);
+  saveIntegrations(current);
+}
+
+// --- Mock data generators ---
+
+function randomBetween(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function getAttributionKPIs(
+  period: '7d' | '30d' | '90d'
+): AttributionKPI {
+  const multiplier = period === '7d' ? 1 : period === '30d' ? 4 : 12;
+  return {
+    aiVisits: randomBetween(820, 1350) * multiplier,
+    aiConversions: randomBetween(24, 68) * multiplier,
+    aiTrafficShare: parseFloat((randomBetween(80, 180) / 10).toFixed(1)),
+    aiAvgCTR: parseFloat((randomBetween(25, 72) / 10).toFixed(1)),
+  };
+}
+
+export function getTrafficData(
+  period: '7d' | '30d' | '90d'
+): TrafficDataPoint[] {
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const points: TrafficDataPoint[] = [];
+  const now = new Date();
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10);
+
+    points.push({
+      date: dateStr,
+      chatgpt: randomBetween(30, 150),
+      perplexity: randomBetween(10, 60),
+      claude: randomBetween(15, 80),
+      gemini: randomBetween(20, 90),
+      copilot: randomBetween(5, 40),
+    });
+  }
+
+  return points;
+}
+
+export function getAttributionTable(): AttributionRow[] {
+  return [
+    {
+      source: 'ChatGPT',
+      visits: randomBetween(3200, 5800),
+      pageViews: randomBetween(8400, 14200),
+      avgDuration: `${randomBetween(2, 4)}m ${randomBetween(10, 55)}s`,
+      bounceRate: randomBetween(28, 45),
+      conversions: randomBetween(82, 190),
+      trend: randomBetween(-8, 25),
+    },
+    {
+      source: 'Perplexity',
+      visits: randomBetween(1100, 2400),
+      pageViews: randomBetween(2800, 6200),
+      avgDuration: `${randomBetween(1, 3)}m ${randomBetween(10, 55)}s`,
+      bounceRate: randomBetween(32, 52),
+      conversions: randomBetween(28, 75),
+      trend: randomBetween(5, 40),
+    },
+    {
+      source: 'Claude',
+      visits: randomBetween(900, 2100),
+      pageViews: randomBetween(2200, 5400),
+      avgDuration: `${randomBetween(2, 5)}m ${randomBetween(10, 55)}s`,
+      bounceRate: randomBetween(25, 40),
+      conversions: randomBetween(22, 65),
+      trend: randomBetween(2, 30),
+    },
+    {
+      source: 'Gemini',
+      visits: randomBetween(800, 1800),
+      pageViews: randomBetween(1900, 4600),
+      avgDuration: `${randomBetween(1, 3)}m ${randomBetween(10, 55)}s`,
+      bounceRate: randomBetween(35, 55),
+      conversions: randomBetween(18, 52),
+      trend: randomBetween(-5, 20),
+    },
+    {
+      source: 'Copilot',
+      visits: randomBetween(300, 900),
+      pageViews: randomBetween(700, 2200),
+      avgDuration: `${randomBetween(1, 2)}m ${randomBetween(10, 55)}s`,
+      bounceRate: randomBetween(40, 60),
+      conversions: randomBetween(8, 28),
+      trend: randomBetween(0, 35),
+    },
+  ];
+}
+
+export function getAIQueries(): AIQuery[] {
+  const queries = [
+    'meilleur outil SEO pour IA',
+    'comment optimiser son site pour ChatGPT',
+    'citedby avis et prix',
+    'alternative a semrush pour AEO',
+    'robots.txt bloquer GPTBot',
+    'schema markup pour IA',
+    'comment etre cite par Perplexity',
+    'audit SEO intelligence artificielle',
+    'strategie contenu answer engine',
+    'llms.txt generateur en ligne',
+  ];
+
+  return queries.map((query, idx) => ({
+    query,
+    clicks: randomBetween(12, 340),
+    impressions: randomBetween(200, 5800),
+    ctr: parseFloat((randomBetween(10, 85) / 10).toFixed(1)),
+    position: parseFloat((randomBetween(10, 120) / 10).toFixed(1)),
+    isAIReferral: idx < 6, // ~60 %
+  }));
+}

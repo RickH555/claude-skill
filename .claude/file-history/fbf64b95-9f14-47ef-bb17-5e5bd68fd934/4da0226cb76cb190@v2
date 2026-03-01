@@ -1,0 +1,284 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Loader2, CheckCircle2 } from 'lucide-react';
+import type { Survey, SurveyQuestion } from '@/types';
+
+export default function PublicSurveyPage() {
+  const { surveyId } = useParams();
+  const [survey, setSurvey] = useState<Survey | null>(null);
+  const [answers, setAnswers] = useState<Record<string, string | number | string[]>>({});
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchSurvey = async () => {
+      try {
+        const res = await fetch(`/api/surveys/${surveyId}/public`);
+        if (!res.ok) throw new Error('Survey not found');
+        const { data } = await res.json();
+        setSurvey(data);
+      } catch {
+        setError('This survey is not available');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSurvey();
+  }, [surveyId]);
+
+  const handleAnswer = (questionId: string, value: string | number | string[]) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+  };
+
+  const handleCheckboxChange = (questionId: string, option: string, checked: boolean) => {
+    setAnswers((prev) => {
+      const current = (prev[questionId] as string[]) || [];
+      if (checked) {
+        return { ...prev, [questionId]: [...current, option] };
+      }
+      return { ...prev, [questionId]: current.filter((v) => v !== option) };
+    });
+  };
+
+  const handleSubmit = async () => {
+    if (!survey) return;
+
+    // Validate required questions
+    for (const q of survey.questions) {
+      if (q.required && (!answers[q.id] || (Array.isArray(answers[q.id]) && (answers[q.id] as string[]).length === 0))) {
+        setError(`Please answer: ${q.text}`);
+        return;
+      }
+    }
+
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const res = await fetch(`/api/surveys/${surveyId}/responses`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers }),
+      });
+
+      if (!res.ok) throw new Error('Failed to submit');
+      setSubmitted(true);
+    } catch {
+      setError('Failed to submit response. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">
+        <Card className="w-full max-w-lg text-center">
+          <CardContent className="pt-8 pb-8">
+            <CheckCircle2 className="mx-auto h-16 w-16 text-green-500 mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Thank you!</h2>
+            <p className="text-muted-foreground">
+              {survey?.settings?.thankYouMessage || 'Your response has been recorded.'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!survey || error === 'This survey is not available') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">
+        <Card className="w-full max-w-lg text-center">
+          <CardContent className="pt-8 pb-8">
+            <h2 className="text-xl font-bold mb-2">Survey Not Found</h2>
+            <p className="text-muted-foreground">This survey is no longer available.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const answeredCount = Object.keys(answers).length;
+  const totalQuestions = survey.questions.length;
+  const progressPercent = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4">
+      <div className="mx-auto max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">{survey.title}</CardTitle>
+            {survey.description && (
+              <CardDescription className="text-base">{survey.description}</CardDescription>
+            )}
+            <Progress value={progressPercent} className="h-1.5 mt-4" />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
+
+            {survey.questions.map((question, index) => (
+              <QuestionRenderer
+                key={question.id}
+                question={question}
+                index={index}
+                value={answers[question.id]}
+                onChange={(value) => handleAnswer(question.id, value)}
+                onCheckboxChange={(option, checked) => handleCheckboxChange(question.id, option, checked)}
+              />
+            ))}
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <p className="text-xs text-muted-foreground">
+              Powered by NexusAI
+            </p>
+            <Button onClick={handleSubmit} disabled={submitting}>
+              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Submit
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function QuestionRenderer({
+  question,
+  index,
+  value,
+  onChange,
+  onCheckboxChange,
+}: {
+  question: SurveyQuestion;
+  index: number;
+  value: string | number | string[] | undefined;
+  onChange: (value: string | number | string[]) => void;
+  onCheckboxChange: (option: string, checked: boolean) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <Label className="text-base">
+        {index + 1}. {question.text}
+        {question.required && <span className="text-destructive ml-1">*</span>}
+      </Label>
+
+      {question.type === 'open_ended' && (
+        <Textarea
+          value={(value as string) || ''}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Type your answer..."
+          rows={3}
+        />
+      )}
+
+      {question.type === 'single_choice' && question.options && (
+        <RadioGroup value={(value as string) || ''} onValueChange={onChange}>
+          {question.options.map((option) => (
+            <div key={option} className="flex items-center space-x-2">
+              <RadioGroupItem value={option} id={`${question.id}-${option}`} />
+              <Label htmlFor={`${question.id}-${option}`} className="font-normal">
+                {option}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      )}
+
+      {question.type === 'multiple_choice' && question.options && (
+        <div className="space-y-2">
+          {question.options.map((option) => (
+            <div key={option} className="flex items-center space-x-2">
+              <Checkbox
+                id={`${question.id}-${option}`}
+                checked={Array.isArray(value) && value.includes(option)}
+                onCheckedChange={(checked) => onCheckboxChange(option, checked === true)}
+              />
+              <Label htmlFor={`${question.id}-${option}`} className="font-normal">
+                {option}
+              </Label>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {question.type === 'rating' && (
+        <div className="flex gap-2">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <Button
+              key={n}
+              variant={value === n ? 'default' : 'outline'}
+              size="lg"
+              onClick={() => onChange(n)}
+              className="w-12 h-12"
+            >
+              {n}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {question.type === 'nps' && (
+        <div className="space-y-2">
+          <div className="flex gap-1 flex-wrap">
+            {Array.from({ length: 11 }, (_, i) => (
+              <Button
+                key={i}
+                variant={value === i ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onChange(i)}
+                className="w-10 h-10"
+              >
+                {i}
+              </Button>
+            ))}
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground px-1">
+            <span>Not likely</span>
+            <span>Very likely</span>
+          </div>
+        </div>
+      )}
+
+      {question.type === 'yes_no' && (
+        <div className="flex gap-3">
+          <Button
+            variant={value === 'Yes' ? 'default' : 'outline'}
+            onClick={() => onChange('Yes')}
+            className="flex-1"
+          >
+            Yes
+          </Button>
+          <Button
+            variant={value === 'No' ? 'default' : 'outline'}
+            onClick={() => onChange('No')}
+            className="flex-1"
+          >
+            No
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}

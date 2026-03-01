@@ -1,0 +1,479 @@
+import React, { useState, Suspense, lazy } from 'react';
+import {
+  Sparkles, Home as HomeIcon, BarChart3, Search, Globe, Settings, LogOut,
+  Activity, Shield, Menu, X, ChevronRight, Loader2, FolderOpen, CreditCard,
+  Zap, Command, ArrowRight, User as UserIcon
+} from 'lucide-react';
+import { User, AnalysisResult } from './types';
+import { analyzeUrl } from './services/analyzer';
+
+// --- Lazy-loaded Pages ---
+const HomePage = lazy(() => import('./pages/Home'));
+const LoginPage = lazy(() => import('./pages/Login'));
+const AnalyzePage = lazy(() => import('./pages/Analyze'));
+const ResultsPage = lazy(() => import('./pages/Results'));
+const DashboardPage = lazy(() => import('./pages/Dashboard'));
+const ProjectsPage = lazy(() => import('./pages/Projects'));
+const PlanPage = lazy(() => import('./pages/Plan'));
+const DirectoryPage = lazy(() => import('./pages/Directory'));
+const AccountPage = lazy(() => import('./pages/Account'));
+const AiMonitoringPage = lazy(() => import('./pages/AiMonitoring'));
+const EeatBuilderPage = lazy(() => import('./pages/EeatBuilder'));
+
+// --- View Type ---
+type ViewType =
+  | 'home'
+  | 'login'
+  | 'analyze'
+  | 'results'
+  | 'dashboard'
+  | 'projects'
+  | 'plan'
+  | 'directory'
+  | 'account'
+  | 'ai-monitoring'
+  | 'eeat-builder';
+
+// --- Navigation Config ---
+interface NavItem {
+  id: ViewType;
+  label: string;
+  icon: React.ReactNode;
+  section: 'principal' | 'outils' | 'settings';
+  requiresAuth?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'dashboard', label: 'Tableau de bord', icon: <BarChart3 size={18} />, section: 'principal', requiresAuth: true },
+  { id: 'ai-monitoring', label: 'Monitoring IA', icon: <Activity size={18} />, section: 'principal', requiresAuth: true },
+  { id: 'analyze', label: 'Analyse AEO', icon: <Search size={18} />, section: 'principal', requiresAuth: true },
+  { id: 'projects', label: 'Projets', icon: <FolderOpen size={18} />, section: 'principal', requiresAuth: true },
+  { id: 'eeat-builder', label: 'E-E-A-T Builder', icon: <Shield size={18} />, section: 'outils', requiresAuth: true },
+  { id: 'directory', label: 'Annuaire IA', icon: <Globe size={18} />, section: 'outils', requiresAuth: true },
+  { id: 'plan', label: 'Plans & Tarifs', icon: <CreditCard size={18} />, section: 'settings' },
+  { id: 'account', label: 'Mon Compte', icon: <Settings size={18} />, section: 'settings', requiresAuth: true },
+];
+
+// --- Breadcrumb Labels ---
+const BREADCRUMB_LABELS: Record<ViewType, string> = {
+  'home': 'Accueil',
+  'login': 'Connexion',
+  'analyze': 'Analyse',
+  'results': 'Résultats',
+  'dashboard': 'Tableau de bord',
+  'projects': 'Projets',
+  'plan': 'Plans & Tarifs',
+  'directory': 'Annuaire IA',
+  'account': 'Mon Compte',
+  'ai-monitoring': 'Monitoring IA',
+  'eeat-builder': 'E-E-A-T Builder',
+};
+
+// --- Loading Fallback ---
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="flex flex-col items-center gap-4">
+      <Loader2 size={32} className="animate-spin text-primary" />
+      <p className="text-sm text-gray-500">Chargement...</p>
+    </div>
+  </div>
+);
+
+// --- Command Palette ---
+const CommandPalette: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onNavigate: (view: ViewType) => void;
+  user: User | null;
+}> = ({ isOpen, onClose, onNavigate, user }) => {
+  const [query, setQuery] = useState('');
+
+  if (!isOpen) return null;
+
+  const allCommands = [
+    { id: 'home', label: 'Accueil', icon: <HomeIcon size={16} /> },
+    ...NAV_ITEMS.map(nav => ({
+      id: nav.id,
+      label: nav.label,
+      icon: nav.icon
+    }))
+  ].filter(cmd =>
+    cmd.label.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg bg-[#12121a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+          <Command size={16} className="text-gray-500" />
+          <input
+            type="text"
+            placeholder="Rechercher une page..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
+            autoFocus
+          />
+          <kbd className="text-[10px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded border border-white/10">ESC</kbd>
+        </div>
+        <div className="max-h-64 overflow-y-auto py-2">
+          {allCommands.map(cmd => (
+            <button
+              key={cmd.id}
+              onClick={() => { onNavigate(cmd.id as ViewType); onClose(); setQuery(''); }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+            >
+              <span className="opacity-50">{cmd.icon}</span>
+              {cmd.label}
+            </button>
+          ))}
+          {allCommands.length === 0 && (
+            <p className="text-center text-gray-500 text-sm py-4">Aucun résultat</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN APP ---
+export default function App() {
+  // State
+  const [currentView, setCurrentView] = useState<ViewType>('home');
+  const [user, setUser] = useState<User | null>(null);
+  const [analysisHistory, setAnalysisHistory] = useState<AnalysisResult[]>([]);
+  const [currentAnalysis, setCurrentAnalysis] = useState<AnalysisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  // Navigation
+  const navigate = (view: string) => {
+    setCurrentView(view as ViewType);
+    setSidebarOpen(false);
+  };
+
+  // Auth
+  const handleLogin = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    setCurrentView('dashboard');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCurrentView('home');
+  };
+
+  // Analysis
+  const handleAnalyze = async (url: string) => {
+    setIsAnalyzing(true);
+    setCurrentView('results');
+    try {
+      const result = await analyzeUrl(url);
+      setCurrentAnalysis(result);
+      setAnalysisHistory(prev => [result, ...prev]);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // Credits
+  const handleDeductCredits = (amount: number): boolean => {
+    if (!user || user.credits < amount) return false;
+    setUser(prev => prev ? { ...prev, credits: prev.credits - amount } : null);
+    return true;
+  };
+
+  // Keyboard shortcut for command palette
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setCommandPaletteOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  const isAuthenticated = !!user;
+  const showSidebar = isAuthenticated && !['home', 'login'].includes(currentView);
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] text-white selection:bg-emerald-500/30 font-sans">
+      {/* Command Palette */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onNavigate={navigate}
+        user={user}
+      />
+
+      {/* Header */}
+      <header className="relative z-40 border-b border-white/5 backdrop-blur-md bg-[#0a0a0f]/80 sticky top-0">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {showSidebar && (
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden p-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            )}
+            <button onClick={() => navigate('home')} className="flex items-center gap-2">
+              <div className="bg-primary p-1.5 rounded-lg">
+                <Sparkles className="w-5 h-5 text-black" />
+              </div>
+              <h1 className="text-lg font-bold">CitedBy<span className="text-primary">.ai</span></h1>
+            </button>
+          </div>
+
+          {/* Breadcrumb */}
+          {currentView !== 'home' && (
+            <div className="hidden md:flex items-center gap-1.5 text-sm text-gray-500">
+              <button onClick={() => navigate('home')} className="hover:text-white transition-colors">Accueil</button>
+              <ChevronRight size={12} />
+              <span className="text-white font-medium">{BREADCRUMB_LABELS[currentView]}</span>
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            {/* Command Palette Trigger */}
+            {isAuthenticated && (
+              <button
+                onClick={() => setCommandPaletteOpen(true)}
+                className="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <Command size={12} />
+                <span>Rechercher...</span>
+                <kbd className="text-[10px] bg-white/5 px-1 py-0.5 rounded border border-white/10 ml-2">⌘K</kbd>
+              </button>
+            )}
+
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">
+                  <Zap size={12} className="text-primary" />
+                  <span className="text-xs font-bold text-white">{user?.credits ?? 0}</span>
+                  <span className="text-[10px] text-gray-500">Gas</span>
+                </div>
+                <button
+                  onClick={() => navigate('account')}
+                  className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-emerald-800 flex items-center justify-center text-white text-sm font-bold"
+                >
+                  {user?.name?.[0]?.toUpperCase() || 'U'}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('login')}
+                className="bg-white/5 border border-white/10 px-4 py-2 rounded-lg text-sm hover:bg-white/10 transition-colors"
+              >
+                Connexion
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        {showSidebar && (
+          <>
+            {/* Mobile overlay */}
+            {sidebarOpen && (
+              <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+            )}
+
+            <aside className={`
+              fixed md:sticky top-[53px] left-0 z-30 h-[calc(100vh-53px)]
+              w-64 bg-[#0a0a0f] border-r border-white/5 flex flex-col
+              transform transition-transform duration-300 md:transform-none
+              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+            `}>
+              <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+                {/* Principal Section */}
+                <div>
+                  <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-3 mb-2">Principal</p>
+                  <div className="space-y-0.5">
+                    {NAV_ITEMS.filter(n => n.section === 'principal').map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => navigate(item.id)}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                          currentView === item.id
+                            ? 'bg-primary/10 text-primary border border-primary/20'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <span className={currentView === item.id ? 'text-primary' : 'opacity-50'}>{item.icon}</span>
+                        {item.label}
+                        {item.id === 'ai-monitoring' && (
+                          <span className="ml-auto text-[9px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded-full font-bold">NEW</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Outils Section */}
+                <div>
+                  <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-3 mb-2">Outils Génératifs</p>
+                  <div className="space-y-0.5">
+                    {NAV_ITEMS.filter(n => n.section === 'outils').map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => navigate(item.id)}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                          currentView === item.id
+                            ? 'bg-primary/10 text-primary border border-primary/20'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <span className={currentView === item.id ? 'text-primary' : 'opacity-50'}>{item.icon}</span>
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Settings Section */}
+                <div>
+                  <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-3 mb-2">Paramètres</p>
+                  <div className="space-y-0.5">
+                    {NAV_ITEMS.filter(n => n.section === 'settings').map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => navigate(item.id)}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                          currentView === item.id
+                            ? 'bg-primary/10 text-primary border border-primary/20'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <span className={currentView === item.id ? 'text-primary' : 'opacity-50'}>{item.icon}</span>
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </nav>
+
+              {/* Sidebar Footer */}
+              <div className="p-3 border-t border-white/5">
+                <div className="flex items-center gap-3 px-3 py-2 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-emerald-800 flex items-center justify-center text-white text-xs font-bold">
+                    {user?.name?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{user?.name || 'Utilisateur'}</p>
+                    <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-colors"
+                >
+                  <LogOut size={16} />
+                  Déconnexion
+                </button>
+              </div>
+            </aside>
+          </>
+        )}
+
+        {/* Main Content */}
+        <main className={`flex-1 min-h-[calc(100vh-53px)] relative ${showSidebar ? '' : ''}`}>
+          <Suspense fallback={<PageLoader />}>
+            {currentView === 'home' && (
+              <HomePage onNavigate={navigate} user={user} />
+            )}
+
+            {currentView === 'login' && (
+              <LoginPage onLogin={handleLogin} onBack={() => navigate('home')} />
+            )}
+
+            {currentView === 'analyze' && (
+              <AnalyzePage onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+            )}
+
+            {currentView === 'results' && currentAnalysis && (
+              <ResultsPage
+                data={currentAnalysis}
+                onBack={() => navigate('dashboard')}
+                user={user}
+                onDeductCredits={handleDeductCredits}
+              />
+            )}
+
+            {currentView === 'results' && !currentAnalysis && !isAnalyzing && (
+              <AnalyzePage onAnalyze={handleAnalyze} isAnalyzing={false} />
+            )}
+
+            {currentView === 'dashboard' && (
+              <DashboardPage
+                onBack={() => navigate('home')}
+                history={analysisHistory}
+                onView={(analysis) => { setCurrentAnalysis(analysis); navigate('results'); }}
+              />
+            )}
+
+            {currentView === 'projects' && (
+              <ProjectsPage
+                onBack={() => navigate('dashboard')}
+                onNavigateToAnalysis={() => navigate('analyze')}
+                user={user}
+              />
+            )}
+
+            {currentView === 'plan' && (
+              <PlanPage
+                onBack={() => navigate('dashboard')}
+                onNavigateToProjects={() => navigate('projects')}
+                user={user}
+              />
+            )}
+
+            {currentView === 'directory' && (
+              <DirectoryPage onBack={() => navigate('dashboard')} />
+            )}
+
+            {currentView === 'account' && (
+              <AccountPage
+                user={user}
+                onLogout={handleLogout}
+                onNavigate={navigate}
+                onUpgrade={(plan) => setUser(prev => prev ? { ...prev, plan } : null)}
+                monthlyProjectCount={1}
+                maxProjects={user?.plan === 'enterprise' ? Infinity : user?.plan === 'pro' ? 3 : 1}
+              />
+            )}
+
+            {currentView === 'ai-monitoring' && (
+              <AiMonitoringPage
+                user={user}
+                onDeductCredits={handleDeductCredits}
+                onBack={() => navigate('dashboard')}
+              />
+            )}
+
+            {currentView === 'eeat-builder' && (
+              <EeatBuilderPage
+                user={user}
+                onDeductCredits={handleDeductCredits}
+                onBack={() => navigate('dashboard')}
+              />
+            )}
+          </Suspense>
+        </main>
+      </div>
+    </div>
+  );
+}

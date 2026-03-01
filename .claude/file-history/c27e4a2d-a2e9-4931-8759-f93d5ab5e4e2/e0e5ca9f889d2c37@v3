@@ -1,0 +1,124 @@
+import { createServerSupabase } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  const supabase = await createServerSupabase();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { card_id, amount, program_id, customer_id } = body;
+
+  if (!amount || amount <= 0) {
+    return NextResponse.json({ error: 'Montant invalide' }, { status: 400 });
+  }
+
+  // Look up the merchant by user_id to get merchant.id
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!merchant) {
+    return NextResponse.json({ error: 'Marchand non trouve' }, { status: 404 });
+  }
+
+  // We need either card_id OR (program_id + customer_id) to identify the card
+  let targetCardId = card_id;
+
+  if (!targetCardId && program_id && customer_id) {
+    // Verify the program belongs to this merchant
+    const { data: program } = await supabase
+      .from('loyalty_programs')
+      .select('id, type')
+      .eq('id', program_id)
+      .eq('merchant_id', merchant.id)
+      .single();
+
+    if (!program) {
+      return NextResponse.json({ error: 'Programme non trouve' }, { status: 404 });
+    }
+
+    // Find or create the customer card
+    let { data: card } = await supabase
+      .from('customer_cards')
+      .select('id, current_stamps, current_points')
+      .eq('customer_id', customer_id)
+      .eq('program_id', program_id)
+      .single();
+
+    if (!card) {
+      // Auto-enroll the customer
+      const { data: newCard, error } = await supabase
+        .from('customer_cards')
+        .insert({ customer_id, program_id, current_stamps: 0, current_points: 0 })
+        .select('id, current_stamps, current_points')
+        .single();
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      card = newCard;
+    }
+
+    targetCardId = card!.id;
+  }
+
+  if (!targetCardId) {
+    return NextResponse.json({ error: 'card_id ou (program_id + customer_id) requis' }, { status: 400 });
+  }
+
+  // Fetch current card with program info
+  const { data: card } = await supabase
+    .from('customer_cards')
+    .select('*, loyalty_programs(merchant_id, type)')
+    .eq('id', targetCardId)
+    .single();
+
+  if (!card) {
+    return NextResponse.json({ error: 'Carte non trouvee' }, { status: 404 });
+  }
+
+  // Verify the merchant owns this program
+  if (card.loyalty_programs.merchant_id !== merchant.id) {
+    return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
+  }
+
+  // Determine which balance field to update based on program type
+  const programType = card.loyalty_programs.type;
+  const balanceField = programType === 'stamp' ? 'current_stamps' : 'current_points';
+  const currentBalance = programType === 'stamp' ? card.current_stamps : card.current_points;
+  const newBalance = currentBalance + amount;
+
+  // Update balance
+  const { error: updateError } = await supabase
+    .from('customer_cards')
+    .update({ [balanceField]: newBalance })
+    .eq('id', targetCardId);
+
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
+
+  // Log transaction
+  const { error: txnError } = await supabase.from('transactions').insert({
+    card_id: targetCardId,
+    validated_by: merchant.id,
+    type: 'earn',
+    value: amount,
+  });
+
+  if (txnError) {
+    return NextResponse.json({ error: txnError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    success: true,
+    new_balance: newBalance,
+    amount_added: amount,
+  });
+}

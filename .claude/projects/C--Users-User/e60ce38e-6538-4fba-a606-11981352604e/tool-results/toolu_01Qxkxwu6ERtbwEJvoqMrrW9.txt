@@ -1,0 +1,206 @@
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-1-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-2-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-3-const requestBuckets = new Map<string, { count: number; resetAt: number }>();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-4-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts:5:export const corsHeaders: Record<string, string> = {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts:6:  'Access-Control-Allow-Origin': '*',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-7-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-8-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-9-  'Content-Type': 'application/json',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-10-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-11-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-13- * Retourne une reponse JSON standardisee.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-14- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-15-export const jsonResponse = (body: unknown, status = 200): Response =>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-16-  new Response(JSON.stringify(body), {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-17-    status,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts:18:    headers: corsHeaders,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-19-  });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-20-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-21-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-22- * Parse sécurisé du body JSON.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\_shared\common.ts-23- */
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:1:import { corsHeaders, createAdminClient, enforceRateLimit, haversineKm, jsonResponse, logAutomationEvent, parseJsonBody } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-2-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-3-type Heat = 'burning' | 'hot' | 'warm' | 'cold';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-4-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-5-interface DistributePayload {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-6-  prospect_id: string;
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-152- * Distribution user-level d'un prospect nouvellement analyse.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-153- * Chaque assignment consomme des credits prepaid.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-154- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-155-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-156-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts:157:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-158-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-159-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-160-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-161-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\distribute\index.ts-162-    enforceRateLimit(`distribute:${ip}`, 100);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-1-import Stripe from 'https://esm.sh/stripe@15.12.0?target=denonext';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts:2:import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, parseJsonBody } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-3-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-4-interface PortalPayload {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-5-  user_id: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-6-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-7-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-17-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-18- * Cree une session Stripe Customer Portal.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-19- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-20-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-21-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts:22:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-23-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-24-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-25-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-26-    enforceRateLimit(`portal:${ip}`, 100);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\customer-portal\index.ts-27-    if (request.method !== 'POST') {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-1-import {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:2:  corsHeaders,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-3-  createAdminClient,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-4-  enforceRateLimit,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-5-  jsonResponse,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-6-  logAutomationEvent,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-7-  parseJsonBody,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-204-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-205- * Lance un scan manuel immediat pour les secteurs/sources cibles de l'utilisateur.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-206- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-207-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-208-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts:209:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-210-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-211-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-212-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-213-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\scan-now\index.ts-214-    enforceRateLimit(`scan-now:${ip}`, 100);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-1-import Stripe from 'https://esm.sh/stripe@15.12.0?target=denonext';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts:2:import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, parseJsonBody } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-3-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-4-interface CheckoutPayload {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-5-  price_id?: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-6-  pack_id?: 'pack_20' | 'pack_50' | 'pack_120' | 'pack_300';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-7-  user_id: string;
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-66-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-67- * Cree une session checkout Stripe pour achat cash de credits.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-68- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-69-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-70-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts:71:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-72-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-73-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-74-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-75-    enforceRateLimit(`checkout:${ip}`, 100);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\create-checkout\index.ts-76-    if (request.method !== 'POST') {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts:1:import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent, parseJsonBody, sha256Hex } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-2-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-3-type Heat = 'burning' | 'hot' | 'warm' | 'cold';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-4-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-5-interface AnalyzePayload {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-6-  sector: string;
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-158-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-159- * Analyse IA d'un item brut, puis insertion prospect.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-160- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-161-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-162-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts:163:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-164-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-165-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-166-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-167-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\analyze\index.ts-168-    enforceRateLimit(`analyze:${ip}`, 100);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-1-import Stripe from 'https://esm.sh/stripe@15.12.0?target=denonext';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:2:import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent, parseJsonBody } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-3-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-4-interface AutoRechargePayload {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-5-  user_id: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-6-  minimum_required_credits?: number;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-7-  reason?: string;
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-107-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-108- * Recharge auto one-shot sur carte sauvegardee Stripe.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-109- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-110-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-111-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts:112:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-113-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-114-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-115-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-116-  let userIdForLog: string | null = null;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\auto-recharge\index.ts-117-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts:1:import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-2-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-3-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-4- * Tache de maintenance credits (legacy endpoint).
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-5- * Corrige les soldes negatifs eventuels et journalise l'operation.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-6- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-7-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-8-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts:9:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-10-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-11-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-12-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-13-    enforceRateLimit(`reset-quotas:${ip}`, 100);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\reset-quotas\index.ts-14-    if (request.method !== 'POST' && request.method !== 'GET') {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts:1:import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent, parseJsonBody, sha256Hex } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-2-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-3-interface IngestPayload {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-4-  sector: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-5-  source: string;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-6-  data: Array<Record<string, unknown>>;
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-11-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-12- * Point d'entree ingestion n8n -> LeadRadar.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-13- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-14-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-15-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts:16:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-17-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-18-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-19-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-20-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\ingest\index.ts-21-    enforceRateLimit(`ingest:${ip}`, 100);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts:1:import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent, parseJsonBody } from '../_shared/common.ts';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-2-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-3-type NotificationType =
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-4-  | 'new_prospect'
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-5-  | 'burning_alert'
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-6-  | 'weekly_report'
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-117-/**
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-118- * Notification in-app/email.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-119- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-120-Deno.serve(async (request: Request) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-121-  if (request.method === 'OPTIONS') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts:122:    return new Response('ok', { headers: corsHeaders });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-123-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-124-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-125-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-126-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\supabase\functions\notify\index.ts-127-    enforceRateLimit(`notify:${ip}`, 100);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-29-      // Wait a moment for the hidden div to render properly
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-30-      await new Promise(resolve => setTimeout(resolve, 500));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-31-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-32-      const canvas = await html2canvas(element, {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-33-        scale: 2,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx:34:        useCORS: true,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-35-        logging: false,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-36-        windowWidth: 1000 // Force width to match container style
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-37-      });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-38-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Results.tsx-39-      const imgData = canvas.toDataURL('image/jpeg', 0.95);

@@ -1,0 +1,227 @@
+import React from 'react';
+import { ArrowLeft, Lock, CreditCard, Loader2, ShieldCheck } from 'lucide-react';
+
+interface StripeCheckoutProps {
+  mode: 'subscription' | 'one-time';
+  productName: string;
+  productDescription: string;
+  productIcon?: React.ReactNode;
+  amount: number;
+  amountDetails?: { label: string; value: string; highlight?: boolean; separator?: boolean }[];
+  userEmail?: string;
+  onConfirm: () => void;
+  onBack: () => void;
+  isProcessing: boolean;
+  ctaLabel?: string;
+}
+
+const StripeCheckout: React.FC<StripeCheckoutProps> = ({
+  mode,
+  productName,
+  productDescription,
+  productIcon,
+  amount,
+  amountDetails,
+  userEmail,
+  onConfirm,
+  onBack,
+  isProcessing,
+  ctaLabel,
+}) => {
+  return (
+    <div className="w-full max-w-lg mx-auto">
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        disabled={isProcessing}
+        className="flex items-center gap-2 text-gray-500 hover:text-white mb-6 transition-colors text-sm"
+      >
+        <ArrowLeft size={16} /> Retour
+      </button>
+
+      <div className="ninja-card rounded-2xl border border-white/[0.08] overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 border-b border-white/[0.06] px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Lock size={16} className="text-purple-400" />
+              <span className="text-white font-bold text-sm">Paiement securise</span>
+            </div>
+            <span className="text-[#635bff] font-bold text-sm tracking-wide">stripe</span>
+          </div>
+        </div>
+
+        {/* Order summary */}
+        <div className="px-6 py-5 border-b border-white/[0.06]">
+          <div className="flex items-center gap-4">
+            {productIcon && (
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 shrink-0">
+                {productIcon}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-white font-bold text-base truncate">{productName}</h3>
+              <p className="text-sm text-gray-500 truncate">{productDescription}</p>
+              {mode === 'subscription' && (
+                <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 text-[10px] font-bold uppercase tracking-wider border border-purple-500/20">
+                  Abonnement mensuel
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Amount details */}
+        {amountDetails && amountDetails.length > 0 && (
+          <div className="px-6 py-4 border-b border-white/[0.06]">
+            <div className="space-y-2">
+              {amountDetails.map((detail, i) => (
+                <React.Fragment key={i}>
+                  {detail.separator && (
+                    <div className="border-t border-white/[0.06] pt-2" />
+                  )}
+                  <div className={`flex justify-between items-center text-sm ${
+                    detail.highlight ? 'text-white font-bold' : 'text-gray-400'
+                  }`}>
+                    <span>{detail.label}</span>
+                    <span className={detail.highlight ? 'text-purple-400 text-base' : ''}>
+                      {detail.value}
+                    </span>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* STRIPE_INTEGRATION_POINT: Replace the fake form below with Stripe <CardElement> */}
+        {/* When integrating Stripe, wrap this component with <Elements> provider */}
+        {/* and replace the fake inputs with <CardElement /> from @stripe/react-stripe-js */}
+        <div className="px-6 py-5 space-y-4">
+          {/* Email */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">
+              Email (pour le recu)
+            </label>
+            {/* STRIPE_INTEGRATION_POINT: This email will be passed to Stripe checkout session */}
+            <input
+              type="email"
+              defaultValue={userEmail || ''}
+              placeholder="email@exemple.com"
+              className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors"
+            />
+          </div>
+
+          {/* Card holder */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">
+              Titulaire de la carte
+            </label>
+            {/* STRIPE_INTEGRATION_POINT: Card holder name */}
+            <input
+              type="text"
+              placeholder="Jean Dupont"
+              className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors"
+            />
+          </div>
+
+          {/* Card number */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">
+              Numero de carte
+            </label>
+            {/* STRIPE_INTEGRATION_POINT: Replace with <CardNumberElement /> */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="4242 4242 4242 4242"
+                className="w-full bg-[#111111] border border-white/[0.08] rounded-xl pl-10 pr-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors"
+              />
+              <CreditCard size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            </div>
+          </div>
+
+          {/* Expiration + CVC */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">
+                Expiration
+              </label>
+              {/* STRIPE_INTEGRATION_POINT: Replace with <CardExpiryElement /> */}
+              <input
+                type="text"
+                placeholder="MM / AA"
+                className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wider">
+                CVC
+              </label>
+              {/* STRIPE_INTEGRATION_POINT: Replace with <CardCvcElement /> */}
+              <input
+                type="text"
+                placeholder="123"
+                className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-purple-500/50 focus:outline-none transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Button */}
+        <div className="px-6 pb-5">
+          <button
+            onClick={onConfirm}
+            disabled={isProcessing}
+            className="w-full py-3.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Traitement en cours...
+              </>
+            ) : (
+              <>
+                <Lock size={16} />
+                {ctaLabel || `Payer ${amount.toFixed(2)} \u20ac`}
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Trust badges */}
+        <div className="px-6 pb-4">
+          <div className="flex items-center justify-center gap-4 text-[10px] text-gray-600">
+            <span className="flex items-center gap-1">
+              <ShieldCheck size={12} className="text-green-500/70" />
+              SSL 256-bit
+            </span>
+            <span className="text-gray-700">|</span>
+            <span>
+              Powered by <span className="text-[#635bff] font-bold">stripe</span>
+            </span>
+            <span className="text-gray-700">|</span>
+            <span className="flex items-center gap-1">
+              <Lock size={10} />
+              Chiffre
+            </span>
+          </div>
+        </div>
+
+        {/* Legal */}
+        <div className="px-6 pb-5">
+          <p className="text-[10px] text-gray-600 text-center leading-relaxed">
+            En cliquant sur "Payer", vous acceptez nos{' '}
+            <button className="text-purple-400/70 hover:text-purple-300 underline transition-colors">
+              Conditions Generales de Vente
+            </button>
+            .{' '}
+            {mode === 'subscription' && "Votre abonnement sera renouvel\u00e9 automatiquement chaque mois."}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default StripeCheckout;

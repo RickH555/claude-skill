@@ -1,0 +1,364 @@
+import { useState, useEffect, useCallback } from 'react'
+import { motion } from 'framer-motion'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import Card from '../../components/ui/Card.tsx'
+import Button from '../../components/ui/Button.tsx'
+import type { IntegrationPeriod, IntegrationState } from '../../types/integrations.ts'
+import {
+  getIntegrationState,
+  hasAnyConnection,
+  connectProvider,
+  disconnectProvider,
+  setPeriod,
+  getKPIs,
+  getTrafficData,
+  getAttributionData,
+  getAIQueries,
+  getProviderLabel,
+} from '../../services/integrations.ts'
+
+const SOURCE_COLORS: Record<string, string> = {
+  chatgpt: '#10B981',
+  perplexity: '#6366F1',
+  claude: '#F59E0B',
+  gemini: '#3B82F6',
+  copilot: '#8B5CF6',
+}
+
+function CustomTooltip({ active, payload, label }: {
+  active?: boolean
+  payload?: Array<{ value: number; name: string; color: string }>
+  label?: string
+}) {
+  if (!active || !payload) return null
+  return (
+    <div className="rounded-lg border border-gray-100 bg-white p-3 shadow-lg">
+      <p className="mb-1 text-xs font-medium text-gray-500">{label}</p>
+      {payload.map((entry) => (
+        <p key={entry.name} className="text-sm" style={{ color: entry.color }}>
+          {entry.name}: <span className="font-semibold">{entry.value}</span>
+        </p>
+      ))}
+    </div>
+  )
+}
+
+const periods: { value: IntegrationPeriod; label: string }[] = [
+  { value: '7d', label: '7 jours' },
+  { value: '30d', label: '30 jours' },
+  { value: '90d', label: '90 jours' },
+]
+
+export default function Integrations() {
+  const [state, setState] = useState<IntegrationState>(getIntegrationState)
+  const [loading, setLoading] = useState<string | null>(null)
+
+  const refreshState = useCallback(() => {
+    setState(getIntegrationState())
+  }, [])
+
+  useEffect(() => {
+    refreshState()
+  }, [refreshState])
+
+  const connected = hasAnyConnection(state)
+  const kpis = connected ? getKPIs(state.period) : null
+  const trafficData = connected ? getTrafficData(state.period) : []
+  const attribution = connected ? getAttributionData() : []
+  const queries = connected ? getAIQueries() : []
+
+  async function handleConnect(provider: 'ga4' | 'search_console') {
+    setLoading(provider)
+    await connectProvider(provider)
+    refreshState()
+    setLoading(null)
+  }
+
+  function handleDisconnect(provider: 'ga4' | 'search_console') {
+    disconnectProvider(provider)
+    refreshState()
+  }
+
+  function handlePeriodChange(period: IntegrationPeriod) {
+    setPeriod(period)
+    refreshState()
+  }
+
+  const ga4 = state.connections.find((c) => c.provider === 'ga4')!
+  const sc = state.connections.find((c) => c.provider === 'search_console')!
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Integrations</h2>
+        {connected && (
+          <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+            3 Gas par chargement
+          </span>
+        )}
+      </div>
+
+      {/* Connection Cards */}
+      <motion.div
+        className="grid grid-cols-1 gap-4 md:grid-cols-2"
+        initial="hidden"
+        animate="visible"
+        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+      >
+        {/* GA4 Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100">
+                  <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{getProviderLabel('ga4')}</h3>
+                  {ga4.status === 'connected' ? (
+                    <p className="text-xs text-gray-500">{ga4.accountName}</p>
+                  ) : (
+                    <p className="text-xs text-gray-400">Non connecte</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`inline-block h-2 w-2 rounded-full ${ga4.status === 'connected' ? 'bg-green-500' : 'bg-gray-300'}`} />
+                {ga4.status === 'connected' ? (
+                  <Button variant="ghost" size="sm" onClick={() => handleDisconnect('ga4')}>
+                    Deconnecter
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={() => handleConnect('ga4')} disabled={loading === 'ga4'}>
+                    {loading === 'ga4' ? 'Connexion...' : 'Connecter'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Search Console Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
+                  <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{getProviderLabel('search_console')}</h3>
+                  {sc.status === 'connected' ? (
+                    <p className="text-xs text-gray-500">{sc.accountName}</p>
+                  ) : (
+                    <p className="text-xs text-gray-400">Non connecte</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`inline-block h-2 w-2 rounded-full ${sc.status === 'connected' ? 'bg-green-500' : 'bg-gray-300'}`} />
+                {sc.status === 'connected' ? (
+                  <Button variant="ghost" size="sm" onClick={() => handleDisconnect('search_console')}>
+                    Deconnecter
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={() => handleConnect('search_console')} disabled={loading === 'search_console'}>
+                    {loading === 'search_console' ? 'Connexion...' : 'Connecter'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+      {/* Dashboard - only if connected */}
+      {connected && kpis && (
+        <>
+          {/* Period Selector */}
+          <div className="flex gap-2">
+            {periods.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => handlePeriodChange(p.value)}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                  state.period === p.value
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* KPIs */}
+          <motion.div
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+          >
+            {[
+              { label: 'Visites IA', value: kpis.aiVisits.toLocaleString('fr-FR'), color: 'text-blue-600' },
+              { label: 'Conversions IA', value: kpis.aiConversions.toLocaleString('fr-FR'), color: 'text-emerald-600' },
+              { label: 'Part trafic IA', value: `${kpis.aiTrafficShare.toFixed(1)}%`, color: 'text-purple-600' },
+              { label: 'CTR moyen IA', value: `${kpis.avgAiCTR.toFixed(1)}%`, color: 'text-amber-600' },
+            ].map((kpi) => (
+              <motion.div
+                key={kpi.label}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <Card>
+                  <p className="text-sm text-gray-500">{kpi.label}</p>
+                  <p className={`mt-1 text-2xl font-bold ${kpi.color}`}>{kpi.value}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Traffic Chart */}
+          <Card title="Trafic par source IA">
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trafficData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                  <defs>
+                    {Object.entries(SOURCE_COLORS).map(([key, color]) => (
+                      <linearGradient key={key} id={`grad_${key}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+                        <stop offset="100%" stopColor={color} stopOpacity={0} />
+                      </linearGradient>
+                    ))}
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
+                  <Tooltip content={<CustomTooltip />} />
+                  {Object.entries(SOURCE_COLORS).map(([key, color]) => (
+                    <Area
+                      key={key}
+                      type="monotone"
+                      dataKey={key}
+                      name={key.charAt(0).toUpperCase() + key.slice(1)}
+                      stroke={color}
+                      fill={`url(#grad_${key})`}
+                      strokeWidth={2}
+                    />
+                  ))}
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+
+          {/* Attribution Table */}
+          <Card title="Attribution par source IA">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-gray-200 bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 font-medium text-gray-600">Source</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Visites</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Pages vues</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Duree moy.</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Taux rebond</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Conversions</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Tendance</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {attribution.map((row) => (
+                    <tr key={row.source} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium text-gray-900">{row.source}</td>
+                      <td className="px-4 py-3 text-gray-700">{row.visits.toLocaleString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-gray-700">{row.pageViews.toLocaleString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-gray-700">{row.avgDuration}</td>
+                      <td className="px-4 py-3 text-gray-700">{row.bounceRate}%</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{row.conversions}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                          row.trend === 'up' ? 'bg-green-100 text-green-700' :
+                          row.trend === 'down' ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {row.trend === 'up' ? '↑ Hausse' : row.trend === 'down' ? '↓ Baisse' : '→ Stable'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* AI Queries - Search Console */}
+          {sc.status === 'connected' && (
+            <Card title="Top requetes IA (Search Console)">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-gray-200 bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 font-medium text-gray-600">Requete</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Impressions</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Clics</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">CTR</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Position</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Source IA</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {queries.map((q) => (
+                      <tr key={q.query} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-900">{q.query}</td>
+                        <td className="px-4 py-3 text-gray-700">{q.impressions.toLocaleString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-gray-700">{q.clicks.toLocaleString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-gray-700">{q.ctr}%</td>
+                        <td className="px-4 py-3 text-gray-700">{q.position.toFixed(1)}</td>
+                        <td className="px-4 py-3">
+                          {q.isAIReferral ? (
+                            <span className="inline-block rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
+                              IA Referral
+                            </span>
+                          ) : (
+                            <span className="inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                              Organique
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Empty state */}
+      {!connected && (
+        <Card>
+          <div className="py-12 text-center">
+            <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.03a4.5 4.5 0 00-6.364-6.364L4.34 8.342a4.5 4.5 0 006.364 6.364l1.757-1.757" />
+            </svg>
+            <h3 className="mt-4 text-lg font-semibold text-gray-900">Aucune integration connectee</h3>
+            <p className="mt-2 text-sm text-gray-500">
+              Connectez Google Analytics 4 ou Search Console pour voir le dashboard d'attribution IA.
+            </p>
+          </div>
+        </Card>
+      )}
+    </div>
+  )
+}

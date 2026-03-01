@@ -1,0 +1,200 @@
+claudeSaaS/src/app/App.tsx(3,39): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/app/App.tsx(4,27): error TS2307: Cannot find module '@/app/router' or its corresponding type declarations.
+claudeSaaS/src/app/App.tsx(5,28): error TS2307: Cannot find module '@/components/layout/MainLayout' or its corresponding type declarations.
+claudeSaaS/src/app/App.tsx(6,31): error TS2307: Cannot find module '@/components/ui/ErrorBoundary' or its corresponding type declarations.
+claudeSaaS/src/app/App.tsx(7,35): error TS2307: Cannot find module '@/features/notifications/components/NotificationToast' or its corresponding type declarations.
+claudeSaaS/src/app/providers.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/app/providers.tsx(4,44): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(3,25): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(4,10): error TS2305: Module '"@/config/constants"' has no exported member 'ROUTES'.
+claudeSaaS/src/app/router.tsx(7,37): error TS2307: Cannot find module '@/features/auth/pages/LoginPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(8,38): error TS2307: Cannot find module '@/features/auth/pages/SignupPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(9,40): error TS2307: Cannot find module '@/features/auth/pages/AuthCallback' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(10,41): error TS2307: Cannot find module '@/features/dashboard/pages/DashboardPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(11,40): error TS2307: Cannot find module '@/features/analysis/pages/AnalysisPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(12,46): error TS2307: Cannot find module '@/features/analysis/pages/AnalysisDetailPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(13,45): error TS2307: Cannot find module '@/features/content-studio/pages/ContentStudioPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(14,41): error TS2307: Cannot find module '@/features/citations/pages/CitationsPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(15,42): error TS2307: Cannot find module '@/features/indexation/pages/IndexationPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(16,46): error TS2307: Cannot find module '@/features/knowledge-graph/pages/KnowledgeGraphPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(17,41): error TS2307: Cannot find module '@/features/benchmark/pages/BenchmarkPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(18,39): error TS2307: Cannot find module '@/features/billing/pages/BillingPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(19,39): error TS2307: Cannot find module '@/features/billing/pages/PricingPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(20,40): error TS2307: Cannot find module '@/features/organization/pages/SettingsPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(21,39): error TS2307: Cannot find module '@/features/clients/pages/ClientsPage' or its corresponding type declarations.
+claudeSaaS/src/app/router.tsx(22,44): error TS2307: Cannot find module '@/features/clients/pages/ClientDetailPage' or its corresponding type declarations.
+claudeSaaS/src/components/layout/MainLayout.tsx(2,25): error TS2307: Cannot find module '@/components/layout/Sidebar' or its corresponding type declarations.
+claudeSaaS/src/components/layout/MainLayout.tsx(3,30): error TS2307: Cannot find module '@/components/layout/MobileHeader' or its corresponding type declarations.
+claudeSaaS/src/components/layout/MainLayout.tsx(4,34): error TS2307: Cannot find module '@/components/layout/NotificationBell' or its corresponding type declarations.
+claudeSaaS/src/components/layout/MobileHeader.tsx(3,25): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/components/layout/MobileHeader.tsx(4,10): error TS2305: Module '"@/config/constants"' has no exported member 'ROUTES'.
+claudeSaaS/src/components/layout/MobileHeader.tsx(5,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/layout/NotificationBell.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/components/layout/NotificationBell.tsx(4,25): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/components/layout/NotificationBell.tsx(5,29): error TS2307: Cannot find module '@/lib/hooks/useRealtime' or its corresponding type declarations.
+claudeSaaS/src/components/layout/NotificationBell.tsx(6,32): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/components/layout/NotificationBell.tsx(7,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/layout/NotificationBell.tsx(8,35): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/components/layout/Sidebar.tsx(3,25): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/components/layout/Sidebar.tsx(4,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/layout/Sidebar.tsx(5,10): error TS2305: Module '"@/config/constants"' has no exported member 'ROUTES'.
+claudeSaaS/src/components/ui/Badge.tsx(2,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/ui/Button.tsx(2,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/ui/Card.tsx(2,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/ui/CodePreview.tsx(3,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/ui/EmptyState.tsx(2,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/components/ui/Input.tsx(2,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/ui/Modal.tsx(3,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/components/ui/ScoreRing.tsx(2,28): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/components/ui/Spinner.tsx(2,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(4,34): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(5,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(6,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(7,27): error TS2307: Cannot find module '@/components/ui/ScoreRing' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(8,29): error TS2307: Cannot find module '@/components/ui/Spinner' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(9,59): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(10,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisDetailPage.tsx(15,47): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(3,47): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(4,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(5,22): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(6,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(7,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(8,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(9,27): error TS2307: Cannot find module '@/components/ui/ScoreRing' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(10,28): error TS2307: Cannot find module '@/components/ui/EmptyState' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(11,29): error TS2307: Cannot find module '@/lib/hooks/useRealtime' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(12,47): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(13,42): error TS2307: Cannot find module '@/lib/utils/validators' or its corresponding type declarations.
+claudeSaaS/src/features/analysis/pages/AnalysisPage.tsx(16,31): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/AuthCallback.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/AuthCallback.tsx(4,29): error TS2307: Cannot find module '@/components/ui/Spinner' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/LoginPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/LoginPage.tsx(4,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/LoginPage.tsx(5,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/LoginPage.tsx(7,29): error TS2307: Cannot find module '@/lib/utils/validators' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/SignupPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/SignupPage.tsx(4,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/SignupPage.tsx(5,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/auth/pages/SignupPage.tsx(7,30): error TS2307: Cannot find module '@/lib/utils/validators' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(2,47): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(4,34): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(5,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(6,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(7,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(8,27): error TS2307: Cannot find module '@/components/ui/ScoreRing' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(9,28): error TS2307: Cannot find module '@/components/ui/EmptyState' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(10,43): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/benchmark/pages/BenchmarkPage.tsx(12,31): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(2,47): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(4,44): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(5,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(6,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(7,23): error TS2307: Cannot find module '@/components/ui/Modal' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(8,10): error TS2305: Module '"@/config/constants"' has no exported member 'PLANS'.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(9,30): error TS2307: Cannot find module '@/config/stripe-plans' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(10,72): error TS2307: Cannot find module '@/lib/stripe/checkout' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(11,44): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(12,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(17,40): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(140,56): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(144,22): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(144,71): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(148,20): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/BillingPage.tsx(162,68): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(3,10): error TS2305: Module '"@/config/constants"' has no exported member 'PLANS'.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(4,22): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(5,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(6,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(7,32): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(8,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(49,56): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(51,24): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(53,43): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(61,22): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(74,22): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/billing/pages/PricingPage.tsx(74,79): error TS18046: 'plan' is of type 'unknown'.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(2,47): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(4,44): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(5,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(6,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(7,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(8,23): error TS2307: Cannot find module '@/components/ui/Modal' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(9,28): error TS2307: Cannot find module '@/components/ui/EmptyState' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(10,29): error TS2307: Cannot find module '@/lib/hooks/useRealtime' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(11,32): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(17,54): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(87,61): error TS2339: Property 'citation_check' does not exist on type '{ readonly analysis: 25; readonly generation: 5; }'.
+claudeSaaS/src/features/citations/pages/CitationsPage.tsx(161,70): error TS2339: Property 'citation_check' does not exist on type '{ readonly analysis: 25; readonly generation: 5; }'.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(3,25): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(4,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(5,32): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(6,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(7,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(8,27): error TS2307: Cannot find module '@/components/ui/ScoreRing' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(9,28): error TS2307: Cannot find module '@/components/ui/EmptyState' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(10,29): error TS2307: Cannot find module '@/components/ui/Spinner' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(11,47): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientDetailPage.tsx(13,39): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(3,47): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(4,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(5,34): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(6,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(7,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(8,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(9,23): error TS2307: Cannot find module '@/components/ui/Modal' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(10,28): error TS2307: Cannot find module '@/components/ui/EmptyState' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(11,47): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/clients/pages/ClientsPage.tsx(13,29): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(2,47): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(4,22): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(5,33): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(6,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(7,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(8,23): error TS2307: Cannot find module '@/components/ui/Modal' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(9,29): error TS2307: Cannot find module '@/components/ui/CodePreview' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(10,28): error TS2307: Cannot find module '@/components/ui/EmptyState' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(11,32): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(12,10): error TS2305: Module '"@/config/constants"' has no exported member 'CONTENT_TYPES'.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(13,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(18,52): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/content-studio/pages/ContentStudioPage.tsx(59,61): error TS2339: Property 'content_generation' does not exist on type '{ readonly analysis: 25; readonly generation: 5; }'.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(3,25): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(4,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(5,32): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(6,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(7,27): error TS2307: Cannot find module '@/components/ui/ScoreRing' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(8,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(9,28): error TS2307: Cannot find module '@/components/ui/EmptyState' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(10,59): error TS2307: Cannot find module '@/lib/utils/format' or its corresponding type declarations.
+claudeSaaS/src/features/dashboard/pages/DashboardPage.tsx(15,31): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/features/indexation/pages/IndexationPage.tsx(2,34): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/indexation/pages/IndexationPage.tsx(3,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/indexation/pages/IndexationPage.tsx(4,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/indexation/pages/IndexationPage.tsx(5,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/indexation/pages/IndexationPage.tsx(6,29): error TS2307: Cannot find module '@/components/ui/CodePreview' or its corresponding type declarations.
+claudeSaaS/src/features/indexation/pages/IndexationPage.tsx(7,10): error TS2305: Module '"@/config/constants"' has no exported member 'AI_BOTS'.
+claudeSaaS/src/features/indexation/pages/IndexationPage.tsx(8,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/features/knowledge-graph/pages/KnowledgeGraphPage.tsx(3,22): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/knowledge-graph/pages/KnowledgeGraphPage.tsx(4,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/knowledge-graph/pages/KnowledgeGraphPage.tsx(5,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/knowledge-graph/pages/KnowledgeGraphPage.tsx(6,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/notifications/components/NotificationToast.tsx(3,38): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/notifications/components/NotificationToast.tsx(4,20): error TS2307: Cannot find module '@/lib/utils/cn' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(2,47): error TS2307: Cannot find module '@/app/providers' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(3,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(4,34): error TS2307: Cannot find module '@/components/ui/Card' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(5,23): error TS2307: Cannot find module '@/components/ui/Input' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(6,24): error TS2307: Cannot find module '@/components/ui/Button' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(7,23): error TS2307: Cannot find module '@/components/ui/Badge' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(8,23): error TS2307: Cannot find module '@/components/ui/Modal' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(9,30): error TS2307: Cannot find module '@/lib/utils/validators' or its corresponding type declarations.
+claudeSaaS/src/features/organization/pages/SettingsPage.tsx(13,50): error TS2307: Cannot find module '@/types/database.types' or its corresponding type declarations.
+claudeSaaS/src/lib/hooks/useRealtime.ts(2,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/lib/stripe/checkout.ts(1,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.
+claudeSaaS/src/lib/supabase/client.ts(2,26): error TS2307: Cannot find module '@/config/supabase' or its corresponding type declarations.

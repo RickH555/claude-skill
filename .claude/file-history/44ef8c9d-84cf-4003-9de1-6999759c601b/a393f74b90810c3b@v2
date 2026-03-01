@@ -1,0 +1,8 @@
+const isDev = import.meta.env.DEV;
+
+export const logger = {
+  log: (...args: unknown[]) => isDev && console.log('[CitedBy]', ...args),
+  warn: (...args: unknown[]) => isDev && console.warn('[CitedBy]', ...args),
+  error: (...args: unknown[]) => console.error('[CitedBy]', ...args),
+  debug: (...args: unknown[]) => isDev && console.log('[CitedBy:debug]', ...args),
+};

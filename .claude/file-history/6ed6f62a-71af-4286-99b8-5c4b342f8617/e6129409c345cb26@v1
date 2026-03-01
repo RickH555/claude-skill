@@ -1,0 +1,248 @@
+import React, { useState, useEffect } from 'react';
+import { Project, SourceOfTruthData } from '../types';
+import { LLM_TRUTH_TEMPLATES } from '../services/llm_templates';
+import { X, FileText, Download, Copy, Sparkles, Check, Plus, Trash2, Building2, MapPin, Calendar } from 'lucide-react';
+
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  project: Project | null;
+}
+
+const SourceOfTruthModal: React.FC<Props> = ({ isOpen, onClose, project }) => {
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
+  const [format, setFormat] = useState<'txt' | 'json'>('txt');
+  const [copied, setCopied] = useState(false);
+  const [data, setData] = useState<SourceOfTruthData>({
+    description: '',
+    type: 'SaaS B2B',
+    founded: new Date().getFullYear().toString(),
+    location: 'Paris, France',
+    services: [{ name: 'AEO Score Analysis', description: 'Analyse automatique de la qualité de votre contenu pour les systèmes IA.', category: 'Analytics' }],
+    faqs: [{ question: "Qu'est-ce que l'AEO ?", answer: "L'AEO est l'optimisation de contenu pour les moteurs de réponse IA." }]
+  });
+
+  useEffect(() => {
+    if (project) {
+      setData(prev => ({
+        ...prev,
+        description: `Plateforme d'optimisation pour les moteurs de réponse IA (AEO). Analyse et améliore la visibilité de ${project.name} auprès des assistants IA.`,
+      }));
+    }
+  }, [project]);
+
+  if (!isOpen || !project) return null;
+
+  const handleServiceChange = (idx: number, field: string, value: string) => {
+    const newServices = [...data.services];
+    (newServices[idx] as any)[field] = value;
+    setData({ ...data, services: newServices });
+  };
+
+  const handleFaqChange = (idx: number, field: string, value: string) => {
+    const newFaqs = [...data.faqs];
+    (newFaqs[idx] as any)[field] = value;
+    setData({ ...data, faqs: newFaqs });
+  };
+
+  const addService = () => setData({ ...data, services: [...data.services, { name: '', description: '', category: '' }] });
+  const removeService = (idx: number) => setData({ ...data, services: data.services.filter((_, i) => i !== idx) });
+
+  const addFaq = () => setData({ ...data, faqs: [...data.faqs, { question: '', answer: '' }] });
+  const removeFaq = (idx: number) => setData({ ...data, faqs: data.faqs.filter((_, i) => i !== idx) });
+
+  const generateContent = () => {
+    const projectInfo = { name: project.name, domain: project.domain };
+    return format === 'json' 
+      ? LLM_TRUTH_TEMPLATES.json(projectInfo, data)
+      : LLM_TRUTH_TEMPLATES.txt(projectInfo, data);
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generateContent());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([generateContent()], { type: format === 'json' ? 'application/json' : 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `llm.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="relative bg-[#0f1115] border border-white/[0.08] rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        
+        {/* Header */}
+        <div className="p-6 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.04]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-purple-500/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
+              <FileText size={20} />
+            </div>
+            <div>
+              <h3 className="text-lg font-sans font-bold text-white">LLM Source of Truth</h3>
+              <p className="text-xs text-gray-500">Générez le fichier de référence pour les IA (llm.txt / llm.json)</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex bg-black/40 rounded-full p-1 mr-4 border border-white/[0.08]">
+              <button onClick={() => setActiveTab('edit')} className={`px-4 py-1.5 rounded-md text-sm transition-all ${activeTab === 'edit' ? 'bg-white/[0.08] text-white' : 'text-gray-500 hover:text-gray-300'}`}>Éditer</button>
+              <button onClick={() => setActiveTab('preview')} className={`px-4 py-1.5 rounded-md text-sm transition-all ${activeTab === 'preview' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'}`}>Aperçu</button>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-white/[0.08] rounded-full transition-colors text-gray-500 hover:text-white"><X size={20} /></button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#000000]">
+          {activeTab === 'edit' ? (
+            <div className="p-8 max-w-4xl mx-auto space-y-8">
+              
+              {/* Identity Section */}
+              <section className="space-y-4">
+                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                  <Building2 size={16} /> Identité Organisation
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="block text-xs text-gray-500 mb-1">Description courte (Context Window friendly)</label>
+                    <textarea 
+                      value={data.description}
+                      onChange={(e) => setData({...data, description: e.target.value})}
+                      className="w-full bg-black/40 border border-white/[0.08] rounded-xl p-3 text-white focus:border-purple-500/50 outline-none h-24 text-sm"
+                      placeholder="Décrivez votre organisation en 2-3 phrases factuelles..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Type</label>
+                    <input 
+                      type="text" value={data.type}
+                      onChange={(e) => setData({...data, type: e.target.value})}
+                      className="w-full bg-black/40 border border-white/[0.08] rounded-xl p-3 text-white text-sm" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Année création</label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+                      <input 
+                        type="text" value={data.founded}
+                        onChange={(e) => setData({...data, founded: e.target.value})}
+                        className="w-full bg-black/40 border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm" 
+                      />
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs text-gray-500 mb-1">Localisation</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+                      <input 
+                        type="text" value={data.location}
+                        onChange={(e) => setData({...data, location: e.target.value})}
+                        className="w-full bg-black/40 border border-white/[0.08] rounded-xl p-3 pl-9 text-white text-sm" 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Services Section */}
+              <section className="space-y-4 pt-6 border-t border-white/[0.06]">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles size={16} /> Services & Offres
+                  </h4>
+                  <button onClick={addService} className="text-xs flex items-center gap-1 text-gray-500 hover:text-white"><Plus size={14} /> Ajouter</button>
+                </div>
+                {data.services.map((service, idx) => (
+                  <div key={idx} className="bg-white/[0.04] p-4 rounded-2xl border border-white/[0.06] group relative">
+                    <button onClick={() => removeService(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <input 
+                        placeholder="Nom du service"
+                        value={service.name}
+                        onChange={(e) => handleServiceChange(idx, 'name', e.target.value)}
+                        className="bg-black/40 border border-white/[0.08] rounded p-2 text-sm text-white"
+                      />
+                      <input 
+                        placeholder="Catégorie"
+                        value={service.category}
+                        onChange={(e) => handleServiceChange(idx, 'category', e.target.value)}
+                        className="bg-black/40 border border-white/[0.08] rounded p-2 text-sm text-white"
+                      />
+                    </div>
+                    <textarea 
+                      placeholder="Description factuelle..."
+                      value={service.description}
+                      onChange={(e) => handleServiceChange(idx, 'description', e.target.value)}
+                      className="w-full bg-black/40 border border-white/[0.08] rounded p-2 text-sm text-white h-16"
+                    />
+                  </div>
+                ))}
+              </section>
+
+              {/* FAQ Section */}
+              <section className="space-y-4 pt-6 border-t border-white/[0.06]">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                    <FileText size={16} /> FAQ (Knowledge Graph)
+                  </h4>
+                  <button onClick={addFaq} className="text-xs flex items-center gap-1 text-gray-500 hover:text-white"><Plus size={14} /> Ajouter</button>
+                </div>
+                {data.faqs.map((faq, idx) => (
+                  <div key={idx} className="bg-white/[0.04] p-4 rounded-2xl border border-white/[0.06] group relative">
+                    <button onClick={() => removeFaq(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 size={16} /></button>
+                    <input 
+                      placeholder="Question ?"
+                      value={faq.question}
+                      onChange={(e) => handleFaqChange(idx, 'question', e.target.value)}
+                      className="w-full bg-black/40 border border-white/[0.08] rounded p-2 text-sm text-white mb-2 font-medium"
+                    />
+                    <textarea 
+                      placeholder="Réponse..."
+                      value={faq.answer}
+                      onChange={(e) => handleFaqChange(idx, 'answer', e.target.value)}
+                      className="w-full bg-black/40 border border-white/[0.08] rounded p-2 text-sm text-gray-300 h-16"
+                    />
+                  </div>
+                ))}
+              </section>
+
+            </div>
+          ) : (
+            <div className="h-full flex flex-col">
+              <div className="p-4 border-b border-white/[0.08] flex items-center justify-between bg-[#111111]">
+                <div className="flex items-center gap-4">
+                  <button onClick={() => setFormat('txt')} className={`text-xs font-bold px-3 py-1 rounded transition-colors ${format === 'txt' ? 'bg-purple-500 text-white' : 'text-gray-500 hover:text-white'}`}>llm.txt</button>
+                  <button onClick={() => setFormat('json')} className={`text-xs font-bold px-3 py-1 rounded transition-colors ${format === 'json' ? 'bg-purple-500 text-white' : 'text-gray-500 hover:text-white'}`}>llm.json</button>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={handleCopy} className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-purple-500/10 rounded text-xs font-medium text-white border border-white/[0.08]">
+                    {copied ? <Check size={14} className="text-purple-300" /> : <Copy size={14} />}
+                    {copied ? 'Copié' : 'Copier'}
+                  </button>
+                  <button onClick={handleDownload} className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-400 hover:to-violet-500 rounded text-xs font-bold">
+                    <Download size={14} /> Télécharger
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 bg-[#111111] p-6 overflow-auto">
+                <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap">{generateContent()}</pre>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SourceOfTruthModal;

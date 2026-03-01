@@ -1,0 +1,6 @@
+export { generateAuthorBio } from './author-bio-generator';
+export { generateAboutPage } from './about-page-generator';
+export { generateTrustSignals } from './trust-signals-generator';
+export { generateCredentials } from './credentials-generator';
+export { generateCitationBlock } from './citation-block-generator';
+export { auditEeat } from './eeat-auditor';

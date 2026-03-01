@@ -1,0 +1,9 @@
+{
+  "id": "14",
+  "subject": "Fix all 16 modals for scrolling/sizing",
+  "description": "Test and fix all 16 modals so their content is either scrollable or fully visible without scrolling. Add overflow-y-auto + max-h-[90vh] where needed.",
+  "activeForm": "Fixing modal scrolling/sizing",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

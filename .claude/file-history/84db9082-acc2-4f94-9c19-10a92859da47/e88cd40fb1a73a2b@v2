@@ -1,0 +1,249 @@
+import { chromium } from 'playwright';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const SURVEY_ID = '02023306-325a-4eac-bd57-39c01be98291';
+const SS = (name) => path.join(__dirname, `tour`, `${name}.png`);
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+
+  // ===== PART 1: PUBLIC PAGES (no auth) =====
+  console.log('=== PART 1: Public Pages ===');
+  const pubCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const pub = await pubCtx.newPage();
+
+  // 1. Landing page
+  await pub.goto(APP, { waitUntil: 'networkidle' });
+  await pub.waitForTimeout(1500);
+  await pub.screenshot({ path: SS('01-landing-hero') });
+  console.log('  01 - Landing hero');
+
+  // Scroll to features
+  await pub.evaluate(() => window.scrollBy(0, 800));
+  await pub.waitForTimeout(500);
+  await pub.screenshot({ path: SS('02-landing-features') });
+  console.log('  02 - Landing features');
+
+  // Scroll to more
+  await pub.evaluate(() => window.scrollBy(0, 800));
+  await pub.waitForTimeout(500);
+  await pub.screenshot({ path: SS('03-landing-more') });
+  console.log('  03 - Landing more');
+
+  // 2. Pricing page
+  await pub.goto(`${APP}/pricing`, { waitUntil: 'networkidle' });
+  await pub.waitForTimeout(1500);
+  await pub.screenshot({ path: SS('04-pricing') });
+  console.log('  04 - Pricing');
+
+  await pub.evaluate(() => window.scrollBy(0, 600));
+  await pub.waitForTimeout(500);
+  await pub.screenshot({ path: SS('05-pricing-plans') });
+  console.log('  05 - Pricing plans');
+
+  // 3. Signup page
+  await pub.goto(`${APP}/signup`, { waitUntil: 'networkidle' });
+  await pub.waitForTimeout(1000);
+  await pub.screenshot({ path: SS('06-signup') });
+  console.log('  06 - Signup page');
+
+  // 4. Login page
+  await pub.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await pub.waitForTimeout(1000);
+  await pub.screenshot({ path: SS('07-login') });
+  console.log('  07 - Login page');
+
+  // 5. Forgot password page
+  await pub.goto(`${APP}/forgot-password`, { waitUntil: 'networkidle' });
+  await pub.waitForTimeout(1000);
+  await pub.screenshot({ path: SS('08-forgot-password') });
+  console.log('  08 - Forgot password');
+
+  // 6. Public survey page
+  await pub.goto(`${APP}/s/${SURVEY_ID}`, { waitUntil: 'networkidle' });
+  await pub.waitForTimeout(2000);
+  await pub.screenshot({ path: SS('09-public-survey') });
+  console.log('  09 - Public survey');
+
+  await pub.evaluate(() => window.scrollBy(0, 600));
+  await pub.waitForTimeout(500);
+  await pub.screenshot({ path: SS('10-public-survey-scroll') });
+  console.log('  10 - Public survey scroll');
+
+  await pubCtx.close();
+
+  // ===== PART 2: AUTHENTICATED DASHBOARD =====
+  console.log('\n=== PART 2: Dashboard (authenticated) ===');
+  const authCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await authCtx.newPage();
+
+  // Login
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+  await page.waitForTimeout(2000);
+
+  // 11. Dashboard overview
+  await page.screenshot({ path: SS('11-dashboard') });
+  console.log('  11 - Dashboard overview');
+
+  // ===== DocAI Module =====
+  console.log('\n--- DocAI Module ---');
+
+  // 12. Documents list
+  await page.goto(`${APP}/dashboard/documents`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000);
+  await page.screenshot({ path: SS('12-documents-list') });
+  console.log('  12 - Documents list');
+
+  // 13. Upload page
+  await page.goto(`${APP}/dashboard/documents/upload`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('13-upload-page') });
+  console.log('  13 - Upload page');
+
+  // 14. Document detail (find first document)
+  const docLinks = page.locator('a[href*="/dashboard/documents/"]');
+  await page.goto(`${APP}/dashboard/documents`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  // Try to click on first document
+  const docRows = page.locator('tr[class*="cursor"], a[href*="/documents/"][href$="-"]').first();
+  if (await docRows.count() > 0) {
+    await docRows.click();
+    await page.waitForTimeout(2000);
+    await page.screenshot({ path: SS('14-document-detail') });
+    console.log('  14 - Document detail');
+
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('15-document-extraction') });
+    console.log('  15 - Document extraction data');
+
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('16-document-extraction-more') });
+    console.log('  16 - Document extraction more');
+  } else {
+    console.log('  14 - No documents found, skipping detail');
+  }
+
+  // 15. Templates list
+  await page.goto(`${APP}/dashboard/templates`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('17-templates') });
+  console.log('  17 - Templates');
+
+  // 16. Create template
+  await page.goto(`${APP}/dashboard/templates/new`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('18-create-template') });
+  console.log('  18 - Create template');
+
+  // ===== FeedbackAI Module =====
+  console.log('\n--- FeedbackAI Module ---');
+
+  // 17. Surveys list
+  await page.goto(`${APP}/dashboard/surveys`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('19-surveys-list') });
+  console.log('  19 - Surveys list');
+
+  // 18. Create survey page
+  await page.goto(`${APP}/dashboard/surveys/create`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('20-create-survey') });
+  console.log('  20 - Create survey');
+
+  // 19. Survey detail - Responses tab
+  await page.goto(`${APP}/dashboard/surveys/${SURVEY_ID}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000);
+  await page.screenshot({ path: SS('21-survey-overview') });
+  console.log('  21 - Survey overview');
+
+  // Scroll to see responses
+  await page.evaluate(() => window.scrollBy(0, 400));
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: SS('22-survey-responses') });
+  console.log('  22 - Survey responses');
+
+  await page.evaluate(() => window.scrollBy(0, 400));
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: SS('23-survey-responses-more') });
+  console.log('  23 - Survey responses more');
+
+  // 20. Survey detail - Charts tab
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const chartsTab = page.locator('[role="tab"]:has-text("Charts")').first();
+  if (await chartsTab.count() > 0) {
+    await chartsTab.click();
+    await page.waitForTimeout(2000);
+    await page.screenshot({ path: SS('24-survey-charts') });
+    console.log('  24 - Survey charts');
+
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('25-survey-charts-more') });
+    console.log('  25 - Survey charts more');
+  }
+
+  // 21. Survey detail - AI Analysis tab
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const analysisTab = page.locator('[role="tab"]:has-text("AI Analysis")').first();
+  if (await analysisTab.count() > 0) {
+    await analysisTab.click();
+    await page.waitForTimeout(3000);
+    await page.screenshot({ path: SS('26-ai-analysis-summary') });
+    console.log('  26 - AI Analysis summary + sentiment');
+
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('27-ai-analysis-themes') });
+    console.log('  27 - AI Analysis themes');
+
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('28-ai-analysis-recommendations') });
+    console.log('  28 - AI Analysis recommendations');
+  }
+
+  // ===== Settings =====
+  console.log('\n--- Settings ---');
+
+  // 22. General settings
+  await page.goto(`${APP}/dashboard/settings`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('29-settings-general') });
+  console.log('  29 - Settings general');
+
+  // 23. Team settings
+  await page.goto(`${APP}/dashboard/settings/team`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('30-settings-team') });
+  console.log('  30 - Settings team');
+
+  // 24. Billing
+  await page.goto(`${APP}/dashboard/settings/billing`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('31-settings-billing') });
+  console.log('  31 - Settings billing');
+
+  await page.evaluate(() => window.scrollBy(0, 500));
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: SS('32-settings-billing-plans') });
+  console.log('  32 - Settings billing plans');
+
+  // 25. API Keys
+  await page.goto(`${APP}/dashboard/settings/api-keys`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: SS('33-settings-api-keys') });
+  console.log('  33 - Settings API keys');
+
+  await authCtx.close();
+  await browser.close();
+  console.log('\n=== TOUR COMPLETE - 33 screenshots ===');
+})();

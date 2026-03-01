@@ -1,0 +1,309 @@
+import React, { useState } from 'react';
+import { User, AnalysisResult } from '../types';
+import { auditAnswerFirst, AnswerFirstAuditResult } from '../services/answer-first-audit';
+import {
+  ArrowLeft, Search, Loader2, Sparkles, Zap, CheckCircle, AlertTriangle, XCircle,
+  FileText, Code, HelpCircle, Clock, Tag, BarChart3, ChevronDown, ChevronUp, Lightbulb,
+} from 'lucide-react';
+
+interface Props {
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  history?: AnalysisResult[];
+}
+
+const CREDIT_COST = 5;
+
+const CATEGORY_META: Record<string, { label: string; icon: React.ElementType; color: string; bg: string }> = {
+  answerFirst: { label: 'Answer-First', icon: Zap, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  schemaOrg: { label: 'Schema.org', icon: Code, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+  faqStructure: { label: 'Structure FAQ', icon: HelpCircle, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+  semanticHtml: { label: 'HTML Sémantique', icon: FileText, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+  contentFreshness: { label: 'Fraîcheur', icon: Clock, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  metaOptimization: { label: 'Meta Tags', icon: Tag, color: 'text-pink-400', bg: 'bg-pink-500/10' },
+};
+
+const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 120 }) => {
+  const radius = (size - 12) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+  const color = score >= 70 ? '#22c55e' : score >= 40 ? '#f59e0b' : '#ef4444';
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={radius} stroke="rgba(255,255,255,0.05)" strokeWidth="8" fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth="8" fill="none"
+          strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset 1s ease-out' }} />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-bold text-white">{score}</span>
+        <span className="text-[10px] text-gray-500 uppercase tracking-wider">/100</span>
+      </div>
+    </div>
+  );
+};
+
+const CategoryCard: React.FC<{
+  catKey: string;
+  data: { score: number; label: string; details: string; tips: string[] };
+}> = ({ catKey, data }) => {
+  const [expanded, setExpanded] = useState(false);
+  const meta = CATEGORY_META[catKey];
+  if (!meta) return null;
+  const Icon = meta.icon;
+  const statusIcon = data.score >= 70 ? CheckCircle : data.score >= 40 ? AlertTriangle : XCircle;
+  const StatusIcon = statusIcon;
+  const statusColor = data.score >= 70 ? 'text-emerald-400' : data.score >= 40 ? 'text-amber-400' : 'text-red-400';
+
+  return (
+    <div className="ninja-card overflow-hidden">
+      <button onClick={() => setExpanded(!expanded)} className="w-full p-4 flex items-center gap-3 hover:bg-white/[0.02] transition-colors">
+        <div className={`p-2 rounded-lg ${meta.bg}`}>
+          <Icon size={16} className={meta.color} />
+        </div>
+        <div className="flex-1 text-left">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-gray-200">{meta.label}</span>
+            <StatusIcon size={14} className={statusColor} />
+          </div>
+          <p className="text-xs text-gray-500 mt-0.5">{data.label}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="w-24 h-2 bg-white/[0.04] rounded-full overflow-hidden">
+            <div className="h-full rounded-full transition-all duration-700"
+              style={{
+                width: `${data.score}%`,
+                background: data.score >= 70 ? '#22c55e' : data.score >= 40 ? '#f59e0b' : '#ef4444'
+              }} />
+          </div>
+          <span className="text-sm font-bold text-gray-300 w-8 text-right">{data.score}</span>
+          {expanded ? <ChevronUp size={14} className="text-gray-500" /> : <ChevronDown size={14} className="text-gray-500" />}
+        </div>
+      </button>
+      {expanded && (
+        <div className="px-4 pb-4 border-t border-white/[0.04] pt-3 space-y-3 animate-slide-up">
+          <p className="text-sm text-gray-400">{data.details}</p>
+          {data.tips.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Lightbulb size={10} /> Recommandations
+              </p>
+              <ul className="space-y-1.5">
+                {data.tips.map((tip, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-gray-400">
+                    <span className="text-purple-400 mt-0.5 shrink-0">→</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AnswerFirstAudit: React.FC<Props> = ({ onBack, user, onDeductCredits, history }) => {
+  const [url, setUrl] = useState('');
+  const [brandName, setBrandName] = useState('');
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [result, setResult] = useState<AnswerFirstAuditResult | null>(null);
+  const [auditStep, setAuditStep] = useState(0);
+
+  const steps = [
+    { label: 'Crawl de la page...', icon: Search },
+    { label: 'Analyse Answer-First...', icon: Zap },
+    { label: 'Vérification Schema.org...', icon: Code },
+    { label: 'Évaluation sémantique...', icon: FileText },
+    { label: 'Calcul du score...', icon: BarChart3 },
+  ];
+
+  const handleAudit = async () => {
+    if (!url) return;
+    const canProceed = onDeductCredits(CREDIT_COST);
+    if (!canProceed) return;
+
+    // Check pre-generated cache — match hostname
+    const cachedAudit = history && history.length > 0 ? history[0]?.preGenerated?.answerFirstAudit : undefined;
+    if (cachedAudit?.globalScore != null) {
+      let cachedHostname = '';
+      let inputHostname = '';
+      try { cachedHostname = new URL(cachedAudit.url).hostname; } catch { cachedHostname = cachedAudit.url; }
+      try { inputHostname = new URL(url.startsWith('http') ? url : `https://${url}`).hostname; } catch { inputHostname = url; }
+
+      if (cachedHostname === inputHostname) {
+        setResult(cachedAudit as AnswerFirstAuditResult);
+        return;
+      }
+    }
+
+    setIsAuditing(true);
+    setResult(null);
+    setAuditStep(0);
+
+    // Animate steps
+    const stepInterval = setInterval(() => {
+      setAuditStep(prev => {
+        if (prev >= steps.length - 1) { clearInterval(stepInterval); return prev; }
+        return prev + 1;
+      });
+    }, 600);
+
+    try {
+      const output = await auditAnswerFirst(url, brandName || undefined);
+      setResult(output);
+    } catch (err) {
+      console.error('Audit failed:', err);
+    } finally {
+      clearInterval(stepInterval);
+      setIsAuditing(false);
+    }
+  };
+
+  return (
+    <div className="w-full px-6 py-8 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <button onClick={onBack} className="p-2 rounded-xl hover:bg-white/[0.04] transition-colors">
+          <ArrowLeft size={20} className="text-gray-400" />
+        </button>
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">Audit <span className="gradient-text">Answer-First</span></h1>
+            <span className="bg-amber-500/10 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-500/20 flex items-center gap-1">
+              <Sparkles size={10} /> NOUVEAU
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">Analysez la "citabilité" de vos pages par les IA — score détaillé sur 6 critères AEO</p>
+        </div>
+      </div>
+
+      {/* URL Input */}
+      <div className="ninja-card p-6 mb-8">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">URL à auditer <span className="text-red-400">*</span></label>
+            <div className="relative">
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com/page-a-auditer"
+                className="w-full bg-[#111111] border border-white/[0.08] rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50 transition-colors"
+                onKeyDown={e => e.key === 'Enter' && handleAudit()} />
+            </div>
+          </div>
+          <div className="md:w-48">
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">Marque (optionnel)</label>
+            <input value={brandName} onChange={e => setBrandName(e.target.value)} placeholder="Nom de marque"
+              className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50 transition-colors" />
+          </div>
+          <div className="md:self-end">
+            <button onClick={handleAudit} disabled={isAuditing || !url}
+              className={`w-full md:w-auto px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                isAuditing || !url ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' : 'btn-gradient text-white'
+              }`}>
+              {isAuditing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+              {isAuditing ? 'Audit...' : `Auditer (${CREDIT_COST} Gas)`}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Audit Progress */}
+      {isAuditing && (
+        <div className="ninja-card p-8 mb-8">
+          <div className="flex items-center gap-8 justify-center">
+            {steps.map((step, i) => {
+              const StepIcon = step.icon;
+              const isDone = auditStep > i;
+              const isCurrent = auditStep === i;
+              return (
+                <div key={i} className="flex flex-col items-center gap-2">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isDone ? 'bg-emerald-500/20 text-emerald-400' : isCurrent ? 'bg-purple-500/20 text-purple-400 animate-pulse' : 'bg-white/[0.04] text-gray-600'
+                  }`}>
+                    {isDone ? <CheckCircle size={18} /> : <StepIcon size={18} />}
+                  </div>
+                  <span className={`text-[10px] text-center max-w-[80px] ${isCurrent ? 'text-purple-300' : isDone ? 'text-emerald-400/70' : 'text-gray-600'}`}>
+                    {step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Results */}
+      {result && !isAuditing && (
+        <div className="space-y-6 animate-in fade-in duration-500">
+          {/* Score + Summary */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="ninja-card p-6 flex flex-col items-center justify-center">
+              <ScoreRing score={result.globalScore} />
+              <p className="text-sm font-semibold text-gray-300 mt-3">Score de Citabilité</p>
+              <p className="text-xs text-gray-500 mt-1">{
+                result.globalScore >= 70 ? 'Excellent — Votre page est bien optimisée pour les IA' :
+                result.globalScore >= 40 ? 'Moyen — Des améliorations significatives sont possibles' :
+                'Faible — Votre page est peu visible pour les IA'
+              }</p>
+            </div>
+            <div className="md:col-span-2 ninja-card p-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                <BarChart3 size={14} className="text-purple-400" /> Résumé de l'audit
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed mb-4">{result.summary}</p>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <Lightbulb size={10} className="text-amber-400" /> Actions prioritaires
+                </p>
+                {result.topRecommendations.map((rec, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm text-gray-300 bg-white/[0.02] rounded-lg px-3 py-2 border border-white/[0.04]">
+                    <span className="text-purple-400 font-bold shrink-0">{i + 1}.</span>
+                    {rec}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Category Details */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Détail par Critère</h3>
+            <div className="grid md:grid-cols-2 gap-3">
+              {Object.entries(result.categories).map(([key, cat]) => (
+                <CategoryCard key={key} catKey={key} data={cat} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!result && !isAuditing && (
+        <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+          <div className="p-4 bg-amber-500/10 rounded-2xl mb-4">
+            <BarChart3 size={40} className="text-amber-400" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-300 mb-2">Audit de Citabilité IA</h3>
+          <p className="text-sm text-gray-500 max-w-md">Entrez l'URL d'une page de votre site pour analyser ses 6 critères de citabilité par les moteurs de réponse IA</p>
+          <div className="grid grid-cols-3 gap-4 mt-8 w-full max-w-lg">
+            {Object.entries(CATEGORY_META).map(([key, meta]) => {
+              const Icon = meta.icon;
+              return (
+                <div key={key} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                  <Icon size={16} className={meta.color} />
+                  <span className="text-[10px] text-gray-500 text-center">{meta.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AnswerFirstAudit;

@@ -1,0 +1,314 @@
+import React from 'react';
+import {
+  LogOut, Zap, Plus, Menu, Fuel, Bell, Search, X,
+  User as UserIcon, Clock, Sparkles, Users, FileText,
+  AlertTriangle, AlertCircle, Info, CheckCircle
+} from 'lucide-react';
+import { LanguageSelector, useTranslation } from '../i18n';
+import { User } from '../types';
+
+interface NavbarProps {
+  user: User | null;
+  navbarVisible: boolean;
+  animatedCredits: number;
+  sessionMinutes: number;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (v: boolean | ((prev: boolean) => boolean)) => void;
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: (v: boolean | ((prev: boolean) => boolean)) => void;
+  navigateTo: (view: string) => void;
+  onLogout: () => void;
+  onOpenCommandPalette: () => void;
+  // Notification state
+  notifications: Array<{ id: number; type: 'critical' | 'warning' | 'info' | 'success'; title: string; time: string; unread: boolean }>;
+  isNotifOpen: boolean;
+  setIsNotifOpen: (v: boolean) => void;
+  notifRef: React.RefObject<HTMLDivElement>;
+  // Quick actions
+  isQuickActionsOpen: boolean;
+  setIsQuickActionsOpen: (v: boolean) => void;
+  quickActionsRef: React.RefObject<HTMLDivElement>;
+  // Profile
+  isProfileOpen: boolean;
+  setIsProfileOpen: (v: boolean) => void;
+  profileRef: React.RefObject<HTMLDivElement>;
+}
+
+const Navbar: React.FC<NavbarProps> = ({
+  user,
+  navbarVisible,
+  animatedCredits,
+  sessionMinutes,
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
+  isSidebarCollapsed,
+  setIsSidebarCollapsed,
+  navigateTo,
+  onLogout,
+  onOpenCommandPalette,
+  notifications,
+  isNotifOpen,
+  setIsNotifOpen,
+  notifRef,
+  isQuickActionsOpen,
+  setIsQuickActionsOpen,
+  quickActionsRef,
+  isProfileOpen,
+  setIsProfileOpen,
+  profileRef,
+}) => {
+  const { t } = useTranslation();
+  const unreadCount = notifications.filter(n => n.unread).length;
+
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-[#0e0e18] border-b border-white/[0.06] shadow-lg shadow-black/30 transition-transform duration-300 ${navbarVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div className="px-6 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          {user && (
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((prev: boolean) => !prev)}
+              className="md:hidden w-9 h-9 rounded-full border border-white/[0.08] bg-white/[0.03] text-gray-300 hover:text-white hover:bg-white/[0.06] transition-colors flex items-center justify-center"
+              aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-sidebar-menu"
+            >
+              {isMobileMenuOpen ? <X size={17} /> : <Menu size={17} />}
+            </button>
+          )}
+          {user && (
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed((prev: boolean) => !prev)}
+              className="hidden md:flex w-9 h-9 rounded-full border border-white/[0.08] bg-white/[0.03] text-gray-300 hover:text-white hover:bg-white/[0.06] transition-colors items-center justify-center"
+              aria-label={isSidebarCollapsed ? "Ouvrir le menu" : "Réduire le menu"}
+            >
+              <Menu size={17} />
+            </button>
+          )}
+          <div
+            className="flex items-center gap-2.5 cursor-pointer"
+            onClick={() => navigateTo('home')}
+          >
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-purple-900/40">
+            <Zap size={16} className="text-white fill-white" />
+          </div>
+          <span className="font-sans text-lg font-bold tracking-tight hidden sm:block">
+            <span className="text-white">CitedBy</span><span className="text-amber-400">.ai</span>
+          </span>
+          {user && (
+            <span className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">Online</span>
+            </span>
+          )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-5">
+          {user ? (
+            <div className="flex items-center gap-3">
+              <LanguageSelector compact />
+              {/* Quick Actions dropdown */}
+              <div className="relative hidden md:block" ref={quickActionsRef as React.RefObject<HTMLDivElement>}>
+                <button
+                  onClick={() => setIsQuickActionsOpen(!isQuickActionsOpen)}
+                  className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300 hover:text-white hover:border-purple-400/50 transition-all"
+                  title="Actions rapides"
+                >
+                  <Plus size={16} />
+                </button>
+                {isQuickActionsOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-[220px] bg-[#13131d] border border-white/[0.08] rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in duration-150">
+                    <div className="px-4 py-3 border-b border-white/[0.06]">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Actions rapides</span>
+                    </div>
+                    <div className="py-1.5">
+                      {[
+                        { icon: Search, label: 'Nouvel Audit', view: 'analyze' },
+                        { icon: Users, label: 'Nouveau Client', view: 'clients' },
+                        { icon: FileText, label: 'Nouvelle Mission', view: 'mission-orders' },
+                        { icon: Sparkles, label: 'Outils Génératifs', view: 'generative-tools' },
+                      ].map(action => (
+                        <button
+                          key={action.view}
+                          onClick={() => { setIsQuickActionsOpen(false); navigateTo(action.view); }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors"
+                        >
+                          <action.icon size={15} className="text-purple-400" />
+                          {action.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Bell notification with dropdown */}
+              <div className="relative" ref={notifRef as React.RefObject<HTMLDivElement>}>
+                <button
+                  onClick={() => setIsNotifOpen(!isNotifOpen)}
+                  className="relative w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.08] transition-colors"
+                  title="Notifications"
+                >
+                  <Bell size={16} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full border-2 border-[#0e0e18]"></span>
+                  )}
+                </button>
+
+                {isNotifOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-[380px] max-w-[380px] bg-[#13131d] border border-white/[0.08] rounded-2xl shadow-2xl z-50 overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-white font-semibold text-sm">Notifications</span>
+                        {unreadCount > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-xs font-bold">
+                            {unreadCount}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => setIsNotifOpen(false)}
+                        className="text-gray-500 hover:text-white transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+
+                    {/* Notification list */}
+                    <div className="max-h-[360px] overflow-y-auto">
+                      {notifications.map((notif) => {
+                        const iconMap = {
+                          critical: { icon: AlertCircle, color: 'text-red-400', bg: 'bg-red-500/10' },
+                          warning: { icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+                          info: { icon: Info, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+                          success: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+                        };
+                        const { icon: Icon, color, bg } = iconMap[notif.type];
+                        return (
+                          <div
+                            key={notif.id}
+                            className="flex items-start gap-3 px-5 py-3.5 hover:bg-white/[0.03] transition-colors cursor-pointer border-b border-white/[0.04] last:border-b-0"
+                          >
+                            <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                              <Icon size={15} className={color} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm leading-snug ${notif.unread ? 'text-white font-medium' : 'text-gray-400'}`}>
+                                {notif.title}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+                            </div>
+                            {notif.unread && (
+                              <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0 mt-2"></div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="border-t border-white/[0.06] px-5 py-3">
+                      <button
+                        onClick={() => { setIsNotifOpen(false); navigateTo('alerts'); }}
+                        className="w-full text-center text-sm text-purple-400 hover:text-purple-300 font-medium transition-colors"
+                      >
+                        Voir toutes les alertes
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {/* Credits badge with progress bar */}
+              <button
+                onClick={() => navigateTo('recharge')}
+                className="hidden md:flex flex-col items-stretch px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors group"
+                title="Recharger GTO Gas"
+              >
+                <div className="flex items-center gap-2">
+                  <Fuel size={14} className="text-amber-400" />
+                  <span className="text-sm font-bold text-amber-400">{animatedCredits.toLocaleString()}</span>
+                  <span className="text-xs text-amber-400/70 font-medium">Credits</span>
+                </div>
+                <div className="w-full h-1 bg-amber-900/30 rounded-full mt-1 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.min(100, (user.credits / (user.plan === 'enterprise' ? 1000 : user.plan === 'pro' ? 200 : 50)) * 100)}%`,
+                      background: user.credits <= 10 ? '#ef4444' : 'linear-gradient(90deg, #f59e0b, #d97706)'
+                    }}
+                  />
+                </div>
+              </button>
+              <div className="relative" ref={profileRef as React.RefObject<HTMLDivElement>}>
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-2.5 group"
+                >
+                  <div className="text-right hidden sm:block">
+                    <p className="text-sm font-semibold text-white leading-none group-hover:text-purple-400 transition-colors">{user.name}</p>
+                    <div className="flex items-center justify-end gap-1.5 mt-0.5">
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">{user.plan === 'free' ? 'Admin' : user.plan.toUpperCase()}</p>
+                      {sessionMinutes > 0 && (
+                        <span className="flex items-center gap-0.5 text-[10px] text-gray-600">
+                          <Clock size={8} />
+                          {sessionMinutes >= 60 ? `${Math.floor(sessionMinutes / 60)}h${String(sessionMinutes % 60).padStart(2, '0')}` : `${sessionMinutes}m`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-500/30 text-purple-300 text-sm font-bold flex items-center justify-center group-hover:border-purple-400/50 transition-colors">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                </button>
+
+                {isProfileOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-[260px] bg-[#13131d] border border-white/[0.08] rounded-2xl shadow-2xl z-50 overflow-hidden">
+                    <div className="px-5 py-4 border-b border-white/[0.06]">
+                      <p className="text-sm font-semibold text-white">{user.name}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{user.email || 'admin@citedby.ai'}</p>
+                      <div className="flex items-center gap-2 mt-2.5">
+                        <span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-[10px] font-bold uppercase">{user.plan === 'free' ? 'Starter' : user.plan}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold">{user.credits} Credits</span>
+                      </div>
+                    </div>
+                    <div className="py-1.5">
+                      <button onClick={() => { setIsProfileOpen(false); navigateTo('account'); }} className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors">
+                        <UserIcon size={15} className="text-gray-500" /> Mon Compte
+                      </button>
+                      <button onClick={() => { setIsProfileOpen(false); navigateTo('recharge'); }} className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors">
+                        <Fuel size={15} className="text-gray-500" /> Recharger Credits
+                      </button>
+                      <button onClick={() => { setIsProfileOpen(false); onOpenCommandPalette(); }} className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors">
+                        <Search size={15} className="text-gray-500" /> Recherche rapide
+                        <kbd className="ml-auto px-1.5 py-0.5 text-[10px] text-gray-600 bg-white/[0.04] border border-white/[0.08] rounded font-mono">⌘K</kbd>
+                      </button>
+                    </div>
+                    <div className="border-t border-white/[0.06] py-1.5">
+                      <button onClick={() => { setIsProfileOpen(false); onLogout(); }} className="w-full flex items-center gap-3 px-5 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/[0.05] transition-colors">
+                        <LogOut size={15} /> Déconnexion
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <LanguageSelector compact />
+              <button
+                onClick={() => navigateTo('login')}
+                className="btn-gradient text-sm !py-2 !px-5"
+              >
+                {t.nav.login}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

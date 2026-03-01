@@ -1,0 +1,136 @@
+'use client';
+
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams?.get('redirect') || '';
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const supabase = createClient();
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    // If explicit redirect, use it
+    if (redirect) {
+      router.push(redirect);
+      return;
+    }
+
+    // Smart routing: check if user is a merchant or customer
+    const userId = authData.user?.id;
+    if (userId) {
+      const { data: merchant } = await supabase
+        .from('merchants')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+
+      if (merchant) {
+        router.push('/merchant');
+        return;
+      }
+
+      const { data: customer } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('id', userId)
+        .single();
+
+      if (customer) {
+        router.push('/customer');
+        return;
+      }
+    }
+
+    // Fallback
+    router.push('/merchant');
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input
+        label="Email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        placeholder="email@exemple.com"
+      />
+      <Input
+        label="Mot de passe"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        placeholder="••••••••"
+      />
+      {error && <p className="text-[12px] text-[var(--error)]">{error}</p>}
+      <Button type="submit" loading={loading} className="w-full">
+        Se connecter
+      </Button>
+    </form>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)] px-4">
+      <div className="w-full max-w-sm space-y-6 page-enter">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+            <span>Royall</span>
+            <span className="text-[var(--accent)]">Azz</span>
+          </h1>
+          <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
+            Connectez-vous a votre espace
+          </p>
+        </div>
+
+        <Suspense
+          fallback={
+            <div className="space-y-4 animate-pulse">
+              <div className="h-10 bg-[var(--bg-surface)] rounded-lg" />
+              <div className="h-10 bg-[var(--bg-surface)] rounded-lg" />
+              <div className="h-10 bg-[var(--bg-surface)] rounded-lg" />
+            </div>
+          }
+        >
+          <LoginForm />
+        </Suspense>
+
+        <p className="text-center text-[13px] text-[var(--text-tertiary)]">
+          Pas encore de compte ?{' '}
+          <a
+            href="/register"
+            className="text-[var(--accent)] hover:underline"
+          >
+            Creer un compte
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+}

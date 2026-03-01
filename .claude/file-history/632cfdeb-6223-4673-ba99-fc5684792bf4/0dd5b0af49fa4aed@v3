@@ -1,0 +1,114 @@
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
+import { generateApiKey } from "@/lib/api-auth"
+import { AuthError, ValidationError, NotFoundError, ForbiddenError, formatApiError } from "@/lib/errors"
+
+/**
+ * GET /api/keys — List API keys for current workspace
+ */
+export async function GET() {
+  try {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new AuthError()
+
+    const { data: membership } = await supabase
+      .from("workspace_users")
+      .select("workspace_id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .single()
+
+    if (!membership) throw new NotFoundError("Aucun workspace")
+
+    const { data: keys } = await supabase
+      .from("api_keys")
+      .select("id, name, key_prefix, scopes, rate_limit, last_used_at, is_active, created_at")
+      .eq("workspace_id", membership.workspace_id)
+      .order("created_at", { ascending: false })
+
+    return NextResponse.json({ keys: keys || [] })
+  } catch (error) {
+    const { status, body } = formatApiError(error)
+    return NextResponse.json(body, { status })
+  }
+}
+
+/**
+ * POST /api/keys — Create a new API key
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new AuthError()
+
+    const { name, scopes } = await req.json()
+    if (!name) throw new ValidationError("name is required")
+
+    const { data: membership } = await supabase
+      .from("workspace_users")
+      .select("workspace_id, role")
+      .eq("user_id", user.id)
+      .limit(1)
+      .single()
+
+    if (!membership) throw new NotFoundError("Aucun workspace")
+
+    if (!["owner", "admin"].includes(membership.role)) {
+      throw new ForbiddenError("Seuls les admins peuvent creer des cles API")
+    }
+
+    const { key, hash, prefix } = generateApiKey()
+
+    const { data: saved, error } = await supabase
+      .from("api_keys")
+      .insert({
+        workspace_id: membership.workspace_id,
+        created_by: user.id,
+        name,
+        key_hash: hash,
+        key_prefix: prefix,
+        scopes: scopes || ["read"],
+      })
+      .select("id, name, key_prefix, scopes, rate_limit, created_at")
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json({
+      key,
+      details: saved,
+      warning: "Copiez cette cle maintenant, elle ne sera plus affichee.",
+    })
+  } catch (error) {
+    const { status, body } = formatApiError(error)
+    return NextResponse.json(body, { status })
+  }
+}
+
+/**
+ * DELETE /api/keys — Deactivate an API key
+ */
+export async function DELETE(req: NextRequest) {
+  try {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new AuthError()
+
+    const { keyId } = await req.json()
+    if (!keyId) throw new ValidationError("keyId is required")
+
+    const { error } = await supabase
+      .from("api_keys")
+      .update({ is_active: false })
+      .eq("id", keyId)
+
+    if (error) throw error
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    const { status, body } = formatApiError(error)
+    return NextResponse.json(body, { status })
+  }
+}

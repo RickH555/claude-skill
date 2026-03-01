@@ -1,0 +1,9 @@
+{
+  "id": "15",
+  "subject": "Initialize pnpm project and install Next.js + React + TypeScript",
+  "description": "Run pnpm init, install next/react/react-dom as dependencies, and typescript/@types as dev dependencies",
+  "activeForm": "Initializing pnpm project and installing Next.js dependencies",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

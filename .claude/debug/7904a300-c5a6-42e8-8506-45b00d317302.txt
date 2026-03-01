@@ -1,0 +1,1013 @@
+2026-02-11T09:13:35.929Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-11T09:13:35.935Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-11T09:13:35.935Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-11T09:13:35.935Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-11T09:13:36.007Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-11T09:13:36.083Z [DEBUG] Applying permission update: Adding 1 allow rule(s) to destination 'localSettings': ["Bash(npx vite build)"]
+2026-02-11T09:13:36.083Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-11T09:13:36.215Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-11T09:13:36.221Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-11T09:13:36.225Z [DEBUG] [STARTUP] Running setup()...
+2026-02-11T09:13:36.240Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-11T09:13:36.245Z [DEBUG] Passes: Using fresh cached eligibility data
+2026-02-11T09:13:36.245Z [DEBUG] Error log sink initialized
+2026-02-11T09:13:36.354Z [DEBUG] [STARTUP] setup() completed in 129ms
+2026-02-11T09:13:36.354Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-11T09:13:36.948Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1
+2026-02-11T09:13:37.013Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-02-11T09:13:37.022Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=C:\Users\User\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\vendor\ripgrep\x64-win32\rg.exe)
+2026-02-11T09:13:37.108Z [DEBUG] Loaded 1 unique skills (1 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 1)
+2026-02-11T09:13:37.108Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:37.111Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-11T09:13:37.111Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-11T09:13:37.125Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-11T09:13:37.140Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:37.141Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-11T09:13:37.141Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-11T09:13:37.154Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-11T09:13:37.156Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-11T09:13:37.157Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-11T09:13:37.157Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-11T09:13:37.169Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-11T09:13:37.170Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-11T09:13:37.171Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-11T09:13:37.171Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-11T09:13:37.172Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-11T09:13:37.183Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-11T09:13:37.190Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:37.190Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-11T09:13:37.190Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-11T09:13:37.203Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-11T09:13:37.203Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-11T09:13:37.206Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770801217206_zlk7qv
+2026-02-11T09:13:37.655Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801217655
+2026-02-11T09:13:37.656Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:13:37.657Z [DEBUG] Temp file written successfully, size: 10485 bytes
+2026-02-11T09:13:37.658Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:13:37.658Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801217655 to C:\Users\User\.claude.json
+2026-02-11T09:13:37.661Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:13:40.740Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770801217206_zlk7qv
+2026-02-11T09:13:40.743Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-11T09:13:40.744Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-11T09:13:40.744Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-11T09:13:40.884Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-11T09:13:40.893Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-11T09:13:40.895Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:40.896Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-11T09:13:40.897Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-11T09:13:40.910Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-11T09:13:40.913Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:40.914Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-11T09:13:40.914Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-11T09:13:40.915Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-11T09:13:40.923Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-11T09:13:40.923Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-11T09:13:40.924Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770801220924_6rmskq
+2026-02-11T09:13:44.115Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770801220924_6rmskq
+2026-02-11T09:13:44.121Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-11T09:13:44.121Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-11T09:13:44.121Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-11T09:13:44.185Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-11T09:13:44.189Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:44.190Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-11T09:13:44.190Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-11T09:13:44.207Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-11T09:13:44.208Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-11T09:13:44.209Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-11T09:13:44.209Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-11T09:13:46.358Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-11T09:13:46.376Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:46.377Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-11T09:13:46.377Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-11T09:13:46.406Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-11T09:13:46.407Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-11T09:13:46.408Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-11T09:13:46.408Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-11T09:13:46.410Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-11T09:13:46.422Z [DEBUG] Loading plugin agent-sdk-dev from source: "./plugins/agent-sdk-dev"
+2026-02-11T09:13:46.426Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:46.427Z [DEBUG] Plugin agent-sdk-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-11T09:13:46.427Z [DEBUG] Copied local plugin agent-sdk-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-11T09:13:46.442Z [DEBUG] Loading plugin pr-review-toolkit from source: "./plugins/pr-review-toolkit"
+2026-02-11T09:13:46.447Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:46.448Z [DEBUG] Plugin pr-review-toolkit@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-11T09:13:46.448Z [DEBUG] Copied local plugin pr-review-toolkit to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-11T09:13:46.466Z [DEBUG] Loading plugin code-review from source: "./plugins/code-review"
+2026-02-11T09:13:46.471Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:13:46.472Z [DEBUG] Plugin code-review@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-11T09:13:46.472Z [DEBUG] Copied local plugin code-review to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-11T09:13:46.492Z [DEBUG] Loading plugin stripe from source: "./external_plugins/stripe"
+2026-02-11T09:13:46.496Z [DEBUG] Using manifest version for stripe@claude-plugins-official: 0.1.0
+2026-02-11T09:13:46.498Z [DEBUG] Plugin stripe@claude-plugins-official version 0.1.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-02-11T09:13:46.498Z [DEBUG] Copied local plugin stripe to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-02-11T09:13:46.522Z [DEBUG] Loading plugin claude-md-management from source: "./plugins/claude-md-management"
+2026-02-11T09:13:46.525Z [DEBUG] Using manifest version for claude-md-management@claude-plugins-official: 1.0.0
+2026-02-11T09:13:46.526Z [DEBUG] Plugin claude-md-management@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0
+2026-02-11T09:13:46.526Z [DEBUG] Copied local plugin claude-md-management to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0
+2026-02-11T09:13:46.530Z [DEBUG] Found 18 plugins (18 enabled, 0 disabled)
+2026-02-11T09:13:46.533Z [DEBUG] getPluginSkills: Processing 18 enabled plugins
+2026-02-11T09:13:46.533Z [DEBUG] Checking plugin frontend-design: skillsPath=exists, skillsPaths=0 paths
+2026-02-11T09:13:46.533Z [DEBUG] Attempting to load skills from plugin frontend-design default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7\skills
+2026-02-11T09:13:46.563Z [DEBUG] Loading hooks from plugin: superpowers
+2026-02-11T09:13:46.564Z [DEBUG] Registered 1 hooks from 18 plugins
+2026-02-11T09:13:46.609Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-11T09:13:46.621Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-11T09:13:46.635Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-11T09:13:46.689Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-11T09:13:46.711Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-02-11T09:13:46.734Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\code-reviewer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review code for adherence to proje…
+             ^
+2026-02-11T09:13:46.759Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\comment-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to analyze code comments for accuracy…
+             ^
+2026-02-11T09:13:46.772Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\pr-test-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review a pull request for test cov…
+             ^
+2026-02-11T09:13:46.788Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\silent-failure-hunter.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when reviewing code changes in a pull request to id…
+             ^
+2026-02-11T09:13:46.803Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\type-design-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need expert analysis of type design in you…
+             ^
+2026-02-11T09:13:46.805Z [DEBUG] Loaded 6 agents from plugin pr-review-toolkit default directory
+2026-02-11T09:13:46.805Z [DEBUG] Total plugin agents loaded: 16
+2026-02-11T09:13:46.805Z [DEBUG] Loaded 1 skills from plugin frontend-design default directory
+2026-02-11T09:13:46.805Z [DEBUG] Checking plugin feature-dev: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:46.806Z [DEBUG] Checking plugin code-simplifier: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:46.806Z [DEBUG] Checking plugin typescript-lsp: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:46.806Z [DEBUG] Checking plugin context7: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:46.806Z [DEBUG] Checking plugin superpowers: skillsPath=exists, skillsPaths=0 paths
+2026-02-11T09:13:46.806Z [DEBUG] Attempting to load skills from plugin superpowers default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\skills
+2026-02-11T09:13:46.892Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-11T09:13:46.908Z [DEBUG] Loaded 14 skills from plugin superpowers default directory
+2026-02-11T09:13:46.908Z [DEBUG] Checking plugin supabase: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:46.908Z [DEBUG] Checking plugin plugin-dev: skillsPath=exists, skillsPaths=0 paths
+2026-02-11T09:13:46.908Z [DEBUG] Attempting to load skills from plugin plugin-dev default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7\skills
+2026-02-11T09:13:46.960Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-11T09:13:46.967Z [DEBUG] Loaded 7 skills from plugin plugin-dev default directory
+2026-02-11T09:13:46.967Z [DEBUG] Checking plugin vercel: skillsPath=none, skillsPaths=1 paths
+2026-02-11T09:13:46.967Z [DEBUG] Attempting to load skills from plugin vercel skillsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\
+2026-02-11T09:13:46.967Z [DEBUG] Loading from skillPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\ for plugin vercel
+2026-02-11T09:13:46.982Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-11T09:13:46.982Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-11T09:13:46.982Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-11T09:13:46.995Z [DEBUG] Loaded 3 skills from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\
+2026-02-11T09:13:46.995Z [DEBUG] Checking plugin github: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:46.995Z [DEBUG] Checking plugin claude-code-setup: skillsPath=exists, skillsPaths=0 paths
+2026-02-11T09:13:46.995Z [DEBUG] Attempting to load skills from plugin claude-code-setup default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0\skills
+2026-02-11T09:13:47.001Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-11T09:13:47.009Z [DEBUG] Loaded 1 skills from plugin claude-code-setup default directory
+2026-02-11T09:13:47.009Z [DEBUG] Checking plugin serena: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:47.009Z [DEBUG] Checking plugin pyright-lsp: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:47.009Z [DEBUG] Checking plugin agent-sdk-dev: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:47.009Z [DEBUG] Checking plugin pr-review-toolkit: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:47.009Z [DEBUG] Checking plugin code-review: skillsPath=none, skillsPaths=0 paths
+2026-02-11T09:13:47.009Z [DEBUG] Checking plugin stripe: skillsPath=exists, skillsPaths=0 paths
+2026-02-11T09:13:47.009Z [DEBUG] Attempting to load skills from plugin stripe default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0\skills
+2026-02-11T09:13:47.017Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-02-11T09:13:47.025Z [DEBUG] Loaded 1 skills from plugin stripe default directory
+2026-02-11T09:13:47.025Z [DEBUG] Checking plugin claude-md-management: skillsPath=exists, skillsPaths=0 paths
+2026-02-11T09:13:47.025Z [DEBUG] Attempting to load skills from plugin claude-md-management default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0\skills
+2026-02-11T09:13:47.033Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-02-11T09:13:47.039Z [DEBUG] Loaded 1 skills from plugin claude-md-management default directory
+2026-02-11T09:13:47.040Z [DEBUG] Total plugin skills loaded: 28
+2026-02-11T09:13:47.040Z [DEBUG] Loaded 1 commands from plugin code-review default directory
+2026-02-11T09:13:47.054Z [DEBUG] Loaded 2 commands from plugin stripe default directory
+2026-02-11T09:13:47.063Z [DEBUG] Loaded 1 commands from plugin claude-md-management default directory
+2026-02-11T09:13:47.063Z [DEBUG] Total plugin commands loaded: 14
+2026-02-11T09:13:47.064Z [DEBUG] getSkills returning: 1 skill dir commands, 28 plugin skills, 2 bundled skills
+2026-02-11T09:13:47.093Z [DEBUG] [STARTUP] Commands and agents loaded in 10739ms
+2026-02-11T09:13:47.099Z [DEBUG] Layout engine: yoga
+2026-02-11T09:13:47.141Z [WARN] Missing environment variables in plugin MCP config: GITHUB_PERSONAL_ACCESS_TOKEN
+2026-02-11T09:13:47.195Z [ERROR] Error: Error: Plugin MCP server error - mcp-config-invalid: MCP server github invalid: Missing environment variables: GITHUB_PERSONAL_ACCESS_TOKEN
+    at ZG1 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3143:29994)
+2026-02-11T09:13:47.252Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-02-11T09:13:47.300Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-02-11T09:13:47.705Z [DEBUG] [keybindings] Watching for changes to C:\Users\User\.claude\keybindings.json
+2026-02-11T09:13:51.416Z [DEBUG] Grove: Using fresh cached config
+2026-02-11T09:13:51.643Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-11T09:13:51.685Z [DEBUG] Git remote URL: null
+2026-02-11T09:13:51.685Z [DEBUG] No git remote URL found
+2026-02-11T09:13:51.686Z [DEBUG] Not in a GitHub repository, skipping path mapping update
+2026-02-11T09:13:51.994Z [DEBUG] [STARTUP] showSetupScreens() completed in 4742ms
+2026-02-11T09:13:51.995Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-11T09:13:51.995Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-11T09:13:51.995Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-11T09:13:51.999Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:13:51.999Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:13:52.003Z [DEBUG] Passes: Using fresh cached eligibility data
+2026-02-11T09:13:52.010Z [DEBUG] [STARTUP] MCP configs loaded in 15927ms
+2026-02-11T09:13:52.043Z [DEBUG] MCP server "plugin:context7:context7": Starting connection with timeout of 30000ms
+2026-02-11T09:13:52.105Z [DEBUG] MCP server "plugin:serena:serena": Starting connection with timeout of 30000ms
+2026-02-11T09:13:52.205Z [DEBUG] MCP server "plugin:supabase:supabase": Initializing HTTP transport to https://mcp.supabase.com/mcp
+2026-02-11T09:13:52.206Z [DEBUG] MCP server "plugin:supabase:supabase": Node version: v20.20.0, Platform: win32
+2026-02-11T09:13:52.206Z [DEBUG] MCP server "plugin:supabase:supabase": Environment: {"NODE_OPTIONS":"not set","UV_THREADPOOL_SIZE":"default","HTTP_PROXY":"not set","HTTPS_PROXY":"not set","NO_PROXY":"not set"}
+2026-02-11T09:13:52.209Z [DEBUG] MCP server "plugin:github:github": Initializing HTTP transport to https://api.githubcopilot.com/mcp/
+2026-02-11T09:13:52.209Z [DEBUG] MCP server "plugin:github:github": Node version: v20.20.0, Platform: win32
+2026-02-11T09:13:52.209Z [DEBUG] MCP server "plugin:github:github": Environment: {"NODE_OPTIONS":"not set","UV_THREADPOOL_SIZE":"default","HTTP_PROXY":"not set","HTTPS_PROXY":"not set","NO_PROXY":"not set"}
+2026-02-11T09:13:52.210Z [DEBUG] MCP server "plugin:stripe:stripe": Initializing HTTP transport to https://mcp.stripe.com
+2026-02-11T09:13:52.211Z [DEBUG] MCP server "plugin:stripe:stripe": Node version: v20.20.0, Platform: win32
+2026-02-11T09:13:52.211Z [DEBUG] MCP server "plugin:stripe:stripe": Environment: {"NODE_OPTIONS":"not set","UV_THREADPOOL_SIZE":"default","HTTP_PROXY":"not set","HTTPS_PROXY":"not set","NO_PROXY":"not set"}
+2026-02-11T09:13:52.243Z [DEBUG] All plugins already exist, skipping migration
+2026-02-11T09:13:52.257Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-02-11T09:13:52.266Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801232266
+2026-02-11T09:13:52.267Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:13:52.269Z [DEBUG] Temp file written successfully, size: 10485 bytes
+2026-02-11T09:13:52.269Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:13:52.269Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801232266 to C:\Users\User\.claude.json
+2026-02-11T09:13:52.271Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:13:52.287Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-11T09:13:52.287Z [DEBUG] Found 1 hook matchers in settings
+2026-02-11T09:13:52.288Z [DEBUG] Matched 1 unique hooks for query "startup" (1 before deduplication)
+2026-02-11T09:13:52.297Z [DEBUG] Loaded 18 installed plugins from C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-11T09:13:52.297Z [DEBUG] Initialized versioned plugins system with 18 plugins
+2026-02-11T09:13:52.384Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801232384
+2026-02-11T09:13:52.384Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:13:52.385Z [DEBUG] Temp file written successfully, size: 10521 bytes
+2026-02-11T09:13:52.386Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:13:52.386Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801232384 to C:\Users\User\.claude.json
+2026-02-11T09:13:52.387Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:13:52.388Z [DEBUG] MCP server "plugin:supabase:supabase": Proxy options: default
+2026-02-11T09:13:52.390Z [DEBUG] MCP server "plugin:supabase:supabase": HTTP transport options: {"url":"https://mcp.supabase.com/mcp","headers":{"User-Agent":"claude-code/2.1.39 (cli)"},"hasAuthProvider":true,"timeoutMs":60000}
+2026-02-11T09:13:52.391Z [DEBUG] MCP server "plugin:supabase:supabase": HTTP transport created successfully
+2026-02-11T09:13:52.394Z [DEBUG] MCP server "plugin:supabase:supabase": Client created, setting up request handler
+2026-02-11T09:13:52.394Z [DEBUG] MCP server "plugin:supabase:supabase": Starting connection with timeout of 30000ms
+2026-02-11T09:13:52.394Z [DEBUG] MCP server "plugin:supabase:supabase": Testing basic HTTP connectivity to https://mcp.supabase.com/mcp
+2026-02-11T09:13:52.394Z [DEBUG] MCP server "plugin:supabase:supabase": Parsed URL: host=mcp.supabase.com, port=default, protocol=https:
+2026-02-11T09:13:52.395Z [DEBUG] MCP server "plugin:github:github": Proxy options: default
+2026-02-11T09:13:52.395Z [DEBUG] MCP server "plugin:github:github": HTTP transport options: {"url":"https://api.githubcopilot.com/mcp/","headers":{"User-Agent":"claude-code/2.1.39 (cli)","Authorization":"[REDACTED]"},"hasAuthProvider":true,"timeoutMs":60000}
+2026-02-11T09:13:52.395Z [DEBUG] MCP server "plugin:github:github": HTTP transport created successfully
+2026-02-11T09:13:52.397Z [DEBUG] MCP server "plugin:github:github": Client created, setting up request handler
+2026-02-11T09:13:52.398Z [DEBUG] MCP server "plugin:github:github": Starting connection with timeout of 30000ms
+2026-02-11T09:13:52.398Z [DEBUG] MCP server "plugin:github:github": Testing basic HTTP connectivity to https://api.githubcopilot.com/mcp/
+2026-02-11T09:13:52.398Z [DEBUG] MCP server "plugin:github:github": Parsed URL: host=api.githubcopilot.com, port=default, protocol=https:
+2026-02-11T09:13:52.398Z [DEBUG] MCP server "plugin:stripe:stripe": Proxy options: default
+2026-02-11T09:13:52.398Z [DEBUG] MCP server "plugin:stripe:stripe": HTTP transport options: {"url":"https://mcp.stripe.com","headers":{"User-Agent":"claude-code/2.1.39 (cli)"},"hasAuthProvider":true,"timeoutMs":60000}
+2026-02-11T09:13:52.398Z [DEBUG] MCP server "plugin:stripe:stripe": HTTP transport created successfully
+2026-02-11T09:13:52.400Z [DEBUG] MCP server "plugin:stripe:stripe": Client created, setting up request handler
+2026-02-11T09:13:52.401Z [DEBUG] MCP server "plugin:stripe:stripe": Starting connection with timeout of 30000ms
+2026-02-11T09:13:52.401Z [DEBUG] MCP server "plugin:stripe:stripe": Testing basic HTTP connectivity to https://mcp.stripe.com
+2026-02-11T09:13:52.401Z [DEBUG] MCP server "plugin:stripe:stripe": Parsed URL: host=mcp.stripe.com, port=default, protocol=https:
+2026-02-11T09:13:52.486Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:13:52.513Z [DEBUG] MCP server "plugin:supabase:supabase": Token expired without refresh token
+2026-02-11T09:13:52.514Z [DEBUG] MCP server "plugin:github:github": No token data found
+2026-02-11T09:13:52.516Z [DEBUG] MCP server "plugin:stripe:stripe": Token expired without refresh token
+2026-02-11T09:13:52.558Z [DEBUG] Hooks: Config-based async hook, backgrounding process async_hook_53612
+2026-02-11T09:13:52.562Z [DEBUG] Hooks: Registering async hook async_hook_53612 (SessionStart:startup) with timeout 600000ms
+2026-02-11T09:13:52.744Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-02-11T09:13:53.003Z [DEBUG] High write ratio: blit=0, write=1150 (100.0% writes), screen=16x168
+2026-02-11T09:13:53.047Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801233047
+2026-02-11T09:13:53.048Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:13:53.050Z [DEBUG] Temp file written successfully, size: 10521 bytes
+2026-02-11T09:13:53.050Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:13:53.050Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801233047 to C:\Users\User\.claude.json
+2026-02-11T09:13:53.052Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:13:53.067Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801233067
+2026-02-11T09:13:53.068Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:13:53.070Z [DEBUG] Temp file written successfully, size: 10521 bytes
+2026-02-11T09:13:53.070Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:13:53.070Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801233067 to C:\Users\User\.claude.json
+2026-02-11T09:13:53.072Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:13:53.096Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801233096
+2026-02-11T09:13:53.097Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:13:53.099Z [DEBUG] Temp file written successfully, size: 10492 bytes
+2026-02-11T09:13:53.099Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:13:53.099Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801233096 to C:\Users\User\.claude.json
+2026-02-11T09:13:53.101Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:13:53.125Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-02-11T09:13:53.143Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-02-11T09:13:53.149Z [DEBUG] performStartupChecks called
+2026-02-11T09:13:53.150Z [DEBUG] Starting background plugin installations
+2026-02-11T09:13:53.152Z [DEBUG] performBackgroundPluginInstallations called
+2026-02-11T09:13:53.186Z [DEBUG] No CLAUDE.md/rules files found
+2026-02-11T09:13:53.317Z [DEBUG] Watching for changes in setting files C:\Users\User\.claude\settings.json, C:\Users\User\.claude\settings.local.json...
+2026-02-11T09:13:53.322Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-11T09:13:53.343Z [DEBUG] Found 18 enabled plugins
+2026-02-11T09:13:53.347Z [DEBUG] All plugins already exist, skipping migration
+2026-02-11T09:13:53.349Z [DEBUG] Found 18 installed plugins (V2 format)
+2026-02-11T09:13:53.353Z [DEBUG] Loaded plugins - Enabled: 18, Disabled: 0, Commands: 14, Agents: 16, Errors: 0
+2026-02-11T09:13:53.354Z [DEBUG] Found 0 missing plugins (not installed):
+2026-02-11T09:13:53.354Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-02-11T09:13:53.371Z [WARN] Missing environment variables in plugin MCP config: GITHUB_PERSONAL_ACCESS_TOKEN
+2026-02-11T09:13:53.371Z [WARN] Missing environment variables in plugin MCP config: GITHUB_PERSONAL_ACCESS_TOKEN
+2026-02-11T09:13:53.382Z [ERROR] Error: Error: Plugin MCP server error - mcp-config-invalid: MCP server github invalid: Missing environment variables: GITHUB_PERSONAL_ACCESS_TOKEN
+    at ZG1 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3143:29994)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async M (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3916:17175)
+2026-02-11T09:13:53.382Z [ERROR] Error: Error: Plugin MCP server error - mcp-config-invalid: MCP server github invalid: Missing environment variables: GITHUB_PERSONAL_ACCESS_TOKEN
+    at ZG1 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3143:29994)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async P (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3916:17691)
+2026-02-11T09:13:53.398Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-11T09:13:53.399Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-02-11T09:13:53.399Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-02-11T09:13:53.507Z [DEBUG] High write ratio: blit=19, write=1294 (98.6% writes), screen=17x168
+2026-02-11T09:13:53.714Z [ERROR] MCP server "plugin:serena:serena" Server stderr: 'uvx' n'est pas reconnu en tant que commande interne
+ou externe, un programme ex�cutable ou un fichier de commandes.
+2026-02-11T09:13:53.719Z [DEBUG] MCP server "plugin:serena:serena": Connection failed after 1615ms: MCP error -32000: Connection closed
+2026-02-11T09:13:53.719Z [ERROR] MCP server "plugin:serena:serena" Connection failed: MCP error -32000: Connection closed
+2026-02-11T09:13:53.840Z [DEBUG] Org fast mode: disabled (extra_usage_disabled)
+2026-02-11T09:13:53.841Z [DEBUG] [claudeai-mcp] Fetched 2 servers
+2026-02-11T09:13:53.850Z [DEBUG] MCP server "claude.ai Supabase": Initializing claude.ai proxy transport for server mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-11T09:13:53.850Z [DEBUG] MCP server "claude.ai Supabase": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-11T09:13:53.851Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy transport created successfully
+2026-02-11T09:13:53.856Z [DEBUG] MCP server "claude.ai Supabase": Starting connection with timeout of 30000ms
+2026-02-11T09:13:53.857Z [DEBUG] MCP server "claude.ai Gamma": Initializing claude.ai proxy transport for server mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-11T09:13:53.858Z [DEBUG] MCP server "claude.ai Gamma": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-11T09:13:53.858Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy transport created successfully
+2026-02-11T09:13:53.861Z [DEBUG] MCP server "claude.ai Gamma": Starting connection with timeout of 30000ms
+2026-02-11T09:13:54.006Z [DEBUG] Loaded 1 LSP server(s) from plugin: typescript-lsp
+2026-02-11T09:13:54.013Z [DEBUG] Watching for changes in skill/command directories: C:\Users\User\.claude\commands, C:\Users\User\.claude\commands...
+2026-02-11T09:13:54.126Z [DEBUG] Loaded 1 LSP server(s) from plugin: pyright-lsp
+2026-02-11T09:13:54.198Z [DEBUG] MCP server "plugin:github:github": HTTP Connection failed after 1989ms: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+ (code: 400, errno: none)
+2026-02-11T09:13:54.198Z [ERROR] MCP server "plugin:github:github" Error: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+2026-02-11T09:13:54.200Z [DEBUG] MCP server "plugin:github:github": Connection failed after 1989ms: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+2026-02-11T09:13:54.201Z [ERROR] MCP server "plugin:github:github" Connection failed: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+2026-02-11T09:13:54.346Z [DEBUG] Total LSP servers loaded: 2
+2026-02-11T09:13:54.346Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 2 server(s)
+2026-02-11T09:13:54.348Z [DEBUG] Queued request handler for plugin:typescript-lsp:typescript.workspace/configuration (connection not ready)
+2026-02-11T09:13:54.349Z [DEBUG] Starting LSP server instance: plugin:typescript-lsp:typescript
+2026-02-11T09:13:54.360Z [DEBUG] Queued request handler for plugin:pyright-lsp:pyright.workspace/configuration (connection not ready)
+2026-02-11T09:13:54.360Z [DEBUG] Starting LSP server instance: plugin:pyright-lsp:pyright
+2026-02-11T09:13:54.371Z [DEBUG] LSP manager initialized with 2 servers
+2026-02-11T09:13:54.371Z [DEBUG] LSP server manager initialized successfully
+2026-02-11T09:13:54.373Z [DEBUG] Queued notification handler for plugin:typescript-lsp:typescript.textDocument/publishDiagnostics (connection not ready)
+2026-02-11T09:13:54.373Z [DEBUG] Registered diagnostics handler for plugin:typescript-lsp:typescript
+2026-02-11T09:13:54.373Z [DEBUG] Queued notification handler for plugin:pyright-lsp:pyright.textDocument/publishDiagnostics (connection not ready)
+2026-02-11T09:13:54.373Z [DEBUG] Registered diagnostics handler for plugin:pyright-lsp:pyright
+2026-02-11T09:13:54.373Z [DEBUG] LSP notification handlers registered successfully for all 2 server(s)
+2026-02-11T09:13:54.375Z [ERROR] Error: Error: LSP server plugin:typescript-lsp:typescript failed to start: spawn typescript-language-server ENOENT
+    at Object.start (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2184:22368)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.$ [as start] (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2184:24804)
+2026-02-11T09:13:54.376Z [ERROR] Error: Error: LSP server plugin:pyright-lsp:pyright failed to start: spawn pyright-langserver ENOENT
+    at Object.start (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2184:22368)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.$ [as start] (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2184:24804)
+2026-02-11T09:13:54.377Z [ERROR] Error: Error: spawn typescript-language-server ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:285:19)
+    at onErrorNT (node:internal/child_process:483:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+2026-02-11T09:13:54.377Z [ERROR] Error: Error: spawn pyright-langserver ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:285:19)
+    at onErrorNT (node:internal/child_process:483:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+2026-02-11T09:13:54.378Z [ERROR] Error: Error: Failed to start LSP server plugin:typescript-lsp:typescript: spawn typescript-language-server ENOENT
+    at file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2184:32601
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-11T09:13:54.379Z [ERROR] Error: Error: Failed to start LSP server plugin:pyright-lsp:pyright: spawn pyright-langserver ENOENT
+    at file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2184:32601
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-11T09:13:54.408Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy connection failed after 551ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY22TTDksL1jcnozFu2EA"}
+2026-02-11T09:13:54.409Z [ERROR] MCP server "claude.ai Gamma" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY22TTDksL1jcnozFu2EA"}
+2026-02-11T09:13:54.411Z [DEBUG] MCP server "claude.ai Gamma": Authentication required for claude.ai proxy server
+2026-02-11T09:13:54.482Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy connection failed after 632ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY22TTKTeiGZfEnHY9khu"}
+2026-02-11T09:13:54.482Z [ERROR] MCP server "claude.ai Supabase" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY22TTKTeiGZfEnHY9khu"}
+2026-02-11T09:13:54.484Z [DEBUG] MCP server "claude.ai Supabase": Authentication required for claude.ai proxy server
+2026-02-11T09:13:54.606Z [DEBUG] MCP server "plugin:supabase:supabase": Found client info
+2026-02-11T09:13:54.607Z [DEBUG] MCP server "plugin:supabase:supabase": Token expired without refresh token
+2026-02-11T09:13:54.611Z [DEBUG] MCP server "plugin:supabase:supabase": Generated new OAuth state
+2026-02-11T09:13:55.012Z [DEBUG] MCP server "plugin:supabase:supabase": Saving code verifier
+2026-02-11T09:13:55.017Z [DEBUG] MCP server "plugin:supabase:supabase": Authorization URL: https://api.supabase.com/v1/oauth/authorize?response_type=code&client_id=c7bc69d2-0547-4843-855a-2f17b5a1efea&code_challenge=%5BREDACTED%5D&code_challenge_method=S256&redirect_uri=http%3A%2F%2Flocalhost%3A3118%2Fcallback&state=%5BREDACTED%5D&scope=organizations%3Aread+projects%3Aread+projects%3Awrite+database%3Awrite+database%3Aread+analytics%3Aread+secrets%3Aread+edge_functions%3Aread+edge_functions%3Awrite+environment%3Aread+environment%3Awrite+storage%3Aread&resource=https%3A%2F%2Fmcp.supabase.com%2Fmcp
+2026-02-11T09:13:55.017Z [DEBUG] MCP server "plugin:supabase:supabase": Scopes in URL: organizations:read projects:read projects:write database:write database:read analytics:read secrets:read edge_functions:read edge_functions:write environment:read environment:write storage:read
+2026-02-11T09:13:55.017Z [DEBUG] MCP server "plugin:supabase:supabase": Captured scopes from authorization URL: organizations:read projects:read projects:write database:write database:read analytics:read secrets:read edge_functions:read edge_functions:write environment:read environment:write storage:read
+2026-02-11T09:13:55.017Z [DEBUG] MCP server "plugin:supabase:supabase": Redirection handling is disabled, skipping redirect
+2026-02-11T09:13:55.018Z [DEBUG] MCP server "plugin:supabase:supabase": HTTP Connection failed after 2813ms: Unauthorized (code: none, errno: none)
+2026-02-11T09:13:55.018Z [ERROR] MCP server "plugin:supabase:supabase" Error: Unauthorized
+2026-02-11T09:13:55.020Z [DEBUG] MCP server "plugin:supabase:supabase": Authentication required for HTTP server
+2026-02-11T09:13:55.135Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801235135
+2026-02-11T09:13:55.136Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:13:55.152Z [DEBUG] Temp file written successfully, size: 10492 bytes
+2026-02-11T09:13:55.152Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:13:55.152Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801235135 to C:\Users\User\.claude.json
+2026-02-11T09:13:55.154Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:13:55.581Z [DEBUG] MCP server "plugin:stripe:stripe": Found client info
+2026-02-11T09:13:55.582Z [DEBUG] MCP server "plugin:stripe:stripe": Token expired without refresh token
+2026-02-11T09:13:55.583Z [DEBUG] MCP server "plugin:stripe:stripe": Generated new OAuth state
+2026-02-11T09:13:55.585Z [DEBUG] MCP server "plugin:stripe:stripe": Saving code verifier
+2026-02-11T09:13:55.586Z [DEBUG] MCP server "plugin:stripe:stripe": Authorization URL: https://access.stripe.com/mcp/oauth2/authorize?response_type=code&client_id=oacli_Twsg8A211avHmM&code_challenge=%5BREDACTED%5D&code_challenge_method=S256&redirect_uri=http%3A%2F%2Flocalhost%3A3118%2Fcallback&state=%5BREDACTED%5D&resource=https%3A%2F%2Fmcp.stripe.com%2F
+2026-02-11T09:13:55.586Z [DEBUG] MCP server "plugin:stripe:stripe": Scopes in URL: NOT FOUND
+2026-02-11T09:13:55.586Z [DEBUG] MCP server "plugin:stripe:stripe": No scopes available from URL or metadata
+2026-02-11T09:13:55.587Z [DEBUG] MCP server "plugin:stripe:stripe": Redirection handling is disabled, skipping redirect
+2026-02-11T09:13:55.587Z [DEBUG] MCP server "plugin:stripe:stripe": HTTP Connection failed after 3377ms: Unauthorized (code: none, errno: none)
+2026-02-11T09:13:55.587Z [ERROR] MCP server "plugin:stripe:stripe" Error: Unauthorized
+2026-02-11T09:13:55.590Z [DEBUG] MCP server "plugin:stripe:stripe": Authentication required for HTTP server
+2026-02-11T09:13:57.516Z [DEBUG] Hooks: Adding stderr to async_hook_53612: <3>WSL (9 - Relay) ERROR: CreateProcessCommon:800:...
+2026-02-11T09:13:58.150Z [DEBUG] LSP error: plugin:typescript-lsp:typescript - spawn typescript-language-server ENOENT
+2026-02-11T09:13:58.154Z [DEBUG] LSP error: plugin:pyright-lsp:pyright - spawn pyright-langserver ENOENT
+2026-02-11T09:14:00.984Z [ERROR] MCP server "plugin:context7:context7" Server stderr: WARNING: Using default CLIENT_IP_ENCRYPTION_KEY.
+Context7 Documentation MCP Server v2.1.1 running on stdio
+2026-02-11T09:14:00.985Z [DEBUG] MCP server "plugin:context7:context7": Successfully connected to undefined server in 8966ms
+2026-02-11T09:14:00.985Z [DEBUG] MCP server "plugin:context7:context7": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"serverVersion":{"name":"Context7","version":"2.1.1"}}
+2026-02-11T09:14:01.031Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:14:01.031Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:14:01.032Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:14:01.032Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:14:01.032Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:14:01.033Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:14:01.359Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:14:01.359Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:14:01.360Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:14:01.558Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: analyzeMcp]
+2026-02-11T09:14:01.629Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:14:01.629Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:14:01.629Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:16:40.732Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:16:40.733Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:16:40.736Z [DEBUG] Hooks: Found 1 total hooks in registry
+2026-02-11T09:16:40.736Z [DEBUG] Hooks: Checking hook async_hook_53612 (SessionStart:startup) - attachmentSent: false, stdout length: 0
+2026-02-11T09:16:40.736Z [DEBUG] Hooks: Hook shell status completed
+2026-02-11T09:16:40.736Z [DEBUG] Hooks: Skipping hook async_hook_53612 - already delivered/sent or no stdout
+2026-02-11T09:16:40.736Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:16:41.093Z [DEBUG] Sending 41 skills via attachment (initial, 38 total sent)
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "frontend-design:frontend-design" (userFacingName="frontend-design")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:brainstorming" (userFacingName="brainstorming")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:dispatching-parallel-agents" (userFacingName="dispatching-parallel-agents")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:executing-plans" (userFacingName="executing-plans")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:finishing-a-development-branch" (userFacingName="finishing-a-development-branch")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:receiving-code-review" (userFacingName="receiving-code-review")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:requesting-code-review" (userFacingName="requesting-code-review")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:subagent-driven-development" (userFacingName="subagent-driven-development")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:systematic-debugging" (userFacingName="systematic-debugging")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:test-driven-development" (userFacingName="test-driven-development")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:using-git-worktrees" (userFacingName="using-git-worktrees")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:using-superpowers" (userFacingName="using-superpowers")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:verification-before-completion" (userFacingName="verification-before-completion")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:writing-plans" (userFacingName="writing-plans")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "superpowers:writing-skills" (userFacingName="writing-skills")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "plugin-dev:agent-development" (userFacingName="agent-development")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "plugin-dev:command-development" (userFacingName="command-development")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "plugin-dev:hook-development" (userFacingName="hook-development")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "plugin-dev:mcp-integration" (userFacingName="mcp-integration")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "plugin-dev:plugin-settings" (userFacingName="plugin-settings")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "plugin-dev:plugin-structure" (userFacingName="plugin-structure")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "plugin-dev:skill-development" (userFacingName="skill-development")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "vercel:deploy" (userFacingName="deploy")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "vercel:logs" (userFacingName="logs")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "vercel:setup" (userFacingName="setup")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "claude-code-setup:claude-automation-recommender" (userFacingName="claude-automation-recommender")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "stripe:stripe-best-practices" (userFacingName="stripe-best-practices")
+2026-02-11T09:16:41.094Z [DEBUG] Skill prompt: showing "claude-md-management:claude-md-improver" (userFacingName="claude-md-improver")
+2026-02-11T09:16:41.108Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-02-11T09:16:41.108Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:16:41.108Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-11T09:16:41.112Z [DEBUG] FileHistory: Added snapshot for 1c96c5a5-67b3-4af3-ad32-16444946b872, tracking 0 files
+2026-02-11T09:16:41.119Z [DEBUG] [useDeferredValue] Messages deferred by 2 (1→3)
+2026-02-11T09:16:41.210Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-11T09:16:41.214Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-02-11T09:16:41.287Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.b03; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:16:41.302Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:16:41.302Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:16:41.331Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:16:41.338Z [DEBUG] Total plugin output styles loaded: 0
+2026-02-11T09:16:41.374Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801401374
+2026-02-11T09:16:41.375Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:16:41.376Z [DEBUG] Temp file written successfully, size: 10529 bytes
+2026-02-11T09:16:41.376Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:16:41.376Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801401374 to C:\Users\User\.claude.json
+2026-02-11T09:16:41.377Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:16:41.385Z [DEBUG] autocompact: tokens=14298 threshold=167000 effectiveWindow=180000
+2026-02-11T09:16:41.390Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:16:41.391Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:16:41.416Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:16:41.431Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:16:41.432Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:16:41.440Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:16:41.461Z [DEBUG] [useDeferredValue] Messages deferred by 2 (1→3)
+2026-02-11T09:16:41.516Z [DEBUG] Stored paste a21a355890f86762 to C:\Users\User\.claude\paste-cache\a21a355890f86762.txt
+2026-02-11T09:16:41.544Z [DEBUG] Stats cache stale (2026-02-08), processing 2026-02-09 to 2026-02-10 in background
+2026-02-11T09:16:42.593Z [DEBUG] Successfully refreshed marketplace: claude-plugins-official
+2026-02-11T09:16:42.593Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-02-11T09:16:42.723Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-11T09:16:42.725Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-11T09:16:42.730Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770801402730_pr78vr
+2026-02-11T09:16:42.752Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770801402752_xa7vrg
+2026-02-11T09:16:42.776Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-11T09:16:42.784Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-11T09:16:42.798Z [DEBUG] Using manifest version for stripe@claude-plugins-official: 0.1.0
+2026-02-11T09:16:42.801Z [DEBUG] Using manifest version for claude-md-management@claude-plugins-official: 1.0.0
+2026-02-11T09:16:42.832Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:16:44.130Z [DEBUG] High write ratio: blit=2016, write=205355 (99.0% writes), screen=1270x168
+2026-02-11T09:16:44.337Z [DEBUG] Slow render: 207.4ms, screen: 1270x168, damage: 168x1270 at (0,0), changes: 415745
+2026-02-11T09:16:44.754Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:16:44.785Z [DEBUG] [useDeferredValue] Messages deferred by 1 (3→4)
+2026-02-11T09:16:45.004Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.004Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.004Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.004Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.004Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.005Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.005Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.005Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.005Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.006Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 2cd88e7947b7
+2026-02-11T09:16:45.355Z [DEBUG] [useDeferredValue] Messages deferred by 1 (4→5)
+2026-02-11T09:16:45.543Z [DEBUG] Stats cache saved successfully (lastComputedDate: 2026-02-10)
+2026-02-11T09:16:45.543Z [DEBUG] Stats cache updated with 4 new sessions
+2026-02-11T09:16:46.036Z [DEBUG] [useDeferredValue] Messages deferred by 1 (5→6)
+2026-02-11T09:16:46.108Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801406108
+2026-02-11T09:16:46.108Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:16:46.110Z [DEBUG] Temp file written successfully, size: 10562 bytes
+2026-02-11T09:16:46.110Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:16:46.110Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801406108 to C:\Users\User\.claude.json
+2026-02-11T09:16:46.111Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:16:47.022Z [DEBUG] High write ratio: blit=0, write=206285 (100.0% writes), screen=1272x168
+2026-02-11T09:16:47.036Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770801402752_xa7vrg
+2026-02-11T09:16:47.039Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-11T09:16:47.039Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-11T09:16:47.083Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770801402730_pr78vr
+2026-02-11T09:16:47.086Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-11T09:16:47.086Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-11T09:16:47.237Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-02-11T09:16:47.240Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-02-11T09:16:47.240Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:16:47.240Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:16:47.292Z [DEBUG] [useDeferredValue] Messages deferred by 1 (6→7)
+2026-02-11T09:16:48.093Z [DEBUG] High write ratio: blit=0, write=206285 (100.0% writes), screen=1272x168
+2026-02-11T09:16:48.115Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-02-11T09:16:48.117Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-02-11T09:16:48.117Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:16:48.117Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:16:48.140Z [DEBUG] [useDeferredValue] Messages deferred by 2 (6→8)
+2026-02-11T09:16:49.000Z [DEBUG] High write ratio: blit=0, write=206285 (100.0% writes), screen=1272x168
+2026-02-11T09:16:49.077Z [DEBUG] tree-sitter: loaded from disk
+2026-02-11T09:16:50.272Z [DEBUG] Creating shell snapshot for bash (C:\Program Files\Git\bin\bash.exe)
+2026-02-11T09:16:50.274Z [DEBUG] Looking for shell config file: C:\Users\User\.bashrc
+2026-02-11T09:16:50.274Z [DEBUG] Shell config file not found: C:\Users\User\.bashrc, creating snapshot with Claude Code defaults only
+2026-02-11T09:16:50.274Z [DEBUG] Snapshots directory: C:\Users\User\.claude\shell-snapshots
+2026-02-11T09:16:50.343Z [DEBUG] Creating snapshot at: C:\Users\User\.claude\shell-snapshots\snapshot-bash-1770801410274-vqytuq.sh
+2026-02-11T09:16:50.343Z [DEBUG] Shell binary exists: true
+2026-02-11T09:16:50.343Z [DEBUG] Execution timeout: 10000ms
+2026-02-11T09:16:52.171Z [DEBUG] Shell snapshot created successfully (367 bytes)
+2026-02-11T09:16:52.519Z [DEBUG] Session environment not yet supported on Windows
+2026-02-11T09:16:52.532Z [DEBUG] Session environment not yet supported on Windows
+2026-02-11T09:16:54.566Z [DEBUG] [useDeferredValue] Messages deferred by 2 (8→10)
+2026-02-11T09:16:54.964Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-11T09:16:54.975Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.05b; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:16:54.980Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:16:54.980Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:16:54.988Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:16:54.994Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-02-11T09:16:54.994Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:16:54.994Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:16:55.005Z [DEBUG] [useDeferredValue] Messages deferred by 1 (10→11)
+2026-02-11T09:16:55.934Z [DEBUG] High write ratio: blit=0, write=206527 (100.0% writes), screen=1278x168
+2026-02-11T09:16:55.967Z [DEBUG] [useDeferredValue] Messages deferred by 1 (11→12)
+2026-02-11T09:16:56.952Z [DEBUG] [useDeferredValue] Messages deferred by 1 (12→13)
+2026-02-11T09:16:56.996Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:16:57.969Z [DEBUG] [useDeferredValue] Messages deferred by 1 (13→14)
+2026-02-11T09:16:58.984Z [DEBUG] [useDeferredValue] Messages deferred by 1 (14→15)
+2026-02-11T09:16:59.444Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-11T09:16:59.451Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.05b; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:16:59.456Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:16:59.456Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:16:59.463Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:16:59.468Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-02-11T09:16:59.468Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:16:59.468Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:16:59.478Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:16:59.478Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:16:59.479Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:16:59.479Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:16:59.497Z [DEBUG] autocompact: tokens=41214 threshold=167000 effectiveWindow=180000
+2026-02-11T09:16:59.501Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:16:59.502Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:16:59.521Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:16:59.531Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:16:59.531Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:16:59.539Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:16:59.553Z [DEBUG] [useDeferredValue] Messages deferred by 1 (15→16)
+2026-02-11T09:17:00.468Z [DEBUG] High write ratio: blit=0, write=206651 (100.0% writes), screen=1281x168
+2026-02-11T09:17:00.482Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:17:03.190Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:17:08.008Z [DEBUG] [useDeferredValue] Messages deferred by 1 (16→17)
+2026-02-11T09:17:08.030Z [DEBUG] [useDeferredValue] Messages deferred by 1 (16→17)
+2026-02-11T09:17:08.238Z [DEBUG] [useDeferredValue] Messages deferred by 1 (17→18)
+2026-02-11T09:17:08.253Z [DEBUG] [useDeferredValue] Messages deferred by 1 (17→18)
+2026-02-11T09:17:09.065Z [DEBUG] High write ratio: blit=0, write=206818 (100.0% writes), screen=1283x168
+2026-02-11T09:17:09.648Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-02-11T09:17:09.651Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-02-11T09:17:09.651Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:09.651Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:17:09.667Z [DEBUG] Permission suggestions for Bash: []
+2026-02-11T09:17:09.673Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-02-11T09:17:09.676Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-02-11T09:17:09.676Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:09.676Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:17:09.683Z [DEBUG] [useDeferredValue] Messages deferred by 1 (18→19)
+2026-02-11T09:17:10.488Z [DEBUG] High write ratio: blit=0, write=206897 (100.0% writes), screen=1288x168
+2026-02-11T09:17:10.502Z [DEBUG] [useDeferredValue] Messages deferred by 1 (18→19)
+2026-02-11T09:17:10.517Z [DEBUG] [useDeferredValue] Messages deferred by 2 (18→20)
+2026-02-11T09:17:11.337Z [DEBUG] High write ratio: blit=0, write=206897 (100.0% writes), screen=1288x168
+2026-02-11T09:17:11.363Z [DEBUG] [useDeferredValue] Messages deferred by 3 (18→21)
+2026-02-11T09:17:12.200Z [DEBUG] High write ratio: blit=0, write=206897 (100.0% writes), screen=1288x168
+2026-02-11T09:17:16.515Z [DEBUG] Getting matching hook commands for Notification with query: permission_prompt
+2026-02-11T09:17:16.515Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:16.515Z [DEBUG] Matched 0 unique hooks for query "permission_prompt" (0 before deduplication)
+2026-02-11T09:17:16.778Z [DEBUG] Session environment not yet supported on Windows
+2026-02-11T09:17:16.853Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-11T09:17:18.330Z [DEBUG] Bash tool error (1553ms): Shell command failed
+2026-02-11T09:17:18.338Z [DEBUG] Getting matching hook commands for PostToolUseFailure with query: Bash
+2026-02-11T09:17:18.338Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:18.338Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:17:18.345Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:17:18.345Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:17:18.346Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:17:18.346Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:17:18.525Z [DEBUG] autocompact: tokens=42641 threshold=167000 effectiveWindow=180000
+2026-02-11T09:17:18.532Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:17:18.534Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:17:18.563Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:17:18.572Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:17:18.572Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:17:18.577Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:17:18.591Z [DEBUG] [useDeferredValue] Messages deferred by 3 (21→24)
+2026-02-11T09:17:22.076Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:17:23.662Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-02-11T09:17:23.664Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-02-11T09:17:23.664Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:23.664Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:17:24.955Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-02-11T09:17:24.957Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-02-11T09:17:24.957Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:24.957Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:17:24.971Z [DEBUG] [useDeferredValue] Messages deferred by 1 (24→25)
+2026-02-11T09:17:25.854Z [DEBUG] High write ratio: blit=0, write=207475 (100.0% writes), screen=1308x168
+2026-02-11T09:17:25.864Z [DEBUG] [useDeferredValue] Messages deferred by 1 (24→25)
+2026-02-11T09:17:28.880Z [DEBUG] Session environment not yet supported on Windows
+2026-02-11T09:17:28.951Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-11T09:17:30.496Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-11T09:17:30.504Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.05b; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:17:30.509Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:17:30.509Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:17:30.517Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:17:30.521Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-02-11T09:17:30.521Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:17:30.521Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:17:30.530Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:17:30.530Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:17:30.531Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:17:30.531Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:17:30.534Z [DEBUG] autocompact: tokens=43046 threshold=167000 effectiveWindow=180000
+2026-02-11T09:17:30.537Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:17:30.538Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:17:30.556Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:17:30.563Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:17:30.563Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:17:30.569Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:17:30.579Z [DEBUG] [useDeferredValue] Messages deferred by 1 (25→26)
+2026-02-11T09:17:31.853Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:17:32.773Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:17:49.685Z [DEBUG] [useDeferredValue] Messages deferred by 1 (26→27)
+2026-02-11T09:17:50.117Z [DEBUG] [useDeferredValue] Messages deferred by 1 (27→28)
+2026-02-11T09:17:50.134Z [DEBUG] [useDeferredValue] Messages deferred by 1 (27→28)
+2026-02-11T09:17:51.514Z [DEBUG] High write ratio: blit=0, write=207861 (100.0% writes), screen=1314x168
+2026-02-11T09:17:51.763Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:17:51.765Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:17:51.765Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:51.765Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:17:52.686Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:17:52.686Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:17:52.687Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:17:52.880Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:17:52.882Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:17:52.882Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:52.882Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:17:53.127Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:17:53.127Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:17:53.127Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:17:53.315Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:17:53.318Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:17:53.318Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:17:53.318Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:17:53.550Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:17:53.550Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:17:53.551Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:17:53.577Z [DEBUG] [useDeferredValue] Messages deferred by 9 (28→37)
+2026-02-11T09:17:54.525Z [DEBUG] High write ratio: blit=0, write=207828 (100.0% writes), screen=1312x168
+2026-02-11T09:17:54.810Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:17:54.811Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:17:54.811Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:17:54.821Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:17:54.821Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:17:54.822Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:17:54.822Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:17:54.877Z [DEBUG] autocompact: tokens=56686 threshold=167000 effectiveWindow=180000
+2026-02-11T09:17:54.881Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:17:54.883Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:17:54.907Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:17:54.916Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:17:54.916Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:17:54.922Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:17:54.937Z [DEBUG] [useDeferredValue] Messages deferred by 5 (37→42)
+2026-02-11T09:17:58.806Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:18:26.627Z [DEBUG] [useDeferredValue] Messages deferred by 1 (42→43)
+2026-02-11T09:18:28.415Z [DEBUG] [useDeferredValue] Messages deferred by 1 (43→44)
+2026-02-11T09:18:29.215Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:18:29.217Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:18:29.217Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:29.217Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:18:29.406Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:18:29.406Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:29.406Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:18:29.412Z [DEBUG] [useDeferredValue] Messages deferred by 4 (44→48)
+2026-02-11T09:18:30.262Z [DEBUG] High write ratio: blit=0, write=208485 (100.0% writes), screen=1326x168
+2026-02-11T09:18:30.426Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:18:30.428Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:18:30.428Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:30.428Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:18:30.600Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:18:30.600Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:30.600Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:18:30.760Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:18:30.761Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:18:30.761Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:30.761Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:18:30.934Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:18:30.934Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:30.935Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:18:30.952Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:18:30.952Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:18:30.952Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:18:30.952Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:18:31.142Z [DEBUG] autocompact: tokens=75352 threshold=167000 effectiveWindow=180000
+2026-02-11T09:18:31.146Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:18:31.147Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:18:31.177Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:18:31.184Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:18:31.184Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:18:31.190Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:18:31.205Z [DEBUG] [useDeferredValue] Messages deferred by 12 (44→56)
+2026-02-11T09:18:32.129Z [DEBUG] High write ratio: blit=0, write=208449 (100.0% writes), screen=1324x168
+2026-02-11T09:18:35.240Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:18:36.240Z [DEBUG] [useDeferredValue] Messages deferred by 1 (56→57)
+2026-02-11T09:18:37.224Z [DEBUG] [useDeferredValue] Messages deferred by 1 (57→58)
+2026-02-11T09:18:37.243Z [DEBUG] [useDeferredValue] Messages deferred by 1 (57→58)
+2026-02-11T09:18:38.483Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:18:38.485Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:18:38.485Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:38.485Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:18:38.675Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:18:38.675Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:38.675Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:18:38.682Z [DEBUG] [useDeferredValue] Messages deferred by 1 (58→59)
+2026-02-11T09:18:39.510Z [DEBUG] High write ratio: blit=0, write=208659 (100.0% writes), screen=1330x168
+2026-02-11T09:18:39.693Z [DEBUG] executePreToolHooks called for tool: Read
+2026-02-11T09:18:39.695Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-02-11T09:18:39.695Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:39.695Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-02-11T09:18:39.882Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-02-11T09:18:39.882Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:39.882Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-02-11T09:18:39.900Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:18:39.900Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:18:39.900Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:18:39.900Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:18:39.917Z [DEBUG] autocompact: tokens=88085 threshold=167000 effectiveWindow=180000
+2026-02-11T09:18:39.920Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:18:39.922Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:18:39.947Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:18:39.954Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:18:39.954Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:18:39.959Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:18:39.972Z [DEBUG] [useDeferredValue] Messages deferred by 8 (58→66)
+2026-02-11T09:18:40.879Z [DEBUG] High write ratio: blit=0, write=208624 (100.0% writes), screen=1328x168
+2026-02-11T09:18:43.665Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:18:46.059Z [DEBUG] [useDeferredValue] Messages deferred by 1 (66→67)
+2026-02-11T09:18:47.315Z [DEBUG] [useDeferredValue] Messages deferred by 1 (67→68)
+2026-02-11T09:18:48.336Z [DEBUG] High write ratio: blit=0, write=208874 (100.0% writes), screen=1333x168
+2026-02-11T09:18:48.709Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-02-11T09:18:48.711Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-02-11T09:18:48.711Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:48.711Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:18:49.064Z [DEBUG] Session environment not yet supported on Windows
+2026-02-11T09:18:49.080Z [DEBUG] [useDeferredValue] Messages deferred by 1 (68→69)
+2026-02-11T09:18:50.170Z [DEBUG] High write ratio: blit=0, write=208918 (100.0% writes), screen=1335x168
+2026-02-11T09:18:50.186Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-02-11T09:18:50.188Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-02-11T09:18:50.188Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:50.188Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-02-11T09:18:50.992Z [DEBUG] [useDeferredValue] Messages deferred by 2 (68→70)
+2026-02-11T09:18:51.993Z [DEBUG] High write ratio: blit=0, write=208873 (100.0% writes), screen=1333x168
+2026-02-11T09:18:52.028Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-11T09:18:52.033Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.05b; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:18:52.038Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:18:52.038Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:18:52.045Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:18:52.050Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-02-11T09:18:52.050Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:52.050Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:18:52.064Z [DEBUG] [useDeferredValue] Messages deferred by 4 (68→72)
+2026-02-11T09:18:52.101Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-02-11T09:18:52.101Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:52.102Z [DEBUG] Matched 1 unique hooks for query "Grep" (1 before deduplication)
+2026-02-11T09:18:52.110Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:18:52.110Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:18:52.111Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:18:52.111Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:18:52.114Z [DEBUG] autocompact: tokens=91389 threshold=167000 effectiveWindow=180000
+2026-02-11T09:18:52.117Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:18:52.118Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:18:52.157Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:18:52.164Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:18:52.164Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:18:52.169Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:18:52.184Z [DEBUG] [useDeferredValue] Messages deferred by 8 (68→76)
+2026-02-11T09:18:52.627Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:18:54.675Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:18:55.560Z [DEBUG] [useDeferredValue] Messages deferred by 1 (76→77)
+2026-02-11T09:18:56.408Z [DEBUG] High write ratio: blit=0, write=209161 (100.0% writes), screen=1342x168
+2026-02-11T09:18:57.004Z [DEBUG] executePreToolHooks called for tool: TaskCreate
+2026-02-11T09:18:57.006Z [DEBUG] Getting matching hook commands for PreToolUse with query: TaskCreate
+2026-02-11T09:18:57.006Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:18:57.006Z [DEBUG] Matched 0 unique hooks for query "TaskCreate" (0 before deduplication)
+2026-02-11T09:18:57.030Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801537030
+2026-02-11T09:18:57.031Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:18:57.032Z [DEBUG] Temp file written successfully, size: 10591 bytes
+2026-02-11T09:18:57.032Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:18:57.032Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801537030 to C:\Users\User\.claude.json
+2026-02-11T09:18:57.033Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:18:57.040Z [DEBUG] Getting matching hook commands for PostToolUse with query: TaskCreate
+2026-02-11T09:18:57.040Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:18:57.040Z [DEBUG] Matched 0 unique hooks for query "TaskCreate" (0 before deduplication)
+2026-02-11T09:18:57.054Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:18:57.054Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:18:57.055Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:18:57.055Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:18:57.058Z [DEBUG] autocompact: tokens=91771 threshold=167000 effectiveWindow=180000
+2026-02-11T09:18:57.060Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:18:57.062Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:18:57.089Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:18:57.097Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:18:57.097Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:18:57.101Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:18:57.117Z [DEBUG] [useDeferredValue] Messages deferred by 2 (77→79)
+2026-02-11T09:18:57.979Z [DEBUG] High write ratio: blit=0, write=209161 (100.0% writes), screen=1342x168
+2026-02-11T09:18:58.008Z [DEBUG] [useDeferredValue] Messages deferred by 2 (77→79)
+2026-02-11T09:19:01.081Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:19:02.393Z [DEBUG] executePreToolHooks called for tool: TaskCreate
+2026-02-11T09:19:02.395Z [DEBUG] Getting matching hook commands for PreToolUse with query: TaskCreate
+2026-02-11T09:19:02.395Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:19:02.395Z [DEBUG] Matched 0 unique hooks for query "TaskCreate" (0 before deduplication)
+2026-02-11T09:19:02.407Z [DEBUG] Getting matching hook commands for PostToolUse with query: TaskCreate
+2026-02-11T09:19:02.407Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:19:02.407Z [DEBUG] Matched 0 unique hooks for query "TaskCreate" (0 before deduplication)
+2026-02-11T09:19:02.412Z [DEBUG] [useDeferredValue] Messages deferred by 1 (79→80)
+2026-02-11T09:19:03.376Z [DEBUG] High write ratio: blit=0, write=209236 (100.0% writes), screen=1343x168
+2026-02-11T09:19:03.395Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:19:03.395Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:19:03.396Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:19:03.396Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:19:03.400Z [DEBUG] autocompact: tokens=91908 threshold=167000 effectiveWindow=180000
+2026-02-11T09:19:03.402Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:19:03.404Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:19:03.437Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:19:03.444Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:19:03.444Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:19:03.449Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:19:03.465Z [DEBUG] [useDeferredValue] Messages deferred by 2 (79→81)
+2026-02-11T09:19:05.789Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:19:06.287Z [DEBUG] executePreToolHooks called for tool: TaskUpdate
+2026-02-11T09:19:06.289Z [DEBUG] Getting matching hook commands for PreToolUse with query: TaskUpdate
+2026-02-11T09:19:06.289Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:19:06.289Z [DEBUG] Matched 0 unique hooks for query "TaskUpdate" (0 before deduplication)
+2026-02-11T09:19:06.303Z [DEBUG] Getting matching hook commands for PostToolUse with query: TaskUpdate
+2026-02-11T09:19:06.303Z [DEBUG] Found 5 hook matchers in settings
+2026-02-11T09:19:06.303Z [DEBUG] Matched 0 unique hooks for query "TaskUpdate" (0 before deduplication)
+2026-02-11T09:19:06.316Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:19:06.316Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:19:06.316Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:19:06.316Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:19:06.319Z [DEBUG] autocompact: tokens=91995 threshold=167000 effectiveWindow=180000
+2026-02-11T09:19:06.322Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:19:06.323Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:19:06.353Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:19:06.360Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:19:06.361Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:19:06.365Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:19:06.385Z [DEBUG] [useDeferredValue] Messages deferred by 2 (81→83)
+2026-02-11T09:19:06.424Z [DEBUG] [useDeferredValue] Messages deferred by 2 (81→83)
+2026-02-11T09:19:07.239Z [DEBUG] High write ratio: blit=0, write=209298 (100.0% writes), screen=1344x168
+2026-02-11T09:19:09.283Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:19:10.745Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-02-11T09:19:10.746Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-02-11T09:19:10.746Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:19:10.746Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:19:11.058Z [DEBUG] Permission suggestions for Bash: [
+  {
+    "type": "addDirectories",
+    "directories": [
+      "C:\\Users\\User\\Downloads\\SaaSV13 - Rick"
+    ],
+    "destination": "session"
+  },
+  {
+    "type": "setMode",
+    "mode": "acceptEdits",
+    "destination": "session"
+  }
+]
+2026-02-11T09:19:11.061Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-02-11T09:19:11.063Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-02-11T09:19:11.063Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:19:11.063Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-02-11T09:19:11.082Z [DEBUG] [useDeferredValue] Messages deferred by 1 (83→84)
+2026-02-11T09:19:11.950Z [DEBUG] High write ratio: blit=0, write=209474 (100.0% writes), screen=1353x168
+2026-02-11T09:19:11.963Z [DEBUG] [useDeferredValue] Messages deferred by 1 (83→84)
+2026-02-11T09:19:12.036Z [DEBUG] Aborting: tool=Bash isAbort=undefined hasFeedback=false isSubagent=false
+2026-02-11T09:19:12.040Z [DEBUG] Bash tool permission denied
+2026-02-11T09:19:12.091Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801552091
+2026-02-11T09:19:12.091Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:19:12.092Z [DEBUG] Temp file written successfully, size: 10592 bytes
+2026-02-11T09:19:12.092Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:19:12.093Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801552091 to C:\Users\User\.claude.json
+2026-02-11T09:19:12.093Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:19:12.102Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801552102
+2026-02-11T09:19:12.103Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:19:12.104Z [DEBUG] Temp file written successfully, size: 10592 bytes
+2026-02-11T09:19:12.104Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:19:12.104Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801552102 to C:\Users\User\.claude.json
+2026-02-11T09:19:12.105Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:19:12.111Z [DEBUG] [useDeferredValue] Messages deferred by 2 (84→86)
+2026-02-11T09:19:12.158Z [DEBUG] [Todo Migration] Skipping migration - 2 tasks already exist
+2026-02-11T09:19:12.169Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-11T09:20:12.180Z [DEBUG] Getting matching hook commands for Notification with query: idle_prompt
+2026-02-11T09:20:12.180Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:20:12.180Z [DEBUG] Matched 0 unique hooks for query "idle_prompt" (0 before deduplication)
+2026-02-11T09:22:41.174Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-11T09:22:41.174Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-11T09:22:41.174Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-11T09:22:41.174Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-11T09:22:41.181Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-02-11T09:22:41.181Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:22:41.181Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-11T09:22:41.183Z [DEBUG] FileHistory: Making snapshot for message fd0ea598-fc24-421d-9479-23dd03b650a2
+2026-02-11T09:22:41.183Z [DEBUG] FileHistory: Added snapshot for fd0ea598-fc24-421d-9479-23dd03b650a2, tracking 0 files
+2026-02-11T09:22:41.187Z [DEBUG] [useDeferredValue] Messages deferred by 1 (86→87)
+2026-02-11T09:22:41.239Z [DEBUG] [Todo Migration] Skipping migration - 2 tasks already exist
+2026-02-11T09:22:41.248Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-02-11T09:22:41.249Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-02-11T09:22:41.251Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.57c; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:22:41.256Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:22:41.256Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:22:41.261Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:22:41.267Z [DEBUG] autocompact: tokens=92243 threshold=167000 effectiveWindow=180000
+2026-02-11T09:22:41.274Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:22:41.275Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:22:41.303Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:22:41.310Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:22:41.310Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:22:41.314Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:22:41.334Z [DEBUG] [useDeferredValue] Messages deferred by 1 (86→87)
+2026-02-11T09:22:42.006Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:22:43.752Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:22:43.772Z [DEBUG] [useDeferredValue] Messages deferred by 1 (87→88)
+2026-02-11T09:22:44.545Z [DEBUG] [useDeferredValue] Messages deferred by 1 (88→89)
+2026-02-11T09:22:45.563Z [DEBUG] [useDeferredValue] Messages deferred by 1 (89→90)
+2026-02-11T09:22:45.613Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-02-11T09:22:45.613Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:22:45.613Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-11T09:22:45.614Z [DEBUG] autocompact: tokens=92628 threshold=167000 effectiveWindow=180000
+2026-02-11T09:22:45.628Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: query]
+2026-02-11T09:22:45.629Z [DEBUG] Using tool-based global cache marker on TaskList
+2026-02-11T09:22:45.668Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801765668
+2026-02-11T09:22:45.668Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:22:45.669Z [DEBUG] Temp file written successfully, size: 10593 bytes
+2026-02-11T09:22:45.669Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:22:45.669Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801765668 to C:\Users\User\.claude.json
+2026-02-11T09:22:45.670Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:22:45.677Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801765677
+2026-02-11T09:22:45.677Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:22:45.678Z [DEBUG] Temp file written successfully, size: 10593 bytes
+2026-02-11T09:22:45.678Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:22:45.678Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801765677 to C:\Users\User\.claude.json
+2026-02-11T09:22:45.679Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:22:45.697Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.39.c39; cc_entrypoint=cli; cch=00000;
+2026-02-11T09:22:45.704Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T09:22:45.704Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T09:22:45.708Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T09:22:45.723Z [DEBUG] [useDeferredValue] Messages deferred by 1 (89→90)
+2026-02-11T09:22:47.751Z [DEBUG] Stream started - received first chunk
+2026-02-11T09:22:48.087Z [DEBUG] Forked agent [prompt_suggestion] received message: type=assistant
+2026-02-11T09:22:48.113Z [DEBUG] Getting matching hook commands for SubagentStop with query:
+2026-02-11T09:22:48.113Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T09:22:48.113Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-11T09:22:48.114Z [DEBUG] Forked agent [prompt_suggestion] finished: 1 messages, types=[assistant], totalUsage: input=3 output=16 cacheRead=92262 cacheCreate=381
+2026-02-11T09:22:48.116Z [DEBUG] [Speculation] enabled=false
+2026-02-11T09:22:53.751Z [DEBUG] [onCancel] focusedInputDialog=undefined streamMode=tool-use
+2026-02-11T09:22:53.773Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.47364.1770801773773
+2026-02-11T09:22:53.774Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T09:22:53.774Z [DEBUG] Temp file written successfully, size: 10594 bytes
+2026-02-11T09:22:53.774Z [DEBUG] Applied original permissions to temp file
+2026-02-11T09:22:53.774Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.47364.1770801773773 to C:\Users\User\.claude.json
+2026-02-11T09:22:53.775Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T09:22:56.512Z [DEBUG] High write ratio: blit=0, write=209570 (100.0% writes), screen=1348x168
+2026-02-11T09:22:56.528Z [DEBUG] [Todo Migration] Skipping migration - 2 tasks already exist
+2026-02-11T09:22:56.533Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CitedBy.ai — Join the Waitlist</title>
+    <meta name="description" content="Be the first to know when AI recommends your brand. Join as a founding member and lock in exclusive lifetime pricing." />
+    <meta property="og:title" content="CitedBy.ai — Join the Waitlist" />
+    <meta property="og:description" content="The first platform for Answer Engine Optimization. Measure how AI engines cite your brand." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+// components/layout/TopNav.tsx
+// Barre horizontale — style Linear/Vercel, glassmorphism subtil
+// Desktop : barre fixe pleine largeur
+// Mobile  : masquée (la navigation mobile est dans Sidebar.tsx)
+
+import React from 'react';
+import { Coins } from 'lucide-react';
+
+const SECTIONS = [
+  { id: 'dashboard',    label: 'Dashboard' },
+  { id: 'analyse',      label: 'Analyse' },
+  { id: 'citations',    label: 'Citations' },
+  { id: 'outils',       label: 'Outils' },
+  { id: 'technique',    label: 'Technique' },
+  { id: 'marketplace',  label: 'Marketplace' },
+  { id: 'compte',       label: 'Compte' },
+];
+
+export { SECTIONS };
+
+interface TopNavProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+  credits: number;
+  user: { name: string; email: string } | null;
+  onOpenCommandPalette?: () => void;
+  onLogoClick?: () => void;
+}
+
+export default function TopNav({
+  activeSection,
+  onSectionChange,
+  credits,
+  user,
+  onOpenCommandPalette,
+  onLogoClick,
+}: TopNavProps) {
+  return (
+    <header className="hidden md:flex h-14 shrink-0 bg-[var(--bg-base)] border-b border-[var(--border-subtle)] items-center">
+
+      {/* ── Left — Logo (aligned with sidebar width) ── */}
+      <div
+        className="w-60 flex items-center px-5 h-full border-r border-[var(--border-subtle)] cursor-pointer flex-shrink-0"
+        onClick={onLogoClick}
+      >
+        <span className="text-[var(--text-primary)] font-semibold text-[15px] tracking-tight">Cited</span>
+        <span className="text-[var(--accent-text)] font-semibold text-[15px]">By</span>
+        <span className="text-[var(--text-tertiary)] font-normal text-[13px]">.ai</span>
+      </div>
+
+      {/* ── Center — Section tabs ── */}
+      <nav className="flex items-center gap-0.5 px-2 flex-1">
+        {SECTIONS.map(section => (
+          <button
+            key={section.id}
+            onClick={() => onSectionChange(section.id)}
+            className={`px-3 py-1.5 rounded-md text-[13px] font-medium cursor-pointer transition-all duration-150 ${
+              activeSection === section.id
+                ? 'text-[var(--text-primary)] bg-[var(--bg-surface)]'
+                : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]'
+            }`}
+          >
+            {section.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* ── Right — ⌘K + Credits + Avatar ── */}
+      <div className="flex items-center gap-3 pr-4 flex-shrink-0">
+        {onOpenCommandPalette && (
+          <button
+            onClick={onOpenCommandPalette}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--border-default)] text-[var(--text-disabled)] text-xs hover:border-[var(--border-strong)] hover:text-[var(--text-tertiary)] transition-all"
+          >
+            <kbd className="font-mono text-[11px]">⌘K</kbd>
+          </button>
+        )}
+
+        {user && (
+          <div className="flex items-center gap-1.5 text-[13px] text-[var(--text-tertiary)]">
+            <span className="font-medium text-[var(--text-secondary)]">{credits}</span>
+            <Coins className="w-3.5 h-3.5 text-[var(--accent-text)]" />
+          </div>
+        )}
+
+        <div className="h-5 w-px bg-[var(--border-default)]" />
+
+        {user && (
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[11px] text-white font-semibold ring-2 ring-[var(--border-subtle)] ring-offset-1 ring-offset-[var(--bg-base)]">
+            {user.name?.charAt(0)?.toUpperCase() || 'U'}
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}

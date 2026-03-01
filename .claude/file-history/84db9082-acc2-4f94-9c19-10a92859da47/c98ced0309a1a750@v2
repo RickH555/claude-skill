@@ -1,0 +1,213 @@
+import { chromium } from 'playwright';
+
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+
+  // Login first
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+  console.log('Logged in.\n');
+
+  // ===== PHASE 1: Check all known routes =====
+  console.log('=== PHASE 1: Direct route checks ===\n');
+
+  const routes = [
+    // Public pages
+    '/',
+    '/pricing',
+    '/login',
+    '/signup',
+    '/forgot-password',
+    '/features',
+    '/docs',
+    '/about',
+    '/contact',
+    '/blog',
+    '/terms',
+    '/privacy',
+    '/changelog',
+
+    // Dashboard
+    '/dashboard',
+    '/dashboard/documents',
+    '/dashboard/documents/upload',
+    '/dashboard/surveys',
+    '/dashboard/surveys/create',
+    '/dashboard/templates',
+    '/dashboard/templates/new',
+    '/dashboard/settings',
+    '/dashboard/settings/team',
+    '/dashboard/settings/billing',
+    '/dashboard/settings/api-keys',
+
+    // Additional dashboard pages that might exist
+    '/dashboard/analytics',
+    '/dashboard/activity',
+    '/dashboard/export',
+    '/dashboard/integrations',
+    '/dashboard/notifications',
+    '/dashboard/profile',
+    '/dashboard/help',
+    '/dashboard/documents/templates',
+    '/dashboard/surveys/analytics',
+    '/dashboard/settings/security',
+    '/dashboard/settings/notifications',
+    '/dashboard/settings/integrations',
+    '/dashboard/settings/export',
+  ];
+
+  const results = [];
+
+  for (const route of routes) {
+    const resp = await page.goto(`${APP}${route}`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null);
+    const status = resp?.status() || 'ERR';
+    const url = page.url();
+    const body = await page.textContent('body').catch(() => '');
+    const is404 = status === 404 || body.includes('404') || body.includes('not found') || body.includes('Not Found') || body.includes('page could not be found');
+    const isRedirect = url !== `${APP}${route}` && !url.includes(route);
+
+    let state = 'OK';
+    if (is404) state = '404';
+    else if (isRedirect) state = `REDIRECT -> ${url.replace(APP, '')}`;
+
+    results.push({ route, status, state });
+    const icon = state === 'OK' ? 'OK' : state.startsWith('404') ? '404' : 'REDIR';
+    console.log(`  [${icon}] ${route} (HTTP ${status})${state !== 'OK' && !state.startsWith('404') ? ' -> ' + state : ''}`);
+  }
+
+  // ===== PHASE 2: Find all internal links on each working page =====
+  console.log('\n=== PHASE 2: Scanning all <a> links from dashboard ===\n');
+
+  const pagesToScan = [
+    '/dashboard',
+    '/dashboard/documents',
+    '/dashboard/documents/upload',
+    '/dashboard/surveys',
+    '/dashboard/surveys/create',
+    '/dashboard/templates',
+    '/dashboard/templates/new',
+    '/dashboard/settings',
+    '/dashboard/settings/team',
+    '/dashboard/settings/billing',
+    '/dashboard/settings/api-keys',
+    '/',
+    '/pricing',
+  ];
+
+  const allLinks = new Set();
+
+  for (const scanPage of pagesToScan) {
+    await page.goto(`${APP}${scanPage}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => null);
+    await page.waitForTimeout(1000);
+
+    const links = await page.evaluate(() => {
+      return [...document.querySelectorAll('a[href]')].map(a => a.getAttribute('href')).filter(h => h && (h.startsWith('/') || h.includes(location.host)) && !h.startsWith('/_next'));
+    });
+
+    links.forEach(l => {
+      // Normalize
+      const clean = l.replace(APP, '').split('?')[0].split('#')[0];
+      if (clean && clean !== '/' && !clean.startsWith('http')) allLinks.add(clean);
+    });
+  }
+
+  console.log(`Found ${allLinks.size} unique internal links:\n`);
+
+  const linkResults = [];
+  for (const link of [...allLinks].sort()) {
+    // Skip already tested routes
+    if (results.some(r => r.route === link)) {
+      const existing = results.find(r => r.route === link);
+      console.log(`  [${existing.state === 'OK' ? 'OK' : existing.state.startsWith('404') ? '404' : 'REDIR'}] ${link} (already tested)`);
+      linkResults.push({ link, state: existing.state });
+      continue;
+    }
+
+    const resp = await page.goto(`${APP}${link}`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null);
+    const status = resp?.status() || 'ERR';
+    const body = await page.textContent('body').catch(() => '');
+    const is404 = status === 404 || body.includes('404') || body.includes('not found') || body.includes('Not Found') || body.includes('page could not be found');
+
+    const state = is404 ? '404' : 'OK';
+    linkResults.push({ link, state, status });
+    console.log(`  [${state}] ${link} (HTTP ${status})`);
+  }
+
+  // ===== PHASE 3: Check sidebar and navbar button clicks =====
+  console.log('\n=== PHASE 3: Checking sidebar navigation items ===\n');
+
+  await page.goto(`${APP}/dashboard`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+
+  // Get all sidebar links
+  const sidebarLinks = await page.evaluate(() => {
+    const sidebar = document.querySelector('aside, nav, [class*="sidebar"], [class*="Sidebar"]');
+    if (!sidebar) return [];
+    return [...sidebar.querySelectorAll('a[href]')].map(a => ({
+      href: a.getAttribute('href'),
+      text: a.textContent?.trim()
+    }));
+  });
+
+  console.log(`Sidebar links found: ${sidebarLinks.length}`);
+  for (const sl of sidebarLinks) {
+    console.log(`  - "${sl.text}" -> ${sl.href}`);
+  }
+
+  // ===== PHASE 4: Check navbar links on landing page =====
+  console.log('\n=== PHASE 4: Navbar links on landing page ===\n');
+
+  await page.goto(APP, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1000);
+
+  const navLinks = await page.evaluate(() => {
+    const nav = document.querySelector('header, nav');
+    if (!nav) return [];
+    return [...nav.querySelectorAll('a[href]')].map(a => ({
+      href: a.getAttribute('href'),
+      text: a.textContent?.trim()
+    }));
+  });
+
+  console.log(`Navbar links: ${navLinks.length}`);
+  for (const nl of navLinks) {
+    console.log(`  - "${nl.text}" -> ${nl.href}`);
+    // Test if it's a page link (not anchor)
+    if (nl.href.startsWith('/') && !nl.href.startsWith('/#') && !nl.href.startsWith('/_')) {
+      const resp = await page.goto(`${APP}${nl.href}`, { waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => null);
+      const status = resp?.status() || 'ERR';
+      const body = await page.textContent('body').catch(() => '');
+      const is404 = status === 404 || body.includes('404') || body.includes('not found') || body.includes('Not Found') || body.includes('page could not be found');
+      console.log(`    -> ${is404 ? '404 NOT FOUND' : 'OK'} (HTTP ${status})`);
+    }
+  }
+
+  // ===== SUMMARY =====
+  console.log('\n========================================');
+  console.log('SUMMARY: Routes returning 404');
+  console.log('========================================\n');
+
+  const all404 = [
+    ...results.filter(r => r.state === '404').map(r => r.route),
+    ...linkResults.filter(r => r.state === '404').map(r => r.link),
+  ];
+
+  const unique404 = [...new Set(all404)].sort();
+
+  if (unique404.length === 0) {
+    console.log('No 404s found!');
+  } else {
+    unique404.forEach(r => console.log(`  404: ${r}`));
+  }
+
+  console.log(`\nTotal: ${unique404.length} broken routes`);
+
+  await browser.close();
+})();

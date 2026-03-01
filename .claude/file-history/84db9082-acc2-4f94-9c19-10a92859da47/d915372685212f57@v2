@@ -1,0 +1,13 @@
+-- ============================================================================
+-- FIX: Allow anonymous access to active surveys and response submission
+--
+-- Problem: RLS on surveys only allows org members to SELECT.
+-- Public survey pages (/s/[id]) need anonymous read access for active surveys.
+-- Response submission also needs to read the survey to check status.
+--
+-- Solution: Add a SELECT policy for anonymous users on active surveys.
+-- ============================================================================
+
+-- Allow anyone to view active surveys (needed for public survey pages)
+CREATE POLICY "Anyone can view active surveys" ON public.surveys
+  FOR SELECT USING (status = 'active');

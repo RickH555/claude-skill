@@ -1,0 +1,402 @@
+import React, { useState } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { ArrowLeft, Activity, Search, TrendingUp, TrendingDown, Eye, MessageSquare, Loader2, Zap, BarChart3, Users } from 'lucide-react';
+import { MonitoringResult } from '../types/ai-monitoring';
+import { scanBrandVisibility } from '../services/ai-monitoring';
+import { User } from '../types';
+
+interface AiMonitoringProps {
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  onBack: () => void;
+}
+
+const SCAN_COST = 5;
+
+const ENGINE_COLORS: Record<string, string> = {
+  chatgpt: '#74aa9c',
+  claude: '#d97706',
+  perplexity: '#3b82f6',
+  gemini: '#8b5cf6',
+  aiOverviews: '#f43f5e'
+};
+
+const ENGINE_LABELS: Record<string, string> = {
+  chatgpt: 'ChatGPT',
+  claude: 'Claude',
+  perplexity: 'Perplexity',
+  gemini: 'Gemini',
+  aiOverviews: 'AI Overviews'
+};
+
+const AiMonitoring: React.FC<AiMonitoringProps> = ({ user, onDeductCredits, onBack }) => {
+  const [brandName, setBrandName] = useState('');
+  const [brandUrl, setBrandUrl] = useState('');
+  const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
+  const [isScanning, setIsScanning] = useState(false);
+  const [results, setResults] = useState<MonitoringResult | null>(null);
+
+  const handleScan = async () => {
+    if (!brandName || !brandUrl) return;
+    if (!user) {
+      alert('Veuillez vous connecter pour utiliser cette fonctionnalité.');
+      return;
+    }
+    if (user.credits < SCAN_COST) {
+      alert(`Solde insuffisant (${user.credits} crédits). Ce scan nécessite ${SCAN_COST} crédits.`);
+      return;
+    }
+
+    const success = onDeductCredits(SCAN_COST);
+    if (!success) return;
+
+    setIsScanning(true);
+    try {
+      const data = await scanBrandVisibility(brandName, brandUrl, period);
+      setResults(data);
+    } catch (error) {
+      console.error('Scan failed:', error);
+      alert('Erreur lors du scan. Veuillez réessayer.');
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  };
+
+  const getSentimentEmoji = (sentiment: string) => {
+    if (sentiment === 'positive') return '🟢';
+    if (sentiment === 'negative') return '🔴';
+    return '⚪';
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-500">
+      {/* Header */}
+      <button onClick={onBack} className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors">
+        <ArrowLeft size={18} className="mr-2" /> Retour
+      </button>
+
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+            <Activity size={20} className="text-blue-400" />
+          </div>
+          <h1 className="text-3xl font-serif font-bold text-white">Monitoring IA</h1>
+        </div>
+        <p className="text-gray-400 ml-13">Suivez les citations de votre marque sur ChatGPT, Claude, Perplexity, Gemini et AI Overviews.</p>
+      </div>
+
+      {/* Input Form */}
+      {!results && (
+        <div className="max-w-2xl mx-auto">
+          <div className="glass-panel rounded-2xl border border-white/10 p-8 space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1.5 block">Nom de la marque</label>
+                <input
+                  type="text"
+                  value={brandName}
+                  onChange={e => setBrandName(e.target.value)}
+                  placeholder="Ex: CitedBy.ai"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-primary/50 focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1.5 block">URL du site</label>
+                <input
+                  type="url"
+                  value={brandUrl}
+                  onChange={e => setBrandUrl(e.target.value)}
+                  placeholder="https://citedby.ai"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-primary/50 focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1.5 block">Période d'analyse</label>
+                <div className="flex gap-2">
+                  {(['7d', '30d', '90d'] as const).map(p => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriod(p)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        period === p
+                          ? 'bg-primary text-black'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10'
+                      }`}
+                    >
+                      {p === '7d' ? '7 jours' : p === '30d' ? '30 jours' : '90 jours'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={handleScan}
+              disabled={isScanning || !brandName || !brandUrl}
+              className="w-full py-3.5 bg-primary text-black font-bold rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isScanning ? (
+                <><Loader2 size={18} className="animate-spin" /> Scan en cours...</>
+              ) : (
+                <><Search size={18} /> Scanner ({SCAN_COST} Gas)</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Results */}
+      {results && (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {/* Reset button */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">{results.brandName}</h2>
+              <p className="text-sm text-gray-400">{results.brandUrl} — Période : {results.period === '7d' ? '7 jours' : results.period === '30d' ? '30 jours' : '90 jours'}</p>
+            </div>
+            <button onClick={() => setResults(null)} className="text-sm text-primary hover:text-white transition-colors flex items-center gap-1">
+              <Search size={14} /> Nouveau scan
+            </button>
+          </div>
+
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="glass-panel p-5 rounded-xl border border-white/10">
+              <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+                <MessageSquare size={14} />
+                <span>Total Citations</span>
+              </div>
+              <div className="text-3xl font-bold text-white">{results.totalCitations}</div>
+              <div className={`text-xs mt-1 flex items-center gap-1 ${results.trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {results.trend >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {results.trend >= 0 ? '+' : ''}{results.trend}%
+              </div>
+            </div>
+
+            <div className="glass-panel p-5 rounded-xl border border-white/10">
+              <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+                <Eye size={14} />
+                <span>Share of Voice</span>
+              </div>
+              <div className="text-3xl font-bold text-white">{results.shareOfVoice}%</div>
+              <div className="h-1.5 bg-white/10 rounded-full mt-2">
+                <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${results.shareOfVoice}%` }} />
+              </div>
+            </div>
+
+            <div className="glass-panel p-5 rounded-xl border border-white/10">
+              <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+                <Zap size={14} />
+                <span>Sentiment</span>
+              </div>
+              <div className="text-3xl font-bold text-emerald-400">{results.overallSentiment.positive}%</div>
+              <div className="flex h-1.5 rounded-full overflow-hidden mt-2 gap-0.5">
+                <div className="bg-emerald-500 rounded-l-full" style={{ width: `${results.overallSentiment.positive}%` }} />
+                <div className="bg-gray-500" style={{ width: `${results.overallSentiment.neutral}%` }} />
+                <div className="bg-red-500 rounded-r-full" style={{ width: `${results.overallSentiment.negative}%` }} />
+              </div>
+            </div>
+
+            <div className="glass-panel p-5 rounded-xl border border-white/10">
+              <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+                <TrendingUp size={14} />
+                <span>Tendance</span>
+              </div>
+              <div className={`text-3xl font-bold ${results.trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {results.trend >= 0 ? '+' : ''}{results.trend}%
+              </div>
+              <p className="text-xs text-gray-500 mt-1">vs période précédente</p>
+            </div>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Area Chart - Citations over time */}
+            <div className="glass-panel p-6 rounded-xl border border-white/10">
+              <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <BarChart3 size={18} className="text-primary" />
+                Citations dans le temps
+              </h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={results.timeSeriesData}>
+                    <defs>
+                      {Object.entries(ENGINE_COLORS).map(([key, color]) => (
+                        <linearGradient key={key} id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+                          <stop offset="95%" stopColor={color} stopOpacity={0} />
+                        </linearGradient>
+                      ))}
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                    <XAxis dataKey="date" tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={formatDate} />
+                    <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white' }}
+                      labelFormatter={formatDate}
+                    />
+                    {Object.entries(ENGINE_COLORS).map(([key, color]) => (
+                      <Area
+                        key={key}
+                        type="monotone"
+                        dataKey={key}
+                        stackId="1"
+                        stroke={color}
+                        fill={`url(#gradient-${key})`}
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex justify-center gap-4 mt-3">
+                {Object.entries(ENGINE_LABELS).map(([key, label]) => (
+                  <div key={key} className="flex items-center gap-1.5 text-xs text-gray-400">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ENGINE_COLORS[key] }} />
+                    {label}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bar Chart - Citations by engine */}
+            <div className="glass-panel p-6 rounded-xl border border-white/10">
+              <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <BarChart3 size={18} className="text-blue-400" />
+                Répartition par moteur IA
+              </h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={results.engineResults.map(e => ({
+                      name: ENGINE_LABELS[e.engine],
+                      citations: e.citations,
+                      color: ENGINE_COLORS[e.engine]
+                    }))}
+                    layout="vertical"
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                    <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 11 }} />
+                    <YAxis dataKey="name" type="category" tick={{ fill: '#9ca3af', fontSize: 12 }} width={100} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white' }}
+                    />
+                    <Bar dataKey="citations" radius={[0, 6, 6, 0]}>
+                      {results.engineResults.map((entry, index) => (
+                        <Cell key={index} fill={ENGINE_COLORS[entry.engine]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Engine details */}
+              <div className="mt-4 space-y-2">
+                {results.engineResults.map(e => (
+                  <div key={e.engine} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ENGINE_COLORS[e.engine] }} />
+                      <span className="text-gray-300">{ENGINE_LABELS[e.engine]}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-gray-500">SoV: {e.shareOfVoice}%</span>
+                      <span className={`text-xs ${e.trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {e.trend >= 0 ? '+' : ''}{e.trend}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Citations Table */}
+          <div className="glass-panel rounded-xl border border-white/10 overflow-hidden">
+            <div className="p-6 border-b border-white/5">
+              <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                <MessageSquare size={18} className="text-emerald-400" />
+                Citations récentes
+              </h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-white/5 text-gray-400 text-xs uppercase tracking-wider">
+                  <tr>
+                    <th className="p-4 font-medium">Moteur</th>
+                    <th className="p-4 font-medium">Requête</th>
+                    <th className="p-4 font-medium">Position</th>
+                    <th className="p-4 font-medium">Date</th>
+                    <th className="p-4 font-medium">Sentiment</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {results.recentCitations.map(citation => (
+                    <tr key={citation.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="p-4">
+                        <span
+                          className="text-xs font-bold px-2.5 py-1 rounded-full"
+                          style={{
+                            backgroundColor: ENGINE_COLORS[citation.engine] + '20',
+                            color: ENGINE_COLORS[citation.engine]
+                          }}
+                        >
+                          {ENGINE_LABELS[citation.engine]}
+                        </span>
+                      </td>
+                      <td className="p-4 text-sm text-gray-300 max-w-[300px] truncate">{citation.query}</td>
+                      <td className="p-4">
+                        <span className="text-sm font-bold text-white">#{citation.position}</span>
+                      </td>
+                      <td className="p-4 text-sm text-gray-500">{formatDate(citation.date)}</td>
+                      <td className="p-4 text-sm">{getSentimentEmoji(citation.sentiment)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Competitors */}
+          <div className="glass-panel rounded-xl border border-white/10 p-6">
+            <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+              <Users size={18} className="text-violet-400" />
+              Comparaison concurrents
+            </h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              {results.competitors.map((comp, i) => (
+                <div key={i} className="bg-white/5 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-white">{comp.name}</h4>
+                    <span className={`text-xs font-medium ${comp.trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {comp.trend >= 0 ? '+' : ''}{comp.trend}%
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Citations</span>
+                      <span className="text-white font-medium">{comp.citations}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Share of Voice</span>
+                      <span className="text-white font-medium">{comp.shareOfVoice}%</span>
+                    </div>
+                    <div className="h-1.5 bg-white/10 rounded-full">
+                      <div className="h-full bg-violet-500/60 rounded-full" style={{ width: `${comp.shareOfVoice}%` }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AiMonitoring;

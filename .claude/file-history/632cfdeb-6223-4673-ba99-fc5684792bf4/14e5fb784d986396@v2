@@ -1,0 +1,199 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useWorkspace } from "@/lib/workspace-context";
+import { toast } from "sonner";
+import { Check, CreditCard, Zap, Crown, Building2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const PLANS = [
+  {
+    id: "starter",
+    name: "Starter",
+    price: "Gratuit",
+    description: "Pour decouvrir l'AEO",
+    icon: Zap,
+    features: [
+      "1 projet",
+      "100 credits/mois",
+      "Analyse AEO basique",
+      "3 generations de contenu",
+      "Export PDF",
+    ],
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: "49€/mois",
+    description: "Pour les entreprises en croissance",
+    icon: Crown,
+    popular: true,
+    features: [
+      "5 projets",
+      "1 000 credits/mois",
+      "Monitoring IA temps reel",
+      "Generations illimitees",
+      "Benchmark concurrents",
+      "Rapports automatises",
+      "Support prioritaire",
+    ],
+  },
+  {
+    id: "agency",
+    name: "Agency",
+    price: "199€/mois",
+    description: "Pour les agences et grands comptes",
+    icon: Building2,
+    features: [
+      "Projets illimites",
+      "10 000 credits/mois",
+      "Multi-utilisateurs & roles",
+      "API access",
+      "White-label rapports",
+      "Onboarding dedie",
+      "Account manager",
+      "SLA garanti",
+    ],
+  },
+];
+
+export default function BillingPage() {
+  const { workspace, reload } = useWorkspace();
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const currentPlan = workspace?.plan || "starter";
+
+  const handleUpgrade = async (planId: string) => {
+    if (planId === currentPlan) return;
+
+    setLoading(planId);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId: workspace?.id, plan: planId }),
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.error || "Erreur lors de la redirection");
+      }
+    } catch {
+      toast.error("Erreur de connexion");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    setLoading("portal");
+    try {
+      const res = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId: workspace?.id }),
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.error || "Erreur lors de l'ouverture du portail");
+      }
+    } catch {
+      toast.error("Erreur de connexion");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  return (
+    <div className="p-8 max-w-6xl mx-auto">
+      <header className="mb-8">
+        <h1 className="text-3xl font-serif font-bold text-white mb-2">Abonnement</h1>
+        <p className="text-white/50">Gerez votre plan et votre facturation.</p>
+      </header>
+
+      {/* Current Plan Banner */}
+      <Card variant="elevated" className="mb-8 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-primary/10">
+              <CreditCard size={24} className="text-primary" />
+            </div>
+            <div>
+              <p className="text-sm text-white/50">Plan actuel</p>
+              <p className="text-xl font-bold text-white capitalize">{currentPlan}</p>
+            </div>
+          </div>
+          {currentPlan !== "starter" && (
+            <Button variant="outline" onClick={handleManageBilling} isLoading={loading === "portal"}>
+              Gerer la facturation
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      {/* Plans Grid */}
+      <div className="grid md:grid-cols-3 gap-6">
+        {PLANS.map((plan) => {
+          const isCurrent = plan.id === currentPlan;
+
+          return (
+            <Card
+              key={plan.id}
+              variant={plan.popular ? "elevated" : "default"}
+              className={cn(
+                "relative flex flex-col",
+                plan.popular && "border-primary/30 ring-1 ring-primary/20"
+              )}
+            >
+              {plan.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge variant="success">Populaire</Badge>
+                </div>
+              )}
+
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <plan.icon size={20} className="text-primary" />
+                  <CardTitle>{plan.name}</CardTitle>
+                </div>
+                <CardDescription>{plan.description}</CardDescription>
+                <p className="text-3xl font-bold text-white mt-3">{plan.price}</p>
+              </CardHeader>
+
+              <CardContent className="flex-1">
+                <ul className="space-y-3">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-sm text-white/70">
+                      <Check size={16} className="text-primary shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  variant={isCurrent ? "outline" : "default"}
+                  disabled={isCurrent}
+                  isLoading={loading === plan.id}
+                  onClick={() => handleUpgrade(plan.id)}
+                >
+                  {isCurrent ? "Plan actuel" : "Passer a ce plan"}
+                </Button>
+              </CardFooter>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

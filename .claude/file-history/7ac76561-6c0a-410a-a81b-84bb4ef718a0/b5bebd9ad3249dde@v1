@@ -1,0 +1,440 @@
+import React, { useState, useEffect } from 'react';
+import { AnalysisResult, User, SMCContent } from '../types';
+import { generateOptimizedRobotsTxt, parseCurrentRobotsTxt, getDetectedPlatformName } from '../services/robots_service';
+import { ArrowLeft, FileCode, Download, Copy, Check, Bot, ShieldCheck, AlertTriangle, RefreshCw, ChevronDown, History, Server, Eye, Settings, FileJson, Globe, Terminal, Lock, Zap, Archive } from 'lucide-react';
+
+interface Props {
+  onBack: () => void;
+  history: AnalysisResult[];
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  onUpdateAnalysis: (index: number, data: Partial<AnalysisResult>) => void;
+  savedFiles: SMCContent[];
+  onSaveFile: (item: SMCContent) => void;
+}
+
+const RobotsTxt: React.FC<Props> = ({ onBack, history, user, onDeductCredits, onUpdateAnalysis, savedFiles, onSaveFile }) => {
+  const [selectedAnalysisIndex, setSelectedAnalysisIndex] = useState<number>(0);
+  const [currentContent, setCurrentContent] = useState('');
+  const [optimizedContent, setOptimizedContent] = useState('');
+  const [platformName, setPlatformName] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+
+  const GENERATION_COST = 10;
+
+  // Initialize with data from history
+  useEffect(() => {
+    const processUrl = (analysis: AnalysisResult | undefined) => {
+        if (!analysis) {
+            // Mode Demo / Fallback
+            const demoUrl = "https://monsite-wordpress.com";
+            setCurrentContent(parseCurrentRobotsTxt(demoUrl));
+            setOptimizedContent(generateOptimizedRobotsTxt(demoUrl));
+            setPlatformName(getDetectedPlatformName(demoUrl));
+            setIsUnlocked(false);
+            return;
+        }
+
+        const url = analysis.url;
+        setCurrentContent(parseCurrentRobotsTxt(url));
+        setPlatformName(getDetectedPlatformName(url));
+
+        // Check if previously unlocked/saved in history
+        if (analysis.robotsTxtData && analysis.robotsTxtData.isUnlocked) {
+            setOptimizedContent(analysis.robotsTxtData.content);
+            setIsUnlocked(true);
+        } else {
+            // Fresh generation (locked)
+            setOptimizedContent(generateOptimizedRobotsTxt(url));
+            setIsUnlocked(false);
+        }
+    };
+
+    if (history.length > 0) {
+      processUrl(history[selectedAnalysisIndex]);
+    } else {
+      processUrl(undefined);
+    }
+  }, [selectedAnalysisIndex, history]);
+
+  const handleUnlock = () => {
+    // La vérification de connexion et de solde est gérée par onDeductCredits
+    if (onDeductCredits(GENERATION_COST)) {
+        setIsUnlocked(true);
+        
+        // Persist to analysis history
+        if (history.length > 0) {
+            onUpdateAnalysis(selectedAnalysisIndex, {
+                robotsTxtData: {
+                    content: optimizedContent,
+                    isUnlocked: true,
+                    platform: platformName,
+                    generatedAt: new Date().toISOString()
+                }
+            });
+        }
+
+        // Save to file history
+        onSaveFile({
+            id: `robots_${Date.now()}`,
+            type: 'fiche', // Generic
+            title: `Robots.txt - ${history[selectedAnalysisIndex]?.url || 'Demo'}`,
+            content: optimizedContent,
+            timestamp: new Date().toISOString()
+        });
+    }
+  };
+
+  const handleDownload = (filename?: string, content?: string) => {
+    const blob = new Blob([content || optimizedContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'robots.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopy = (content?: string) => {
+    navigator.clipboard.writeText(content || optimizedContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getImplementationSteps = (platform: string) => {
+    if (platform.includes('WordPress')) {
+      return {
+        title: "Installation sur WordPress",
+        icon: <Settings size={20} />,
+        steps: [
+          "Connectez-vous à votre tableau de bord WordPress (/wp-admin).",
+          "Si vous utilisez Yoast SEO : Allez dans 'SEO' → 'Outils' → 'Éditeur de fichiers'.",
+          "Si vous utilisez RankMath : Allez dans 'Rank Math' → 'Réglages généraux' → 'Modifier robots.txt'.",
+          "Si aucun plugin SEO : Utilisez un plugin 'File Manager' ou un accès FTP.",
+          "Copiez le code généré ci-dessus et remplacez tout le contenu existant.",
+          "Sauvegardez les modifications."
+        ]
+      };
+    }
+    if (platform.includes('Shopify')) {
+      return {
+        title: "Installation sur Shopify",
+        icon: <FileJson size={20} />,
+        steps: [
+          "Depuis votre admin Shopify, allez dans 'Boutique en ligne' → 'Thèmes'.",
+          "Cliquez sur le bouton 'Actions' (ou les trois points) → 'Modifier le code'.",
+          "Dans la barre de recherche de fichiers, tapez 'robots'.",
+          "Cliquez sur 'Ajouter un nouveau modèle' → sélectionnez 'robots.txt' si robots.txt.liquid n'existe pas.",
+          "Collez le code optimisé dans le fichier.",
+          "Cliquez sur 'Enregistrer' en haut à droite."
+        ]
+      };
+    }
+    if (platform.includes('SaaS') || platform.includes('App')) {
+      return {
+        title: "Installation App Web (React/Next.js/Vue)",
+        icon: <Terminal size={20} />,
+        steps: [
+          "Localisez le dossier 'public' ou 'static' à la racine de votre projet.",
+          "Créez ou modifiez le fichier nommé 'robots.txt'.",
+          "Collez le contenu généré.",
+          "Pour Next.js (App Router) : Vous pouvez alternativement créer un fichier `app/robots.ts` et retourner cet objet.",
+          "Redéployez votre application pour appliquer les changements."
+        ]
+      };
+    }
+    // Default
+    return {
+      title: "Installation Standard (Apache/Nginx/FTP)",
+      icon: <Server size={20} />,
+      steps: [
+        "Connectez-vous à votre serveur via FTP (FileZilla) ou Gestionnaire de fichiers (cPanel).",
+        "Naviguez vers le dossier racine publique (souvent /public_html/ ou /www/).",
+        "Cherchez le fichier 'robots.txt'. S'il n'existe pas, créez-le.",
+        "Ouvrez le fichier avec un éditeur de texte.",
+        "Collez le code généré ci-dessus et sauvegardez.",
+        "Vérifiez l'accès en allant sur votre-site.com/robots.txt"
+      ]
+    };
+  };
+
+  const guide = getImplementationSteps(platformName);
+
+  const handleRestore = (content: string) => {
+      setOptimizedContent(content);
+      setIsUnlocked(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-10 animate-in fade-in duration-500 min-h-screen">
+      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-white mb-6 transition-colors">
+        <ArrowLeft size={18} className="mr-2" /> Retour
+      </button>
+
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+          <h1 className="text-3xl font-sans font-bold text-white mb-2 flex items-center gap-3">
+             <div className="w-10 h-10 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/30">
+              <FileCode size={24} />
+            </div>
+            Robots.txt Optimizer
+          </h1>
+          <p className="text-gray-500">Ouvrez les portes aux bots IA (GPTBot, Claude, Gemini) tout en sécurisant votre site.</p>
+        </div>
+
+        {/* Project Selector */}
+        {history.length > 0 && (
+            <div className="relative group w-full md:w-auto">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-500">
+                <History size={16} />
+            </div>
+            <select 
+                value={selectedAnalysisIndex}
+                onChange={(e) => setSelectedAnalysisIndex(Number(e.target.value))}
+                className="appearance-none bg-white/[0.04] border border-white/[0.08] text-white pl-10 pr-10 py-2.5 rounded-2xl focus:outline-none focus:border-blue-500/50 w-full min-w-[250px] cursor-pointer hover:bg-white/[0.08] transition-colors"
+            >
+                {history.map((analysis, idx) => (
+                <option key={idx} value={idx} className="bg-[#1a1d24]">
+                    {new URL(analysis.url).hostname}
+                </option>
+                ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
+            </div>
+        )}
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-8 mb-12">
+        
+        {/* Left Column: Context & Education (Always Visible) */}
+        <div className="space-y-6">
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Server size={64} />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <Eye size={18} className="text-blue-400" /> Analyse Technique
+                </h3>
+                <div className="flex items-center gap-2 mb-4">
+                    <span className="text-sm text-gray-500">Architecture détectée :</span>
+                    <span className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded uppercase border border-blue-500/30">
+                        {platformName}
+                    </span>
+                </div>
+                <p className="text-sm text-gray-500 leading-relaxed mb-4">
+                    Nous avons adapté les règles <code>Disallow</code> pour masquer les routes sensibles spécifiques à votre technologie ({platformName}), tout en ouvrant les routes de contenu public aux bots IA.
+                </p>
+
+                <div className="bg-[#111111] p-4 rounded-2xl border border-white/[0.06] font-mono text-xs text-gray-500 overflow-auto max-h-[150px] relative">
+                    <div className="absolute top-2 right-2 text-[10px] text-gray-600 font-sans bg-white/[0.04] px-2 py-1 rounded">Fichier Actuel (Simulé)</div>
+                    <pre>{currentContent}</pre>
+                </div>
+            </div>
+
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+                <h3 className="text-lg font-bold text-white mb-4">La Stratégie "Open-AI, Closed-Admin"</h3>
+                <ul className="space-y-4">
+                    <li className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 text-green-400"><Bot size={16} /></div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-200">Whitelist Explicite</p>
+                            <p className="text-xs text-gray-500">
+                                GPTBot, CCBot et Google-Extended sont souvent bloqués par défaut par les pare-feux. Ce fichier force leur autorisation pour garantir votre citation.
+                            </p>
+                        </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 text-purple-400"><AlertTriangle size={16} /></div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-200">Protection Budgétaire</p>
+                            <p className="text-xs text-gray-500">
+                                En bloquant les dossiers <code>/api/</code> ou <code>/search/</code>, nous évitons que les bots IA ne consomment vos ressources serveur inutilement.
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {/* Right Column: Optimized Output (Locked or Unlocked based on history) */}
+        <div className="flex flex-col">
+            <div className="bg-[#0f1115] border border-white/[0.08] rounded-2xl flex flex-col shadow-2xl overflow-hidden relative">
+                
+                <div className="p-4 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.04]">
+                    <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${isUnlocked ? 'bg-purple-400 animate-pulse' : 'bg-gray-500'}`}></div>
+                        <span className="text-sm font-bold text-white">robots.txt (Optimisé AEO)</span>
+                        {!isUnlocked && <Lock size={14} className="text-gray-500 ml-1" />}
+                        {isUnlocked && history.length > 0 && history[selectedAnalysisIndex]?.robotsTxtData && (
+                            <span className="text-xs text-purple-300 bg-purple-400/10 px-2 py-0.5 rounded ml-2">Payé</span>
+                        )}
+                    </div>
+                    <div className="flex gap-2">
+                        {isUnlocked ? (
+                            <>
+                                <button onClick={() => handleCopy()} className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] rounded-full text-xs font-medium text-white border border-white/[0.08] transition-colors">
+                                    {copied ? <Check size={14} className="text-purple-300" /> : <Copy size={14} />}
+                                    {copied ? 'Copié' : 'Copier'}
+                                </button>
+                                <button onClick={() => handleDownload()} className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-600 hover:to-violet-700 rounded-full text-xs font-bold transition-colors">
+                                    <Download size={14} /> Télécharger
+                                </button>
+                            </>
+                        ) : (
+                            <span className="text-xs text-gray-500 flex items-center gap-1 bg-white/[0.04] px-2 py-1 rounded">
+                                <Lock size={10} /> Aperçu verrouillé
+                            </span>
+                        )}
+                    </div>
+                </div>
+                
+                <div className="relative bg-[#000000] p-6 h-[300px] group">
+                    {isUnlocked ? (
+                        <pre className="font-mono text-sm text-purple-100/90 whitespace-pre-wrap leading-relaxed selection:bg-purple-400/30 overflow-auto h-full">
+                            {optimizedContent}
+                        </pre>
+                    ) : (
+                        <>
+                            {/* Blurry Code Placeholder */}
+                            <pre className="font-mono text-sm text-gray-600 blur-[4px] opacity-50 select-none overflow-hidden h-full">
+                                {`User-agent: GPTBot\nAllow: /\nUser-agent: CCBot\nAllow: /\n\n# Secure Admin Paths\nDisallow: /wp-admin/\nDisallow: /private/\n\n# Sitemap Declaration\nSitemap: https://...`}
+                            </pre>
+                            
+                            {/* Unlock Overlay */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] z-10 p-6 text-center">
+                                <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 mb-4 border border-primary/30">
+                                    <Lock size={24} />
+                                </div>
+                                <h4 className="text-white font-bold text-lg mb-2">Fichier Optimisé Prêt</h4>
+                                <p className="text-gray-300 text-sm mb-6 max-w-xs">
+                                    Débloquez votre fichier <code>robots.txt</code> configuré pour GPT-4, Claude et Gemini.
+                                </p>
+                                <button 
+                                    onClick={handleUnlock}
+                                    className="px-6 py-3 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-2xl transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-2"
+                                >
+                                    <Zap size={16} />
+                                    Générer (-{GENERATION_COST} crédits)
+                                </button>
+                                <p className="text-xs text-gray-500 mt-4">
+                                    Solde actuel : <span className="text-white font-bold">{user ? user.credits : 0}</span> crédits
+                                </p>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                <div className="p-4 border-t border-white/[0.08] bg-white/[0.04] text-xs text-gray-500 flex justify-between items-center">
+                    <span>Généré pour : {platformName}</span>
+                    <span>{isUnlocked ? `Taille : ~${optimizedContent.length} bytes` : 'En attente de déverrouillage'}</span>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      {/* IMPLEMENTATION GUIDE SECTION (Blurred if locked to add value) */}
+      <div className={`border-t border-white/[0.08] pt-10 transition-all duration-500 ${!isUnlocked ? 'opacity-50 blur-[2px] pointer-events-none grayscale' : ''}`}>
+        <h2 className="text-2xl font-sans font-bold text-white mb-6 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-white/[0.04] flex items-center justify-center text-gray-300">
+                {guide.icon}
+            </div>
+            Guide d'implémentation : {guide.title}
+        </h2>
+        
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+            <div className="ninja-card p-8 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/5 to-transparent">
+                <ol className="relative border-l border-white/[0.08] ml-3 space-y-8">
+                    {guide.steps.map((step, index) => (
+                        <li key={index} className="pl-8 relative group">
+                            <span className="absolute -left-[17px] top-0 flex items-center justify-center w-8 h-8 bg-[#000000] border border-white/20 rounded-full text-xs font-bold text-gray-500 group-hover:text-purple-400 group-hover:border-primary transition-colors">
+                                {index + 1}
+                            </span>
+                            <p className="text-gray-300 leading-relaxed group-hover:text-white transition-colors text-sm">
+                                {step}
+                            </p>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div className="space-y-6">
+                <div className="bg-purple-500/10 border border-white/[0.1] rounded-2xl p-6">
+                    <h4 className="text-purple-300 font-bold mb-2 flex items-center gap-2">
+                        <AlertTriangle size={18} /> Point de Vigilance
+                    </h4>
+                    <p className="text-sm text-purple-200/80 leading-relaxed">
+                        Une erreur dans le fichier <code>robots.txt</code> peut désindexer totalement votre site de Google. 
+                        Avant de mettre en production, testez toujours votre fichier avec l'outil de test du fichier robots.txt de la Google Search Console.
+                    </p>
+                </div>
+
+                <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+                        <Globe size={24} />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-white text-sm">Vérification Post-Install</h4>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Accédez à <code>{history.length > 0 ? new URL(history[selectedAnalysisIndex].url).origin : 'votre-site.com'}/robots.txt</code> pour confirmer que le nouveau contenu est bien en ligne.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      {/* HISTORIQUE DES FICHIERS */}
+      {savedFiles.length > 0 && (
+        <div className="mt-12 border-t border-white/[0.08] pt-10">
+            <h3 className="text-xl font-sans font-bold text-white mb-6 flex items-center gap-2">
+                <Archive size={20} className="text-gray-500" />
+                Historique des versions
+            </h3>
+            
+            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {savedFiles.map((file) => (
+                    <div key={file.id} className="ninja-card p-5 rounded-2xl border border-white/[0.08] hover:border-blue-500/30 transition-all flex flex-col">
+                        <div className="flex justify-between items-start mb-3">
+                            <span className="text-[10px] font-bold px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">
+                                robots.txt
+                            </span>
+                            <span className="text-xs text-gray-500">{new Date(file.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <h4 className="font-bold text-white mb-2 text-sm line-clamp-1">{file.title}</h4>
+                        
+                        <div className="bg-[#000000] p-3 rounded border border-white/[0.06] mb-4 flex-1 overflow-hidden relative h-20">
+                            <p className="text-[10px] text-gray-500 font-mono line-clamp-3">{file.content}</p>
+                            <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#000000] to-transparent"></div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => handleRestore(file.content)}
+                                className="flex-1 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 rounded text-[10px] font-bold text-purple-400 transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Eye size={10} /> Voir
+                            </button>
+                            <button 
+                                onClick={() => handleDownload(`robots_archive_${file.id}.txt`, file.content)}
+                                className="flex-1 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] rounded text-[10px] font-medium text-gray-300 transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Download size={10} /> DL
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default RobotsTxt;

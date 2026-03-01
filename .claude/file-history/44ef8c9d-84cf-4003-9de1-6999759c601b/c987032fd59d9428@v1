@@ -1,0 +1,286 @@
+// components/layout/Sidebar.tsx
+// Sidebar contextuelle — style Raycast (dense, scannable, icônes fines)
+// Desktop : fixe sous la TopNav (top-14)
+// Mobile  : hamburger + overlay plein écran (sections + sous-items)
+
+import React, { useState } from 'react';
+import {
+  PlusCircle, BarChart3, Zap, RefreshCw, Clock,
+  Activity, Radio, Brain, MonitorCheck, Bell,
+  Sparkles, BookOpen, PenTool, MessageSquare, Shield, AlertTriangle,
+  Code, Bot, FileCheck, FileJson,
+  Globe, Compass, Users, ShoppingBag,
+  User, CreditCard, Coins, LayoutGrid, Link, Key,
+  Menu, X
+} from 'lucide-react';
+import { SECTIONS } from './TopNav';
+
+// ═══════════════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════════════
+
+interface SidebarItem {
+  type: 'link';
+  id: string;
+  label: string;
+  icon: React.ElementType;
+  badge?: string;
+  badgeColor?: string;
+}
+
+interface SidebarSeparator {
+  type: 'separator';
+  label: string;
+}
+
+type SidebarEntry = SidebarItem | SidebarSeparator;
+
+// ═══════════════════════════════════════════════════════════
+// MAPPING SECTION → SOUS-ITEMS (SOURCE DE VÉRITÉ)
+// ═══════════════════════════════════════════════════════════
+
+const SIDEBAR_ITEMS: Record<string, SidebarEntry[]> = {
+
+  // Dashboard — PAS DE SIDEBAR (page pleine largeur)
+
+  analyse: [
+    { type: 'link', id: 'new-analysis',  label: 'Nouvel audit',        icon: PlusCircle },
+    { type: 'link', id: 'results',       label: "Résultats d'audit",   icon: BarChart3 },
+    { type: 'link', id: 'action-plan',   label: "Plan d'action",       icon: Zap },
+    { type: 'link', id: 'rescan',        label: 'Re-scan & Suivi',     icon: RefreshCw },
+    { type: 'link', id: 'history',       label: 'Historique',          icon: Clock },
+  ],
+
+  citations: [
+    { type: 'link', id: 'ai-monitoring',         label: 'Monitoring IA',        icon: Activity },
+    { type: 'link', id: 'ai-citation-simulator',  label: 'Simulateur citations', icon: Radio },
+    { type: 'link', id: 'ai-response-layer',      label: 'AI Response Layer',   icon: Brain },
+    { type: 'link', id: 'bot-tracking',           label: 'Tracking Bots IA',    icon: MonitorCheck },
+    { type: 'link', id: 'alerts-aeo',             label: 'Alertes AEO',         icon: Bell },
+  ],
+
+  outils: [
+    { type: 'link', id: 'smc-studio',     label: 'AEO Studio',          icon: Sparkles },
+    { type: 'link', id: 'blog-optimizer',  label: 'Blog Optimizer',     icon: BookOpen },
+    { type: 'link', id: 'content-writer',  label: 'Rédacteur IA',       icon: PenTool },
+    { type: 'link', id: 'answer-first',    label: 'Answer First Audit', icon: MessageSquare },
+    { type: 'link', id: 'eeat-builder',    label: 'E-E-A-T Builder',    icon: Shield },
+    { type: 'link', id: 'reputation',      label: 'Réputation',         icon: AlertTriangle },
+  ],
+
+  technique: [
+    { type: 'link', id: 'schema-org',       label: 'Schema.org',          icon: Code },
+    { type: 'link', id: 'robots-txt',       label: 'Robots.txt',         icon: Bot },
+    { type: 'link', id: 'source-of-truth',  label: 'Source of Truth',    icon: FileCheck },
+    { type: 'link', id: 'llms-txt',         label: 'LLMs.txt Generator', icon: FileJson },
+  ],
+
+  marketplace: [
+    { type: 'link', id: 'publisher-search',  label: 'Trouver publishers', icon: Globe },
+    { type: 'link', id: 'directory',         label: 'Annuaire',           icon: Compass },
+    { type: 'link', id: 'clients',           label: 'Clients',            icon: Users },
+    { type: 'link', id: 'messages',          label: 'Messages',           icon: MessageSquare },
+    { type: 'link', id: 'mission-orders',    label: 'Commandes',          icon: ShoppingBag },
+  ],
+
+  compte: [
+    { type: 'link', id: 'account',        label: 'Mon compte',        icon: User },
+    { type: 'link', id: 'plan',           label: 'Abonnement',        icon: CreditCard },
+    { type: 'link', id: 'recharge',       label: 'Recharger crédits', icon: Coins },
+    { type: 'link', id: 'projects',       label: 'Projets',           icon: LayoutGrid },
+    { type: 'link', id: 'integrations',   label: 'Intégrations',      icon: Link },
+    { type: 'link', id: 'api-developer',  label: 'API Développeur',   icon: Key },
+    { type: 'link', id: 'affiliation',    label: 'Affiliation',       icon: Users },
+  ],
+};
+
+export { SIDEBAR_ITEMS };
+
+// ═══════════════════════════════════════════════════════════
+// PAGE ALIASES — pour le highlight du bon item
+// ═══════════════════════════════════════════════════════════
+
+const PAGE_ALIASES: Record<string, string> = {
+  'analyze': 'new-analysis',
+  'audit-aeo': 'results',
+  'alerts': 'alerts-aeo',
+  'answer-first-audit': 'answer-first',
+  'api-keys': 'api-developer',
+  'credits': 'recharge',
+  'profile': 'account',
+  'subscription': 'plan',
+  'publisher-request': 'publisher-search',
+  'generative-tools': 'smc-studio',
+  'directory-entity': 'directory',
+};
+
+function resolveActivePage(pageId: string): string {
+  return PAGE_ALIASES[pageId] || pageId;
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMPONENT
+// ═══════════════════════════════════════════════════════════
+
+interface SidebarProps {
+  section: string;
+  activePage: string;
+  onPageChange: (page: string) => void;
+  onSectionChange: (section: string) => void;
+  credits: number;
+  plan: string;
+  onLogoClick?: () => void;
+}
+
+export default function Sidebar({
+  section,
+  activePage,
+  onPageChange,
+  onSectionChange,
+  credits,
+  plan,
+  onLogoClick,
+}: SidebarProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const items = SIDEBAR_ITEMS[section];
+  const resolved = resolveActivePage(activePage);
+
+  // ── Render nav items (Raycast style) ──
+  const renderNavItems = (entries: SidebarEntry[], onClose?: () => void) => (
+    <nav className="flex-1 overflow-y-auto py-3 px-3">
+      {entries.map((entry, i) => {
+        if (entry.type === 'separator') {
+          return (
+            <div key={`sep-${i}`} className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-disabled)] px-2.5 mt-5 mb-2">
+              {entry.label}
+            </div>
+          );
+        }
+
+        const Icon = entry.icon;
+        const isActive = resolved === entry.id;
+        return (
+          <button
+            key={entry.id}
+            onClick={() => { onPageChange(entry.id); onClose?.(); }}
+            className={`group flex items-center gap-2.5 w-full px-2.5 py-[7px] rounded-md text-[13px] leading-none cursor-pointer transition-all duration-150 relative ${
+              isActive
+                ? 'text-[var(--text-primary)] bg-[var(--bg-elevated)]/50'
+                : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]'
+            }`}
+          >
+            {isActive && (
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-[var(--accent)] rounded-r-full" />
+            )}
+            <Icon className={`w-4 h-4 flex-shrink-0 ${
+              isActive
+                ? 'text-[var(--accent-text)]'
+                : 'text-[var(--text-disabled)] group-hover:text-[var(--text-tertiary)]'
+            }`} />
+            <span className="truncate">{entry.label}</span>
+            {entry.badge && (
+              <span className={`ml-auto text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 ${
+                entry.badgeColor === 'red'
+                  ? 'bg-red-500/15 text-red-400'
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-tertiary)]'
+              }`}>
+                {entry.badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </nav>
+  );
+
+  // ── Credits footer ──
+  const creditsFooter = (
+    <div className="border-t border-[var(--border-subtle)] p-3 flex-shrink-0 mx-1">
+      <div className="text-[11px] text-[var(--text-disabled)] font-medium uppercase tracking-wider">Plan {plan}</div>
+      <div className="h-1 w-full rounded-full bg-[var(--bg-elevated)] mt-2 overflow-hidden">
+        <div
+          className="h-full bg-[var(--accent)] rounded-full transition-all duration-500"
+          style={{ width: `${Math.min(100, (credits / 200) * 100)}%` }}
+        />
+      </div>
+      <div className="text-[11px] text-[var(--text-disabled)] mt-1.5">
+        <span className="text-[var(--text-tertiary)]">{credits}</span> / 200 crédits
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* ═══ Desktop sidebar ═══ */}
+      {items && items.length > 0 && (
+        <aside className="hidden md:flex flex-col fixed top-14 left-0 bottom-0 w-60 z-40 bg-[var(--bg-base)] border-r border-[var(--border-subtle)]">
+          {renderNavItems(items)}
+          {creditsFooter}
+        </aside>
+      )}
+
+      {/* ═══ Mobile hamburger button ═══ */}
+      <button
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="md:hidden fixed top-3 left-3 z-[60] p-2 rounded-lg bg-[var(--bg-elevated)]/80 backdrop-blur text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+      >
+        {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* ═══ Mobile overlay ═══ */}
+      {mobileOpen && (
+        <>
+          <div
+            className="md:hidden fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
+          <aside className="md:hidden flex flex-col fixed top-0 left-0 bottom-0 w-72 z-[56] bg-[var(--bg-base)] border-r border-[var(--border-subtle)]">
+            {/* Logo */}
+            <div
+              className="px-5 h-14 flex items-center border-b border-[var(--border-subtle)] flex-shrink-0 cursor-pointer"
+              onClick={() => { onLogoClick?.(); setMobileOpen(false); }}
+            >
+              <span className="text-[var(--text-primary)] font-semibold text-[15px] tracking-tight">Cited</span>
+              <span className="text-[var(--accent-text)] font-semibold text-[15px]">By</span>
+              <span className="text-[var(--text-tertiary)] font-normal text-[13px]">.ai</span>
+            </div>
+
+            {/* Section tabs (mobile) */}
+            <div className="px-3 py-3 border-b border-[var(--border-subtle)] flex-shrink-0">
+              <div className="flex flex-wrap gap-1">
+                {SECTIONS.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => {
+                      onSectionChange(s.id);
+                      if (s.id === 'dashboard') setMobileOpen(false);
+                    }}
+                    className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                      section === s.id
+                        ? 'text-[var(--text-primary)] bg-[var(--bg-surface)]'
+                        : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sub-items for active section */}
+            {items && items.length > 0
+              ? renderNavItems(items, () => setMobileOpen(false))
+              : (
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-sm text-[var(--text-tertiary)]">Dashboard — pleine largeur</p>
+                </div>
+              )
+            }
+
+            {creditsFooter}
+          </aside>
+        </>
+      )}
+    </>
+  );
+}

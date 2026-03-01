@@ -1,0 +1,29 @@
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class Win32 {
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+}
+"@
+
+$chrome = Get-Process chrome -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+if ($chrome) {
+    [Win32]::SetForegroundWindow($chrome.MainWindowHandle)
+}
+Start-Sleep -Milliseconds 800
+
+# Press Ctrl+Home to scroll to top
+[System.Windows.Forms.SendKeys]::SendWait("^{HOME}")
+Start-Sleep -Milliseconds 1500
+
+$screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+$bitmap = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
+$graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+$graphics.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
+$bitmap.Save("C:\Users\User\screenshot.png")
+$graphics.Dispose()
+$bitmap.Dispose()
+Write-Output "Screenshot saved"

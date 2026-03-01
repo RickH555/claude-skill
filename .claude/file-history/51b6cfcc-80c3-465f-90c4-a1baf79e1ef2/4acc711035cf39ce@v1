@@ -1,0 +1,500 @@
+import React, { useState } from 'react';
+import { 
+  Search, Filter, MoreVertical, Download, Plus, 
+  Building2, Mail, Phone, Calendar, CreditCard, 
+  FileText, ShieldCheck, AlertCircle, CheckCircle2,
+  ArrowLeft, Wallet, TrendingUp, Users
+} from 'lucide-react';
+
+interface Client {
+  id: string;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  role: string;
+  status: 'active' | 'pending' | 'churned';
+  plan: 'Starter' | 'Pro' | 'Agency';
+  mrr: number;
+  avatar: string;
+  contract: {
+    startDate: string;
+    renewalDate: string;
+    billingCycle: 'Mensuel' | 'Annuel';
+    paymentMethod: 'Stripe (CB)' | 'Virement' | 'Prélèvement SEPA';
+    slaLevel: 'Standard' | 'Gold' | 'Platinum';
+    nextInvoiceAmount: number;
+  };
+  legal: {
+    address: string;
+    vatNumber: string;
+    siret: string;
+    country: string;
+  };
+}
+
+// Mock Data
+const MOCK_CLIENTS: Client[] = [
+  {
+    id: 'C-001',
+    companyName: 'TechFlow Solutions',
+    contactName: 'Thomas Durand',
+    role: 'CTO',
+    email: 'thomas@techflow.io',
+    phone: '+33 6 12 34 56 78',
+    status: 'active',
+    plan: 'Agency',
+    mrr: 299,
+    avatar: 'TD',
+    contract: {
+      startDate: '2023-09-15',
+      renewalDate: '2024-09-15',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Stripe (CB)',
+      slaLevel: 'Platinum',
+      nextInvoiceAmount: 358.80
+    },
+    legal: {
+      address: '45 Avenue de la République, 75011 Paris',
+      vatNumber: 'FR 12 345678901',
+      siret: '890 123 456 00012',
+      country: 'France'
+    }
+  },
+  {
+    id: 'C-002',
+    companyName: 'GreenGarden Bio',
+    contactName: 'Sophie Martin',
+    role: 'CMO',
+    email: 's.martin@greengarden.com',
+    phone: '+33 6 98 76 54 32',
+    status: 'active',
+    plan: 'Pro',
+    mrr: 89,
+    avatar: 'SM',
+    contract: {
+      startDate: '2024-01-10',
+      renewalDate: '2025-01-10',
+      billingCycle: 'Annuel',
+      paymentMethod: 'Prélèvement SEPA',
+      slaLevel: 'Gold',
+      nextInvoiceAmount: 1068.00
+    },
+    legal: {
+      address: '12 Zone Industrielle Nord, 69000 Lyon',
+      vatNumber: 'FR 88 555444333',
+      siret: '555 444 333 00024',
+      country: 'France'
+    }
+  },
+  {
+    id: 'C-003',
+    companyName: 'FinStart Consulting',
+    contactName: 'Marc Alibert',
+    role: 'CEO',
+    email: 'marc@finstart.co',
+    phone: '+33 7 45 12 89 63',
+    status: 'pending',
+    plan: 'Starter',
+    mrr: 0,
+    avatar: 'MA',
+    contract: {
+      startDate: '-',
+      renewalDate: '-',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Stripe (CB)',
+      slaLevel: 'Standard',
+      nextInvoiceAmount: 0
+    },
+    legal: {
+      address: '8 Rue des Banques, 33000 Bordeaux',
+      vatNumber: 'En attente',
+      siret: 'En cours',
+      country: 'France'
+    }
+  },
+  {
+    id: 'C-004',
+    companyName: 'OmniMedia Group',
+    contactName: 'Julie Ferrand',
+    role: 'Head of SEO',
+    email: 'j.ferrand@omnimedia.fr',
+    phone: '+33 1 44 55 66 77',
+    status: 'active',
+    plan: 'Agency',
+    mrr: 299,
+    avatar: 'JF',
+    contract: {
+      startDate: '2023-11-01',
+      renewalDate: '2024-11-01',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Virement',
+      slaLevel: 'Platinum',
+      nextInvoiceAmount: 358.80
+    },
+    legal: {
+      address: 'Tour Montparnasse, 75015 Paris',
+      vatNumber: 'FR 99 111222333',
+      siret: '111 222 333 00099',
+      country: 'France'
+    }
+  }
+];
+
+interface ClientsProps {
+  onBack: () => void;
+  onNavigate: (view: string) => void;
+}
+
+const Clients: React.FC<ClientsProps> = ({ onBack, onNavigate }) => {
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const filteredClients = MOCK_CLIENTS.filter(client => {
+    const matchesSearch = client.companyName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          client.contactName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalMRR = MOCK_CLIENTS.reduce((acc, curr) => curr.status === 'active' ? acc + curr.mrr : acc, 0);
+
+  // --- RENDER DETAIL VIEW ---
+  if (selectedClient) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-8 animate-in fade-in slide-in-from-right duration-300">
+        <button 
+          onClick={() => setSelectedClient(null)}
+          className="flex items-center text-gray-500 hover:text-white mb-6 transition-colors group"
+        >
+          <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" /> 
+          Retour à la base clients
+        </button>
+
+        {/* Header Fiche Client */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/[0.08] flex items-center justify-center text-white font-bold text-2xl shadow-inner">
+              {selectedClient.avatar}
+            </div>
+            <div>
+              <h1 className="text-3xl font-sans font-bold text-white mb-1">{selectedClient.companyName}</h1>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500 flex items-center gap-1">
+                  <Building2 size={14} /> ID: {selectedClient.id}
+                </span>
+                <span className={`px-2 py-0.5 text-xs font-bold rounded-full border ${
+                  selectedClient.status === 'active' ? 'bg-purple-500/10 border-white/[0.1] text-purple-300' :
+                  selectedClient.status === 'pending' ? 'bg-purple-500/10 border-white/[0.1] text-purple-400' :
+                  'bg-red-500/10 border-red-500/20 text-red-400'
+                }`}>
+                  {selectedClient.status === 'active' ? 'Actif' : selectedClient.status === 'pending' ? 'En attente' : 'Inactif'}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/[0.04] border border-white/[0.08] hover:bg-purple-500/10 rounded-full text-sm font-medium text-white transition-colors flex items-center gap-2">
+              <Download size={16} /> Factures
+            </button>
+            <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-full hover:from-purple-600 hover:to-violet-700 transition-colors flex items-center gap-2">
+              <FileText size={16} /> Éditer Contrat
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Colonne Gauche: Info Contact & Plan */}
+          <div className="space-y-6">
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Users size={16} /> Contact Principal
+              </h3>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-white/[0.08] flex items-center justify-center text-sm font-bold">
+                  {selectedClient.avatar}
+                </div>
+                <div>
+                  <p className="font-bold text-white">{selectedClient.contactName}</p>
+                  <p className="text-xs text-gray-500">{selectedClient.role}</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <Mail size={16} className="text-purple-400" />
+                  <a href={`mailto:${selectedClient.email}`} className="hover:text-white transition-colors">{selectedClient.email}</a>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <Phone size={16} className="text-purple-400" />
+                  <span>{selectedClient.phone}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <ShieldCheck size={16} /> Abonnement
+              </h3>
+              <div className="flex justify-between items-end mb-4">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Plan Actuel</p>
+                  <p className="text-xl font-bold text-white">{selectedClient.plan}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500 mb-1">MRR</p>
+                  <p className="text-xl font-bold text-purple-300">{selectedClient.mrr}€</p>
+                </div>
+              </div>
+              <div className="p-3 bg-white/[0.04] rounded-2xl border border-white/[0.06]">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-500">Cycle</span>
+                  <span className="text-white font-medium">{selectedClient.contract.billingCycle}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">SLA</span>
+                  <span className="text-purple-400 font-bold">{selectedClient.contract.slaLevel}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Colonne Centrale: Données Contractuelles */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-lg font-sans font-bold text-white mb-6 flex items-center gap-2 border-b border-white/[0.08] pb-4">
+                <FileText size={20} className="text-purple-400" /> Informations Contractuelles
+              </h3>
+              
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Date de début</label>
+                    <div className="flex items-center gap-2 text-sm text-white font-medium">
+                      <Calendar size={16} className="text-gray-500" />
+                      {selectedClient.contract.startDate}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Prochain Renouvellement</label>
+                    <div className="flex items-center gap-2 text-sm text-white font-medium">
+                      <Calendar size={16} className="text-gray-500" />
+                      {selectedClient.contract.renewalDate}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Méthode de paiement</label>
+                    <div className="flex items-center gap-2 text-sm text-white font-medium">
+                      <CreditCard size={16} className="text-gray-500" />
+                      {selectedClient.contract.paymentMethod}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Entité Légale</label>
+                    <p className="text-sm text-white font-medium">{selectedClient.companyName}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">SIRET</label>
+                    <p className="text-sm text-gray-300 font-mono">{selectedClient.legal.siret}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Numéro TVA</label>
+                    <p className="text-sm text-gray-300 font-mono">{selectedClient.legal.vatNumber}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Adresse de facturation</label>
+                    <p className="text-sm text-gray-300">{selectedClient.legal.address}</p>
+                    <p className="text-sm text-gray-300">{selectedClient.legal.country}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/5 to-transparent">
+               <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Prochaine Facture</h3>
+                  <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20">Programmé</span>
+               </div>
+               <div className="flex justify-between items-center">
+                  <div>
+                     <p className="text-3xl font-bold text-white">{selectedClient.contract.nextInvoiceAmount.toFixed(2)} € <span className="text-sm font-normal text-gray-500">TTC</span></p>
+                     <p className="text-xs text-gray-500 mt-1">Prévu le {selectedClient.contract.renewalDate}</p>
+                  </div>
+                  <button className="px-4 py-2 bg-white/[0.08] hover:bg-white/20 rounded-full text-sm text-white transition-colors">
+                     Générer pro-forma
+                  </button>
+               </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // --- RENDER LIST VIEW ---
+  return (
+    <div className="max-w-[1400px] mx-auto px-6 py-8 animate-in fade-in duration-500">
+      
+      {/* Header Dashboard */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
+        <div>
+          <h1 className="text-3xl font-sans font-bold text-white mb-2">Base Clients</h1>
+          <p className="text-gray-500">Gérez vos contrats, facturations et relations clients.</p>
+        </div>
+        
+        <div className="flex gap-3">
+           <button className="px-4 py-2.5 bg-white/[0.04] hover:bg-purple-500/10 border border-white/[0.08] rounded-2xl text-gray-300 flex items-center gap-2 transition-colors">
+              <Download size={18} /> Export CSV
+           </button>
+           <button className="px-4 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-2xl flex items-center gap-2 transition-colors shadow-lg shadow-purple-500/20">
+              <Plus size={18} /> Nouveau Client
+           </button>
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-300">
+              <Wallet size={24} />
+           </div>
+           <div>
+              <p className="text-sm text-gray-500">MRR Total</p>
+              <p className="text-2xl font-bold text-white">{totalMRR} €</p>
+           </div>
+        </div>
+        <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <Users size={24} />
+           </div>
+           <div>
+              <p className="text-sm text-gray-500">Clients Actifs</p>
+              <p className="text-2xl font-bold text-white">{MOCK_CLIENTS.filter(c => c.status === 'active').length}</p>
+           </div>
+        </div>
+        <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
+              <TrendingUp size={24} />
+           </div>
+           <div>
+              <p className="text-sm text-gray-500">Croissance (Mois)</p>
+              <p className="text-2xl font-bold text-white">+12%</p>
+           </div>
+        </div>
+      </div>
+
+      {/* Filters & Search */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 bg-[#111111] p-2 rounded-2xl border border-white/[0.08]">
+         <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+            <input 
+               type="text" 
+               placeholder="Rechercher une entreprise ou un contact..." 
+               className="w-full bg-[#0f1115] border border-white/[0.08] rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:border-purple-500/50 outline-none"
+               value={searchTerm}
+               onChange={(e) => setSearchTerm(e.target.value)}
+            />
+         </div>
+         <div className="flex gap-2 w-full md:w-auto overflow-x-auto no-scrollbar">
+            {['all', 'active', 'pending', 'churned'].map(status => (
+               <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`px-4 py-1.5 rounded-full text-sm capitalize transition-colors whitespace-nowrap ${
+                     statusFilter === status ? 'bg-white/[0.08] text-white font-bold' : 'text-gray-500 hover:text-gray-300'
+                  }`}
+               >
+                  {status === 'all' ? 'Tous' : status}
+               </button>
+            ))}
+         </div>
+      </div>
+
+      {/* Clients Table */}
+      <div className="bg-[#111111] border border-white/[0.08] rounded-2xl overflow-hidden">
+         <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+               <thead>
+                  <tr className="border-b border-white/[0.08] text-xs text-gray-500 uppercase bg-white/[0.02]">
+                     <th className="p-4 font-medium pl-6">Entreprise</th>
+                     <th className="p-4 font-medium">Contact</th>
+                     <th className="p-4 font-medium">Plan</th>
+                     <th className="p-4 font-medium">Statut</th>
+                     <th className="p-4 font-medium">Renouvellement</th>
+                     <th className="p-4 font-medium text-right pr-6">Revenus</th>
+                     <th className="p-4 w-10"></th>
+                  </tr>
+               </thead>
+               <tbody className="text-sm divide-y divide-white/5">
+                  {filteredClients.map((client) => (
+                     <tr 
+                        key={client.id} 
+                        className="hover:bg-white/[0.02] transition-colors cursor-pointer group"
+                        onClick={() => setSelectedClient(client)}
+                     >
+                        <td className="p-4 pl-6">
+                           <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-xs font-bold text-gray-300">
+                                 {client.avatar}
+                              </div>
+                              <span className="font-bold text-white group-hover:text-purple-400 transition-colors">{client.companyName}</span>
+                           </div>
+                        </td>
+                        <td className="p-4">
+                           <div className="flex flex-col">
+                              <span className="text-gray-300">{client.contactName}</span>
+                              <span className="text-xs text-gray-500">{client.email}</span>
+                           </div>
+                        </td>
+                        <td className="p-4">
+                           <span className={`px-2 py-1 rounded text-xs font-bold border ${
+                              client.plan === 'Agency' ? 'bg-purple-500/10 text-purple-400 border-white/[0.1]' :
+                              client.plan === 'Pro' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 
+                              'bg-gray-500/10 text-gray-500 border-gray-500/20'
+                           }`}>
+                              {client.plan}
+                           </span>
+                        </td>
+                        <td className="p-4">
+                           <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                 client.status === 'active' ? 'bg-purple-400' :
+                                 client.status === 'pending' ? 'bg-purple-500 animate-pulse' :
+                                 'bg-red-500'
+                              }`}></div>
+                              <span className="text-gray-300 capitalize">{client.status}</span>
+                           </div>
+                        </td>
+                        <td className="p-4 text-gray-500 font-mono text-xs">
+                           {client.contract.renewalDate}
+                        </td>
+                        <td className="p-4 text-right pr-6 font-bold text-white">
+                           {client.mrr > 0 ? `${client.mrr} €/mois` : '-'}
+                        </td>
+                        <td className="p-4 text-center">
+                           <button className="p-2 hover:bg-purple-500/10 rounded-full text-gray-500 hover:text-white transition-colors">
+                              <MoreVertical size={16} />
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
+               </tbody>
+            </table>
+         </div>
+         {filteredClients.length === 0 && (
+            <div className="p-12 text-center text-gray-500">
+               Aucun client ne correspond à votre recherche.
+            </div>
+         )}
+      </div>
+
+    </div>
+  );
+};
+
+export default Clients;

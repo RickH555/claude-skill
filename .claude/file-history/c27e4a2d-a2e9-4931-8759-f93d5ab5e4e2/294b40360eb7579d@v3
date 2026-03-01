@@ -1,0 +1,110 @@
+import { createServerSupabase } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  const supabase = await createServerSupabase();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { card_id, reward_id } = body;
+
+  if (!card_id || !reward_id) {
+    return NextResponse.json({ error: 'card_id et reward_id requis' }, { status: 400 });
+  }
+
+  // Look up the merchant by user_id to get merchant.id
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!merchant) {
+    return NextResponse.json({ error: 'Marchand non trouve' }, { status: 404 });
+  }
+
+  // Fetch the reward with program info
+  const { data: reward } = await supabase
+    .from('rewards')
+    .select('*, loyalty_programs(merchant_id, type, stamp_goal, points_per_euro)')
+    .eq('id', reward_id)
+    .eq('is_active', true)
+    .single();
+
+  if (!reward) {
+    return NextResponse.json({ error: 'Recompense non trouvee ou inactive' }, { status: 404 });
+  }
+
+  // Verify merchant owns this program
+  if (reward.loyalty_programs.merchant_id !== merchant.id) {
+    return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
+  }
+
+  // Fetch the customer card
+  const { data: card } = await supabase
+    .from('customer_cards')
+    .select('*')
+    .eq('id', card_id)
+    .eq('program_id', reward.program_id)
+    .single();
+
+  if (!card) {
+    return NextResponse.json({ error: 'Carte non trouvee pour ce programme' }, { status: 404 });
+  }
+
+  // Determine cost and balance field based on program type
+  const programType = reward.loyalty_programs.type;
+  let cost: number;
+  let balanceField: string;
+  let currentBalance: number;
+
+  if (programType === 'stamp') {
+    cost = reward.stamps_required || reward.loyalty_programs.stamp_goal || 10;
+    balanceField = 'current_stamps';
+    currentBalance = card.current_stamps;
+  } else {
+    cost = reward.points_cost || 0;
+    balanceField = 'current_points';
+    currentBalance = card.current_points;
+  }
+
+  if (currentBalance < cost) {
+    return NextResponse.json({
+      error: `Solde insuffisant. Requis: ${cost}, Actuel: ${currentBalance}`,
+    }, { status: 400 });
+  }
+
+  // Deduct balance
+  const newBalance = currentBalance - cost;
+  const { error: updateError } = await supabase
+    .from('customer_cards')
+    .update({ [balanceField]: newBalance })
+    .eq('id', card_id);
+
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
+
+  // Log redeem transaction
+  const { error: txnError } = await supabase.from('transactions').insert({
+    card_id,
+    validated_by: merchant.id,
+    type: 'redeem',
+    value: cost,
+  });
+
+  if (txnError) {
+    return NextResponse.json({ error: txnError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    success: true,
+    reward_name: reward.name,
+    cost,
+    new_balance: newBalance,
+  });
+}

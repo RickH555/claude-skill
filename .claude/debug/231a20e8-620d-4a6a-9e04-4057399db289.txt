@@ -1,0 +1,1243 @@
+2026-02-09T18:03:08.031Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-09T18:03:08.036Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-09T18:03:08.037Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-09T18:03:08.037Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-09T18:03:08.126Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-09T18:03:08.237Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-09T18:03:08.454Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:03:08.463Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-09T18:03:08.467Z [DEBUG] [STARTUP] Running setup()...
+2026-02-09T18:03:08.484Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-09T18:03:08.489Z [DEBUG] Passes: Cache stale, returning cached data and refreshing in background
+2026-02-09T18:03:08.491Z [DEBUG] Error log sink initialized
+2026-02-09T18:03:08.561Z [DEBUG] [STARTUP] setup() completed in 94ms
+2026-02-09T18:03:08.561Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-09T18:03:08.625Z [DEBUG] Loaded 0 unique skills (managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-02-09T18:03:08.652Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1
+2026-02-09T18:03:08.657Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-02-09T18:03:08.661Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:03:08.663Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:03:08.663Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:03:08.679Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:03:08.685Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:03:08.686Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:03:08.686Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:03:08.698Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:03:08.701Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:03:08.701Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:03:08.701Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:03:08.714Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:03:08.717Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:03:08.719Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:03:08.720Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:03:08.721Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:03:08.737Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:03:08.781Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:03:08.782Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:03:08.782Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:03:08.792Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:03:08.792Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:03:08.795Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660188795_nk0x4r
+2026-02-09T18:03:09.456Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.48644.1770660189455
+2026-02-09T18:03:09.456Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:03:09.458Z [DEBUG] Temp file written successfully, size: 9099 bytes
+2026-02-09T18:03:09.459Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:03:09.459Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.48644.1770660189455 to C:\Users\User\.claude.json
+2026-02-09T18:03:09.462Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-09T18:03:09.465Z [DEBUG] Passes eligibility cached for org 0e714d1f-2f2f-4c21-91c1-17b70825dbc6: true
+2026-02-09T18:03:22.174Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660188795_nk0x4r
+2026-02-09T18:03:24.394Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:03:24.394Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:03:24.395Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:03:35.132Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:03:35.203Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:03:35.209Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:03:35.210Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:03:35.210Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:03:35.219Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:03:35.221Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:03:35.222Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:03:35.222Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:03:35.223Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:03:35.237Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:03:35.238Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:03:35.238Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660215238_264xgk
+2026-02-09T18:03:40.576Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660215238_264xgk
+2026-02-09T18:03:40.581Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:03:40.581Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:03:40.582Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:03:40.638Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:03:40.642Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:03:40.643Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:03:40.643Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:03:40.645Z [DEBUG] Found 10 plugins (10 enabled, 0 disabled)
+2026-02-09T18:03:40.648Z [DEBUG] getPluginSkills: Processing 10 enabled plugins
+2026-02-09T18:03:40.648Z [DEBUG] Checking plugin frontend-design: skillsPath=exists, skillsPaths=0 paths
+2026-02-09T18:03:40.648Z [DEBUG] Attempting to load skills from plugin frontend-design default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7\skills
+2026-02-09T18:03:40.685Z [DEBUG] Loading hooks from plugin: superpowers
+2026-02-09T18:03:40.686Z [DEBUG] Registered 1 hooks from 10 plugins
+2026-02-09T18:03:40.718Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:03:40.726Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:03:40.738Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:03:40.770Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:03:40.770Z [DEBUG] Total plugin agents loaded: 8
+2026-02-09T18:03:40.770Z [DEBUG] Loaded 1 skills from plugin frontend-design default directory
+2026-02-09T18:03:40.770Z [DEBUG] Checking plugin feature-dev: skillsPath=none, skillsPaths=0 paths
+2026-02-09T18:03:40.770Z [DEBUG] Checking plugin code-simplifier: skillsPath=none, skillsPaths=0 paths
+2026-02-09T18:03:40.770Z [DEBUG] Checking plugin typescript-lsp: skillsPath=none, skillsPaths=0 paths
+2026-02-09T18:03:40.770Z [DEBUG] Checking plugin context7: skillsPath=none, skillsPaths=0 paths
+2026-02-09T18:03:40.770Z [DEBUG] Checking plugin superpowers: skillsPath=exists, skillsPaths=0 paths
+2026-02-09T18:03:40.770Z [DEBUG] Attempting to load skills from plugin superpowers default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\skills
+2026-02-09T18:03:40.862Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:03:40.881Z [DEBUG] Loaded 14 skills from plugin superpowers default directory
+2026-02-09T18:03:40.881Z [DEBUG] Checking plugin supabase: skillsPath=none, skillsPaths=0 paths
+2026-02-09T18:03:40.881Z [DEBUG] Checking plugin plugin-dev: skillsPath=exists, skillsPaths=0 paths
+2026-02-09T18:03:40.881Z [DEBUG] Attempting to load skills from plugin plugin-dev default skillsPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7\skills
+2026-02-09T18:03:40.957Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:03:40.972Z [DEBUG] Loaded 7 skills from plugin plugin-dev default directory
+2026-02-09T18:03:40.972Z [DEBUG] Checking plugin vercel: skillsPath=none, skillsPaths=1 paths
+2026-02-09T18:03:40.972Z [DEBUG] Attempting to load skills from plugin vercel skillsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\
+2026-02-09T18:03:40.972Z [DEBUG] Loading from skillPath: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\ for plugin vercel
+2026-02-09T18:03:41.002Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:03:41.002Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:03:41.003Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:03:41.016Z [DEBUG] Loaded 3 skills from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\skills\
+2026-02-09T18:03:41.016Z [DEBUG] Checking plugin github: skillsPath=none, skillsPaths=0 paths
+2026-02-09T18:03:41.016Z [DEBUG] Total plugin skills loaded: 25
+2026-02-09T18:03:41.016Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:03:41.016Z [DEBUG] Total plugin commands loaded: 8
+2026-02-09T18:03:41.016Z [DEBUG] getSkills returning: 0 skill dir commands, 25 plugin skills, 2 bundled skills
+2026-02-09T18:03:41.033Z [DEBUG] [STARTUP] Commands and agents loaded in 32472ms
+2026-02-09T18:03:41.034Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-02-09T18:03:41.050Z [DEBUG] [render] initLayout starting
+2026-02-09T18:03:41.050Z [DEBUG] Layout engine: yoga
+2026-02-09T18:03:41.077Z [WARN] Missing environment variables in plugin MCP config: GITHUB_PERSONAL_ACCESS_TOKEN
+2026-02-09T18:03:41.111Z [ERROR] Error: Error: Plugin MCP server error - mcp-config-invalid: MCP server github invalid: Missing environment variables: GITHUB_PERSONAL_ACCESS_TOKEN
+    at GG1 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3023:29943)
+2026-02-09T18:03:41.154Z [DEBUG] [render] initLayout complete
+2026-02-09T18:03:41.191Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-02-09T18:03:41.375Z [DEBUG] [render] first ink render: 37296ms since process start
+2026-02-09T18:03:41.379Z [DEBUG] [keybindings] Watching for changes to C:\Users\User\.claude\keybindings.json
+2026-02-09T18:03:58.097Z [DEBUG] Grove: Using fresh cached config
+2026-02-09T18:03:58.229Z [DEBUG] [render] initLayout starting
+2026-02-09T18:03:58.232Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-09T18:03:58.302Z [DEBUG] [render] initLayout complete
+2026-02-09T18:03:58.313Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-02-09T18:03:58.341Z [DEBUG] [render] first ink render: 54261ms since process start
+2026-02-09T18:03:58.463Z [DEBUG] Git remote URL: null
+2026-02-09T18:03:58.463Z [DEBUG] No git remote URL found
+2026-02-09T18:03:58.464Z [DEBUG] Not in a GitHub repository, skipping path mapping update
+2026-02-09T18:03:58.794Z [DEBUG] [STARTUP] showSetupScreens() completed in 17760ms
+2026-02-09T18:03:58.795Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-09T18:03:58.796Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-09T18:03:58.796Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-09T18:03:58.801Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-09T18:03:58.801Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-09T18:03:58.806Z [DEBUG] Passes: Using fresh cached eligibility data
+2026-02-09T18:03:58.816Z [DEBUG] [STARTUP] MCP configs loaded in 50578ms
+2026-02-09T18:03:58.861Z [DEBUG] MCP server "plugin:context7:context7": Starting connection with timeout of 30000ms
+2026-02-09T18:03:59.001Z [DEBUG] MCP server "plugin:supabase:supabase": Initializing HTTP transport to https://mcp.supabase.com/mcp
+2026-02-09T18:03:59.001Z [DEBUG] MCP server "plugin:supabase:supabase": Node version: v20.20.0, Platform: win32
+2026-02-09T18:03:59.001Z [DEBUG] MCP server "plugin:supabase:supabase": Environment: {"NODE_OPTIONS":"not set","UV_THREADPOOL_SIZE":"default","HTTP_PROXY":"not set","HTTPS_PROXY":"not set","NO_PROXY":"not set"}
+2026-02-09T18:03:59.004Z [DEBUG] MCP server "plugin:github:github": Initializing HTTP transport to https://api.githubcopilot.com/mcp/
+2026-02-09T18:03:59.004Z [DEBUG] MCP server "plugin:github:github": Node version: v20.20.0, Platform: win32
+2026-02-09T18:03:59.004Z [DEBUG] MCP server "plugin:github:github": Environment: {"NODE_OPTIONS":"not set","UV_THREADPOOL_SIZE":"default","HTTP_PROXY":"not set","HTTPS_PROXY":"not set","NO_PROXY":"not set"}
+2026-02-09T18:03:59.041Z [DEBUG] All plugins already exist, skipping migration
+2026-02-09T18:03:59.077Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-02-09T18:03:59.147Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.48644.1770660239147
+2026-02-09T18:03:59.147Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:03:59.149Z [DEBUG] Temp file written successfully, size: 9099 bytes
+2026-02-09T18:03:59.149Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:03:59.149Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.48644.1770660239147 to C:\Users\User\.claude.json
+2026-02-09T18:03:59.150Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-09T18:03:59.159Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-09T18:03:59.159Z [DEBUG] Found 1 hook matchers in settings
+2026-02-09T18:03:59.160Z [DEBUG] Matched 1 unique hooks for query "startup" (1 before deduplication)
+2026-02-09T18:03:59.166Z [DEBUG] Loaded 10 installed plugins from C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:03:59.166Z [DEBUG] Initialized versioned plugins system with 10 plugins
+2026-02-09T18:03:59.167Z [DEBUG] MCP server "plugin:supabase:supabase": Proxy options: default
+2026-02-09T18:03:59.168Z [DEBUG] MCP server "plugin:supabase:supabase": HTTP transport options: {"url":"https://mcp.supabase.com/mcp","headers":{"User-Agent":"claude-code/2.1.37"},"hasAuthProvider":true,"timeoutMs":60000}
+2026-02-09T18:03:59.169Z [DEBUG] MCP server "plugin:supabase:supabase": HTTP transport created successfully
+2026-02-09T18:03:59.171Z [DEBUG] MCP server "plugin:supabase:supabase": Client created, setting up request handler
+2026-02-09T18:03:59.171Z [DEBUG] MCP server "plugin:supabase:supabase": Starting connection with timeout of 30000ms
+2026-02-09T18:03:59.171Z [DEBUG] MCP server "plugin:supabase:supabase": Testing basic HTTP connectivity to https://mcp.supabase.com/mcp
+2026-02-09T18:03:59.171Z [DEBUG] MCP server "plugin:supabase:supabase": Parsed URL: host=mcp.supabase.com, port=default, protocol=https:
+2026-02-09T18:03:59.172Z [DEBUG] MCP server "plugin:github:github": Proxy options: default
+2026-02-09T18:03:59.172Z [DEBUG] MCP server "plugin:github:github": HTTP transport options: {"url":"https://api.githubcopilot.com/mcp/","headers":{"User-Agent":"claude-code/2.1.37","Authorization":"[REDACTED]"},"hasAuthProvider":true,"timeoutMs":60000}
+2026-02-09T18:03:59.172Z [DEBUG] MCP server "plugin:github:github": HTTP transport created successfully
+2026-02-09T18:03:59.173Z [DEBUG] MCP server "plugin:github:github": Client created, setting up request handler
+2026-02-09T18:03:59.173Z [DEBUG] MCP server "plugin:github:github": Starting connection with timeout of 30000ms
+2026-02-09T18:03:59.173Z [DEBUG] MCP server "plugin:github:github": Testing basic HTTP connectivity to https://api.githubcopilot.com/mcp/
+2026-02-09T18:03:59.174Z [DEBUG] MCP server "plugin:github:github": Parsed URL: host=api.githubcopilot.com, port=default, protocol=https:
+2026-02-09T18:03:59.244Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-09T18:03:59.303Z [DEBUG] MCP server "plugin:supabase:supabase": Token expired without refresh token
+2026-02-09T18:03:59.339Z [DEBUG] MCP server "plugin:github:github": No token data found
+2026-02-09T18:03:59.540Z [DEBUG] Hooks: Config-based async hook, backgrounding process async_hook_24928
+2026-02-09T18:03:59.543Z [DEBUG] Hooks: Registering async hook async_hook_24928 (SessionStart:startup) with timeout 600000ms
+2026-02-09T18:03:59.596Z [DEBUG] [render] initLayout starting
+2026-02-09T18:03:59.596Z [DEBUG] [render] initLayout complete
+2026-02-09T18:03:59.645Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-02-09T18:03:59.975Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-02-09T18:03:59.987Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-02-09T18:03:59.996Z [DEBUG] performStartupChecks called
+2026-02-09T18:03:59.997Z [DEBUG] Starting background plugin installations
+2026-02-09T18:03:59.998Z [DEBUG] performBackgroundPluginInstallations called
+2026-02-09T18:04:00.017Z [DEBUG] [render] first ink render: 55938ms since process start
+2026-02-09T18:04:00.017Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:04:00.334Z [DEBUG] Watching for changes in setting files C:\Users\User\.claude\settings.json, C:\Users\User\.claude\settings.local.json...
+2026-02-09T18:04:00.345Z [DEBUG] Found 10 enabled plugins
+2026-02-09T18:04:00.347Z [DEBUG] All plugins already exist, skipping migration
+2026-02-09T18:04:00.347Z [DEBUG] Found 10 installed plugins (V2 format)
+2026-02-09T18:04:00.350Z [DEBUG] Loaded plugins - Enabled: 10, Disabled: 0, Commands: 8, Agents: 8, Errors: 0
+2026-02-09T18:04:00.350Z [DEBUG] Found 0 missing plugins (not installed):
+2026-02-09T18:04:00.350Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-02-09T18:04:00.390Z [WARN] Missing environment variables in plugin MCP config: GITHUB_PERSONAL_ACCESS_TOKEN
+2026-02-09T18:04:00.391Z [WARN] Missing environment variables in plugin MCP config: GITHUB_PERSONAL_ACCESS_TOKEN
+2026-02-09T18:04:00.393Z [ERROR] Error: Error: Plugin MCP server error - mcp-config-invalid: MCP server github invalid: Missing environment variables: GITHUB_PERSONAL_ACCESS_TOKEN
+    at GG1 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3023:29943)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async M (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3874:16470)
+2026-02-09T18:04:00.394Z [ERROR] Error: Error: Plugin MCP server error - mcp-config-invalid: MCP server github invalid: Missing environment variables: GITHUB_PERSONAL_ACCESS_TOKEN
+    at GG1 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3023:29943)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async W (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:3874:16986)
+2026-02-09T18:04:00.404Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-09T18:04:00.457Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-02-09T18:04:00.457Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-02-09T18:04:00.851Z [DEBUG] High write ratio: blit=0, write=1090 (100.0% writes), screen=18x120
+2026-02-09T18:04:01.016Z [DEBUG] Hooks: Adding stderr to async_hook_24928: <3>WSL (31870 - Relay) ERROR: CreateProcessCommon:...
+2026-02-09T18:04:01.055Z [DEBUG] [claudeai-mcp] Fetched 2 servers
+2026-02-09T18:04:01.061Z [DEBUG] MCP server "claude.ai Supabase": Initializing claude.ai proxy transport for server mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-09T18:04:01.061Z [DEBUG] MCP server "claude.ai Supabase": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-09T18:04:01.062Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy transport created successfully
+2026-02-09T18:04:01.066Z [DEBUG] MCP server "claude.ai Supabase": Starting connection with timeout of 30000ms
+2026-02-09T18:04:01.068Z [DEBUG] MCP server "claude.ai Gamma": Initializing claude.ai proxy transport for server mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-09T18:04:01.068Z [DEBUG] MCP server "claude.ai Gamma": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-09T18:04:01.069Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy transport created successfully
+2026-02-09T18:04:01.072Z [DEBUG] MCP server "claude.ai Gamma": Starting connection with timeout of 30000ms
+2026-02-09T18:04:01.104Z [DEBUG] Org penguin mode: disabled (extra_usage_disabled)
+2026-02-09T18:04:01.145Z [DEBUG] Loaded 1 LSP server(s) from plugin: typescript-lsp
+2026-02-09T18:04:01.639Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.48644.1770660241639
+2026-02-09T18:04:01.639Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:04:01.641Z [DEBUG] Temp file written successfully, size: 9099 bytes
+2026-02-09T18:04:01.641Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:04:01.641Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.48644.1770660241639 to C:\Users\User\.claude.json
+2026-02-09T18:04:01.642Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-09T18:04:02.576Z [DEBUG] Total LSP servers loaded: 1
+2026-02-09T18:04:02.576Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 1 server(s)
+2026-02-09T18:04:02.577Z [DEBUG] Queued request handler for plugin:typescript-lsp:typescript.workspace/configuration (connection not ready)
+2026-02-09T18:04:02.578Z [DEBUG] Starting LSP server instance: plugin:typescript-lsp:typescript
+2026-02-09T18:04:03.039Z [DEBUG] LSP manager initialized with 1 servers
+2026-02-09T18:04:03.039Z [DEBUG] LSP server manager initialized successfully
+2026-02-09T18:04:03.041Z [DEBUG] Queued notification handler for plugin:typescript-lsp:typescript.textDocument/publishDiagnostics (connection not ready)
+2026-02-09T18:04:03.041Z [DEBUG] Registered diagnostics handler for plugin:typescript-lsp:typescript
+2026-02-09T18:04:03.041Z [DEBUG] LSP notification handlers registered successfully for all 1 server(s)
+2026-02-09T18:04:03.043Z [ERROR] Error: Error: LSP server plugin:typescript-lsp:typescript failed to start: spawn typescript-language-server ENOENT
+    at Object.start (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2152:22369)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Object.$ [as start] (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2152:24805)
+2026-02-09T18:04:03.044Z [ERROR] Error: Error: spawn typescript-language-server ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:285:19)
+    at onErrorNT (node:internal/child_process:483:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+2026-02-09T18:04:03.045Z [ERROR] Error: Error: Failed to start LSP server plugin:typescript-lsp:typescript: spawn typescript-language-server ENOENT
+    at file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:2152:32602
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-09T18:04:03.066Z [DEBUG] MCP server "plugin:github:github": HTTP Connection failed after 4062ms: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+ (code: 400, errno: none)
+2026-02-09T18:04:03.067Z [ERROR] MCP server "plugin:github:github" Error: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+2026-02-09T18:04:03.068Z [DEBUG] MCP server "plugin:github:github": Connection failed after 4063ms: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+2026-02-09T18:04:03.068Z [ERROR] MCP server "plugin:github:github" Connection failed: Streamable HTTP error: Error POSTing to endpoint: bad request: Authorization header is badly formatted
+2026-02-09T18:04:03.076Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy connection failed after 2015ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CXxwGRPUMuF7oG1q1HGxN"}
+2026-02-09T18:04:03.076Z [ERROR] MCP server "claude.ai Supabase" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CXxwGRPUMuF7oG1q1HGxN"}
+2026-02-09T18:04:03.077Z [DEBUG] MCP server "claude.ai Supabase": Authentication required for claude.ai proxy server
+2026-02-09T18:04:04.219Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy connection failed after 3151ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CXxwGZRR49mcvZM7TEDjv"}
+2026-02-09T18:04:04.220Z [ERROR] MCP server "claude.ai Gamma" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CXxwGZRR49mcvZM7TEDjv"}
+2026-02-09T18:04:04.221Z [DEBUG] MCP server "claude.ai Gamma": Authentication required for claude.ai proxy server
+2026-02-09T18:04:04.570Z [DEBUG] MCP server "plugin:supabase:supabase": Found client info
+2026-02-09T18:04:04.571Z [DEBUG] MCP server "plugin:supabase:supabase": Token expired without refresh token
+2026-02-09T18:04:04.624Z [DEBUG] MCP server "plugin:supabase:supabase": Generated new OAuth state
+2026-02-09T18:04:04.635Z [DEBUG] MCP server "plugin:supabase:supabase": Saving code verifier
+2026-02-09T18:04:04.640Z [DEBUG] MCP server "plugin:supabase:supabase": Authorization URL: https://api.supabase.com/v1/oauth/authorize?response_type=code&client_id=c7bc69d2-0547-4843-855a-2f17b5a1efea&code_challenge=%5BREDACTED%5D&code_challenge_method=S256&redirect_uri=http%3A%2F%2Flocalhost%3A3118%2Fcallback&state=%5BREDACTED%5D&scope=organizations%3Aread+projects%3Aread+projects%3Awrite+database%3Awrite+database%3Aread+analytics%3Aread+secrets%3Aread+edge_functions%3Aread+edge_functions%3Awrite+environment%3Aread+environment%3Awrite+storage%3Aread&resource=https%3A%2F%2Fmcp.supabase.com%2Fmcp
+2026-02-09T18:04:04.640Z [DEBUG] MCP server "plugin:supabase:supabase": Scopes in URL: organizations:read projects:read projects:write database:write database:read analytics:read secrets:read edge_functions:read edge_functions:write environment:read environment:write storage:read
+2026-02-09T18:04:04.640Z [DEBUG] MCP server "plugin:supabase:supabase": Captured scopes from authorization URL: organizations:read projects:read projects:write database:write database:read analytics:read secrets:read edge_functions:read edge_functions:write environment:read environment:write storage:read
+2026-02-09T18:04:04.640Z [DEBUG] MCP server "plugin:supabase:supabase": Redirection handling is disabled, skipping redirect
+2026-02-09T18:04:04.640Z [DEBUG] MCP server "plugin:supabase:supabase": HTTP Connection failed after 5639ms: Unauthorized (code: none, errno: none)
+2026-02-09T18:04:04.641Z [ERROR] MCP server "plugin:supabase:supabase" Error: Unauthorized
+2026-02-09T18:04:04.642Z [DEBUG] MCP server "plugin:supabase:supabase": Authentication required for HTTP server
+2026-02-09T18:04:04.989Z [DEBUG] LSP error: plugin:typescript-lsp:typescript - spawn typescript-language-server ENOENT
+2026-02-09T18:04:05.557Z [DEBUG] npm view failed with code 1
+2026-02-09T18:04:05.557Z [DEBUG] npm stderr: (empty)
+2026-02-09T18:04:07.139Z [DEBUG] Writing to temp file: C:\Users\User\.claude\todos\231a20e8-620d-4a6a-9e04-4057399db289-agent-231a20e8-620d-4a6a-9e04-4057399db289.json.tmp.48644.1770660247139
+2026-02-09T18:04:07.140Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-02-09T18:04:07.140Z [DEBUG] Renaming C:\Users\User\.claude\todos\231a20e8-620d-4a6a-9e04-4057399db289-agent-231a20e8-620d-4a6a-9e04-4057399db289.json.tmp.48644.1770660247139 to C:\Users\User\.claude\todos\231a20e8-620d-4a6a-9e04-4057399db289-agent-231a20e8-620d-4a6a-9e04-4057399db289.json
+2026-02-09T18:04:07.141Z [DEBUG] File C:\Users\User\.claude\todos\231a20e8-620d-4a6a-9e04-4057399db289-agent-231a20e8-620d-4a6a-9e04-4057399db289.json written atomically
+2026-02-09T18:04:07.203Z [DEBUG] FileHistory: Added snapshot for f2b45791-9afe-467d-974d-bf7e174e659c, tracking 0 files
+2026-02-09T18:04:07.228Z [DEBUG] [useDeferredValue] Messages deferred by 3 (1→4)
+2026-02-09T18:04:07.479Z [DEBUG] High write ratio: blit=0, write=1104 (100.0% writes), screen=21x120
+2026-02-09T18:04:07.515Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:04:07.588Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.48644.1770660247588
+2026-02-09T18:04:07.589Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:04:07.651Z [DEBUG] Temp file written successfully, size: 9123 bytes
+2026-02-09T18:04:07.652Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:04:07.652Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.48644.1770660247588 to C:\Users\User\.claude.json
+2026-02-09T18:04:07.653Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-09T18:04:07.673Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.48644.1770660247673
+2026-02-09T18:04:07.673Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:04:07.676Z [DEBUG] Temp file written successfully, size: 9123 bytes
+2026-02-09T18:04:07.676Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:04:07.676Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.48644.1770660247673 to C:\Users\User\.claude.json
+2026-02-09T18:04:07.677Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-09T18:04:07.703Z [DEBUG] [useDeferredValue] Messages deferred by 3 (1→4)
+2026-02-09T18:04:08.261Z [DEBUG] Stats cache is up to date
+2026-02-09T18:04:11.303Z [DEBUG] Successfully refreshed marketplace: claude-plugins-official
+2026-02-09T18:04:11.303Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-02-09T18:04:11.550Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:04:11.552Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:04:11.558Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660251558_109b3z
+2026-02-09T18:04:11.648Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660251648_0apx64
+2026-02-09T18:04:11.725Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:04:11.725Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:04:11.725Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:04:11.726Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:04:11.726Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:04:11.726Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:04:12.780Z [DEBUG] npm view failed with code 1
+2026-02-09T18:04:12.780Z [DEBUG] npm stderr: (empty)
+2026-02-09T18:04:17.344Z [ERROR] MCP server "plugin:context7:context7" Server stderr: WARNING: Using default CLIENT_IP_ENCRYPTION_KEY.
+Context7 Documentation MCP Server v2.1.1 running on stdio
+2026-02-09T18:04:17.344Z [DEBUG] MCP server "plugin:context7:context7": Successfully connected to undefined server in 18515ms
+2026-02-09T18:04:17.345Z [DEBUG] MCP server "plugin:context7:context7": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"serverVersion":{"name":"Context7","version":"2.1.1"}}
+2026-02-09T18:04:17.386Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-09T18:04:17.386Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-09T18:04:17.386Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-09T18:04:17.386Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-09T18:04:17.386Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-09T18:04:17.387Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-09T18:04:17.687Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-09T18:04:17.687Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-09T18:04:17.687Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-09T18:04:17.945Z [DEBUG] Tool search disabled via experiment (tengu_tst_kx7): below threshold, deferred tools present [source: analyzeMcp]
+2026-02-09T18:04:18.117Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-09T18:04:18.117Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-09T18:04:18.118Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-09T18:04:20.754Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660251648_0apx64
+2026-02-09T18:04:20.757Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:04:20.758Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:04:20.916Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660251558_109b3z
+2026-02-09T18:04:20.923Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:04:20.923Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:04:31.293Z [DEBUG] Using cached install counts
+2026-02-09T18:04:47.460Z [DEBUG] Full reset (shrink->below): prevHeight=43, nextHeight=30, viewport=30
+2026-02-09T18:05:37.537Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\plugins\\claude-code-setup" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660337537_iuwjoj
+2026-02-09T18:05:37.579Z [DEBUG] Successfully cached plugin claude-code-setup to C:\Users\User\.claude\plugins\cache\claude-code-setup
+2026-02-09T18:05:37.602Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:05:37.611Z [DEBUG] Saved 11 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:05:37.611Z [DEBUG] Added installed plugin: claude-code-setup@claude-plugins-official (scope: user)
+2026-02-09T18:05:37.626Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660337626
+2026-02-09T18:05:37.626Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:05:37.627Z [DEBUG] Temp file written successfully, size: 568 bytes
+2026-02-09T18:05:37.628Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:05:37.628Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660337626 to C:\Users\User\.claude\settings.json
+2026-02-09T18:05:37.629Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:05:37.657Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:05:37.687Z [DEBUG] FileHistory: Making snapshot for message 6d1ddba8-039b-464f-84ec-2af7912b69f4
+2026-02-09T18:05:37.687Z [DEBUG] FileHistory: Added snapshot for 6d1ddba8-039b-464f-84ec-2af7912b69f4, tracking 0 files
+2026-02-09T18:05:37.696Z [DEBUG] [useDeferredValue] Messages deferred by 3 (4→7)
+2026-02-09T18:05:37.775Z [DEBUG] High write ratio: blit=0, write=1123 (100.0% writes), screen=24x120
+2026-02-09T18:05:37.775Z [DEBUG] Full reset (shrink->below): prevHeight=42, nextHeight=24, viewport=30
+2026-02-09T18:05:37.810Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:05:37.865Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.48644.1770660337865
+2026-02-09T18:05:37.866Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:05:37.867Z [DEBUG] Temp file written successfully, size: 9144 bytes
+2026-02-09T18:05:37.868Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:05:37.868Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.48644.1770660337865 to C:\Users\User\.claude.json
+2026-02-09T18:05:37.869Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-09T18:05:37.895Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.48644.1770660337895
+2026-02-09T18:05:37.896Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:05:37.898Z [DEBUG] Temp file written successfully, size: 9144 bytes
+2026-02-09T18:05:37.899Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:05:37.899Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.48644.1770660337895 to C:\Users\User\.claude.json
+2026-02-09T18:05:37.901Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-09T18:05:37.910Z [DEBUG] [useDeferredValue] Messages deferred by 3 (4→7)
+2026-02-09T18:05:38.116Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:38.118Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:05:38.118Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:05:38.137Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:05:38.194Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:38.195Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:05:38.195Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:05:38.248Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:05:38.249Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:05:38.256Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:05:38.256Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:05:38.294Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:05:38.305Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:05:38.306Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:05:38.306Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:05:38.307Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:05:38.317Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:05:38.333Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:38.335Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:05:38.335Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:05:38.356Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:05:38.356Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:05:38.358Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660338358_bb2wcz
+2026-02-09T18:05:43.500Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660338358_bb2wcz
+2026-02-09T18:05:43.508Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:05:43.508Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:05:43.510Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:05:43.943Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:05:43.975Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:05:44.098Z [DEBUG] Using cached install counts
+2026-02-09T18:05:44.189Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:44.191Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:05:44.192Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:05:44.223Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:05:44.278Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:44.280Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:05:44.280Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:05:44.283Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:05:44.299Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:05:44.299Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:05:44.302Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660344301_1imd99
+2026-02-09T18:05:48.050Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660344301_1imd99
+2026-02-09T18:05:48.053Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:05:48.053Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:05:48.054Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:05:48.098Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:05:48.100Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:48.101Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:05:48.101Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:05:48.108Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:05:48.110Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:05:48.110Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:05:48.110Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:05:48.112Z [DEBUG] Found 11 plugins (11 enabled, 0 disabled)
+2026-02-09T18:05:48.137Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:05:48.141Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:05:48.147Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:05:48.162Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:05:48.162Z [DEBUG] Total plugin agents loaded: 8
+2026-02-09T18:05:48.162Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:05:48.170Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:05:48.176Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:05:48.176Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:05:48.176Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:05:48.185Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:05:48.185Z [DEBUG] Total plugin commands loaded: 8
+2026-02-09T18:05:53.660Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\external_plugins\\serena" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660353660_b0nufg
+2026-02-09T18:05:53.668Z [DEBUG] Successfully cached plugin serena to C:\Users\User\.claude\plugins\cache\serena
+2026-02-09T18:05:53.680Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:53.685Z [DEBUG] Saved 12 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:05:53.685Z [DEBUG] Added installed plugin: serena@claude-plugins-official (scope: user)
+2026-02-09T18:05:53.694Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660353694
+2026-02-09T18:05:53.694Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:05:53.695Z [DEBUG] Temp file written successfully, size: 612 bytes
+2026-02-09T18:05:53.696Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:05:53.696Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660353694 to C:\Users\User\.claude\settings.json
+2026-02-09T18:05:53.697Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:05:53.714Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:05:53.725Z [DEBUG] FileHistory: Making snapshot for message 7c7f2ccb-3491-4789-981a-716c8acf6581
+2026-02-09T18:05:53.725Z [DEBUG] FileHistory: Added snapshot for 7c7f2ccb-3491-4789-981a-716c8acf6581, tracking 0 files
+2026-02-09T18:05:53.731Z [DEBUG] [useDeferredValue] Messages deferred by 3 (7→10)
+2026-02-09T18:05:53.758Z [DEBUG] High write ratio: blit=0, write=1189 (100.0% writes), screen=27x120
+2026-02-09T18:05:53.758Z [DEBUG] Full reset (shrink->below): prevHeight=44, nextHeight=27, viewport=30
+2026-02-09T18:05:53.791Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:05:53.819Z [DEBUG] [useDeferredValue] Messages deferred by 3 (7→10)
+2026-02-09T18:05:53.895Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:53.896Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:05:53.896Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:05:53.904Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:05:53.909Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:53.909Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:05:53.909Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:05:53.917Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:05:53.918Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:05:53.919Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:05:53.919Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:05:53.931Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:05:53.931Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:05:53.932Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:05:53.932Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:05:53.932Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:05:53.938Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:05:53.940Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:53.941Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:05:53.941Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:05:53.948Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:05:53.948Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:05:53.949Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660353949_ruqe0f
+2026-02-09T18:05:57.232Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660353949_ruqe0f
+2026-02-09T18:05:57.235Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:05:57.235Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:05:57.236Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:05:57.354Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:05:57.360Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:05:57.362Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:57.363Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:05:57.363Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:05:57.371Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:05:57.380Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:05:57.380Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:05:57.380Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:05:57.382Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:05:57.387Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:05:57.387Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:05:57.388Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660357388_kfkr5d
+2026-02-09T18:06:00.998Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660357388_kfkr5d
+2026-02-09T18:06:01.001Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:06:01.001Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:06:01.002Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:06:01.064Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:06:01.066Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:01.067Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:06:01.067Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:06:01.076Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:06:01.077Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:06:01.078Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:06:01.078Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:06:01.086Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-09T18:06:01.089Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:01.090Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:06:01.090Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:06:01.091Z [DEBUG] Found 12 plugins (12 enabled, 0 disabled)
+2026-02-09T18:06:01.112Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:06:01.119Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:06:01.124Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:06:01.140Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:06:01.140Z [DEBUG] Total plugin agents loaded: 8
+2026-02-09T18:06:01.140Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:06:01.149Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:06:01.153Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:06:01.153Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:06:01.154Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:06:01.164Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:06:01.164Z [DEBUG] Total plugin commands loaded: 8
+2026-02-09T18:06:01.215Z [DEBUG] Using cached install counts
+2026-02-09T18:06:25.470Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\plugins\\pyright-lsp" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660385470_p7ybk4
+2026-02-09T18:06:25.476Z [DEBUG] Successfully cached plugin pyright-lsp to C:\Users\User\.claude\plugins\cache\pyright-lsp
+2026-02-09T18:06:25.487Z [DEBUG] Using manifest version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:06:25.491Z [DEBUG] Saved 13 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:06:25.491Z [DEBUG] Added installed plugin: pyright-lsp@claude-plugins-official (scope: user)
+2026-02-09T18:06:25.498Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660385498
+2026-02-09T18:06:25.499Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:06:25.499Z [DEBUG] Temp file written successfully, size: 661 bytes
+2026-02-09T18:06:25.500Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:06:25.500Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660385498 to C:\Users\User\.claude\settings.json
+2026-02-09T18:06:25.501Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:06:25.512Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:06:25.521Z [DEBUG] FileHistory: Making snapshot for message 6ab43ed5-91a8-4a92-bcd2-169c7c4e2c2e
+2026-02-09T18:06:25.521Z [DEBUG] FileHistory: Added snapshot for 6ab43ed5-91a8-4a92-bcd2-169c7c4e2c2e, tracking 0 files
+2026-02-09T18:06:25.527Z [DEBUG] [useDeferredValue] Messages deferred by 3 (10→13)
+2026-02-09T18:06:25.576Z [DEBUG] High write ratio: blit=0, write=1180 (100.0% writes), screen=29x120
+2026-02-09T18:06:25.576Z [DEBUG] Full reset (shrink->below): prevHeight=48, nextHeight=29, viewport=30
+2026-02-09T18:06:25.609Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:06:25.640Z [DEBUG] [useDeferredValue] Messages deferred by 3 (10→13)
+2026-02-09T18:06:25.717Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:25.717Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:06:25.717Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:06:25.726Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:06:25.730Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:25.730Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:06:25.730Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:06:25.736Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:06:25.737Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:06:25.738Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:06:25.738Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:06:25.744Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:06:25.745Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:06:25.745Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:06:25.745Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:06:25.746Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:06:25.750Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:06:25.752Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:25.753Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:06:25.753Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:06:25.758Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:06:25.758Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:06:25.758Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660385758_fsny5f
+2026-02-09T18:06:27.360Z [DEBUG] Full reset (shrink->below): prevHeight=30, nextHeight=29, viewport=30
+2026-02-09T18:06:29.336Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660385758_fsny5f
+2026-02-09T18:06:29.338Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:06:29.338Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:06:29.339Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:06:29.434Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:06:29.440Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:06:29.443Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:29.444Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:06:29.444Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:06:29.450Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:06:29.452Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:29.452Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:06:29.452Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:06:29.453Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:06:29.458Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:06:29.458Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:06:29.459Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660389459_m3osts
+2026-02-09T18:06:30.563Z [DEBUG] Using cached install counts
+2026-02-09T18:06:32.316Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660389459_m3osts
+2026-02-09T18:06:32.318Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:06:32.318Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:06:32.318Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:06:32.353Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:06:32.355Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:32.356Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:06:32.356Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:06:32.361Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:06:32.362Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:06:32.362Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:06:32.362Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:06:32.368Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-09T18:06:32.370Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:32.371Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:06:32.371Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:06:32.376Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-09T18:06:32.377Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:06:32.377Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:06:32.377Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:06:32.377Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-09T18:06:32.378Z [DEBUG] Found 13 plugins (13 enabled, 0 disabled)
+2026-02-09T18:06:32.391Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:06:32.394Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:06:32.398Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:06:32.409Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:06:32.409Z [DEBUG] Total plugin agents loaded: 8
+2026-02-09T18:06:32.409Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:06:32.419Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:06:32.425Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:06:32.425Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:06:32.425Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:06:32.431Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:06:32.431Z [DEBUG] Total plugin commands loaded: 8
+2026-02-09T18:06:38.844Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\plugins\\agent-sdk-dev" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660398844_ydgfg0
+2026-02-09T18:06:38.859Z [DEBUG] Successfully cached plugin agent-sdk-dev to C:\Users\User\.claude\plugins\cache\agent-sdk-dev
+2026-02-09T18:06:38.877Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:38.882Z [DEBUG] Saved 14 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:06:38.882Z [DEBUG] Added installed plugin: agent-sdk-dev@claude-plugins-official (scope: user)
+2026-02-09T18:06:38.890Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660398890
+2026-02-09T18:06:38.890Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:06:38.891Z [DEBUG] Temp file written successfully, size: 712 bytes
+2026-02-09T18:06:38.891Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:06:38.891Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660398890 to C:\Users\User\.claude\settings.json
+2026-02-09T18:06:38.893Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:06:38.907Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:06:38.916Z [DEBUG] FileHistory: Making snapshot for message b1b11d71-72a4-48d1-b7ef-55fdf0f152d3
+2026-02-09T18:06:38.916Z [DEBUG] FileHistory: Added snapshot for b1b11d71-72a4-48d1-b7ef-55fdf0f152d3, tracking 0 files
+2026-02-09T18:06:38.920Z [DEBUG] [useDeferredValue] Messages deferred by 3 (13→16)
+2026-02-09T18:06:38.944Z [DEBUG] High write ratio: blit=0, write=1263 (100.0% writes), screen=32x120
+2026-02-09T18:06:38.970Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:06:39.000Z [DEBUG] [useDeferredValue] Messages deferred by 3 (13→16)
+2026-02-09T18:06:39.008Z [DEBUG] Full reset (shrink->below): prevHeight=32, nextHeight=30, viewport=30
+2026-02-09T18:06:39.070Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:39.071Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:06:39.071Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:06:39.081Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:06:39.091Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:39.092Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:06:39.092Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:06:39.098Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:06:39.099Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:06:39.099Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:06:39.099Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:06:39.105Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:06:39.105Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:06:39.106Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:06:39.106Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:06:39.106Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:06:39.111Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:06:39.113Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:39.113Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:06:39.113Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:06:39.119Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:06:39.119Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:06:39.120Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660399120_wqhdfc
+2026-02-09T18:06:42.250Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660399120_wqhdfc
+2026-02-09T18:06:42.253Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:06:42.253Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:06:42.254Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:06:42.368Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:06:42.373Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:06:42.376Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:42.376Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:06:42.376Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:06:42.383Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:06:42.385Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:42.385Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:06:42.385Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:06:42.386Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:06:42.391Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:06:42.391Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:06:42.392Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660402391_j81xw2
+2026-02-09T18:06:46.069Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660402391_j81xw2
+2026-02-09T18:06:46.072Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:06:46.072Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:06:46.073Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:06:46.119Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:06:46.122Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:46.123Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:06:46.123Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:06:46.130Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:06:46.131Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:06:46.132Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:06:46.132Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:06:46.139Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-09T18:06:46.141Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:46.142Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:06:46.142Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:06:46.149Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-09T18:06:46.150Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:06:46.150Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:06:46.150Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:06:46.151Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-09T18:06:46.160Z [DEBUG] Loading plugin agent-sdk-dev from source: "./plugins/agent-sdk-dev"
+2026-02-09T18:06:46.162Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:06:46.163Z [DEBUG] Plugin agent-sdk-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:06:46.163Z [DEBUG] Copied local plugin agent-sdk-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:06:46.165Z [DEBUG] Found 14 plugins (14 enabled, 0 disabled)
+2026-02-09T18:06:46.185Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:06:46.190Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:06:46.196Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:06:46.213Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:06:46.222Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-02-09T18:06:46.222Z [DEBUG] Total plugin agents loaded: 10
+2026-02-09T18:06:46.222Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:06:46.232Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:06:46.238Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:06:46.238Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:06:46.238Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:06:46.248Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:06:46.252Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-02-09T18:06:46.252Z [DEBUG] Total plugin commands loaded: 9
+2026-02-09T18:06:48.550Z [DEBUG] Using cached install counts
+2026-02-09T18:07:02.709Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\plugins\\pr-review-toolkit" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660422709_ycyf7j
+2026-02-09T18:07:02.736Z [DEBUG] Successfully cached plugin pr-review-toolkit to C:\Users\User\.claude\plugins\cache\pr-review-toolkit
+2026-02-09T18:07:02.748Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:02.754Z [DEBUG] Saved 15 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:07:02.754Z [DEBUG] Added installed plugin: pr-review-toolkit@claude-plugins-official (scope: user)
+2026-02-09T18:07:02.762Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660422762
+2026-02-09T18:07:02.762Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:07:02.763Z [DEBUG] Temp file written successfully, size: 767 bytes
+2026-02-09T18:07:02.764Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:07:02.764Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660422762 to C:\Users\User\.claude\settings.json
+2026-02-09T18:07:02.765Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:07:02.782Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:07:02.796Z [DEBUG] FileHistory: Making snapshot for message 8661ee4e-be3b-42f8-94ef-a95e6ed1a5ba
+2026-02-09T18:07:02.796Z [DEBUG] FileHistory: Added snapshot for 8661ee4e-be3b-42f8-94ef-a95e6ed1a5ba, tracking 0 files
+2026-02-09T18:07:02.805Z [DEBUG] [useDeferredValue] Messages deferred by 3 (16→19)
+2026-02-09T18:07:02.841Z [DEBUG] High write ratio: blit=0, write=1344 (100.0% writes), screen=35x120
+2026-02-09T18:07:02.868Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:07:02.899Z [DEBUG] [useDeferredValue] Messages deferred by 3 (16→19)
+2026-02-09T18:07:02.970Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:02.970Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:07:02.971Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:07:02.978Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:07:02.987Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:02.987Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:07:02.987Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:07:02.995Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:07:02.996Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:07:02.997Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:07:02.997Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:07:03.005Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:07:03.005Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:07:03.006Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:07:03.006Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:07:03.006Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:07:03.011Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:07:03.013Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:03.014Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:07:03.014Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:07:03.020Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:07:03.020Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:07:03.021Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660423021_gns87c
+2026-02-09T18:07:06.598Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660423021_gns87c
+2026-02-09T18:07:06.601Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:07:06.601Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:07:06.602Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:07:06.717Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:07:06.725Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:07:06.729Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:06.729Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:07:06.729Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:07:06.736Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:07:06.739Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:06.739Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:07:06.739Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:07:06.740Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:07:06.746Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:07:06.746Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:07:06.747Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660426747_z39fmh
+2026-02-09T18:07:09.387Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:07:10.399Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660426747_z39fmh
+2026-02-09T18:07:10.402Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:07:10.402Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:07:10.402Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:07:10.458Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:07:10.460Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:10.461Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:07:10.461Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:07:10.472Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:07:10.473Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:07:10.473Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:07:10.473Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:07:10.480Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-09T18:07:10.483Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:10.483Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:07:10.483Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:07:10.490Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-09T18:07:10.490Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:07:10.491Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:07:10.491Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:07:10.491Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-09T18:07:10.498Z [DEBUG] Loading plugin agent-sdk-dev from source: "./plugins/agent-sdk-dev"
+2026-02-09T18:07:10.501Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:10.502Z [DEBUG] Plugin agent-sdk-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:07:10.502Z [DEBUG] Copied local plugin agent-sdk-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:07:10.509Z [DEBUG] Loading plugin pr-review-toolkit from source: "./plugins/pr-review-toolkit"
+2026-02-09T18:07:10.511Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:10.512Z [DEBUG] Plugin pr-review-toolkit@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:07:10.512Z [DEBUG] Copied local plugin pr-review-toolkit to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:07:10.514Z [DEBUG] Found 15 plugins (15 enabled, 0 disabled)
+2026-02-09T18:07:10.530Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:07:10.533Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:07:10.537Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:07:10.551Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:07:10.562Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-02-09T18:07:10.574Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\code-reviewer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review code for adherence to proje…
+             ^
+2026-02-09T18:07:10.588Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\comment-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to analyze code comments for accuracy…
+             ^
+2026-02-09T18:07:10.597Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\pr-test-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review a pull request for test cov…
+             ^
+2026-02-09T18:07:10.604Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\silent-failure-hunter.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when reviewing code changes in a pull request to id…
+             ^
+2026-02-09T18:07:10.612Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\type-design-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need expert analysis of type design in you…
+             ^
+2026-02-09T18:07:10.613Z [DEBUG] Loaded 6 agents from plugin pr-review-toolkit default directory
+2026-02-09T18:07:10.613Z [DEBUG] Total plugin agents loaded: 16
+2026-02-09T18:07:10.613Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:07:10.623Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:07:10.629Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:07:10.629Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:07:10.629Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:07:10.639Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:07:10.643Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-02-09T18:07:10.647Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-02-09T18:07:10.647Z [DEBUG] Total plugin commands loaded: 10
+2026-02-09T18:07:13.803Z [DEBUG] Using cached install counts
+2026-02-09T18:07:21.466Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\plugins\\code-review" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660441466_k58vpp
+2026-02-09T18:07:21.477Z [DEBUG] Successfully cached plugin code-review to C:\Users\User\.claude\plugins\cache\code-review
+2026-02-09T18:07:21.497Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:21.503Z [DEBUG] Saved 16 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:07:21.503Z [DEBUG] Added installed plugin: code-review@claude-plugins-official (scope: user)
+2026-02-09T18:07:21.514Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660441514
+2026-02-09T18:07:21.514Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:07:21.516Z [DEBUG] Temp file written successfully, size: 816 bytes
+2026-02-09T18:07:21.516Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:07:21.516Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660441514 to C:\Users\User\.claude\settings.json
+2026-02-09T18:07:21.518Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:07:21.542Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:07:21.558Z [DEBUG] FileHistory: Making snapshot for message 813e45ff-2829-4b5a-9292-d698c2aafdc1
+2026-02-09T18:07:21.559Z [DEBUG] FileHistory: Added snapshot for 813e45ff-2829-4b5a-9292-d698c2aafdc1, tracking 0 files
+2026-02-09T18:07:21.570Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-02-09T18:07:21.616Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:07:21.681Z [DEBUG] High write ratio: blit=0, write=1430 (100.0% writes), screen=38x120
+2026-02-09T18:07:21.695Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-02-09T18:07:21.767Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:21.767Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:07:21.768Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:07:21.780Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:07:21.803Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:21.804Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:07:21.804Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:07:21.812Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:07:21.813Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:07:21.813Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:07:21.814Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:07:21.821Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:07:21.821Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:07:21.822Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:07:21.822Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:07:21.822Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:07:21.829Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:07:21.832Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:21.832Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:07:21.832Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:07:21.842Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:07:21.842Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:07:21.843Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660441843_xr9no9
+2026-02-09T18:07:25.869Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660441843_xr9no9
+2026-02-09T18:07:25.874Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:07:25.874Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:07:25.874Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:07:26.019Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:07:26.031Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:07:26.035Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:26.036Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:07:26.036Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:07:26.044Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:07:26.047Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:26.047Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:07:26.047Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:07:26.048Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:07:26.054Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:07:26.054Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:07:26.054Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660446054_4wn5yj
+2026-02-09T18:07:27.558Z [DEBUG] Using cached install counts
+2026-02-09T18:07:29.687Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660446054_4wn5yj
+2026-02-09T18:07:29.690Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:07:29.690Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:07:29.691Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:07:29.742Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:07:29.745Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:29.746Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:07:29.746Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:07:29.753Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:07:29.754Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:07:29.754Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:07:29.754Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:07:29.761Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-09T18:07:29.764Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:29.764Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:07:29.764Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:07:29.772Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-09T18:07:29.773Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:07:29.773Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:07:29.773Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:07:29.774Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-09T18:07:29.783Z [DEBUG] Loading plugin agent-sdk-dev from source: "./plugins/agent-sdk-dev"
+2026-02-09T18:07:29.787Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:29.787Z [DEBUG] Plugin agent-sdk-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:07:29.787Z [DEBUG] Copied local plugin agent-sdk-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:07:29.796Z [DEBUG] Loading plugin pr-review-toolkit from source: "./plugins/pr-review-toolkit"
+2026-02-09T18:07:29.799Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:29.800Z [DEBUG] Plugin pr-review-toolkit@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:07:29.800Z [DEBUG] Copied local plugin pr-review-toolkit to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:07:29.807Z [DEBUG] Loading plugin code-review from source: "./plugins/code-review"
+2026-02-09T18:07:29.810Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:07:29.810Z [DEBUG] Plugin code-review@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-09T18:07:29.810Z [DEBUG] Copied local plugin code-review to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-09T18:07:29.812Z [DEBUG] Found 16 plugins (16 enabled, 0 disabled)
+2026-02-09T18:07:29.831Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:07:29.836Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:07:29.842Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:07:29.856Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:07:29.867Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-02-09T18:07:29.880Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\code-reviewer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review code for adherence to proje…
+             ^
+2026-02-09T18:07:29.898Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\comment-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to analyze code comments for accuracy…
+             ^
+2026-02-09T18:07:29.909Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\pr-test-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review a pull request for test cov…
+             ^
+2026-02-09T18:07:29.919Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\silent-failure-hunter.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when reviewing code changes in a pull request to id…
+             ^
+2026-02-09T18:07:29.929Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\type-design-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need expert analysis of type design in you…
+             ^
+2026-02-09T18:07:29.930Z [DEBUG] Loaded 6 agents from plugin pr-review-toolkit default directory
+2026-02-09T18:07:29.930Z [DEBUG] Total plugin agents loaded: 16
+2026-02-09T18:07:29.930Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:07:29.941Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:07:29.945Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:07:29.945Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:07:29.945Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:07:29.952Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:07:29.956Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-02-09T18:07:29.959Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-02-09T18:07:29.962Z [DEBUG] Loaded 1 commands from plugin code-review default directory
+2026-02-09T18:07:29.962Z [DEBUG] Total plugin commands loaded: 11
+2026-02-09T18:08:31.592Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\external_plugins\\stripe" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660511592_yioahf
+2026-02-09T18:08:31.610Z [DEBUG] Successfully cached plugin stripe to C:\Users\User\.claude\plugins\cache\stripe
+2026-02-09T18:08:31.623Z [DEBUG] Using manifest version for stripe@claude-plugins-official: 0.1.0
+2026-02-09T18:08:31.629Z [DEBUG] Saved 17 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:08:31.629Z [DEBUG] Added installed plugin: stripe@claude-plugins-official (scope: user)
+2026-02-09T18:08:31.640Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660511640
+2026-02-09T18:08:31.640Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:08:31.641Z [DEBUG] Temp file written successfully, size: 860 bytes
+2026-02-09T18:08:31.642Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:08:31.642Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660511640 to C:\Users\User\.claude\settings.json
+2026-02-09T18:08:31.643Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:08:31.656Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:08:31.666Z [DEBUG] FileHistory: Making snapshot for message 33be7d06-ccea-487b-bb32-6d3ce8435be2
+2026-02-09T18:08:31.666Z [DEBUG] FileHistory: Added snapshot for 33be7d06-ccea-487b-bb32-6d3ce8435be2, tracking 0 files
+2026-02-09T18:08:31.673Z [DEBUG] [useDeferredValue] Messages deferred by 3 (22→25)
+2026-02-09T18:08:31.715Z [DEBUG] High write ratio: blit=0, write=1517 (100.0% writes), screen=41x120
+2026-02-09T18:08:31.736Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:08:31.764Z [DEBUG] [useDeferredValue] Messages deferred by 3 (22→25)
+2026-02-09T18:08:31.828Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:31.829Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:08:31.829Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:08:31.838Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:08:31.843Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:31.844Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:08:31.844Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:08:31.856Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:08:31.857Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:08:31.857Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:08:31.857Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:08:31.870Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:08:31.871Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:08:31.871Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:08:31.871Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:08:31.872Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:08:31.880Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:08:31.883Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:31.883Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:08:31.883Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:08:31.889Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:08:31.889Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:08:31.890Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660511890_tb0gg8
+2026-02-09T18:08:35.096Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660511890_tb0gg8
+2026-02-09T18:08:35.098Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:08:35.099Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:08:35.099Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:08:35.190Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:08:35.195Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:08:35.198Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:35.198Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:08:35.198Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:08:35.204Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:08:35.205Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:35.206Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:08:35.206Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:08:35.207Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:08:35.211Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:08:35.211Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:08:35.212Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660515212_d9b5bl
+2026-02-09T18:08:36.558Z [DEBUG] Using cached install counts
+2026-02-09T18:08:37.931Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660515212_d9b5bl
+2026-02-09T18:08:37.936Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:08:37.936Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:08:37.937Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:08:38.018Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:08:38.022Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:38.023Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:08:38.023Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:08:38.038Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:08:38.039Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:08:38.041Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:08:38.041Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:08:38.060Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-09T18:08:38.066Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:38.067Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:08:38.067Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:08:38.077Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-09T18:08:38.077Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:08:38.078Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:08:38.078Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:08:38.079Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-09T18:08:38.088Z [DEBUG] Loading plugin agent-sdk-dev from source: "./plugins/agent-sdk-dev"
+2026-02-09T18:08:38.090Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:38.090Z [DEBUG] Plugin agent-sdk-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:08:38.090Z [DEBUG] Copied local plugin agent-sdk-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:08:38.097Z [DEBUG] Loading plugin pr-review-toolkit from source: "./plugins/pr-review-toolkit"
+2026-02-09T18:08:38.099Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:38.100Z [DEBUG] Plugin pr-review-toolkit@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:08:38.100Z [DEBUG] Copied local plugin pr-review-toolkit to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:08:38.106Z [DEBUG] Loading plugin code-review from source: "./plugins/code-review"
+2026-02-09T18:08:38.108Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:38.109Z [DEBUG] Plugin code-review@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-09T18:08:38.109Z [DEBUG] Copied local plugin code-review to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-09T18:08:38.114Z [DEBUG] Loading plugin stripe from source: "./external_plugins/stripe"
+2026-02-09T18:08:38.115Z [DEBUG] Using manifest version for stripe@claude-plugins-official: 0.1.0
+2026-02-09T18:08:38.116Z [DEBUG] Plugin stripe@claude-plugins-official version 0.1.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-02-09T18:08:38.116Z [DEBUG] Copied local plugin stripe to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-02-09T18:08:38.117Z [DEBUG] Found 17 plugins (17 enabled, 0 disabled)
+2026-02-09T18:08:38.129Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:08:38.132Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:08:38.135Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:08:38.146Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:08:38.157Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-02-09T18:08:38.163Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\code-reviewer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review code for adherence to proje…
+             ^
+2026-02-09T18:08:38.174Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\comment-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to analyze code comments for accuracy…
+             ^
+2026-02-09T18:08:38.180Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\pr-test-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review a pull request for test cov…
+             ^
+2026-02-09T18:08:38.186Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\silent-failure-hunter.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when reviewing code changes in a pull request to id…
+             ^
+2026-02-09T18:08:38.191Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\type-design-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need expert analysis of type design in you…
+             ^
+2026-02-09T18:08:38.192Z [DEBUG] Loaded 6 agents from plugin pr-review-toolkit default directory
+2026-02-09T18:08:38.192Z [DEBUG] Total plugin agents loaded: 16
+2026-02-09T18:08:38.192Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:08:38.199Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:08:38.202Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:08:38.202Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:08:38.203Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:08:38.208Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:08:38.211Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-02-09T18:08:38.213Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-02-09T18:08:38.218Z [DEBUG] Loaded 1 commands from plugin code-review default directory
+2026-02-09T18:08:38.222Z [DEBUG] Loaded 2 commands from plugin stripe default directory
+2026-02-09T18:08:38.222Z [DEBUG] Total plugin commands loaded: 13
+2026-02-09T18:08:47.216Z [DEBUG] Caching plugin from source: "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official\\plugins\\claude-md-management" to temporary path C:\Users\User\.claude\plugins\cache\temp_local_1770660527216_r02l5z
+2026-02-09T18:08:47.244Z [DEBUG] Successfully cached plugin claude-md-management to C:\Users\User\.claude\plugins\cache\claude-md-management
+2026-02-09T18:08:47.254Z [DEBUG] Using manifest version for claude-md-management@claude-plugins-official: 1.0.0
+2026-02-09T18:08:47.259Z [DEBUG] Saved 18 installed plugins to C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-09T18:08:47.259Z [DEBUG] Added installed plugin: claude-md-management@claude-plugins-official (scope: user)
+2026-02-09T18:08:47.266Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.json.tmp.48644.1770660527266
+2026-02-09T18:08:47.266Z [DEBUG] Preserving file permissions: 100666
+2026-02-09T18:08:47.267Z [DEBUG] Temp file written successfully, size: 918 bytes
+2026-02-09T18:08:47.267Z [DEBUG] Applied original permissions to temp file
+2026-02-09T18:08:47.267Z [DEBUG] Renaming C:\Users\User\.claude\settings.json.tmp.48644.1770660527266 to C:\Users\User\.claude\settings.json
+2026-02-09T18:08:47.269Z [DEBUG] File C:\Users\User\.claude\settings.json written atomically
+2026-02-09T18:08:47.281Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:08:47.291Z [DEBUG] FileHistory: Making snapshot for message 5e09f5d5-ed4a-45d4-ab0b-e40edc430049
+2026-02-09T18:08:47.292Z [DEBUG] FileHistory: Added snapshot for 5e09f5d5-ed4a-45d4-ab0b-e40edc430049, tracking 0 files
+2026-02-09T18:08:47.299Z [DEBUG] [useDeferredValue] Messages deferred by 3 (25→28)
+2026-02-09T18:08:47.331Z [DEBUG] High write ratio: blit=0, write=1585 (100.0% writes), screen=44x120
+2026-02-09T18:08:47.347Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-09T18:08:47.372Z [DEBUG] [useDeferredValue] Messages deferred by 3 (25→28)
+2026-02-09T18:08:47.446Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:47.446Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:08:47.446Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:08:47.453Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:08:47.458Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:47.458Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:08:47.458Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:08:47.465Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:08:47.466Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:08:47.466Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:08:47.466Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:08:47.472Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:08:47.473Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:08:47.474Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:08:47.474Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:08:47.475Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:08:47.484Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:08:47.488Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:47.488Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:08:47.488Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:08:47.496Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:08:47.496Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:08:47.497Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660527497_pn9al0
+2026-02-09T18:08:50.661Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660527497_pn9al0
+2026-02-09T18:08:50.664Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-09T18:08:50.664Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.2.0
+2026-02-09T18:08:50.664Z [DEBUG] Plugin superpowers@claude-plugins-official version 4.2.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0
+2026-02-09T18:08:50.768Z [DEBUG] Loaded hooks from standard location for plugin superpowers: C:\Users\User\.claude\plugins\cache\claude-plugins-official\superpowers\4.2.0\hooks\hooks.json
+2026-02-09T18:08:50.773Z [DEBUG] Loading plugin supabase from source: "./external_plugins/supabase"
+2026-02-09T18:08:50.778Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:50.778Z [DEBUG] Plugin supabase@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:08:50.778Z [DEBUG] Copied local plugin supabase to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\supabase\2cd88e7947b7
+2026-02-09T18:08:50.784Z [DEBUG] Loading plugin plugin-dev from source: "./plugins/plugin-dev"
+2026-02-09T18:08:50.786Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:50.787Z [DEBUG] Plugin plugin-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:08:50.787Z [DEBUG] Copied local plugin plugin-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\plugin-dev\2cd88e7947b7
+2026-02-09T18:08:50.788Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-02-09T18:08:50.792Z [DEBUG] Loading plugin vercel from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"}
+2026-02-09T18:08:50.793Z [DEBUG] No version found for vercel@claude-plugins-official, using 'unknown'
+2026-02-09T18:08:50.793Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770660530793_m4bmwk
+2026-02-09T18:08:51.476Z [DEBUG] Using cached install counts
+2026-02-09T18:08:53.556Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1770660530793_m4bmwk
+2026-02-09T18:08:53.560Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-09T18:08:53.560Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-09T18:08:53.560Z [DEBUG] Plugin vercel@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0
+2026-02-09T18:08:53.604Z [DEBUG] Loading plugin github from source: "./external_plugins/github"
+2026-02-09T18:08:53.607Z [DEBUG] Using git SHA for github@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:53.608Z [DEBUG] Plugin github@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:08:53.608Z [DEBUG] Copied local plugin github to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\github\2cd88e7947b7
+2026-02-09T18:08:53.615Z [DEBUG] Loading plugin claude-code-setup from source: "./plugins/claude-code-setup"
+2026-02-09T18:08:53.617Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-09T18:08:53.618Z [DEBUG] Plugin claude-code-setup@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:08:53.618Z [DEBUG] Copied local plugin claude-code-setup to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-code-setup\1.0.0
+2026-02-09T18:08:53.625Z [DEBUG] Loading plugin serena from source: "./external_plugins/serena"
+2026-02-09T18:08:53.628Z [DEBUG] Using git SHA for serena@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:53.629Z [DEBUG] Plugin serena@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:08:53.629Z [DEBUG] Copied local plugin serena to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\serena\2cd88e7947b7
+2026-02-09T18:08:53.637Z [DEBUG] Loading plugin pyright-lsp from source: "./plugins/pyright-lsp"
+2026-02-09T18:08:53.638Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:08:53.638Z [DEBUG] Plugin pyright-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:08:53.638Z [DEBUG] Copied local plugin pyright-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pyright-lsp\1.0.0
+2026-02-09T18:08:53.639Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-02-09T18:08:53.646Z [DEBUG] Loading plugin agent-sdk-dev from source: "./plugins/agent-sdk-dev"
+2026-02-09T18:08:53.649Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:53.650Z [DEBUG] Plugin agent-sdk-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:08:53.650Z [DEBUG] Copied local plugin agent-sdk-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\agent-sdk-dev\2cd88e7947b7
+2026-02-09T18:08:53.657Z [DEBUG] Loading plugin pr-review-toolkit from source: "./plugins/pr-review-toolkit"
+2026-02-09T18:08:53.660Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:53.661Z [DEBUG] Plugin pr-review-toolkit@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:08:53.661Z [DEBUG] Copied local plugin pr-review-toolkit to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7
+2026-02-09T18:08:53.670Z [DEBUG] Loading plugin code-review from source: "./plugins/code-review"
+2026-02-09T18:08:53.673Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:08:53.673Z [DEBUG] Plugin code-review@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-09T18:08:53.673Z [DEBUG] Copied local plugin code-review to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-review\2cd88e7947b7
+2026-02-09T18:08:53.679Z [DEBUG] Loading plugin stripe from source: "./external_plugins/stripe"
+2026-02-09T18:08:53.680Z [DEBUG] Using manifest version for stripe@claude-plugins-official: 0.1.0
+2026-02-09T18:08:53.680Z [DEBUG] Plugin stripe@claude-plugins-official version 0.1.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-02-09T18:08:53.680Z [DEBUG] Copied local plugin stripe to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\stripe\0.1.0
+2026-02-09T18:08:53.686Z [DEBUG] Loading plugin claude-md-management from source: "./plugins/claude-md-management"
+2026-02-09T18:08:53.687Z [DEBUG] Using manifest version for claude-md-management@claude-plugins-official: 1.0.0
+2026-02-09T18:08:53.687Z [DEBUG] Plugin claude-md-management@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0
+2026-02-09T18:08:53.687Z [DEBUG] Copied local plugin claude-md-management to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\claude-md-management\1.0.0
+2026-02-09T18:08:53.689Z [DEBUG] Found 18 plugins (18 enabled, 0 disabled)
+2026-02-09T18:08:53.701Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-02-09T18:08:53.705Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-02-09T18:08:53.708Z [DEBUG] Loaded 1 agents from plugin superpowers default directory
+2026-02-09T18:08:53.719Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-02-09T18:08:53.725Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-02-09T18:08:53.734Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\code-reviewer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review code for adherence to proje…
+             ^
+2026-02-09T18:08:53.744Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\comment-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to analyze code comments for accuracy…
+             ^
+2026-02-09T18:08:53.750Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\pr-test-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need to review a pull request for test cov…
+             ^
+2026-02-09T18:08:53.756Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\silent-failure-hunter.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when reviewing code changes in a pull request to id…
+             ^
+2026-02-09T18:08:53.761Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\plugins\cache\claude-plugins-official\pr-review-toolkit\2cd88e7947b7\agents\type-design-analyzer.md: Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: Use this agent when you need expert analysis of type design in you…
+             ^
+2026-02-09T18:08:53.762Z [DEBUG] Loaded 6 agents from plugin pr-review-toolkit default directory
+2026-02-09T18:08:53.762Z [DEBUG] Total plugin agents loaded: 16
+2026-02-09T18:08:53.762Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-02-09T18:08:53.768Z [DEBUG] Loaded 3 commands from plugin superpowers default directory
+2026-02-09T18:08:53.770Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-02-09T18:08:53.770Z [DEBUG] Plugin vercel has commandsPaths: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:08:53.770Z [DEBUG] Checking commandPath C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\ - isDirectory: true, isFile: false
+2026-02-09T18:08:53.776Z [DEBUG] Loaded 3 commands from plugin vercel custom path: C:\Users\User\.claude\plugins\cache\claude-plugins-official\vercel\1.0.0\commands\
+2026-02-09T18:08:53.778Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-02-09T18:08:53.781Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-02-09T18:08:53.783Z [DEBUG] Loaded 1 commands from plugin code-review default directory
+2026-02-09T18:08:53.787Z [DEBUG] Loaded 2 commands from plugin stripe default directory
+2026-02-09T18:08:53.790Z [DEBUG] Loaded 1 commands from plugin claude-md-management default directory
+2026-02-09T18:08:53.790Z [DEBUG] Total plugin commands loaded: 14

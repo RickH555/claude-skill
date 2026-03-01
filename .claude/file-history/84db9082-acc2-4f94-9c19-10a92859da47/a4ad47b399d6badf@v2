@@ -1,0 +1,41 @@
+import { chromium } from 'playwright';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const SURVEY_ID = '02023306-325a-4eac-bd57-39c01be98291';
+const SS = (name) => path.join(__dirname, `tall-${name}.png`);
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  // Use a very tall viewport to capture all content
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 4000 } });
+  const page = await ctx.newPage();
+
+  // Login
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+
+  // Go to survey detail
+  await page.goto(`${APP}/dashboard/surveys/${SURVEY_ID}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000);
+
+  // AI Analysis tab
+  const analysisTab = page.locator('[role="tab"]:has-text("AI Analysis")').first();
+  await analysisTab.click();
+  await page.waitForTimeout(3000);
+  await page.screenshot({ path: SS('analysis'), fullPage: true });
+
+  // Charts tab
+  const chartsTab = page.locator('[role="tab"]:has-text("Charts")').first();
+  await chartsTab.click();
+  await page.waitForTimeout(2000);
+  await page.screenshot({ path: SS('charts'), fullPage: true });
+
+  await browser.close();
+  console.log('Done!');
+})();

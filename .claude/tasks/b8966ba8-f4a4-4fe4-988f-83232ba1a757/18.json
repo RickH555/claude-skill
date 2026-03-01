@@ -1,0 +1,9 @@
+{
+  "id": "18",
+  "subject": "Create postcss.config.mjs, .env.example, and .gitignore",
+  "description": "Create PostCSS config with @tailwindcss/postcss plugin, .env.example with all required env vars, and .gitignore for Next.js project",
+  "activeForm": "Creating project configuration files",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

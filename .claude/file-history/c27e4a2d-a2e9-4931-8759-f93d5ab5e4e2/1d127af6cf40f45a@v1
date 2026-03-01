@@ -1,0 +1,10 @@
+import PageHeader from '@/components/layout/PageHeader';
+
+export default function ClientsPage() {
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Clients" description="Consultez et gérez vos clients fidélité." />
+      <p className="text-[var(--text-tertiary)]">Bientôt disponible.</p>
+    </div>
+  );
+}

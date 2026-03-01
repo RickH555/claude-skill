@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Restaurer l'architecture SPA Vite du projet CitedBy.ai",
+  "description": "Le projet a été cassé par une migration Next.js non demandée. Restaurer: 1) Renommer _legacy_pages → pages, 2) Réinstaller Vite, 3) Corriger package.json, 4) Vérifier tous les fichiers, 5) Lancer le dev server",
+  "activeForm": "Diagnostiquant l'état du projet",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,1181 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { User } from '../types';
+import {
+  AuthorProfile, OrganizationProfile, TrustSignalsConfig, EEAT_CREDITS,
+  GeneratedAuthorBio, GeneratedAboutPage, GeneratedTrustBlock,
+  GeneratedCredentials, GeneratedCitationBlock, EeatAuditResult,
+  Credential, Education, Certification, Award, Publication, SocialProfile,
+  ReviewAggregate, MediaMention,
+} from '../types/eeat';
+import {
+  generateAuthorBio, generateAboutPage, generateTrustSignals,
+  generateCredentials, generateCitationBlock, auditEeat,
+  saveAuditToHistory, getAuditHistory, compareAudits,
+} from '../services/eeat';
+import type { EeatAuditHistoryEntry, AuditComparison } from '../services/eeat';
+import {
+  ArrowLeft, Sparkles, Loader2, Copy, Check, UserCircle, Building2,
+  Shield, Award as AwardIcon, FileText, BarChart3, Plus, X, Search,
+  ChevronDown, ChevronUp, Zap, CheckCircle, AlertTriangle, XCircle,
+  Download, History, ArrowRight, TrendingUp, Wrench, Clock, Trash2,
+} from 'lucide-react';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  ResponsiveContainer,
+} from 'recharts';
+
+interface Props {
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+}
+
+// ── Tabs config ──
+const TABS = [
+  { id: 'author-bio', label: 'Bio Auteur', icon: UserCircle, color: 'text-emerald-400', cost: EEAT_CREDITS.authorBio },
+  { id: 'about-page', label: 'Page A Propos', icon: Building2, color: 'text-blue-400', cost: EEAT_CREDITS.aboutPage },
+  { id: 'trust-signals', label: 'Trust Signals', icon: Shield, color: 'text-amber-400', cost: EEAT_CREDITS.trustSignals },
+  { id: 'credentials', label: 'Credentials', icon: AwardIcon, color: 'text-purple-400', cost: EEAT_CREDITS.credentials },
+  { id: 'citation-block', label: 'Bloc Citation', icon: FileText, color: 'text-cyan-400', cost: EEAT_CREDITS.citationBlock },
+  { id: 'eeat-audit', label: 'Audit E-E-A-T', icon: BarChart3, color: 'text-rose-400', cost: EEAT_CREDITS.audit },
+  { id: 'historique', label: 'Historique', icon: History, color: 'text-indigo-400', cost: 0 },
+] as const;
+
+type TabId = typeof TABS[number]['id'];
+
+// ── Reusable small components ──
+const InputField: React.FC<{ label: string; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean; type?: string }> = ({ label, value, onChange, placeholder, required, type = 'text' }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-300 mb-1.5">{label} {required && <span className="text-red-400">*</span>}</label>
+    <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50 transition-colors" />
+  </div>
+);
+
+const TextArea: React.FC<{ label: string; value: string; onChange: (v: string) => void; placeholder?: string; rows?: number }> = ({ label, value, onChange, placeholder, rows = 3 }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-300 mb-1.5">{label}</label>
+    <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows}
+      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50 transition-colors resize-none" />
+  </div>
+);
+
+const CodeBlock: React.FC<{ code: string; title: string }> = ({ code, title }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+  return (
+    <div className="ninja-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.04]">
+        <span className="text-xs text-gray-500 font-semibold">{title}</span>
+        <button onClick={handleCopy} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-purple-400 transition-colors">
+          {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? 'Copie' : 'Copier'}
+        </button>
+      </div>
+      <pre className="p-4 text-xs text-gray-300 overflow-auto max-h-80 custom-scrollbar"><code>{code}</code></pre>
+    </div>
+  );
+};
+
+const ScoreRing: React.FC<{ score: number; size?: number; label?: string }> = ({ score, size = 100, label }) => {
+  const radius = (size - 10) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+  const color = score >= 70 ? '#22c55e' : score >= 40 ? '#f59e0b' : '#ef4444';
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} className="transform -rotate-90">
+          <circle cx={size / 2} cy={size / 2} r={radius} stroke="rgba(255,255,255,0.05)" strokeWidth="6" fill="none" />
+          <circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth="6" fill="none"
+            strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
+            style={{ transition: 'stroke-dashoffset 1s ease-out' }} />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-bold text-white">{score}</span>
+          <span className="text-[9px] text-gray-500 uppercase">/100</span>
+        </div>
+      </div>
+      {label && <span className="text-xs text-gray-400 font-medium">{label}</span>}
+    </div>
+  );
+};
+
+const ScoreBar: React.FC<{ label: string; score: number; color: string }> = ({ label, score, color }) => (
+  <div className="space-y-1.5">
+    <div className="flex justify-between text-xs">
+      <span className="text-gray-400">{label}</span>
+      <span className="text-gray-300 font-bold">{score}/100</span>
+    </div>
+    <div className="w-full h-2 bg-white/[0.04] rounded-full overflow-hidden">
+      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${score}%`, background: color }} />
+    </div>
+  </div>
+);
+
+// ── Feature 7: ExportPanel Component ──
+type ExportFormat = 'html-raw' | 'wordpress' | 'webflow';
+
+const wrapForFormat = (code: string, format: ExportFormat): string => {
+  if (format === 'html-raw') return code;
+  if (format === 'wordpress') {
+    return `<!-- WordPress Shortcode Block -->
+[citedby_eeat_block]
+<div class="citedby-eeat-wrapper">
+${code}
+</div>
+[/citedby_eeat_block]
+
+<!-- Alternative: Use as Custom HTML Block in Gutenberg -->
+<!-- wp:html -->
+<div class="citedby-eeat-wrapper">
+${code}
+</div>
+<!-- /wp:html -->`;
+  }
+  // webflow
+  return `<!-- Webflow Embed Block -->
+<div class="w-embed citedby-eeat-embed" data-citedby="true" data-eeat-component="true" data-source="citedby-ai">
+  <style>
+    .citedby-eeat-embed { font-family: inherit; }
+    .citedby-eeat-embed * { box-sizing: border-box; }
+  </style>
+${code}
+</div>`;
+};
+
+const ExportPanel: React.FC<{ code: string; title: string }> = ({ code, title }) => {
+  const [format, setFormat] = useState<ExportFormat>('html-raw');
+  const [copied, setCopied] = useState(false);
+
+  const formattedCode = wrapForFormat(code, format);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(formattedCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([formattedCode], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const formatOptions: { id: ExportFormat; label: string }[] = [
+    { id: 'html-raw', label: 'HTML brut' },
+    { id: 'wordpress', label: 'WordPress Shortcode' },
+    { id: 'webflow', label: 'Webflow Embed' },
+  ];
+
+  return (
+    <div className="ninja-card overflow-hidden">
+      <div className="px-4 py-3 border-b border-white/[0.04] space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500 font-semibold">{title} - Export CMS</span>
+        </div>
+        {/* Format selector */}
+        <div className="flex gap-1.5">
+          {formatOptions.map(opt => (
+            <button key={opt.id} onClick={() => setFormat(opt.id)}
+              className={`px-3 py-1.5 text-[11px] font-medium rounded-lg transition-all ${
+                format === opt.id
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'bg-white/[0.03] text-gray-500 border border-white/[0.06] hover:text-gray-300'
+              }`}>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        {/* Action buttons */}
+        <div className="flex gap-2">
+          <button onClick={handleCopy}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-all">
+            {copied ? <Check size={12} /> : <Copy size={12} />}
+            {copied ? 'Copie !' : 'Copier HTML'}
+          </button>
+          <button onClick={handleDownload}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white/[0.04] text-gray-400 border border-white/[0.08] hover:text-gray-200 transition-all">
+            <Download size={12} />
+            Telecharger .html
+          </button>
+        </div>
+      </div>
+      <pre className="p-4 text-xs text-gray-300 overflow-auto max-h-60 custom-scrollbar"><code>{formattedCode}</code></pre>
+    </div>
+  );
+};
+
+// ── Feature 8: Workflow mapping ──
+const CATEGORY_TO_TAB: Record<string, TabId> = {
+  experience: 'citation-block',
+  expertise: 'author-bio',
+  authority: 'trust-signals',
+  trust: 'about-page',
+};
+
+const CATEGORY_TAB_LABELS: Record<string, string> = {
+  experience: 'Bloc Citation',
+  expertise: 'Bio Auteur',
+  authority: 'Trust Signals',
+  trust: 'Page A Propos',
+};
+
+// ═══════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════
+
+const EeatBuilder: React.FC<Props> = ({ onBack, user, onDeductCredits }) => {
+  const [activeTab, setActiveTab] = useState<TabId>('author-bio');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ── Author Bio state ──
+  const [authorName, setAuthorName] = useState('');
+  const [authorTitle, setAuthorTitle] = useState('');
+  const [authorOrg, setAuthorOrg] = useState('');
+  const [authorYears, setAuthorYears] = useState('');
+  const [authorSpecs, setAuthorSpecs] = useState('');
+  const [authorLinkedin, setAuthorLinkedin] = useState('');
+  const [authorPhotoUrl, setAuthorPhotoUrl] = useState('');
+  const [authorEducation, setAuthorEducation] = useState<Education[]>([]);
+  const [authorCredentials, setAuthorCredentials] = useState<Credential[]>([]);
+  const [bioResult, setBioResult] = useState<GeneratedAuthorBio | null>(null);
+
+  // ── About Page state ──
+  const [orgName, setOrgName] = useState('');
+  const [orgType, setOrgType] = useState<'Organization' | 'LocalBusiness' | 'Corporation'>('Organization');
+  const [orgFounding, setOrgFounding] = useState('');
+  const [orgIndustry, setOrgIndustry] = useState('');
+  const [orgSpecs, setOrgSpecs] = useState('');
+  const [orgServices, setOrgServices] = useState('');
+  const [orgEmail, setOrgEmail] = useState('');
+  const [orgSiteUrl, setOrgSiteUrl] = useState('');
+  const [orgCity, setOrgCity] = useState('');
+  const [orgCountry, setOrgCountry] = useState('France');
+  const [aboutResult, setAboutResult] = useState<GeneratedAboutPage | null>(null);
+
+  // ── Trust Signals state ──
+  const [trustOrgName, setTrustOrgName] = useState('');
+  const [trustCerts, setTrustCerts] = useState('');
+  const [trustPress, setTrustPress] = useState('');
+  const [trustGuarantees, setTrustGuarantees] = useState('');
+  const [trustProof, setTrustProof] = useState('');
+  const [trustReviewPlatform, setTrustReviewPlatform] = useState('google');
+  const [trustReviewRating, setTrustReviewRating] = useState('4.5');
+  const [trustReviewCount, setTrustReviewCount] = useState('150');
+  const [trustResult, setTrustResult] = useState<GeneratedTrustBlock | null>(null);
+
+  // ── Credentials state ──
+  const [credName, setCredName] = useState('');
+  const [credTitle, setCredTitle] = useState('');
+  const [credOrg, setCredOrg] = useState('');
+  const [credYears, setCredYears] = useState('');
+  const [credSpecs, setCredSpecs] = useState('');
+  const [credEducation, setCredEducation] = useState<Education[]>([]);
+  const [credCredentials, setCredCredentials] = useState<Credential[]>([]);
+  const [credAwards, setCredAwards] = useState<Award[]>([]);
+  const [credResult, setCredResult] = useState<GeneratedCredentials | null>(null);
+
+  // ── Citation Block state ──
+  const [citeName, setCiteName] = useState('');
+  const [citeTitle, setCiteTitle] = useState('');
+  const [citeOrg, setCiteOrg] = useState('');
+  const [citeYears, setCiteYears] = useState('');
+  const [citeSpecs, setCiteSpecs] = useState('');
+  const [citeLinkedin, setCiteLinkedin] = useState('');
+  const [citePhotoUrl, setCitePhotoUrl] = useState('');
+  const [citeArticleTitle, setCiteArticleTitle] = useState('');
+  const [citeResult, setCiteResult] = useState<GeneratedCitationBlock | null>(null);
+
+  // ── Audit state ──
+  const [auditUrl, setAuditUrl] = useState('');
+  const [auditBrand, setAuditBrand] = useState('');
+  const [auditResult, setAuditResult] = useState<EeatAuditResult | null>(null);
+
+  // ── Feature 9: History state ──
+  const [auditHistory, setAuditHistory] = useState<EeatAuditHistoryEntry[]>([]);
+  const [selectedComparison, setSelectedComparison] = useState<AuditComparison | null>(null);
+
+  // Load history on mount
+  useEffect(() => {
+    setAuditHistory(getAuditHistory());
+  }, []);
+
+  // ── Build AuthorProfile helper ──
+  const buildAuthorProfile = (name: string, title: string, org: string, years: string, specs: string, linkedin: string, photoUrl: string, education: Education[], credentials: Credential[], awards?: Award[], publications?: Publication[]): AuthorProfile => ({
+    name, jobTitle: title, organization: org,
+    yearsExperience: parseInt(years) || 5,
+    specializations: specs.split(',').map(s => s.trim()).filter(Boolean),
+    credentials,
+    certifications: [],
+    education,
+    awards: awards || [],
+    publications: publications || [],
+    socialProfiles: linkedin ? [{ platform: 'linkedin' as const, url: linkedin }] : [],
+    photoUrl: photoUrl || undefined,
+  });
+
+  // ── Handlers ──
+  const handleGenerateBio = async () => {
+    if (!authorName || !authorTitle) return;
+    if (!onDeductCredits(EEAT_CREDITS.authorBio)) return;
+    setIsLoading(true); setBioResult(null);
+    try {
+      const profile = buildAuthorProfile(authorName, authorTitle, authorOrg, authorYears, authorSpecs, authorLinkedin, authorPhotoUrl, authorEducation, authorCredentials);
+      const result = await generateAuthorBio(profile);
+      setBioResult(result);
+    } catch (e) { console.error(e); }
+    finally { setIsLoading(false); }
+  };
+
+  const handleGenerateAbout = async () => {
+    if (!orgName || !orgEmail) return;
+    if (!onDeductCredits(EEAT_CREDITS.aboutPage)) return;
+    setIsLoading(true); setAboutResult(null);
+    try {
+      const org: OrganizationProfile = {
+        name: orgName, type: orgType, foundingDate: orgFounding || '2020-01-01',
+        industry: orgIndustry, specializations: orgSpecs.split(',').map(s => s.trim()).filter(Boolean),
+        servicesOffered: orgServices.split(',').map(s => s.trim()).filter(Boolean),
+        certifications: [], awards: [], partnerships: [], mediaAppearances: [],
+        reviews: [], guarantees: [], accreditations: [],
+        address: { street: '', city: orgCity, postalCode: '', country: orgCountry },
+        email: orgEmail, socialProfiles: [], siteUrl: orgSiteUrl,
+      };
+      const result = await generateAboutPage(org);
+      setAboutResult(result);
+    } catch (e) { console.error(e); }
+    finally { setIsLoading(false); }
+  };
+
+  const handleGenerateTrust = async () => {
+    if (!trustOrgName) return;
+    if (!onDeductCredits(EEAT_CREDITS.trustSignals)) return;
+    setIsLoading(true); setTrustResult(null);
+    try {
+      const config: TrustSignalsConfig = {
+        certifications: trustCerts.split('\n').filter(Boolean).map(c => {
+          const parts = c.split('|').map(s => s.trim());
+          return { name: parts[0] || c, issuer: parts[1] || '' };
+        }),
+        securityBadges: [{ type: 'ssl' }, { type: 'gdpr' }, { type: 'secure_payment' }],
+        guarantees: trustGuarantees.split('\n').filter(Boolean).map(g => ({
+          type: 'satisfaction' as const, details: g,
+        })),
+        socialProof: trustProof.split('\n').filter(Boolean).map(s => ({ metric: s })),
+        pressMentions: trustPress.split('\n').filter(Boolean).map(p => {
+          const parts = p.split('|').map(s => s.trim());
+          return { outlet: parts[0] || p, quote: parts[1] || undefined };
+        }),
+        reviews: [{ platform: trustReviewPlatform as any, rating: parseFloat(trustReviewRating) || 4.5, count: parseInt(trustReviewCount) || 100 }],
+      };
+      const result = await generateTrustSignals(config, trustOrgName);
+      setTrustResult(result);
+    } catch (e) { console.error(e); }
+    finally { setIsLoading(false); }
+  };
+
+  const handleGenerateCredentials = async () => {
+    if (!credName || !credTitle) return;
+    if (!onDeductCredits(EEAT_CREDITS.credentials)) return;
+    setIsLoading(true); setCredResult(null);
+    try {
+      const profile = buildAuthorProfile(credName, credTitle, credOrg, credYears, credSpecs, '', '', credEducation, credCredentials, credAwards);
+      const result = await generateCredentials(profile);
+      setCredResult(result);
+    } catch (e) { console.error(e); }
+    finally { setIsLoading(false); }
+  };
+
+  const handleGenerateCitation = async () => {
+    if (!citeName || !citeTitle) return;
+    if (!onDeductCredits(EEAT_CREDITS.citationBlock)) return;
+    setIsLoading(true); setCiteResult(null);
+    try {
+      const profile = buildAuthorProfile(citeName, citeTitle, citeOrg, citeYears, citeSpecs, citeLinkedin, citePhotoUrl, [], []);
+      const result = await generateCitationBlock(profile, citeArticleTitle || undefined);
+      setCiteResult(result);
+    } catch (e) { console.error(e); }
+    finally { setIsLoading(false); }
+  };
+
+  const handleAudit = async () => {
+    if (!auditUrl) return;
+    if (!onDeductCredits(EEAT_CREDITS.audit)) return;
+    setIsLoading(true); setAuditResult(null);
+    try {
+      const result = await auditEeat(auditUrl, auditBrand || undefined);
+      setAuditResult(result);
+      // Feature 9: Save to history
+      saveAuditToHistory(result, auditBrand || undefined);
+      setAuditHistory(getAuditHistory());
+    } catch (e) { console.error(e); }
+    finally { setIsLoading(false); }
+  };
+
+  // ── Feature 8: Workflow helpers ──
+  const getAuditIssues = useCallback(() => {
+    if (!auditResult) return [];
+    return auditResult.findings.filter(f => f.status === 'missing' || f.status === 'incomplete');
+  }, [auditResult]);
+
+  const handleCorrectFinding = (category: string) => {
+    const tab = CATEGORY_TO_TAB[category];
+    if (tab) setActiveTab(tab);
+  };
+
+  const handleCorrectAll = () => {
+    const issues = getAuditIssues();
+    if (issues.length > 0) {
+      const firstCategory = issues[0].category;
+      handleCorrectFinding(firstCategory);
+    }
+  };
+
+  const estimateGasCost = useCallback(() => {
+    const issues = getAuditIssues();
+    const uniqueCategories = new Set(issues.map(f => f.category));
+    let total = 0;
+    if (uniqueCategories.has('experience')) total += EEAT_CREDITS.citationBlock;
+    if (uniqueCategories.has('expertise')) total += EEAT_CREDITS.authorBio;
+    if (uniqueCategories.has('authority')) total += EEAT_CREDITS.trustSignals;
+    if (uniqueCategories.has('trust')) total += EEAT_CREDITS.aboutPage;
+    return total;
+  }, [getAuditIssues]);
+
+  // ── Feature 9: History helpers ──
+  const handleCompareWithPrevious = (entry: EeatAuditHistoryEntry) => {
+    const history = getAuditHistory();
+    const idx = history.findIndex(h => h.id === entry.id);
+    if (idx >= 0 && idx < history.length - 1) {
+      const previous = history[idx + 1];
+      setSelectedComparison(compareAudits(entry, previous));
+    }
+  };
+
+  const handleClearHistory = () => {
+    if (window.confirm('Supprimer tout l\'historique des audits ?')) {
+      localStorage.removeItem('citedby-eeat-history');
+      setAuditHistory([]);
+      setSelectedComparison(null);
+    }
+  };
+
+  // Build chart data for history
+  const chartData = auditHistory.slice().reverse().map(entry => ({
+    date: new Date(entry.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+    Experience: entry.scores.experience,
+    Expertise: entry.scores.expertise,
+    Autorite: entry.scores.authoritativeness,
+    Confiance: entry.scores.trustworthiness,
+  }));
+
+  const activeTabConfig = TABS.find(t => t.id === activeTab)!;
+
+  return (
+    <div className="w-full px-6 py-8 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <button onClick={onBack} className="p-2 rounded-xl hover:bg-white/[0.04] transition-colors">
+          <ArrowLeft size={20} className="text-gray-400" />
+        </button>
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">E-E-A-T <span className="gradient-text">Builder</span></h1>
+            <span className="bg-amber-500/10 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-500/20 flex items-center gap-1">
+              <Sparkles size={10} /> NOUVEAU
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">Construisez votre autorite E-E-A-T pour etre cite par les IA</p>
+        </div>
+      </div>
+
+      {/* Tab Bar */}
+      <div className="flex gap-1 mb-8 overflow-x-auto pb-2 border-b border-white/[0.04]">
+        {TABS.map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${
+                isActive ? 'border-purple-500 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'
+              }`}>
+              <Icon size={16} className={isActive ? tab.color : ''} />
+              {tab.label}
+              {tab.cost > 0 && <span className="text-[10px] text-gray-600 ml-1">{tab.cost}G</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ═══ TAB: Author Bio ═══ */}
+      {activeTab === 'author-bio' && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="ninja-card p-6 space-y-4">
+              <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Profil Auteur</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Nom complet" value={authorName} onChange={setAuthorName} placeholder="Jean Dupont" required />
+                <InputField label="Titre/Poste" value={authorTitle} onChange={setAuthorTitle} placeholder="Directeur Marketing" required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Organisation" value={authorOrg} onChange={setAuthorOrg} placeholder="MonEntreprise" />
+                <InputField label="Annees d'exp." value={authorYears} onChange={setAuthorYears} placeholder="10" type="number" />
+              </div>
+              <InputField label="Specialisations (virgules)" value={authorSpecs} onChange={setAuthorSpecs} placeholder="SEO, AEO, Marketing digital" />
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="LinkedIn URL" value={authorLinkedin} onChange={setAuthorLinkedin} placeholder="https://linkedin.com/in/..." />
+                <InputField label="Photo URL" value={authorPhotoUrl} onChange={setAuthorPhotoUrl} placeholder="https://..." />
+              </div>
+            </div>
+
+            <div className="ninja-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Formation</h3>
+                <button onClick={() => setAuthorEducation([...authorEducation, { degree: '', field: '', institution: '', year: 2020 }])}
+                  className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"><Plus size={12} /> Ajouter</button>
+              </div>
+              {authorEducation.map((edu, i) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <div className="flex-1 grid grid-cols-2 gap-2">
+                    <input value={edu.degree} onChange={e => { const n = [...authorEducation]; n[i] = { ...n[i], degree: e.target.value }; setAuthorEducation(n); }}
+                      placeholder="Master" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={edu.field} onChange={e => { const n = [...authorEducation]; n[i] = { ...n[i], field: e.target.value }; setAuthorEducation(n); }}
+                      placeholder="Marketing Digital" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={edu.institution} onChange={e => { const n = [...authorEducation]; n[i] = { ...n[i], institution: e.target.value }; setAuthorEducation(n); }}
+                      placeholder="HEC Paris" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={edu.year} onChange={e => { const n = [...authorEducation]; n[i] = { ...n[i], year: parseInt(e.target.value) || 2020 }; setAuthorEducation(n); }}
+                      type="number" placeholder="2020" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                  </div>
+                  <button onClick={() => setAuthorEducation(authorEducation.filter((_, j) => j !== i))} className="p-1 text-gray-600 hover:text-red-400"><X size={14} /></button>
+                </div>
+              ))}
+            </div>
+
+            <div className="ninja-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Credentials</h3>
+                <button onClick={() => setAuthorCredentials([...authorCredentials, { type: 'certification', name: '', issuer: '' }])}
+                  className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"><Plus size={12} /> Ajouter</button>
+              </div>
+              {authorCredentials.map((cred, i) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <div className="flex-1 grid grid-cols-2 gap-2">
+                    <input value={cred.name} onChange={e => { const n = [...authorCredentials]; n[i] = { ...n[i], name: e.target.value }; setAuthorCredentials(n); }}
+                      placeholder="Google Analytics" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={cred.issuer} onChange={e => { const n = [...authorCredentials]; n[i] = { ...n[i], issuer: e.target.value }; setAuthorCredentials(n); }}
+                      placeholder="Google" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                  </div>
+                  <button onClick={() => setAuthorCredentials(authorCredentials.filter((_, j) => j !== i))} className="p-1 text-gray-600 hover:text-red-400"><X size={14} /></button>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={handleGenerateBio} disabled={isLoading || !authorName || !authorTitle}
+              className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                isLoading || !authorName || !authorTitle ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' : 'btn-gradient text-white'
+              }`}>
+              {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+              {isLoading ? 'Generation...' : `Generer les Bios (${EEAT_CREDITS.authorBio} Gas)`}
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {bioResult ? (
+              <>
+                <div className="ninja-card p-6">
+                  <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Bio Courte (50 mots)</h4>
+                  <p className="text-sm text-gray-200 leading-relaxed">{bioResult.bioShort}</p>
+                </div>
+                <div className="ninja-card p-6">
+                  <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Bio Longue (150 mots)</h4>
+                  <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-line">{bioResult.bioLong}</p>
+                </div>
+                <CodeBlock code={bioResult.schemaOrg} title="Schema.org Person (JSON-LD)" />
+                <CodeBlock code={bioResult.htmlBlock} title="Bloc HTML" />
+                <ExportPanel code={bioResult.htmlBlock} title="Bio Auteur HTML" />
+              </>
+            ) : (
+              <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+                <UserCircle size={48} className="text-emerald-400/30 mb-4" />
+                <h3 className="text-lg font-bold text-gray-400 mb-2">Bio Auteur E-E-A-T</h3>
+                <p className="text-sm text-gray-600 max-w-sm">Remplissez le profil pour generer des bios optimisees avec Schema.org Person</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ TAB: About Page ═══ */}
+      {activeTab === 'about-page' && (
+        <div className="space-y-6">
+          <div className="ninja-card p-6">
+            <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-4">Informations Organisation</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              <InputField label="Nom" value={orgName} onChange={setOrgName} placeholder="MonEntreprise" required />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">Type</label>
+                <select value={orgType} onChange={e => setOrgType(e.target.value as any)}
+                  className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50">
+                  <option value="Organization">Organization</option>
+                  <option value="LocalBusiness">Local Business</option>
+                  <option value="Corporation">Corporation</option>
+                </select>
+              </div>
+              <InputField label="Date de creation" value={orgFounding} onChange={setOrgFounding} placeholder="2015-06-01" type="date" />
+            </div>
+            <div className="grid md:grid-cols-3 gap-4 mt-4">
+              <InputField label="Industrie" value={orgIndustry} onChange={setOrgIndustry} placeholder="Marketing Digital" />
+              <InputField label="Specialisations (virgules)" value={orgSpecs} onChange={setOrgSpecs} placeholder="SEO, AEO, Content" />
+              <InputField label="Services (virgules)" value={orgServices} onChange={setOrgServices} placeholder="Audit, Conseil, Formation" />
+            </div>
+            <div className="grid md:grid-cols-4 gap-4 mt-4">
+              <InputField label="Email" value={orgEmail} onChange={setOrgEmail} placeholder="contact@..." required />
+              <InputField label="URL du site" value={orgSiteUrl} onChange={setOrgSiteUrl} placeholder="https://..." />
+              <InputField label="Ville" value={orgCity} onChange={setOrgCity} placeholder="Paris" />
+              <InputField label="Pays" value={orgCountry} onChange={setOrgCountry} placeholder="France" />
+            </div>
+          </div>
+
+          <button onClick={handleGenerateAbout} disabled={isLoading || !orgName || !orgEmail}
+            className={`px-8 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all ${
+              isLoading || !orgName || !orgEmail ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' : 'btn-gradient text-white'
+            }`}>
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+            {isLoading ? 'Generation...' : `Generer la Page (${EEAT_CREDITS.aboutPage} Gas)`}
+          </button>
+
+          {aboutResult && (
+            <div className="space-y-4">
+              <CodeBlock code={aboutResult.html} title="Page HTML Complete" />
+              <CodeBlock code={aboutResult.schemaOrg} title="Schema.org Organization (JSON-LD)" />
+              <ExportPanel code={aboutResult.html} title="Page A Propos HTML" />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ TAB: Trust Signals ═══ */}
+      {activeTab === 'trust-signals' && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="ninja-card p-6 space-y-4">
+              <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Configuration</h3>
+              <InputField label="Nom de l'organisation" value={trustOrgName} onChange={setTrustOrgName} placeholder="MonEntreprise" required />
+              <TextArea label="Certifications (1 par ligne, format: Nom | Emetteur)" value={trustCerts} onChange={setTrustCerts} placeholder="ISO 27001 | Bureau Veritas&#10;Google Partner | Google" />
+              <TextArea label="Mentions presse (1 par ligne, format: Media | Citation)" value={trustPress} onChange={setTrustPress} placeholder="Les Echos | Leader du marche AEO&#10;Forbes | Top 10 startups" />
+              <TextArea label="Garanties (1 par ligne)" value={trustGuarantees} onChange={setTrustGuarantees} placeholder="Satisfait ou rembourse 30 jours&#10;Support 24/7" />
+              <TextArea label="Preuves sociales (1 par ligne)" value={trustProof} onChange={setTrustProof} placeholder="10,000+ clients&#10;99.9% uptime" />
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Plateforme avis</label>
+                  <select value={trustReviewPlatform} onChange={e => setTrustReviewPlatform(e.target.value)}
+                    className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50">
+                    <option value="google">Google</option>
+                    <option value="trustpilot">Trustpilot</option>
+                    <option value="facebook">Facebook</option>
+                  </select>
+                </div>
+                <InputField label="Note" value={trustReviewRating} onChange={setTrustReviewRating} placeholder="4.5" />
+                <InputField label="Nb avis" value={trustReviewCount} onChange={setTrustReviewCount} placeholder="150" />
+              </div>
+            </div>
+            <button onClick={handleGenerateTrust} disabled={isLoading || !trustOrgName}
+              className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                isLoading || !trustOrgName ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' : 'btn-gradient text-white'
+              }`}>
+              {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+              {isLoading ? 'Generation...' : `Generer les Blocs (${EEAT_CREDITS.trustSignals} Gas)`}
+            </button>
+          </div>
+          <div className="space-y-4">
+            {trustResult ? (
+              <>
+                <CodeBlock code={trustResult.html} title="Blocs HTML Trust Signals" />
+                <CodeBlock code={trustResult.schemaOrg} title="Schema.org (JSON-LD)" />
+                <ExportPanel code={trustResult.html} title="Trust Signals HTML" />
+              </>
+            ) : (
+              <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+                <Shield size={48} className="text-amber-400/30 mb-4" />
+                <h3 className="text-lg font-bold text-gray-400 mb-2">Trust Signals</h3>
+                <p className="text-sm text-gray-600 max-w-sm">Generez des blocs de confiance : certifications, presse, avis, garanties</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ TAB: Credentials ═══ */}
+      {activeTab === 'credentials' && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="ninja-card p-6 space-y-4">
+              <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Expert</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Nom" value={credName} onChange={setCredName} placeholder="Dr. Marie Laurent" required />
+                <InputField label="Titre" value={credTitle} onChange={setCredTitle} placeholder="Directrice R&D" required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Organisation" value={credOrg} onChange={setCredOrg} placeholder="MonEntreprise" />
+                <InputField label="Annees d'exp." value={credYears} onChange={setCredYears} placeholder="15" type="number" />
+              </div>
+              <InputField label="Specialisations (virgules)" value={credSpecs} onChange={setCredSpecs} placeholder="IA, Machine Learning, NLP" />
+            </div>
+
+            <div className="ninja-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Formation</h3>
+                <button onClick={() => setCredEducation([...credEducation, { degree: '', field: '', institution: '', year: 2020 }])}
+                  className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"><Plus size={12} /> Ajouter</button>
+              </div>
+              {credEducation.map((edu, i) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <div className="flex-1 grid grid-cols-4 gap-2">
+                    <input value={edu.degree} onChange={e => { const n = [...credEducation]; n[i] = { ...n[i], degree: e.target.value }; setCredEducation(n); }}
+                      placeholder="Doctorat" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={edu.field} onChange={e => { const n = [...credEducation]; n[i] = { ...n[i], field: e.target.value }; setCredEducation(n); }}
+                      placeholder="IA" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={edu.institution} onChange={e => { const n = [...credEducation]; n[i] = { ...n[i], institution: e.target.value }; setCredEducation(n); }}
+                      placeholder="Polytechnique" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={edu.year} onChange={e => { const n = [...credEducation]; n[i] = { ...n[i], year: parseInt(e.target.value) || 2020 }; setCredEducation(n); }}
+                      type="number" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                  </div>
+                  <button onClick={() => setCredEducation(credEducation.filter((_, j) => j !== i))} className="p-1 text-gray-600 hover:text-red-400"><X size={14} /></button>
+                </div>
+              ))}
+            </div>
+
+            <div className="ninja-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Certifications</h3>
+                <button onClick={() => setCredCredentials([...credCredentials, { type: 'certification', name: '', issuer: '' }])}
+                  className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"><Plus size={12} /> Ajouter</button>
+              </div>
+              {credCredentials.map((c, i) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <div className="flex-1 grid grid-cols-2 gap-2">
+                    <input value={c.name} onChange={e => { const n = [...credCredentials]; n[i] = { ...n[i], name: e.target.value }; setCredCredentials(n); }}
+                      placeholder="Certification" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={c.issuer} onChange={e => { const n = [...credCredentials]; n[i] = { ...n[i], issuer: e.target.value }; setCredCredentials(n); }}
+                      placeholder="Emetteur" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                  </div>
+                  <button onClick={() => setCredCredentials(credCredentials.filter((_, j) => j !== i))} className="p-1 text-gray-600 hover:text-red-400"><X size={14} /></button>
+                </div>
+              ))}
+            </div>
+
+            <div className="ninja-card p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Recompenses</h3>
+                <button onClick={() => setCredAwards([...credAwards, { name: '', issuer: '', year: 2024 }])}
+                  className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"><Plus size={12} /> Ajouter</button>
+              </div>
+              {credAwards.map((a, i) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <div className="flex-1 grid grid-cols-3 gap-2">
+                    <input value={a.name} onChange={e => { const n = [...credAwards]; n[i] = { ...n[i], name: e.target.value }; setCredAwards(n); }}
+                      placeholder="Prix" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={a.issuer} onChange={e => { const n = [...credAwards]; n[i] = { ...n[i], issuer: e.target.value }; setCredAwards(n); }}
+                      placeholder="Emetteur" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                    <input value={a.year} onChange={e => { const n = [...credAwards]; n[i] = { ...n[i], year: parseInt(e.target.value) || 2024 }; setCredAwards(n); }}
+                      type="number" className="bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300" />
+                  </div>
+                  <button onClick={() => setCredAwards(credAwards.filter((_, j) => j !== i))} className="p-1 text-gray-600 hover:text-red-400"><X size={14} /></button>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={handleGenerateCredentials} disabled={isLoading || !credName || !credTitle}
+              className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                isLoading || !credName || !credTitle ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' : 'btn-gradient text-white'
+              }`}>
+              {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+              {isLoading ? 'Generation...' : `Generer (${EEAT_CREDITS.credentials} Gas)`}
+            </button>
+          </div>
+          <div className="space-y-4">
+            {credResult ? (
+              <>
+                <CodeBlock code={credResult.html} title="Bloc HTML Credentials" />
+                <CodeBlock code={credResult.schemaOrg} title="Schema.org Person (JSON-LD)" />
+                <ExportPanel code={credResult.html} title="Credentials HTML" />
+              </>
+            ) : (
+              <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+                <AwardIcon size={48} className="text-purple-400/30 mb-4" />
+                <h3 className="text-lg font-bold text-gray-400 mb-2">Expert Credentials</h3>
+                <p className="text-sm text-gray-600 max-w-sm">Structurez les diplomes, certifications et recompenses avec Schema.org</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ TAB: Citation Block ═══ */}
+      {activeTab === 'citation-block' && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="ninja-card p-6 space-y-4">
+              <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Auteur</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Nom" value={citeName} onChange={setCiteName} placeholder="Jean Dupont" required />
+                <InputField label="Titre" value={citeTitle} onChange={setCiteTitle} placeholder="Expert AEO" required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Organisation" value={citeOrg} onChange={setCiteOrg} placeholder="CitedBy.ai" />
+                <InputField label="Annees d'exp." value={citeYears} onChange={setCiteYears} placeholder="10" type="number" />
+              </div>
+              <InputField label="Specialisations (virgules)" value={citeSpecs} onChange={setCiteSpecs} placeholder="AEO, SEO, Content Strategy" />
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="LinkedIn URL" value={citeLinkedin} onChange={setCiteLinkedin} placeholder="https://linkedin.com/in/..." />
+                <InputField label="Photo URL" value={citePhotoUrl} onChange={setCitePhotoUrl} placeholder="https://..." />
+              </div>
+              <InputField label="Titre de l'article (optionnel)" value={citeArticleTitle} onChange={setCiteArticleTitle} placeholder="Guide complet du E-E-A-T en 2026" />
+            </div>
+            <button onClick={handleGenerateCitation} disabled={isLoading || !citeName || !citeTitle}
+              className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                isLoading || !citeName || !citeTitle ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' : 'btn-gradient text-white'
+              }`}>
+              {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+              {isLoading ? 'Generation...' : `Generer le Bloc (${EEAT_CREDITS.citationBlock} Gas)`}
+            </button>
+          </div>
+          <div className="space-y-4">
+            {citeResult ? (
+              <>
+                <CodeBlock code={citeResult.html} title="Bloc Citation Auteur (HTML)" />
+                <CodeBlock code={citeResult.schemaOrg} title="Schema.org Person (JSON-LD)" />
+                <ExportPanel code={citeResult.html} title="Bloc Citation HTML" />
+              </>
+            ) : (
+              <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+                <FileText size={48} className="text-cyan-400/30 mb-4" />
+                <h3 className="text-lg font-bold text-gray-400 mb-2">Bloc Citation</h3>
+                <p className="text-sm text-gray-600 max-w-sm">Generez un encart auteur pour vos articles de blog</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ TAB: E-E-A-T Audit ═══ */}
+      {activeTab === 'eeat-audit' && (
+        <div className="space-y-6">
+          <div className="ninja-card p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">URL a auditer <span className="text-red-400">*</span></label>
+                <div className="relative">
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input value={auditUrl} onChange={e => setAuditUrl(e.target.value)} placeholder="https://example.com/page"
+                    className="w-full bg-[#111111] border border-white/[0.08] rounded-xl pl-11 pr-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                    onKeyDown={e => e.key === 'Enter' && handleAudit()} />
+                </div>
+              </div>
+              <div className="md:w-48">
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">Marque (optionnel)</label>
+                <input value={auditBrand} onChange={e => setAuditBrand(e.target.value)} placeholder="Ma Marque"
+                  className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50" />
+              </div>
+              <div className="md:self-end">
+                <button onClick={handleAudit} disabled={isLoading || !auditUrl}
+                  className={`w-full md:w-auto px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                    isLoading || !auditUrl ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed' : 'btn-gradient text-white'
+                  }`}>
+                  {isLoading ? <Loader2 size={16} className="animate-spin" /> : <BarChart3 size={16} />}
+                  {isLoading ? 'Audit...' : `Auditer (${EEAT_CREDITS.audit} Gas)`}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {auditResult && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+
+              {/* Feature 8: Workflow Banner */}
+              {getAuditIssues().length > 0 && (
+                <div className="ninja-card p-4 border border-purple-500/20 bg-purple-500/[0.04]">
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <Wrench size={16} className="text-purple-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">
+                          {getAuditIssues().length} probleme{getAuditIssues().length > 1 ? 's' : ''} detecte{getAuditIssues().length > 1 ? 's' : ''}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Corrigez-les avec les generateurs E-E-A-T integres
+                        </p>
+                      </div>
+                    </div>
+                    <button onClick={handleCorrectAll}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold btn-gradient text-white">
+                      <Zap size={14} />
+                      Tout corriger ({estimateGasCost()} Gas estimes)
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Scores */}
+              <div className="grid md:grid-cols-5 gap-4">
+                <div className="ninja-card p-6 flex flex-col items-center justify-center md:row-span-1">
+                  <ScoreRing score={auditResult.scores.overall} size={110} />
+                  <p className="text-sm font-semibold text-gray-300 mt-3">Score Global</p>
+                </div>
+                <div className="md:col-span-4 ninja-card p-6 space-y-4">
+                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Scores par Pilier</h3>
+                  <ScoreBar label="Experience" score={auditResult.scores.experience} color="#22c55e" />
+                  <ScoreBar label="Expertise" score={auditResult.scores.expertise} color="#3b82f6" />
+                  <ScoreBar label="Authoritativeness" score={auditResult.scores.authoritativeness} color="#f59e0b" />
+                  <ScoreBar label="Trustworthiness" score={auditResult.scores.trustworthiness} color="#a855f7" />
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="ninja-card p-6">
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Resume</h3>
+                <p className="text-sm text-gray-300 leading-relaxed">{auditResult.summary}</p>
+              </div>
+
+              {/* Findings with Corriger buttons (Feature 8) */}
+              <div className="ninja-card p-6">
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Elements Analyses</h3>
+                <div className="space-y-2">
+                  {auditResult.findings.map((f, i) => {
+                    const StatusIcon = f.status === 'present' ? CheckCircle : f.status === 'incomplete' ? AlertTriangle : XCircle;
+                    const statusColor = f.status === 'present' ? 'text-emerald-400' : f.status === 'incomplete' ? 'text-amber-400' : 'text-red-400';
+                    const catColors: Record<string, string> = { experience: 'bg-emerald-500/10 text-emerald-400', expertise: 'bg-blue-500/10 text-blue-400', authority: 'bg-amber-500/10 text-amber-400', trust: 'bg-purple-500/10 text-purple-400' };
+                    const isIssue = f.status === 'missing' || f.status === 'incomplete';
+                    return (
+                      <div key={i} className="flex items-start gap-3 p-3 bg-white/[0.02] rounded-lg border border-white/[0.04]">
+                        <StatusIcon size={16} className={`${statusColor} mt-0.5 shrink-0`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm text-gray-200">{f.element}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${catColors[f.category] || ''}`}>{f.category}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${f.impact === 'high' ? 'bg-red-500/10 text-red-400' : f.impact === 'medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-gray-500/10 text-gray-400'}`}>{f.impact}</span>
+                          </div>
+                          {f.recommendation && f.status !== 'present' && (
+                            <p className="text-xs text-gray-500 mt-1">{f.recommendation}</p>
+                          )}
+                        </div>
+                        {/* Feature 8: Corriger button */}
+                        {isIssue && CATEGORY_TO_TAB[f.category] && (
+                          <button onClick={() => handleCorrectFinding(f.category)}
+                            className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-all">
+                            <Wrench size={11} />
+                            Corriger
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Priority Actions */}
+              <div className="ninja-card p-6">
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Actions Prioritaires</h3>
+                <div className="space-y-3">
+                  {auditResult.priorityActions.map((a, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 bg-purple-500/[0.03] rounded-lg border border-purple-500/10">
+                      <span className="text-purple-400 font-bold text-sm shrink-0">{i + 1}.</span>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-200">{a.action}</p>
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <span className="text-[10px] text-gray-500">Impact: <span className="text-purple-400 font-bold">{a.impact}%</span></span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full ${a.effort === 'low' ? 'bg-emerald-500/10 text-emerald-400' : a.effort === 'medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>Effort: {a.effort}</span>
+                          <span className="text-[10px] text-gray-600">Outil: {a.tool}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!auditResult && !isLoading && (
+            <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+              <BarChart3 size={48} className="text-rose-400/30 mb-4" />
+              <h3 className="text-lg font-bold text-gray-400 mb-2">Audit E-E-A-T</h3>
+              <p className="text-sm text-gray-600 max-w-md">Analysez une URL pour evaluer ses signaux Experience, Expertise, Authoritativeness et Trustworthiness</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 w-full max-w-lg">
+                {['Experience', 'Expertise', 'Authoritativeness', 'Trustworthiness'].map((pillar, i) => (
+                  <div key={pillar} className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                    <span className={`text-sm font-bold ${['text-emerald-400', 'text-blue-400', 'text-amber-400', 'text-purple-400'][i]}`}>{pillar.charAt(0)}</span>
+                    <span className="text-[10px] text-gray-500 text-center">{pillar}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ TAB: Historique (Feature 9) ═══ */}
+      {activeTab === 'historique' && (
+        <div className="space-y-6">
+          {/* Header with clear button */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-white">Historique des Audits E-E-A-T</h3>
+              <p className="text-sm text-gray-500 mt-1">Suivez l'evolution de vos scores au fil du temps</p>
+            </div>
+            {auditHistory.length > 0 && (
+              <button onClick={handleClearHistory}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-all">
+                <Trash2 size={12} />
+                Effacer l'historique
+              </button>
+            )}
+          </div>
+
+          {auditHistory.length === 0 ? (
+            <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+              <History size={48} className="text-indigo-400/30 mb-4" />
+              <h3 className="text-lg font-bold text-gray-400 mb-2">Aucun historique</h3>
+              <p className="text-sm text-gray-600 max-w-md">Lancez un audit E-E-A-T pour commencer a suivre l'evolution de vos scores</p>
+              <button onClick={() => setActiveTab('eeat-audit')}
+                className="mt-6 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold btn-gradient text-white">
+                <BarChart3 size={14} />
+                Lancer un audit
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Evolution Chart */}
+              {chartData.length >= 2 && (
+                <div className="ninja-card p-6">
+                  <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Evolution des Scores E-E-A-T</h3>
+                  <div style={{ width: '100%', height: 300 }}>
+                    <ResponsiveContainer>
+                      <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                        <XAxis dataKey="date" stroke="#6b7280" fontSize={11} />
+                        <YAxis domain={[0, 100]} stroke="#6b7280" fontSize={11} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: '#1a1d21',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                          }}
+                          labelStyle={{ color: '#9ca3af' }}
+                        />
+                        <Legend wrapperStyle={{ fontSize: '11px' }} />
+                        <Line type="monotone" dataKey="Experience" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                        <Line type="monotone" dataKey="Expertise" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                        <Line type="monotone" dataKey="Autorite" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                        <Line type="monotone" dataKey="Confiance" stroke="#a855f7" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Comparison Section */}
+              {selectedComparison && (
+                <div className="ninja-card p-6 border border-indigo-500/20 bg-indigo-500/[0.03]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Comparaison Before/After</h3>
+                    <button onClick={() => setSelectedComparison(null)} className="text-xs text-gray-500 hover:text-gray-300">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {[
+                      { label: 'Global', delta: selectedComparison.deltas.overall, before: selectedComparison.previous.scores.overall, after: selectedComparison.current.scores.overall },
+                      { label: 'Experience', delta: selectedComparison.deltas.experience, before: selectedComparison.previous.scores.experience, after: selectedComparison.current.scores.experience },
+                      { label: 'Expertise', delta: selectedComparison.deltas.expertise, before: selectedComparison.previous.scores.expertise, after: selectedComparison.current.scores.expertise },
+                      { label: 'Autorite', delta: selectedComparison.deltas.authoritativeness, before: selectedComparison.previous.scores.authoritativeness, after: selectedComparison.current.scores.authoritativeness },
+                      { label: 'Confiance', delta: selectedComparison.deltas.trustworthiness, before: selectedComparison.previous.scores.trustworthiness, after: selectedComparison.current.scores.trustworthiness },
+                    ].map(item => (
+                      <div key={item.label} className="ninja-card p-4 text-center">
+                        <p className="text-[10px] text-gray-500 uppercase font-medium mb-2">{item.label}</p>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="text-xs text-gray-500">{item.before}</span>
+                          <ArrowRight size={10} className="text-gray-600" />
+                          <span className="text-sm font-bold text-white">{item.after}</span>
+                        </div>
+                        <p className={`text-sm font-bold mt-1 ${item.delta > 0 ? 'text-emerald-400' : item.delta < 0 ? 'text-red-400' : 'text-gray-500'}`}>
+                          {item.delta > 0 ? '+' : ''}{item.delta} pts
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+                    <span>Piliers ameliores: <span className="text-emerald-400 font-bold">{selectedComparison.improvedCount}</span></span>
+                    <span>Piliers en recul: <span className="text-red-400 font-bold">{selectedComparison.regressedCount}</span></span>
+                  </div>
+                </div>
+              )}
+
+              {/* Timeline */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Timeline des Audits</h3>
+                {auditHistory.map((entry, idx) => {
+                  const hasNext = idx < auditHistory.length - 1;
+                  return (
+                    <div key={entry.id} className="ninja-card p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4 flex-1 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0">
+                            <BarChart3 size={18} className="text-indigo-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-sm font-semibold text-white truncate">{entry.url}</p>
+                              {entry.brand && (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 font-medium">{entry.brand}</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Clock size={11} className="text-gray-600" />
+                              <span className="text-xs text-gray-500">
+                                {new Date(entry.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                            {/* Score pills */}
+                            <div className="flex items-center gap-2 mt-3 flex-wrap">
+                              <span className={`text-xs px-2.5 py-1 rounded-lg font-bold ${entry.scores.overall >= 70 ? 'bg-emerald-500/10 text-emerald-400' : entry.scores.overall >= 40 ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
+                                Score: {entry.scores.overall}/100
+                              </span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">E:{entry.scores.experience}</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">E:{entry.scores.expertise}</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">A:{entry.scores.authoritativeness}</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400">T:{entry.scores.trustworthiness}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Compare button */}
+                        {hasNext && (
+                          <button onClick={() => handleCompareWithPrevious(entry)}
+                            className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all">
+                            <TrendingUp size={11} />
+                            Comparer
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default EeatBuilder;

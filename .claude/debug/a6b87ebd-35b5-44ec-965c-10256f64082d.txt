@@ -1,0 +1,65 @@
+2026-02-07T22:42:23.517Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-07T22:42:23.521Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-07T22:42:23.521Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-07T22:42:23.521Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-07T22:42:23.673Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-07T22:42:23.750Z [DEBUG] Applying permission update: Adding 10 allow rule(s) to destination 'localSettings': ["Bash(dir:*)","Bash(powershell -Command:*)","Bash(node --version)","Bash(npm:*)","Bash(xcopy \"C:\\\\Users\\\\User\\\\Desktop\\\\citedbyai-temp\\\\*\" \"C:\\\\Users\\\\User\\\\Desktop\\\\UltimateSaaSCitedbyai\"\" /E /Y /Q 2>&1 && rmdir /S /Q \"C:UsersUserDesktopcitedbyai-temp \")","Bash(npx tailwindcss init -p)","Bash(npx tsc:*)","Bash(tree:*)","Bash(node -e:*)","Bash(wc:*)"]
+2026-02-07T22:42:23.750Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-07T22:42:23.789Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-02-07T22:42:23.791Z [DEBUG] [STARTUP] Running setup()...
+2026-02-07T22:42:23.792Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-07T22:42:23.803Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-07T22:42:23.804Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-02-07T22:42:23.804Z [DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)
+2026-02-07T22:42:23.809Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-07T22:42:23.812Z [DEBUG] Error log sink initialized
+2026-02-07T22:42:23.825Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-07T22:42:23.825Z [DEBUG] Total plugin skills loaded: 0
+2026-02-07T22:42:23.825Z [DEBUG] Total plugin commands loaded: 0
+2026-02-07T22:42:23.861Z [DEBUG] [STARTUP] setup() completed in 70ms
+2026-02-07T22:42:23.861Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-07T22:42:23.878Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-07T22:42:23.895Z [DEBUG] Total plugin agents loaded: 0
+2026-02-07T22:42:23.896Z [DEBUG] Loaded 0 unique skills (managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-02-07T22:42:23.904Z [DEBUG] getSkills returning: 0 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-02-07T22:42:23.908Z [DEBUG] [STARTUP] Commands and agents loaded in 47ms
+2026-02-07T22:42:23.908Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-07T22:42:23.909Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-07T22:42:23.909Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-07T22:42:23.910Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-07T22:42:23.910Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-07T22:42:23.948Z [DEBUG] Total LSP servers loaded: 0
+2026-02-07T22:42:23.949Z [DEBUG] [STARTUP] MCP configs loaded in 199ms
+2026-02-07T22:42:23.964Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-07T22:42:23.964Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-07T22:42:23.965Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-02-07T22:42:23.965Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-02-07T22:42:23.965Z [DEBUG] LSP server manager initialized successfully
+2026-02-07T22:42:23.965Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-07T22:42:24.161Z [DEBUG] Watching for changes in setting files C:\Users\User\.claude\settings.json, C:\Users\User\Desktop\UltimateSaaSCitedbyai\.claude\settings.json, C:\Users\User\Desktop\UltimateSaaSCitedbyai\.claude\settings.local.json...
+2026-02-07T22:42:24.172Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-07T22:42:25.183Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-07T22:42:25.560Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-02-07T22:42:25.577Z [DEBUG] Writing to temp file: C:\Users\User\.claude\todos\a6b87ebd-35b5-44ec-965c-10256f64082d-agent-a6b87ebd-35b5-44ec-965c-10256f64082d.json.tmp.25396.1770504145573
+2026-02-07T22:42:25.597Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-02-07T22:42:25.597Z [DEBUG] Renaming C:\Users\User\.claude\todos\a6b87ebd-35b5-44ec-965c-10256f64082d-agent-a6b87ebd-35b5-44ec-965c-10256f64082d.json.tmp.25396.1770504145573 to C:\Users\User\.claude\todos\a6b87ebd-35b5-44ec-965c-10256f64082d-agent-a6b87ebd-35b5-44ec-965c-10256f64082d.json
+2026-02-07T22:42:25.602Z [DEBUG] File C:\Users\User\.claude\todos\a6b87ebd-35b5-44ec-965c-10256f64082d-agent-a6b87ebd-35b5-44ec-965c-10256f64082d.json written atomically
+2026-02-07T22:42:26.032Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-02-07T22:42:26.032Z [DEBUG] Found 0 hook matchers in settings
+2026-02-07T22:42:26.039Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)
+2026-02-07T22:42:26.345Z [DEBUG] LSP server manager shut down successfully
+2026-02-07T22:42:26.628Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.25396.1770504146628
+2026-02-07T22:42:26.629Z [DEBUG] Preserving file permissions: 100666
+2026-02-07T22:42:26.643Z [DEBUG] Temp file written successfully, size: 6242 bytes
+2026-02-07T22:42:26.644Z [DEBUG] Applied original permissions to temp file
+2026-02-07T22:42:26.644Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.25396.1770504146628 to C:\Users\User\.claude.json
+2026-02-07T22:42:26.645Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-07T22:42:26.653Z [DEBUG] Stats cache does not exist, returning empty cache
+2026-02-07T22:42:26.727Z [DEBUG] Stats cache empty, processing all historical data in background
+2026-02-07T22:42:27.165Z [DEBUG] Total plugin output styles loaded: 0
+2026-02-07T22:42:27.210Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=C:\Users\User\AppData\Roaming\Claude\claude-code\2.1.34\claude.exe)
+2026-02-07T22:42:27.224Z [DEBUG] rg error (signal=undefined, code=ABORT_ERR, stderr: ), 850 results
+2026-02-07T22:42:27.226Z [ERROR] "AbortError: AbortError: The operation was aborted.\n    at unknown\n    at abortChildProcess (node:child_process:947:42)\n    at onAbortListener2 (node:child_process:35:24)\n    at abort (unknown)\n    at <anonymous> (B:/~BUN/root/claude.exe:7475:5027)"
+2026-02-07T22:42:27.274Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-07T22:42:27.274Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-07T22:42:27.274Z [DEBUG] [API:auth] OAuth token check complete

@@ -1,0 +1,312 @@
+import React, { useState } from 'react';
+import { Sparkles, TrendingUp, Target, Award, MousePointerClick, ArrowRight, ScanLine, Code2, Globe2, Search, Loader2, Shield, BookOpen, Lock, Zap } from 'lucide-react';
+import { User } from '../types';
+import ScoreRing from '../components/ScoreRing';
+
+interface HomeProps {
+  onNavigate: (view: string) => void;
+  user: User | null;
+}
+
+// Deterministic score simulation based on URL
+const simulateEEATScore = (brandName: string, url: string) => {
+  let hash = 0;
+  const seed = brandName + url;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  const base = Math.abs(hash % 40) + 35; // Score between 35-75
+  return {
+    global: base,
+    experience: Math.min(100, base + (Math.abs(hash >> 4) % 20) - 10),
+    expertise: Math.min(100, base + (Math.abs(hash >> 8) % 20) - 10),
+    authority: Math.min(100, base + (Math.abs(hash >> 12) % 20) - 10),
+    trust: Math.min(100, base + (Math.abs(hash >> 16) % 20) - 10),
+  };
+};
+
+const Home: React.FC<HomeProps> = ({ onNavigate, user }) => {
+  const [freeScoreBrand, setFreeScoreBrand] = useState('');
+  const [freeScoreUrl, setFreeScoreUrl] = useState('');
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [freeScoreResult, setFreeScoreResult] = useState<ReturnType<typeof simulateEEATScore> | null>(null);
+
+  const handleStartAnalysis = () => {
+    if (user) {
+      onNavigate('analyze');
+    } else {
+      onNavigate('login');
+    }
+  };
+
+  const handleFreeScore = async () => {
+    if (!freeScoreBrand || !freeScoreUrl) return;
+    setIsCalculating(true);
+    // Simulate processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    const result = simulateEEATScore(freeScoreBrand, freeScoreUrl);
+    setFreeScoreResult(result);
+    setIsCalculating(false);
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 pt-10 pb-20">
+      {/* HERO SECTION WITH LOGO */}
+      <div className="text-center mb-24 space-y-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-pulse-slow">
+          <Sparkles size={14} />
+          <span>Nouvelle Génération de SEO</span>
+        </div>
+        
+        <div className="flex flex-col items-center justify-center gap-6 py-6">
+           <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-black font-bold font-serif text-6xl md:text-8xl shadow-[0_0_50px_rgba(16,185,129,0.4)]">
+             C
+           </div>
+           <h1 className="text-6xl md:text-8xl font-serif tracking-tight text-white">
+             CitedBy.ai
+           </h1>
+        </div>
+        
+        <p className="text-xl text-gray-400 max-w-2xl mx-auto font-light">
+          CitedBy est la première plateforme d'optimisation AEO/GEO. Analysez comment ChatGPT, Claude et Perplexity perçoivent votre marque.
+        </p>
+      </div>
+
+      {/* FREE SCORE SECTION */}
+      <div className="relative mb-24">
+        <div className="absolute inset-0 bg-primary/5 blur-[100px] rounded-full -z-10 opacity-50"></div>
+        <div className="glass-panel rounded-3xl p-8 md:p-12 border border-primary/20 relative overflow-hidden">
+          {/* GRATUIT badge */}
+          <div className="absolute top-4 right-4 bg-primary text-black text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
+            GRATUIT
+          </div>
+
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4">
+              <Zap size={14} />
+              <span>Score Instantané</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mb-3">
+              Évaluez votre Visibilité IA en 30 secondes
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto">
+              Découvrez gratuitement comment les IA perçoivent votre marque selon les 4 piliers E-E-A-T.
+            </p>
+          </div>
+
+          {!freeScoreResult ? (
+            <div className="max-w-lg mx-auto space-y-4">
+              <div className="grid md:grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  value={freeScoreBrand}
+                  onChange={e => setFreeScoreBrand(e.target.value)}
+                  placeholder="Nom de votre marque"
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-primary/50 focus:outline-none transition-colors"
+                />
+                <input
+                  type="url"
+                  value={freeScoreUrl}
+                  onChange={e => setFreeScoreUrl(e.target.value)}
+                  placeholder="https://votre-site.com"
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-primary/50 focus:outline-none transition-colors"
+                />
+              </div>
+              <button
+                onClick={handleFreeScore}
+                disabled={isCalculating || !freeScoreBrand || !freeScoreUrl}
+                className="w-full py-3.5 bg-primary text-black font-bold rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCalculating ? (
+                  <><Loader2 size={18} className="animate-spin" /> Analyse en cours...</>
+                ) : (
+                  <><Search size={18} /> Obtenir mon score gratuit</>
+                )}
+              </button>
+            </div>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <div className="flex flex-col md:flex-row items-center gap-8 justify-center">
+                {/* Score Ring */}
+                <div className="flex flex-col items-center">
+                  <ScoreRing score={freeScoreResult.global} size={160} strokeWidth={10} />
+                  <p className="text-sm text-gray-400 mt-3">Score Global de Visibilité IA</p>
+                </div>
+
+                {/* E-E-A-T Mini Bars */}
+                <div className="space-y-3 min-w-[250px]">
+                  {([
+                    { key: 'experience', label: 'Expérience', icon: <BookOpen size={14} />, color: '#f59e0b' },
+                    { key: 'expertise', label: 'Expertise', icon: <Award size={14} />, color: '#3b82f6' },
+                    { key: 'authority', label: 'Autorité', icon: <Shield size={14} />, color: '#8b5cf6' },
+                    { key: 'trust', label: 'Confiance', icon: <Lock size={14} />, color: '#10b981' },
+                  ] as const).map(pillar => (
+                    <div key={pillar.key} className="flex items-center gap-3">
+                      <div className="w-6 flex justify-center" style={{ color: pillar.color }}>
+                        {pillar.icon}
+                      </div>
+                      <span className="text-xs text-gray-400 w-24">{pillar.label}</span>
+                      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-1000"
+                          style={{
+                            width: `${freeScoreResult[pillar.key]}%`,
+                            backgroundColor: pillar.color
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs font-bold text-white w-8 text-right">
+                        {freeScoreResult[pillar.key]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Summary + CTA */}
+              <div className="mt-8 text-center space-y-4">
+                <p className="text-gray-300 max-w-md mx-auto text-sm">
+                  <strong className="text-white">{freeScoreBrand}</strong> obtient un score de visibilité IA de <strong className="text-primary">{freeScoreResult.global}/100</strong>.
+                  {freeScoreResult.global < 60
+                    ? ' Des optimisations significatives sont nécessaires pour être cité par les IA.'
+                    : ' Votre site a un bon potentiel, mais il reste des optimisations clés à réaliser.'}
+                </p>
+                <button
+                  onClick={() => onNavigate(user ? 'analyze' : 'login')}
+                  className="bg-white text-black font-bold px-8 py-3 rounded-full hover:bg-gray-200 transition-all inline-flex items-center gap-2"
+                >
+                  Créez votre compte pour l'analyse complète <ArrowRight size={16} />
+                </button>
+                <button
+                  onClick={() => { setFreeScoreResult(null); setFreeScoreBrand(''); setFreeScoreUrl(''); }}
+                  className="block mx-auto text-xs text-gray-500 hover:text-gray-300 transition-colors mt-2"
+                >
+                  Tester une autre marque
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* STEPS GRID - REFINED SAAS FEATURES */}
+      <div className="grid md:grid-cols-3 gap-6 mb-24">
+        {[
+          { 
+            icon: <ScanLine size={24} />,
+            title: "Analyse de Perception IA", 
+            desc: "Simulateur de citations multi-LLM (GPT-4, Gemini, Claude) pour identifier vos lacunes sémantiques." 
+          },
+          { 
+            icon: <Code2 size={24} />,
+            title: "Optimisation Technique", 
+            desc: "Génération automatique de données structurées (Schema.org) et correction du code pour le parsing AEO." 
+          },
+          { 
+            icon: <Globe2 size={24} />,
+            title: "Indexation Annuaire", 
+            desc: "Inscription au Knowledge Graph CitedBy pour forcer la découverte de votre marque par les moteurs." 
+          }
+        ].map((item, i) => (
+          <div key={i} className="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors border border-white/5 group">
+            <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center mb-4 text-primary font-bold shadow-inner group-hover:scale-110 transition-transform duration-300">
+              {item.icon}
+            </div>
+            <h3 className="text-xl font-medium mb-2">{item.title}</h3>
+            <p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* EDUCATIONAL BLOCK: WHY AI TRAFFIC MATTERS */}
+      <div className="glass-panel rounded-3xl p-8 md:p-12 border border-white/10 relative overflow-hidden mb-24">
+        {/* Decorative background */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full -z-10"></div>
+        
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 text-primary font-medium text-sm uppercase tracking-wider">
+              <MousePointerClick size={16} />
+              <span>Au-delà du Clic</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold leading-tight">
+              Pourquoi le trafic IA est-il supérieur au SEO classique ?
+            </h2>
+            <p className="text-gray-300 leading-relaxed">
+              Dans l'ancien monde (Google Search), l'utilisateur cherchait une liste de liens. Dans le nouveau monde (ChatGPT, Perplexity), l'utilisateur cherche une <strong>réponse fiable</strong>.
+              <br /><br />
+              Être cité par une IA n'est pas juste une question de visibilité, c'est une question d'autorité. C'est la différence entre être affiché dans un annuaire et être recommandé par un expert.
+            </p>
+            
+            <button 
+               onClick={handleStartAnalysis}
+               className="text-primary hover:text-white font-medium flex items-center gap-2 transition-colors mt-4"
+            >
+              Vérifier mon potentiel de citation <ArrowRight size={16} />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-white/5 p-6 rounded-xl border border-white/5 hover:border-primary/20 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Target size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-white mb-1">Intention Ultra-Ciblée</h3>
+                  <p className="text-sm text-gray-400">
+                    L'utilisateur qui dialogue avec une IA est déjà dans une phase de résolution active. Le trafic généré est souvent "prêt à convertir".
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/5 p-6 rounded-xl border border-white/5 hover:border-primary/20 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                  <Award size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-white mb-1">Confiance & Autorité</h3>
+                  <p className="text-sm text-gray-400">
+                    Quand une IA vous cite comme source unique, elle transfère sa crédibilité vers votre marque. C'est une validation tierce puissante.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+             <div className="bg-white/5 p-6 rounded-xl border border-white/5 hover:border-primary/20 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                  <TrendingUp size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-white mb-1">Volume vs Qualité</h3>
+                  <p className="text-sm text-gray-400">
+                    Moins de rebond, plus d'engagement. L'AEO privilégie la pertinence absolue sur le volume de masse.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FINAL CTA SECTION */}
+      <div className="text-center py-12 relative mb-10">
+        <div className="absolute inset-0 bg-primary/10 blur-[100px] rounded-full opacity-30 -z-10"></div>
+        <h3 className="text-3xl md:text-4xl font-serif font-bold mb-8 text-white">Ne laissez pas les IA parler de vos concurrents</h3>
+        <button 
+          onClick={handleStartAnalysis}
+          className="bg-white text-black font-bold text-lg px-10 py-5 rounded-full hover:bg-gray-200 transition-all inline-flex items-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:scale-105"
+        >
+          Commencer l'analyse gratuite <ArrowRight size={20} />
+        </button>
+      </div>
+
+    </div>
+  );
+};
+
+export default Home;

@@ -1,0 +1,589 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { CreditPacks } from '../components/settings/credit-packs';
+import { SectorTargetingSelector } from '../components/shared/sector-targeting-selector';
+import { useAuth } from '../hooks/useAuth';
+import { CREDIT_PACKS } from '../lib/constants';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import type { ApproachTone, CreditPackId, Profile } from '../lib/types';
+import { buildProfileSectorPatch, getProfileSectorTargets } from '../utils/sector-targeting';
+import { debounce } from '../utils/debounce';
+
+const TONE_PREVIEWS: Record<ApproachTone, string> = {
+  professional: 'Approche structuree, orientee resultat et claire.',
+  friendly: 'Approche plus chaleureuse et conversationnelle.',
+  direct: 'Approche courte, rapide et orientee action.',
+};
+
+interface ScanNowResponse {
+  job_id?: string;
+  triggered_sources?: number;
+  failed_sources?: number;
+  fallback_direct_ingest?: number;
+  used_n8n?: boolean;
+}
+
+/**
+ * Configuration utilisateur simplifiee.
+ */
+const SettingsPage = (): JSX.Element => {
+  const { profile, patchProfile, refreshProfile } = useAuth();
+  const [draft, setDraft] = useState<Profile | null>(profile);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>('');
+  const [scanLoading, setScanLoading] = useState<boolean>(false);
+  const [scanFeedback, setScanFeedback] = useState<string>('');
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
+  const [locationDraft, setLocationDraft] = useState<string>('');
+  const [radiusDraft, setRadiusDraft] = useState<number>(30);
+
+  useEffect(() => {
+    setDraft(profile);
+  }, [profile]);
+
+  const savePatch = useCallback(
+    async (patch: Partial<Profile>): Promise<void> => {
+      if (!profile) {
+        return;
+      }
+      setStatus('Sauvegarde...');
+      const ok = await patchProfile(patch);
+      if (!ok) {
+        setError('Erreur de sauvegarde.');
+        setStatus('');
+        return;
+      }
+      setError(null);
+      setStatus('Sauvegarde');
+      window.setTimeout(() => setStatus(''), 900);
+    },
+    [patchProfile, profile],
+  );
+
+  const debouncedSave = useMemo(
+    () =>
+      debounce((patch: Partial<Profile>) => {
+        void savePatch(patch);
+      }, 500),
+    [savePatch],
+  );
+
+  if (!draft || !profile) {
+    return (
+      <div className="px-4 md:px-0">
+        <div className="h-24 animate-pulse rounded-2xl border border-leadradar-border bg-leadradar-card" />
+      </div>
+    );
+  }
+
+  const creditsBalance = Number(draft.credits_balance ?? 0);
+  const creditsSpent = Number(draft.credits_total_spent ?? 0);
+  const creditsPurchased = Number(draft.credits_total_purchased ?? 0);
+  const creditCostPerLead = Math.max(1, Number(draft.credit_cost_per_prospect ?? 1));
+  const autoRechargeThreshold = Math.max(0, Number(draft.auto_recharge_trigger_threshold ?? 3));
+  const autoRechargeMaxMonth = Math.max(1, Number(draft.auto_recharge_max_per_month ?? 3));
+  const autoRechargeCountMonth = Math.max(0, Number(draft.auto_recharge_count_month ?? 0));
+  const automationMinScore = Math.max(0, Math.min(100, Number(draft.automation_min_score ?? 80)));
+  const automationDailyLimit = Math.max(1, Number(draft.automation_daily_email_limit ?? 5));
+  const sectorTargets = getProfileSectorTargets(draft);
+
+  const consumptionPercent = Math.min(100, (creditsSpent / Math.max(1, creditsPurchased)) * 100);
+  const estimLeadsRemaining = Math.floor(creditsBalance / creditCostPerLead);
+
+  const runManualScan = useCallback(async (): Promise<void> => {
+    if (!profile) {
+      return;
+    }
+
+    setScanLoading(true);
+    setScanError(null);
+    setScanFeedback('');
+
+    try {
+      if (!isSupabaseConfigured) {
+        throw new Error('Supabase non configure. Ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY pour lancer un scan reel.');
+      }
+
+      const { data, error: invokeError } = await supabase.functions.invoke('scan-now', {
+        body: {
+          user_id: profile.id,
+          max_sources: 12,
+        },
+      });
+
+      if (invokeError) {
+        throw invokeError;
+      }
+
+      const response = (data ?? {}) as ScanNowResponse;
+      const triggered = Math.max(0, Number(response.triggered_sources ?? 0));
+      const failed = Math.max(0, Number(response.failed_sources ?? 0));
+      const fallback = Math.max(0, Number(response.fallback_direct_ingest ?? 0));
+
+      const parts = [`Scan lance sur ${triggered} source(s)`];
+      if (failed > 0) {
+        parts.push(`${failed} en echec`);
+      }
+      if (fallback > 0) {
+        parts.push(`${fallback} via pipeline direct`);
+      }
+      setScanFeedback(parts.join(' | '));
+      await refreshProfile();
+    } catch (caughtError) {
+      const message = caughtError instanceof Error ? caughtError.message : 'Lancement du scan impossible';
+      setScanError(message);
+    } finally {
+      setScanLoading(false);
+    }
+  }, [profile, refreshProfile]);
+
+  return (
+    <div className="space-y-6 px-4 pb-24 md:max-w-6xl md:px-0 md:pb-0">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-outfit text-3xl font-semibold tracking-tight">Configuration</h1>
+          <p className="mt-1 text-sm text-slate-300">Recharge, ciblage, automatisation. Simple et fluide.</p>
+        </div>
+        {status ? <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs text-emerald-300">{status}</span> : null}
+      </header>
+
+      {error ? <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">{error}</div> : null}
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <article className="rounded-2xl border border-leadradar-border bg-leadradar-card p-5">
+          <h2 className="font-outfit text-lg font-semibold">1. Recharge credits</h2>
+          <p className="mt-3 text-sm text-slate-300">Solde: {creditsBalance} credits</p>
+          <p className="text-sm text-slate-300">Cout par fiche: {creditCostPerLead} credit</p>
+          <p className="text-sm text-slate-300">Fiches disponibles maintenant: {estimLeadsRemaining}</p>
+          <p className="mt-1 text-xs text-slate-400">
+            Consommes: {creditsSpent} | Achetes: {creditsPurchased}
+          </p>
+          <div className="mt-3 h-2 w-full rounded-full bg-slate-800">
+            <div className="h-full rounded-full bg-emerald-500" style={{ width: `${consumptionPercent}%` }} />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (!isSupabaseConfigured) {
+                setError('Mode demo: portail Stripe indisponible sans configuration Supabase.');
+                return;
+              }
+              void supabase.functions.invoke('customer-portal', { body: { user_id: profile.id } }).then(({ data }) => {
+                const url = String((data as { url?: string } | null)?.url ?? '');
+                if (url && url.startsWith('https://') && url.includes('stripe.com')) {
+                  window.location.href = url;
+                }
+              });
+            }}
+            className="mt-4 rounded-lg border border-leadradar-border px-3 py-2 text-sm text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300"
+          >
+            Historique paiements (Stripe)
+          </button>
+          <div className="mt-4">
+            <CreditPacks userId={profile.id} />
+          </div>
+        </article>
+
+        <article className="rounded-2xl border border-leadradar-border bg-leadradar-card p-5">
+          <h2 className="font-outfit text-lg font-semibold">2. Auto-recharge</h2>
+          <p className="mt-1 text-sm text-slate-300">
+            Recharge automatique declenchee quand le solde passe sous un seuil.
+          </p>
+          <div className="mt-4 space-y-3">
+            <label className="flex items-center justify-between text-sm">
+              Activer auto-recharge
+              <input
+                type="checkbox"
+                checked={Boolean(draft.auto_recharge_enabled)}
+                onChange={(event) => {
+                  const value = event.target.checked;
+                  setDraft((current) => (current ? { ...current, auto_recharge_enabled: value } : current));
+                  debouncedSave({ auto_recharge_enabled: value });
+                }}
+              />
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Pack utilise
+              <select
+                value={(draft.auto_recharge_pack_id ?? 'pack_50') as CreditPackId}
+                onChange={(event) => {
+                  const value = event.target.value as CreditPackId;
+                  setDraft((current) => (current ? { ...current, auto_recharge_pack_id: value } : current));
+                  debouncedSave({ auto_recharge_pack_id: value });
+                }}
+                className="mt-1 w-full rounded-lg border border-leadradar-border bg-[#0F172A] px-3 py-2 text-sm"
+              >
+                {CREDIT_PACKS.map((pack) => (
+                  <option key={pack.id} value={pack.id}>
+                    {pack.label} ({pack.credits + pack.bonusCredits} credits)
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Seuil de declenchement: {autoRechargeThreshold} credit(s)
+              <input
+                type="range"
+                min="1"
+                max="30"
+                value={autoRechargeThreshold}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+                  setDraft((current) => (current ? { ...current, auto_recharge_trigger_threshold: value } : current));
+                  debouncedSave({ auto_recharge_trigger_threshold: value });
+                }}
+                className="mt-2 w-full"
+              />
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Limite auto-recharges / mois
+              <input
+                type="number"
+                min="1"
+                max="20"
+                value={autoRechargeMaxMonth}
+                onChange={(event) => {
+                  const value = Math.max(1, Math.min(20, Number(event.target.value) || 1));
+                  setDraft((current) => (current ? { ...current, auto_recharge_max_per_month: value } : current));
+                  debouncedSave({ auto_recharge_max_per_month: value });
+                }}
+                className="mt-1 w-full rounded-lg border border-leadradar-border bg-[#0F172A] px-3 py-2 text-sm"
+              />
+            </label>
+
+            <p className="text-xs text-slate-400">
+              Deja utilises ce mois: {autoRechargeCountMonth} / {autoRechargeMaxMonth}
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <article className="rounded-2xl border border-leadradar-border bg-leadradar-card p-5">
+          <h2 className="font-outfit text-lg font-semibold">3. Ciblage recherche</h2>
+          <p className="mt-3 text-sm text-slate-300">
+            Secteurs cibles: {sectorTargets.length > 0 ? `${sectorTargets.length} selection(s)` : 'non defini'}
+          </p>
+          <div className="mt-3">
+            <SectorTargetingSelector
+              value={sectorTargets}
+              onChange={(nextTargets) => {
+                const patch = buildProfileSectorPatch(draft, nextTargets);
+                setDraft((current) => (current ? { ...current, ...patch } : current));
+                debouncedSave(patch);
+              }}
+              maxSelections={25}
+            />
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              disabled={scanLoading || sectorTargets.length === 0}
+              onClick={() => {
+                void runManualScan();
+              }}
+              className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {scanLoading ? 'Scan en cours...' : 'Scanner maintenant'}
+            </button>
+            <p className="text-xs text-slate-400">Declenche un scan immediat des sources actives pour vos secteurs.</p>
+          </div>
+          {scanFeedback ? <p className="mt-2 text-xs text-emerald-300">{scanFeedback}</p> : null}
+          {scanError ? <p className="mt-2 text-xs text-red-300">{scanError}</p> : null}
+          <p className="text-sm text-slate-300">
+            Zone: {draft.location_label ?? 'Aucune ville'} | Rayon: {draft.geo_radius_km} km
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setLocationDraft(draft.location_label ?? '');
+              setRadiusDraft(draft.geo_radius_km);
+              setLocationModalOpen(true);
+            }}
+            className="mt-3 rounded-lg border border-leadradar-border px-3 py-2 text-sm text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300"
+          >
+            Modifier la zone
+          </button>
+
+          <div className="mt-4">
+            <label className="text-sm text-slate-300">Score minimum: {draft.min_score}/100</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={draft.min_score}
+              onChange={(event) => {
+                const value = Number(event.target.value);
+                setDraft((current) => (current ? { ...current, min_score: value } : current));
+                debouncedSave({ min_score: value });
+              }}
+              className="mt-2 w-full"
+            />
+          </div>
+          <Link
+            to="/sources"
+            className="mt-3 inline-flex rounded-lg border border-leadradar-border px-3 py-2 text-sm text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300"
+          >
+            Ajuster les sources
+          </Link>
+        </article>
+
+        <article className="rounded-2xl border border-leadradar-border bg-leadradar-card p-5">
+          <h2 className="font-outfit text-lg font-semibold">4. Automatisation prospection</h2>
+          <p className="mt-1 text-sm text-slate-300">
+            Sur prospects eligibles et credits disponibles, l app peut envoyer un email automatiquement.
+          </p>
+          <div className="mt-4 space-y-3">
+            <label className="flex items-center justify-between text-sm">
+              Activer automatisation
+              <input
+                type="checkbox"
+                checked={Boolean(draft.automation_enabled)}
+                onChange={(event) => {
+                  const value = event.target.checked;
+                  setDraft((current) => (current ? { ...current, automation_enabled: value } : current));
+                  debouncedSave({ automation_enabled: value });
+                }}
+              />
+            </label>
+
+            <label className="flex items-center justify-between text-sm">
+              Envoyer email prospect automatiquement
+              <input
+                type="checkbox"
+                checked={Boolean(draft.automation_send_email)}
+                onChange={(event) => {
+                  const value = event.target.checked;
+                  setDraft((current) => (current ? { ...current, automation_send_email: value } : current));
+                  debouncedSave({ automation_send_email: value });
+                }}
+              />
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Score minimum automatisation: {automationMinScore}
+              <input
+                type="range"
+                min="50"
+                max="100"
+                value={automationMinScore}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+                  setDraft((current) => (current ? { ...current, automation_min_score: value } : current));
+                  debouncedSave({ automation_min_score: value });
+                }}
+                className="mt-2 w-full"
+              />
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Limite d emails auto / jour
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={automationDailyLimit}
+                onChange={(event) => {
+                  const value = Math.max(1, Math.min(100, Number(event.target.value) || 1));
+                  setDraft((current) => (current ? { ...current, automation_daily_email_limit: value } : current));
+                  debouncedSave({ automation_daily_email_limit: value });
+                }}
+                className="mt-1 w-full rounded-lg border border-leadradar-border bg-[#0F172A] px-3 py-2 text-sm"
+              />
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Sujet email auto
+              <input
+                type="text"
+                value={draft.automation_email_subject_template ?? ''}
+                onChange={(event) => {
+                  const value = event.target.value.slice(0, 160);
+                  setDraft((current) => (current ? { ...current, automation_email_subject_template: value } : current));
+                  debouncedSave({ automation_email_subject_template: value });
+                }}
+                className="mt-1 w-full rounded-lg border border-leadradar-border bg-[#0F172A] px-3 py-2 text-sm"
+                placeholder="Ex: Opportunite detectee pour {{prospect_name}}"
+              />
+            </label>
+
+            <label className="block text-sm text-slate-300">
+              Signature email auto
+              <textarea
+                value={draft.automation_email_signature ?? ''}
+                onChange={(event) => {
+                  const value = event.target.value.slice(0, 600);
+                  setDraft((current) => (current ? { ...current, automation_email_signature: value } : current));
+                  debouncedSave({ automation_email_signature: value });
+                }}
+                rows={3}
+                className="mt-1 w-full rounded-lg border border-leadradar-border bg-[#0F172A] px-3 py-2 text-sm"
+                placeholder="Ex: Bien cordialement, ..."
+              />
+            </label>
+
+            <p className="text-xs text-slate-400">
+              Envoyes aujourd hui: {Math.max(0, Number(draft.automation_emails_sent_today ?? 0))} / {automationDailyLimit}
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <article className="rounded-2xl border border-leadradar-border bg-leadradar-card p-5">
+          <h2 className="font-outfit text-lg font-semibold">5. Alertes</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            <label className="flex items-center justify-between">
+              Email
+              <input
+                type="checkbox"
+                checked={draft.notification_email}
+                onChange={(event) => {
+                  const value = event.target.checked;
+                  setDraft((current) => (current ? { ...current, notification_email: value } : current));
+                  debouncedSave({ notification_email: value });
+                }}
+              />
+            </label>
+            <label className="flex items-center justify-between">
+              Push
+              <input
+                type="checkbox"
+                checked={draft.notification_push}
+                onChange={(event) => {
+                  const value = event.target.checked;
+                  setDraft((current) => (current ? { ...current, notification_push: value } : current));
+                  debouncedSave({ notification_push: value });
+                }}
+              />
+            </label>
+            <label className="flex items-center justify-between">
+              Brulants uniquement
+              <input
+                type="checkbox"
+                checked={draft.burning_only_alerts}
+                onChange={(event) => {
+                  const value = event.target.checked;
+                  setDraft((current) => (current ? { ...current, burning_only_alerts: value } : current));
+                  debouncedSave({ burning_only_alerts: value });
+                }}
+              />
+            </label>
+          </div>
+        </article>
+
+        <details className="rounded-2xl border border-leadradar-border bg-leadradar-card p-5">
+          <summary className="cursor-pointer font-outfit text-lg font-semibold">6. Parametres avances</summary>
+          <div className="mt-4 space-y-4">
+            <div>
+              <label className="text-sm text-slate-300">Frequence de scan</label>
+              <select
+                value={draft.scan_frequency_hours}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+                  setDraft((current) => (current ? { ...current, scan_frequency_hours: value } : current));
+                  debouncedSave({ scan_frequency_hours: value });
+                }}
+                className="mt-2 w-full rounded-lg border border-leadradar-border bg-[#0F172A] px-3 py-2 text-sm"
+              >
+                <option value={2}>Toutes les 2h</option>
+                <option value={6}>Toutes les 6h</option>
+                <option value={12}>Toutes les 12h</option>
+                <option value={24}>Toutes les 24h</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm text-slate-300">Ton des messages</label>
+              <div className="mt-2 grid gap-2 md:grid-cols-3">
+                {([
+                  ['professional', 'Professionnel'],
+                  ['friendly', 'Amical'],
+                  ['direct', 'Direct'],
+                ] as Array<[ApproachTone, string]>).map(([tone, label]) => (
+                  <label
+                    key={tone}
+                    className={`rounded-lg border p-3 text-sm ${
+                      draft.approach_tone === tone ? 'border-emerald-500 bg-emerald-500/10' : 'border-leadradar-border bg-[#0F172A]'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="approach-tone"
+                      checked={draft.approach_tone === tone}
+                      onChange={() => {
+                        setDraft((current) => (current ? { ...current, approach_tone: tone } : current));
+                        debouncedSave({ approach_tone: tone });
+                      }}
+                      className="mr-2"
+                    />
+                    {label}
+                    <p className="mt-2 text-xs text-slate-300">{TONE_PREVIEWS[tone]}</p>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      {locationModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-leadradar-border bg-[#111827] p-5">
+            <h3 className="font-outfit text-lg font-semibold">Zone geographique</h3>
+            <label className="mt-3 block text-sm">
+              Ville
+              <input
+                value={locationDraft}
+                onChange={(event) => setLocationDraft(event.target.value)}
+                className="mt-1 w-full rounded-lg border border-leadradar-border bg-[#0F172A] px-3 py-2"
+                placeholder="Paris, Ile-de-France"
+              />
+            </label>
+            <label className="mt-3 block text-sm">
+              Rayon: {radiusDraft} km
+              <input
+                type="range"
+                min="5"
+                max="100"
+                value={radiusDraft}
+                onChange={(event) => setRadiusDraft(Number(event.target.value))}
+                className="mt-2 w-full"
+              />
+            </label>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setLocationModalOpen(false)}
+                className="rounded-lg border border-leadradar-border px-3 py-2 text-sm"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const patch: Partial<Profile> = {
+                    location_label: locationDraft.trim() || null,
+                    geo_radius_km: radiusDraft,
+                  };
+                  setDraft((current) => (current ? { ...current, ...patch } : current));
+                  void savePatch(patch);
+                  setLocationModalOpen(false);
+                }}
+                className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-emerald-950"
+              >
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export default SettingsPage;

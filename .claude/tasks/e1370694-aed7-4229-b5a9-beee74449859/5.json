@@ -1,0 +1,9 @@
+{
+  "id": "5",
+  "subject": "Phase 4: Create pages/Reputation.tsx",
+  "description": "Create full UI page for Reputation scanner with form, dashboard results (metrics, themes, competitors, alerts, mentions, recommendations). Dark theme style.",
+  "activeForm": "Creating Reputation page",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

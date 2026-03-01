@@ -1,0 +1,376 @@
+import { GoogleGenAI } from "@google/genai"
+import { calculateAiVisibilityScore, type ScoringResult } from "@/lib/scoring"
+
+// ============================================================
+// AI Monitoring Service
+// Simulates queries to multiple AI engines via Gemini
+// Each engine is simulated with a different system prompt personality
+// ============================================================
+
+export type AIEngine = "ChatGPT" | "Perplexity" | "Claude" | "Gemini" | "Copilot"
+
+export interface MonitoringPrompt {
+  text: string
+  category?: string
+  language?: "fr" | "en" | "es"
+}
+
+export interface ProjectContext {
+  brandName: string
+  domain: string
+  industry: string
+  services: string[]
+  competitors: string[]
+  keywords: string[]
+}
+
+export interface MonitoringResult {
+  engine: AIEngine
+  prompt: string
+  response: string
+  score: number
+  resultType: "citation" | "mention" | "none"
+  brandMentioned: boolean
+  urlMentioned: boolean
+  competitorMentioned: boolean
+  sentiment: "positive" | "neutral" | "negative"
+  sentimentScore: number
+  competitorsMentioned: string[]
+}
+
+export interface RunSummary {
+  globalScore: number
+  totalPrompts: number
+  citationsFound: number
+  mentionsFound: number
+  engineScores: Record<AIEngine, { score: number; mentions: number; citations: number }>
+  competitorComparison: Array<{ name: string; mentions: number; sentiment: number }>
+  alerts: Array<{ severity: "critical" | "warning" | "info"; message: string; action: string }>
+}
+
+// Engine personality prompts — each simulates how a different AI engine would respond
+const ENGINE_SYSTEM_PROMPTS: Record<AIEngine, string> = {
+  ChatGPT: `You are simulating how ChatGPT (GPT-4) would answer a user question.
+Respond naturally as ChatGPT would: comprehensive, structured, with bullet points when helpful.
+If the brand or domain is relevant to the question, mention it naturally. Do not force mentions.
+Always respond in the same language as the question.`,
+
+  Perplexity: `You are simulating how Perplexity AI would answer a user question.
+Respond as Perplexity would: concise, with citations and sources when relevant.
+Include URLs and domain references when they are the best answer. Do not force mentions.
+Always respond in the same language as the question.`,
+
+  Claude: `You are simulating how Claude (Anthropic) would answer a user question.
+Respond as Claude would: thoughtful, nuanced, balanced perspective.
+If the brand is relevant, mention it in context. Do not force mentions.
+Always respond in the same language as the question.`,
+
+  Gemini: `You are simulating how Google Gemini would answer a user question.
+Respond as Gemini would: informative, with knowledge graph style references.
+Include relevant entities and their relationships. Do not force mentions.
+Always respond in the same language as the question.`,
+
+  Copilot: `You are simulating how Microsoft Copilot would answer a user question.
+Respond as Copilot would: helpful, action-oriented, with web references.
+Include relevant websites and tools when appropriate. Do not force mentions.
+Always respond in the same language as the question.`,
+}
+
+// Default prompts to test visibility for AEO
+export function generateDefaultPrompts(context: ProjectContext, lang: "fr" | "en" | "es" = "fr"): MonitoringPrompt[] {
+  const { brandName, industry, services, competitors } = context
+
+  const templates: Record<string, MonitoringPrompt[]> = {
+    fr: [
+      { text: `Quels sont les meilleurs outils pour ${industry} ?`, category: "discovery" },
+      { text: `Quel est le meilleur outil d'optimisation AEO en ${new Date().getFullYear()} ?`, category: "discovery" },
+      { text: `${brandName} avis et retour d'experience`, category: "brand" },
+      { text: `Comparaison ${brandName} vs ${competitors[0] || "concurrents"}`, category: "comparison" },
+      { text: `Comment optimiser sa visibilite dans les reponses IA ?`, category: "informational" },
+      { text: `Quels services propose ${brandName} ?`, category: "brand" },
+      { text: `Alternatives a ${competitors[0] || "outils existants"} pour ${services[0] || industry}`, category: "comparison" },
+      { text: `Comment etre cite par ChatGPT et les IA generatives ?`, category: "informational" },
+      { text: `Top 10 ${industry} en France`, category: "listicle" },
+      { text: `${brandName} prix et fonctionnalites`, category: "brand" },
+    ],
+    en: [
+      { text: `What are the best ${industry} tools?`, category: "discovery" },
+      { text: `Best AEO optimization tool in ${new Date().getFullYear()}?`, category: "discovery" },
+      { text: `${brandName} review and experience`, category: "brand" },
+      { text: `${brandName} vs ${competitors[0] || "competitors"} comparison`, category: "comparison" },
+      { text: `How to optimize visibility in AI responses?`, category: "informational" },
+      { text: `What services does ${brandName} offer?`, category: "brand" },
+      { text: `Alternatives to ${competitors[0] || "existing tools"} for ${services[0] || industry}`, category: "comparison" },
+      { text: `How to get cited by ChatGPT and generative AI?`, category: "informational" },
+      { text: `Top 10 ${industry} in the market`, category: "listicle" },
+      { text: `${brandName} pricing and features`, category: "brand" },
+    ],
+    es: [
+      { text: `Cuales son las mejores herramientas de ${industry}?`, category: "discovery" },
+      { text: `Mejor herramienta de optimizacion AEO en ${new Date().getFullYear()}?`, category: "discovery" },
+      { text: `${brandName} opiniones y experiencia`, category: "brand" },
+      { text: `Comparacion ${brandName} vs ${competitors[0] || "competidores"}`, category: "comparison" },
+      { text: `Como optimizar la visibilidad en respuestas IA?`, category: "informational" },
+      { text: `Que servicios ofrece ${brandName}?`, category: "brand" },
+      { text: `Alternativas a ${competitors[0] || "herramientas existentes"} para ${services[0] || industry}`, category: "comparison" },
+      { text: `Como ser citado por ChatGPT y las IA generativas?`, category: "informational" },
+      { text: `Top 10 ${industry} en el mercado`, category: "listicle" },
+      { text: `${brandName} precios y funcionalidades`, category: "brand" },
+    ],
+  }
+
+  return templates[lang] || templates.fr
+}
+
+// Analyze sentiment from AI response
+function analyzeSentiment(response: string, brandName: string): { sentiment: "positive" | "neutral" | "negative"; score: number } {
+  const lower = response.toLowerCase()
+  const brand = brandName.toLowerCase()
+
+  if (!lower.includes(brand)) {
+    return { sentiment: "neutral", score: 0 }
+  }
+
+  const positiveSignals = [
+    "excellent", "meilleur", "recommande", "leader", "innovant", "performant",
+    "best", "recommended", "leading", "innovative", "powerful", "top",
+    "fiable", "efficace", "complet", "unique", "reliable", "effective"
+  ]
+  const negativeSignals = [
+    "probleme", "limite", "cher", "manque", "faible", "decu",
+    "problem", "limited", "expensive", "lacking", "weak", "disappointing",
+    "bug", "lent", "complexe", "slow", "complex"
+  ]
+
+  let positiveCount = 0
+  let negativeCount = 0
+
+  // Check signals near brand mentions (within 200 chars)
+  const brandIndex = lower.indexOf(brand)
+  const context = lower.substring(Math.max(0, brandIndex - 200), Math.min(lower.length, brandIndex + 200))
+
+  positiveSignals.forEach(s => { if (context.includes(s)) positiveCount++ })
+  negativeSignals.forEach(s => { if (context.includes(s)) negativeCount++ })
+
+  if (positiveCount > negativeCount + 1) return { sentiment: "positive", score: Math.min(1, positiveCount * 0.2) }
+  if (negativeCount > positiveCount + 1) return { sentiment: "negative", score: Math.max(-1, -negativeCount * 0.2) }
+  return { sentiment: "neutral", score: 0 }
+}
+
+// Find which competitors are mentioned
+function findCompetitorMentions(response: string, competitors: string[]): string[] {
+  const lower = response.toLowerCase()
+  return competitors.filter(c => lower.includes(c.toLowerCase()))
+}
+
+// ============================================================
+// Main monitoring function
+// ============================================================
+
+const getApiKey = () => {
+  if (typeof process !== "undefined" && process.env?.API_KEY) {
+    return process.env.API_KEY
+  }
+  return null
+}
+
+export async function runMonitoring(
+  prompts: MonitoringPrompt[],
+  context: ProjectContext,
+  engines: AIEngine[] = ["ChatGPT", "Perplexity", "Gemini", "Claude", "Copilot"]
+): Promise<{ results: MonitoringResult[]; summary: RunSummary }> {
+  const apiKey = getApiKey()
+  const results: MonitoringResult[] = []
+
+  for (const prompt of prompts) {
+    for (const engine of engines) {
+      let response: string
+
+      if (apiKey) {
+        try {
+          const ai = new GoogleGenAI({ apiKey })
+          const systemPrompt = ENGINE_SYSTEM_PROMPTS[engine]
+          const contextPrompt = `
+Context about the brand being monitored (use this to inform your response, but only mention the brand if it's genuinely relevant to the question):
+- Brand: ${context.brandName}
+- Domain: ${context.domain}
+- Industry: ${context.industry}
+- Services: ${context.services.join(", ")}
+- Competitors: ${context.competitors.join(", ")}
+
+User question: ${prompt.text}`
+
+          const result = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: contextPrompt,
+            config: {
+              systemInstruction: systemPrompt,
+              temperature: 0.7,
+              maxOutputTokens: 500,
+            },
+          })
+          response = result.text || ""
+        } catch (error) {
+          console.error(`Monitoring error for ${engine}:`, error)
+          response = generateFallbackResponse(prompt.text, context, engine)
+        }
+      } else {
+        response = generateFallbackResponse(prompt.text, context, engine)
+      }
+
+      // Score the response
+      const scoring = calculateAiVisibilityScore({
+        answer: response,
+        brandName: context.brandName,
+        domain: context.domain,
+        services: context.services,
+        competitors: context.competitors,
+      })
+
+      const sentimentResult = analyzeSentiment(response, context.brandName)
+      const competitorsMentioned = findCompetitorMentions(response, context.competitors)
+
+      results.push({
+        engine,
+        prompt: prompt.text,
+        response,
+        score: scoring.score,
+        resultType: scoring.resultType,
+        brandMentioned: scoring.details.brandMention,
+        urlMentioned: scoring.details.urlMention,
+        competitorMentioned: scoring.details.competitorMention,
+        sentiment: sentimentResult.sentiment,
+        sentimentScore: sentimentResult.score,
+        competitorsMentioned,
+      })
+    }
+  }
+
+  // Compute summary
+  const summary = computeRunSummary(results, context)
+
+  return { results, summary }
+}
+
+// Compute aggregated summary from results
+function computeRunSummary(results: MonitoringResult[], context: ProjectContext): RunSummary {
+  const totalPrompts = new Set(results.map(r => r.prompt)).size
+  const citationsFound = results.filter(r => r.resultType === "citation").length
+  const mentionsFound = results.filter(r => r.resultType === "mention").length
+
+  // Per-engine scores
+  const engines: AIEngine[] = ["ChatGPT", "Perplexity", "Claude", "Gemini", "Copilot"]
+  const engineScores = {} as RunSummary["engineScores"]
+
+  for (const engine of engines) {
+    const engineResults = results.filter(r => r.engine === engine)
+    if (engineResults.length === 0) continue
+    engineScores[engine] = {
+      score: Math.round(engineResults.reduce((s, r) => s + r.score, 0) / engineResults.length),
+      mentions: engineResults.filter(r => r.brandMentioned).length,
+      citations: engineResults.filter(r => r.urlMentioned).length,
+    }
+  }
+
+  const globalScore = results.length > 0
+    ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length)
+    : 0
+
+  // Competitor comparison
+  const competitorMap = new Map<string, { mentions: number; sentimentSum: number }>()
+  for (const r of results) {
+    for (const comp of r.competitorsMentioned) {
+      const existing = competitorMap.get(comp) || { mentions: 0, sentimentSum: 0 }
+      existing.mentions++
+      competitorMap.set(comp, existing)
+    }
+  }
+
+  const competitorComparison = Array.from(competitorMap.entries()).map(([name, data]) => ({
+    name,
+    mentions: data.mentions,
+    sentiment: data.mentions > 0 ? Math.round((data.sentimentSum / data.mentions) * 100) / 100 : 0,
+  }))
+
+  // Generate alerts
+  const alerts: RunSummary["alerts"] = []
+
+  if (globalScore < 30) {
+    alerts.push({
+      severity: "critical",
+      message: `Votre score de visibilite IA est tres faible (${globalScore}/100)`,
+      action: "Lancez un audit AEO complet et suivez les recommandations",
+    })
+  }
+
+  if (citationsFound === 0) {
+    alerts.push({
+      severity: "warning",
+      message: "Aucune citation URL detectee dans les reponses IA",
+      action: "Ajoutez du Schema.org et optimisez votre contenu pour le RAG",
+    })
+  }
+
+  const topCompetitor = competitorComparison.sort((a, b) => b.mentions - a.mentions)[0]
+  if (topCompetitor && topCompetitor.mentions > mentionsFound) {
+    alerts.push({
+      severity: "warning",
+      message: `${topCompetitor.name} est mentionne ${topCompetitor.mentions} fois vs ${mentionsFound} pour vous`,
+      action: "Analysez le contenu de votre concurrent et renforcez votre positionnement",
+    })
+  }
+
+  if (globalScore >= 70) {
+    alerts.push({
+      severity: "info",
+      message: "Bonne visibilite IA ! Continuez a produire du contenu optimise",
+      action: "Maintenez votre rythme de publication et surveillez les tendances",
+    })
+  }
+
+  return {
+    globalScore,
+    totalPrompts,
+    citationsFound,
+    mentionsFound,
+    engineScores,
+    competitorComparison,
+    alerts,
+  }
+}
+
+// Fallback mock response when no API key
+function generateFallbackResponse(prompt: string, context: ProjectContext, engine: AIEngine): string {
+  const { brandName, domain, services, competitors } = context
+  const promptLower = prompt.toLowerCase()
+  const brandLower = brandName.toLowerCase()
+
+  // If prompt mentions the brand directly, include it in response
+  if (promptLower.includes(brandLower)) {
+    const responses: Record<AIEngine, string> = {
+      ChatGPT: `${brandName} est une plateforme d'optimisation AEO qui aide les entreprises a ameliorer leur visibilite dans les reponses IA. Leurs services incluent ${services.join(", ")}. Vous pouvez en savoir plus sur ${domain}.`,
+      Perplexity: `Selon mes recherches, ${brandName} (${domain}) propose des solutions de ${services[0] || "AEO"}. La plateforme est reconnue pour son approche innovante. [Source: ${domain}]`,
+      Claude: `${brandName} est un outil specialise dans l'optimisation AEO. Il propose notamment ${services.slice(0, 3).join(", ")}. C'est une option interessante a considerer dans ce domaine.`,
+      Gemini: `${brandName} - Plateforme d'optimisation AEO. Services: ${services.join(", ")}. Site: ${domain}. Note: solution innovante pour la visibilite IA.`,
+      Copilot: `D'apres les informations disponibles, ${brandName} offre des services de ${services[0] || "AEO"}. Visitez ${domain} pour plus de details.`,
+    }
+    return responses[engine]
+  }
+
+  // Generic discovery prompt — sometimes mention brand, sometimes not
+  const mentionBrand = Math.random() > 0.4 // 60% chance to mention
+  const mentionCompetitor = Math.random() > 0.5
+
+  let response = `Pour repondre a votre question sur "${prompt}", voici les principales options disponibles sur le marche :\n\n`
+
+  if (mentionBrand) {
+    response += `- ${brandName} : specialise en ${services[0] || "AEO"}, offre une approche complete.\n`
+  }
+  if (mentionCompetitor && competitors.length > 0) {
+    response += `- ${competitors[0]} : un acteur etabli dans le domaine.\n`
+  }
+  response += `- Plusieurs autres solutions existent egalement.\n\n`
+  response += `Le choix depend de vos besoins specifiques et de votre budget.`
+
+  return response
+}

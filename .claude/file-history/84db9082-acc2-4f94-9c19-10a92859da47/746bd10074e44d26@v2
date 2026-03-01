@@ -1,0 +1,163 @@
+import { chromium } from 'playwright';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const SURVEY_ID = '02023306-325a-4eac-bd57-39c01be98291';
+const SS = (name) => path.join(__dirname, `fb-${name}.png`);
+
+const responses = [
+  { rating: 5, nps: 9, choice: 'DocAI - Extraction de documents', text: "Excellent outil! L extraction de factures m a fait gagner 3h par semaine. L interface est intuitive et les resultats sont tres precis.", yesno: 'Yes' },
+  { rating: 4, nps: 8, choice: 'DocAI - Extraction de documents', text: "Tres bon produit, l IA est impressionnante sur les documents. J aimerais plus de formats d export.", yesno: 'Yes' },
+  { rating: 3, nps: 6, choice: 'FeedbackAI - Sondages et Analyse', text: "Les sondages sont pratiques mais l analyse IA pourrait etre plus detaillee. Le prix est correct pour le plan Pro.", yesno: 'Yes' },
+  { rating: 2, nps: 3, choice: 'FeedbackAI - Sondages et Analyse', text: "Le traitement des documents est lent (40 secondes). L interface mobile n est pas optimisee. Decu par rapport aux promesses.", yesno: 'No' },
+  { rating: 5, nps: 10, choice: 'Templates - Modeles extraction', text: "Les templates sont geniaux! On les configure une fois et apres c est automatique. Support client reactif aussi.", yesno: 'Yes' },
+  { rating: 3, nps: 5, choice: 'DocAI - Extraction de documents', text: "DocAI fonctionne bien sur les factures claires mais galere sur les scans de mauvaise qualite. Le dashboard pourrait avoir plus de stats.", yesno: 'No' },
+  { rating: 4, nps: 7, choice: 'FeedbackAI - Sondages et Analyse', text: "FeedbackAI nous a permis de comprendre nos clients bien mieux qu avant. L analyse de sentiment est pertinente. Manque juste l integration Slack.", yesno: 'Yes' },
+  { rating: 1, nps: 1, choice: 'DocAI - Extraction de documents', text: "Trop cher pour ce que c est. Le plan gratuit est trop limite (10 docs). La concurrence offre plus pour moins cher. Je vais annuler.", yesno: 'No' },
+];
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+
+  // ========== SUBMIT 8 RESPONSES ==========
+  console.log('=== Submitting 8 responses ===');
+
+  for (let i = 0; i < responses.length; i++) {
+    const r = responses[i];
+    console.log(`  Response ${i+1}/8...`);
+
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const page = await ctx.newPage();
+
+    await page.goto(`${APP}/s/${SURVEY_ID}`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(2000);
+
+    // Q1: Rating - click the correct number button (first row of 1-5)
+    const ratingButtons = page.locator('button.w-12.h-12');
+    await ratingButtons.nth(r.rating - 1).click();
+    await page.waitForTimeout(200);
+
+    // Q2: NPS - click the correct number button (row of 0-10)
+    const npsButtons = page.locator('button.w-10.h-10');
+    await npsButtons.nth(r.nps).click();
+    await page.waitForTimeout(200);
+
+    // Q3: Single Choice - click radio by label text
+    await page.locator(`label:has-text("${r.choice}")`).click();
+    await page.waitForTimeout(200);
+
+    // Q4: Open ended - fill textarea
+    await page.locator('textarea').fill(r.text);
+    await page.waitForTimeout(200);
+
+    // Q5: Yes/No - click the button
+    await page.locator(`button.flex-1:has-text("${r.yesno}")`).click();
+    await page.waitForTimeout(200);
+
+    if (i === 0) {
+      await page.screenshot({ path: SS('03-response-filled'), fullPage: true });
+    }
+
+    // Submit
+    await page.locator('button:has-text("Submit")').last().click();
+    await page.waitForTimeout(3000);
+
+    if (i === 0) {
+      await page.screenshot({ path: SS('04-thank-you') });
+    }
+
+    // Verify "Thank you" appeared
+    const body = await page.textContent('body');
+    if (body.includes('Thank you')) {
+      console.log(`    OK - submitted`);
+    } else {
+      console.log(`    WARN - might not have submitted`);
+    }
+
+    await ctx.close();
+  }
+
+  // ========== VIEW RESULTS & ANALYZE ==========
+  console.log('\n=== Logging in to view results ===');
+  const adminCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await adminCtx.newPage();
+
+  page.on('response', async resp => {
+    if (resp.status() >= 400 && resp.url().includes('/api/')) {
+      let body = ''; try { body = await resp.text(); } catch {}
+      console.log(`  [HTTP ${resp.status()}] ${resp.url().split('.app')[1]?.substring(0,80)} -> ${body.substring(0,200)}`);
+    }
+  });
+
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+
+  // Go to survey detail
+  await page.goto(`${APP}/dashboard/surveys/${SURVEY_ID}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(3000);
+  await page.screenshot({ path: SS('05-survey-overview') });
+
+  // Click on Responses tab
+  const tabs = page.locator('[role="tab"], button[data-state]');
+  const tabCount = await tabs.count();
+  console.log(`  Found ${tabCount} tabs`);
+  for (let t = 0; t < tabCount; t++) {
+    const txt = await tabs.nth(t).textContent();
+    console.log(`    Tab ${t}: "${txt}"`);
+  }
+
+  // Try clicking Responses tab
+  const respTab = page.locator('[role="tab"]:has-text("Response"), button:has-text("Response")').first();
+  if (await respTab.count() > 0) {
+    await respTab.click();
+    await page.waitForTimeout(2000);
+    await page.screenshot({ path: SS('06-responses') });
+    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('06b-responses-scroll') });
+  }
+
+  // Click Analysis tab
+  const analysisTab = page.locator('[role="tab"]:has-text("Analy"), button:has-text("Analy")').first();
+  if (await analysisTab.count() > 0) {
+    await analysisTab.click();
+    await page.waitForTimeout(2000);
+  }
+
+  // Click Run Analysis button
+  const analyzeBtn = page.locator('button:has-text("Run"), button:has-text("Analyze"), button:has-text("Generate")');
+  console.log(`  Found ${await analyzeBtn.count()} analyze buttons`);
+
+  if (await analyzeBtn.count() > 0) {
+    console.log('\n=== Running AI Analysis ===');
+    await analyzeBtn.first().click();
+
+    for (let i = 0; i < 30; i++) {
+      await page.waitForTimeout(3000);
+      const content = await page.textContent('body');
+      if (content?.includes('ummary') || content?.includes('entiment') ||
+          content?.includes('heme') || content?.includes('ecommend') ||
+          content?.includes('insight') || content?.includes('positive')) {
+        console.log(`  Analysis complete in ${(i+1)*3}s`);
+        break;
+      }
+      if (i % 5 === 4) console.log(`  Still analyzing... ${(i+1)*3}s`);
+    }
+  }
+
+  await page.screenshot({ path: SS('07-analysis') });
+
+  for (let s = 1; s <= 5; s++) {
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: SS(`08-analysis-s${s}`) });
+  }
+
+  await browser.close();
+  console.log('\n=== DONE ===');
+})();

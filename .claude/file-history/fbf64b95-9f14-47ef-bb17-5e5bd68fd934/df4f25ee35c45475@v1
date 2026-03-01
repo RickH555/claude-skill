@@ -1,0 +1,81 @@
+import OpenAI from 'openai';
+
+export const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function extractFromDocument(
+  imageBase64: string,
+  prompt: string
+): Promise<Record<string, { value: string | number | boolean | null; confidence: number }>> {
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a document data extraction specialist. Extract structured data from document images. Always respond with valid JSON only.',
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/png;base64,${imageBase64}`,
+              detail: 'high',
+            },
+          },
+          {
+            type: 'text',
+            text: prompt,
+          },
+        ],
+      },
+    ],
+    response_format: { type: 'json_object' },
+    max_tokens: 4096,
+  });
+
+  const content = response.choices[0]?.message?.content;
+  if (!content) throw new Error('No response from OpenAI');
+
+  return JSON.parse(content);
+}
+
+export async function analyzeFeedback(
+  responses: string[],
+  analysisType: 'themes' | 'sentiment' | 'summary' | 'full' = 'full'
+): Promise<Record<string, unknown>> {
+  const systemPrompts: Record<string, string> = {
+    themes: 'Identify the main themes and topics from survey responses. Return JSON with themes array containing name, count, sentiment score (-1 to 1), and example quotes.',
+    sentiment: 'Analyze the sentiment distribution of survey responses. Return JSON with positive, neutral, negative percentages and overall sentiment score.',
+    summary: 'Provide an executive summary of survey responses. Return JSON with summary text, key insights array, and recommendations array.',
+    full: `Perform a comprehensive analysis of survey responses. Return JSON with:
+- "summary": executive summary string
+- "sentiment": {"positive": float, "neutral": float, "negative": float}
+- "themes": [{"name": string, "count": int, "sentiment": float, "examples": string[]}]
+- "recommendations": string[]
+- "key_insights": string[]`,
+  };
+
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompts[analysisType] || systemPrompts.full,
+      },
+      {
+        role: 'user',
+        content: `Analyze these ${responses.length} survey responses:\n\n${responses.map((r, i) => `Response ${i + 1}: ${r}`).join('\n\n')}`,
+      },
+    ],
+    response_format: { type: 'json_object' },
+    max_tokens: 4096,
+  });
+
+  const content = response.choices[0]?.message?.content;
+  if (!content) throw new Error('No response from OpenAI');
+
+  return JSON.parse(content);
+}

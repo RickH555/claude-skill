@@ -1,0 +1,31 @@
+export default function AppLoading() {
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto animate-fade-in">
+      {/* Header skeleton */}
+      <div className="mb-8">
+        <div className="h-8 w-48 bg-white/5 rounded-lg animate-shimmer mb-2" />
+        <div className="h-4 w-72 bg-white/5 rounded-lg animate-shimmer" />
+      </div>
+
+      {/* KPI skeletons */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="p-5 bg-[#1a1d21] border border-white/5 rounded-2xl">
+            <div className="h-3 w-20 bg-white/5 rounded animate-shimmer mb-3" />
+            <div className="h-8 w-16 bg-white/5 rounded animate-shimmer" />
+          </div>
+        ))}
+      </div>
+
+      {/* Chart skeletons */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="bg-[#1a1d21] border border-white/5 rounded-2xl p-6">
+            <div className="h-4 w-32 bg-white/5 rounded animate-shimmer mb-6" />
+            <div className="h-48 bg-white/5 rounded-xl animate-shimmer" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

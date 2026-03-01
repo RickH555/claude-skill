@@ -1,0 +1,9 @@
+{
+  "id": "7",
+  "subject": "Task 1-2: Initialize Next.js + install deps",
+  "description": "Initialize Next.js project with pnpm, install all dependencies, create configs (next.config.ts, tsconfig.json, postcss, .env.example, .gitignore)",
+  "activeForm": "Initializing Next.js project",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

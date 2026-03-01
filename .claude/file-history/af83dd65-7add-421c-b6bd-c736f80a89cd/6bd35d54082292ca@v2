@@ -1,0 +1,315 @@
+# Claude Code - Skills, GSD, Superpowers & Agents
+
+## Skills disponibles
+
+### Developpement & Architecture
+
+| Skill | Description |
+|-------|-------------|
+| `api-design` | REST API design patterns : naming, status codes, pagination, filtering, error handling |
+| `backend-patterns` | Architecture backend, API design, optimisation BDD, best practices serveur |
+| `frontend-patterns` | Patterns frontend pour React, Next.js, state management, performance |
+| `frontend-design` | Interfaces frontend production-grade avec haute qualite design |
+| `senior-architect` | Design d'architecture systeme, evaluation microservices |
+| `senior-backend` | Design REST APIs, optimisation BDD, queries |
+| `senior-frontend` | Developpement frontend moderne et performant |
+| `senior-fullstack` | Fullstack : scaffolding Next.js/FastAPI/MERN/Django |
+| `senior-data-engineer` | Pipelines de donnees scalables, ETL/ELT |
+| `senior-devops` | CI/CD, infrastructure automation, containerisation |
+| `project-guidelines-example` | Template de guidelines projet base sur une app de production |
+| `tech-stack-evaluator` | Evaluation de stack technologique avec analyse TCO et securite |
+
+### Frameworks & Langages
+
+| Skill | Description |
+|-------|-------------|
+| `python-patterns` | Idiomes Python, PEP 8, type hints, best practices |
+| `python-testing` | Strategies de test Python avec pytest, TDD, fixtures, mocking |
+| `golang-patterns` | Patterns Go idiomatiques, best practices |
+| `golang-testing` | Tests Go : table-driven, subtests, benchmarks, fuzzing |
+| `java-coding-standards` | Standards Java pour Spring Boot services |
+| `cpp-coding-standards` | Standards C++ bases sur les C++ Core Guidelines |
+| `cpp-testing` | Tests C++ avec GoogleTest/CTest |
+| `swift-actor-persistence` | Persistence thread-safe en Swift avec actors |
+| `swift-protocol-di-testing` | Injection de dependances par protocoles en Swift |
+| `typescript-migrate` | Assistant de migration TypeScript |
+| `django-patterns` | Architecture Django, REST API avec DRF, ORM |
+| `django-security` | Securite Django : auth, CSRF, SQL injection |
+| `django-tdd` | TDD Django avec pytest-django, factory_boy |
+| `django-verification` | Boucle de verification Django : migrations, linting, tests |
+| `springboot-patterns` | Architecture Spring Boot, REST API, services |
+| `springboot-security` | Spring Security best practices |
+| `springboot-tdd` | TDD Spring Boot avec JUnit 5, Mockito |
+| `springboot-verification` | Boucle de verification Spring Boot |
+| `jpa-patterns` | JPA/Hibernate : entites, relations, queries, transactions |
+| `clickhouse-io` | ClickHouse : patterns BDD, optimisation queries, analytics |
+| `postgres-patterns` | PostgreSQL : optimisation queries, schema, indexing, securite |
+
+### Testing & Qualite
+
+| Skill | Description |
+|-------|-------------|
+| `test` | Assistant de tests |
+| `test-driven-development` | TDD : ecrire les tests avant l'implementation |
+| `tdd-workflow` | Workflow TDD pour features, bugfix, refactoring |
+| `e2e-testing` | Tests E2E avec Playwright : Page Object Model, CI/CD |
+| `webapp-testing` | Tests d'applications web locales avec Playwright |
+| `qa-expert` | Processus de QA testing complet |
+| `senior-qa` | Generation de tests, tests unitaires, analyse |
+| `coding-standards` | Standards de code universels : TypeScript, JavaScript, React, Python, Go |
+| `code-reviewer` | Revue de code automatisee pour TS, JS, Python, Go, Swift, Kotlin |
+| `verification-loop` | Systeme de verification complet pour sessions Claude Code |
+| `verification-before-completion` | Verification avant de declarer un travail termine |
+| `eval-harness` | Framework d'evaluation formel pour sessions Claude Code |
+
+### Securite
+
+| Skill | Description |
+|-------|-------------|
+| `security-review` | Review securite pour auth, user input, secrets, creation |
+| `security-scan` | Scan securite de la configuration Claude Code (.claude/) |
+| `senior-security` | Threat modeling, analyse vulnerabilites, architecture securisee |
+| `owasp-security` | OWASP Top 10 2025, ASVS 5.0, Agentic AI security 2026 |
+
+### DevOps & Deployment
+
+| Skill | Description |
+|-------|-------------|
+| `docker-patterns` | Docker et Docker Compose : dev local, securite, networking |
+| `deployment-patterns` | Workflows de deploiement, CI/CD, Docker, health checks, rollback |
+| `database-migrations` | Migrations BDD : schema, data, rollbacks, zero-downtime |
+| `aws-solution-architect` | Architectures AWS serverless avec IaC templates |
+
+### Documents & Media
+
+| Skill | Description |
+|-------|-------------|
+| `pdf` | Lecture, creation, manipulation de fichiers PDF |
+| `pdf-creator` | Creation de PDF depuis markdown avec support fonts chinoises |
+| `docx` | Creation, lecture, edition de documents Word |
+| `pptx` | Manipulation de fichiers PowerPoint |
+| `ppt-creator` | Creation de slide decks professionnels |
+| `xlsx` | Manipulation de fichiers tableurs |
+| `markdown-tools` | Conversion de documents en markdown multi-outils |
+| `mermaid-tools` | Extraction de diagrammes Mermaid et generation PNG |
+
+### Design & UI
+
+| Skill | Description |
+|-------|-------------|
+| `algorithmic-art` | Art algorithmique avec p5.js, randomness seedee, parametres interactifs |
+| `canvas-design` | Art visuel en .png et .pdf avec philosophie design |
+| `brand-guidelines` | Couleurs et typographie officielles Anthropic |
+| `theme-factory` | Toolkit de theming pour slides, docs, reportings |
+| `ui-ux-pro-max` | Design UI/UX : 67 styles, 96 palettes, 57 font pairings, 25 charts |
+| `web-artifacts-builder` | Creation d'artifacts HTML multi-composants |
+| `slack-gif-creator` | Creation de GIFs animes optimises pour Slack |
+
+### Productivite & Workflow
+
+| Skill | Description |
+|-------|-------------|
+| `brainstorming` | A utiliser avant tout travail creatif |
+| `deep-research` | Rapports de recherche avec citations et suivi des preuves |
+| `fact-checker` | Verification de faits via recherche web et sources officielles |
+| `prompt-optimizer` | Transformation de prompts vagues en specifications precises (EARS) |
+| `senior-prompt-engineer` | Optimisation de prompts, design de templates |
+| `doc-coauthoring` | Co-redaction de documentation structuree |
+| `writing-plans` | Planification avant le code quand il y a des specs/requirements |
+| `executing-plans` | Execution de plans d'implementation avec review |
+| `search-first` | Recherche avant codage : trouver les outils existants d'abord |
+| `strategic-compact` | Compaction manuelle du contexte a intervalles logiques |
+| `iterative-retrieval` | Raffinement progressif de la recuperation de contexte |
+
+### Git & GitHub
+
+| Skill | Description |
+|-------|-------------|
+| `github-ops` | Operations GitHub completes via gh CLI et API |
+| `using-git-worktrees` | Travail isole avec git worktrees |
+| `finishing-a-development-branch` | Finalisation d'une branche de dev : merge, integration |
+| `requesting-code-review` | Demande de code review apres completion |
+| `receiving-code-review` | Reception et implementation de feedback de review |
+
+### MCP & Skills
+
+| Skill | Description |
+|-------|-------------|
+| `mcp-builder` | Guide pour creer des serveurs MCP de qualite |
+| `skill-creator` | Guide pour creer des skills efficaces |
+| `agent-skill-creator` | Creation d'agents et automatisation de taches repetitives |
+| `skill-reviewer` | Review et amelioration de skills Claude Code |
+| `skills-search` | Recherche, decouverte, installation de skills |
+| `writing-skills` | Creation, edition, verification de skills |
+| `configure-ecc` | Installateur interactif Everything Claude Code |
+
+### Internationalisation & Communication
+
+| Skill | Description |
+|-------|-------------|
+| `i18n-expert` | Internationalisation et localisation |
+| `internal-comms` | Communications internes avec formats adaptes |
+| `scrum-master` | Scrum Master avance : analyse sante equipe, velocity, retros |
+| `senior-pm` | Chef de projet senior : logiciel enterprise, SaaS, transformation digitale |
+
+### Patterns avances
+
+| Skill | Description |
+|-------|-------------|
+| `content-hash-cache-pattern` | Cache par hash SHA-256 du contenu des fichiers |
+| `cost-aware-llm-pipeline` | Optimisation de couts pour usage API LLM |
+| `regex-vs-llm-structured-text` | Framework de decision regex vs LLM pour parsing de texte |
+| `continuous-learning` | Extraction de patterns reutilisables depuis les sessions |
+| `continuous-learning-v2` | Systeme d'apprentissage par instincts via hooks |
+
+### Utilitaires rapides
+
+| Skill | Description |
+|-------|-------------|
+| `lint` | Assistant Linting |
+| `debug` | Assistant Debug |
+| `refactor` | Assistant Refactoring |
+| `npm-scripts` | Assistant NPM Scripts |
+| `ultra-think` | Analyse profonde et resolution de problemes multi-dimensionnelle |
+| `keybindings-help` | Personnalisation des raccourcis clavier |
+| `claude-developer-platform` | Programmes utilisant l'API Claude / Anthropic |
+| `using-superpowers` | Etablit comment trouver et utiliser les skills |
+| `dispatching-parallel-agents` | Parallelisation de taches independantes |
+| `subagent-driven-development` | Execution de plans avec taches independantes en session |
+| `systematic-debugging` | Debugging systematique avant de proposer des corrections |
+
+---
+
+## GSD (Get Stuff Done) - Commandes
+
+Systeme de gestion de projet structure avec roadmap, phases, milestones et execution.
+
+### Gestion de projet
+
+| Commande | Description |
+|----------|-------------|
+| `/gsd:new-project` | Initialiser un nouveau projet avec context gathering et PROJECT.md |
+| `/gsd:new-milestone` | Demarrer un nouveau cycle de milestone |
+| `/gsd:progress` | Verifier la progression du projet et router vers l'action suivante |
+| `/gsd:map-codebase` | Analyser le codebase avec des agents mappers paralleles |
+| `/gsd:health` | Diagnostiquer la sante du repertoire de planning |
+
+### Planification
+
+| Commande | Description |
+|----------|-------------|
+| `/gsd:plan-phase` | Creer un plan de phase detaille (PLAN.md) avec verification |
+| `/gsd:discuss-phase` | Questions adaptatives avant la planification d'une phase |
+| `/gsd:list-phase-assumptions` | Reveler les hypotheses de Claude sur l'approche d'une phase |
+| `/gsd:research-phase` | Rechercher comment implementer une phase |
+| `/gsd:plan-milestone-gaps` | Creer des phases pour combler les lacunes d'un audit milestone |
+
+### Gestion des phases
+
+| Commande | Description |
+|----------|-------------|
+| `/gsd:add-phase` | Ajouter une phase a la fin du milestone courant |
+| `/gsd:insert-phase` | Inserer du travail urgent comme phase decimale (ex: 72.1) |
+| `/gsd:remove-phase` | Supprimer une phase future et renumeroter |
+| `/gsd:execute-phase` | Executer tous les plans d'une phase avec parallelisation par vagues |
+
+### Verification & Completion
+
+| Commande | Description |
+|----------|-------------|
+| `/gsd:verify-work` | Valider les features construites via UAT conversationnel |
+| `/gsd:audit-milestone` | Auditer la completion d'un milestone avant archivage |
+| `/gsd:complete-milestone` | Archiver un milestone termine et preparer le suivant |
+
+### Gestion de session
+
+| Commande | Description |
+|----------|-------------|
+| `/gsd:resume-work` | Reprendre le travail d'une session precedente |
+| `/gsd:pause-work` | Creer un handoff de contexte lors d'une pause |
+| `/gsd:quick` | Executer une tache rapide avec les garanties GSD |
+
+### Taches & Maintenance
+
+| Commande | Description |
+|----------|-------------|
+| `/gsd:add-todo` | Capturer une idee ou tache comme todo |
+| `/gsd:check-todos` | Lister les todos en attente et en selectionner un |
+| `/gsd:cleanup` | Archiver les repertoires de phases completees |
+| `/gsd:debug` | Debugging systematique avec etat persistant |
+
+### Configuration & Aide
+
+| Commande | Description |
+|----------|-------------|
+| `/gsd:settings` | Configurer les toggles et profil de modele |
+| `/gsd:set-profile` | Changer le profil de modele (quality/balanced/budget) |
+| `/gsd:update` | Mettre a jour GSD avec affichage du changelog |
+| `/gsd:reapply-patches` | Reappliquer les modifications locales apres une MAJ |
+| `/gsd:help` | Afficher les commandes GSD et guide d'utilisation |
+| `/gsd:join-discord` | Rejoindre la communaute Discord GSD |
+
+---
+
+## Agents (sous-agents specialises)
+
+Les agents sont des processus autonomes lances pour gerer des taches complexes.
+
+### Agents generaux
+
+| Agent | Description |
+|-------|-------------|
+| **Bash** | Specialiste d'execution de commandes bash, operations git, taches terminal |
+| **general-purpose** | Agent generaliste pour recherches complexes, recherche de code, taches multi-etapes |
+| **Explore** | Agent rapide pour explorer les codebases : recherche de fichiers, mots-cles, comprehension du code |
+| **Plan** | Architecte logiciel pour designer des plans d'implementation, identifier les fichiers critiques |
+| **code-reviewer** | Review de code apres completion d'une etape majeure du projet |
+
+### Agents GSD
+
+| Agent | Description |
+|-------|-------------|
+| **gsd-executor** | Execute les plans GSD avec commits atomiques et gestion d'etat |
+| **gsd-planner** | Cree des plans de phase executables avec analyse de dependances |
+| **gsd-debugger** | Investigation de bugs avec methode scientifique et checkpoints |
+| **gsd-verifier** | Verifie l'atteinte des objectifs de phase par analyse goal-backward |
+| **gsd-roadmapper** | Cree des roadmaps projet avec decomposition en phases |
+| **gsd-project-researcher** | Recherche l'ecosysteme du domaine avant creation de roadmap |
+| **gsd-phase-researcher** | Recherche comment implementer une phase avant planification |
+| **gsd-research-synthesizer** | Synthetise les outputs de recherche en SUMMARY.md |
+| **gsd-plan-checker** | Verifie que les plans atteindront l'objectif de phase |
+| **gsd-integration-checker** | Verifie l'integration cross-phases et les flux E2E |
+| **gsd-codebase-mapper** | Explore le codebase et ecrit des documents d'analyse structures |
+
+### Agents utilitaires
+
+| Agent | Description |
+|-------|-------------|
+| **statusline-setup** | Configure la status line de Claude Code |
+| **claude-code-guide** | Repond aux questions sur Claude Code, Agent SDK, API Claude |
+
+---
+
+## Superpowers
+
+Le skill `using-superpowers` etablit comment trouver et utiliser les skills de maniere optimale. Il s'active au demarrage de toute conversation pour :
+
+- **Decouverte de skills** : Trouver automatiquement le skill adapte a la tache
+- **Chargement a la demande** : Invoquer les skills via `/nom-du-skill`
+- **Composition** : Combiner plusieurs skills pour des workflows complexes
+- **Parallelisation** : Lancer plusieurs agents en parallele pour des taches independantes
+
+### Capacites cles
+
+- **Recherche web** : `WebSearch` et `WebFetch` pour acceder a des informations a jour
+- **Systeme de fichiers** : Lecture, ecriture, edition, recherche de fichiers
+- **Execution de commandes** : Terminal bash pour git, npm, docker, etc.
+- **Memoire persistante** : Knowledge graph pour stocker et recuperer des informations
+- **Pensee sequentielle** : Analyse structuree de problemes complexes
+- **Mode plan** : Planification avant implementation avec approbation utilisateur
+- **Gestion de taches** : Suivi de progression avec creation/mise a jour de taches
+- **Worktrees** : Isolation du travail dans des branches separees
+
+---
+
+*Fichier genere le 2026-02-23 par Claude Code (Opus 4.6)*

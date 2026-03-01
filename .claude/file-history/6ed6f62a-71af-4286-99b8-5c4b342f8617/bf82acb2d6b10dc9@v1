@@ -1,0 +1,194 @@
+
+import React, { useState } from 'react';
+import { GeneratedSolution } from '../types';
+import { X, Copy, Check, Sparkles, Loader2, ClipboardList, Briefcase, ArrowRight, UserCheck, Download, FileCode } from 'lucide-react';
+
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  solution: GeneratedSolution | null;
+  isLoading: boolean;
+}
+
+const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading }) => {
+  const [copied, setCopied] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleCopy = () => {
+    if (solution?.content) {
+      navigator.clipboard.writeText(solution.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownload = () => {
+    if (solution?.content) {
+        const extension = solution.language === 'html' ? 'html' : solution.language === 'json' ? 'json' : 'txt';
+        const blob = new Blob([solution.content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `solution_aeo.${extension}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleContactExpert = () => {
+    // In a real app, this would open a booking calendar or contact form
+    window.open('mailto:experts@citedby.ai?subject=Demande%20assistance%20Webmaster%20AEO', '_blank');
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      ></div>
+
+      {/* Modal Content */}
+      <div className="relative bg-[#0f1115] border border-white/[0.08] rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        
+        {/* Header */}
+        <div className="p-6 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.04]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-purple-400 border border-white/[0.06] shadow-inner">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h3 className="text-lg font-sans font-bold text-white">
+                {isLoading ? 'Génération de la solution...' : solution?.title}
+              </h3>
+              {!isLoading && <p className="text-xs text-gray-500">Optimisation AEO générée par l'IA</p>}
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-white/[0.08] rounded-full transition-colors text-gray-500 hover:text-white"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#000000]">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full py-24 text-center space-y-6">
+              <div className="relative">
+                <Loader2 size={64} className="text-purple-400 animate-spin" />
+                <div className="absolute inset-0 blur-xl bg-purple-500/20 rounded-full animate-pulse"></div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-white font-medium text-lg animate-pulse">
+                  Analyse des critères de citation en cours...
+                </p>
+                <p className="text-sm text-gray-500">
+                  Rédaction du code et du guide d'implémentation pour débutant
+                </p>
+              </div>
+            </div>
+          ) : solution ? (
+            <div className="grid lg:grid-cols-12 h-full">
+
+              {/* Left Column: The Code/Content (7 cols) */}
+              <div className="lg:col-span-7 p-6 border-b lg:border-b-0 lg:border-r border-white/[0.08] flex flex-col min-h-0">
+                <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl text-sm text-blue-200 mb-6 leading-relaxed">
+                  <span className="font-bold text-blue-300 block mb-1">Impact AEO :</span>
+                  {solution.explanation}
+                </div>
+
+                <div className="flex-1 flex flex-col">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                      <FileCode size={14} className="text-gray-500" />
+                      {solution.type === 'code' ? 'Fichiers Sources' : 'Contenu Optimisé'}
+                      <span className="text-[10px] bg-white/[0.08] px-1.5 py-0.5 rounded text-gray-500 font-normal normal-case">{solution.language}</span>
+                    </span>
+                    <div className="flex gap-2">
+                        <button
+                        onClick={handleDownload}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-purple-500/10 rounded-md text-xs font-medium text-white transition-all border border-white/[0.08] group"
+                        title="Télécharger le fichier"
+                        >
+                        <Download size={14} className="group-hover:text-purple-400 transition-colors" />
+                        Télécharger
+                        </button>
+                        <button
+                        onClick={handleCopy}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-purple-500/10 rounded-md text-xs font-medium text-white transition-all border border-white/[0.08] group"
+                        >
+                        {copied ? <Check size={14} className="text-purple-300" /> : <Copy size={14} className="group-hover:text-purple-400 transition-colors" />}
+                        {copied ? 'Copié !' : 'Copier'}
+                        </button>
+                    </div>
+                  </div>
+                  
+                  <div className="relative flex-1 min-h-[300px] bg-[#111111] rounded-2xl border border-white/[0.08] overflow-hidden shadow-inner group">
+                    <pre className="absolute inset-0 p-5 overflow-auto text-sm font-mono leading-relaxed text-gray-300 custom-scrollbar">
+                      <code>{solution.content}</code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Implementation Plan (5 cols) */}
+              <div className="lg:col-span-5 p-6 bg-purple-500/[0.02] flex flex-col h-full border-l border-black overflow-y-auto custom-scrollbar min-h-0">
+                <div className="mb-8">
+                    <h4 className="text-lg font-sans font-bold mb-6 flex items-center gap-2 text-white">
+                    <ClipboardList size={20} className="text-purple-400" />
+                    Guide d'installation (Débutant)
+                    </h4>
+                    
+                    <div className="space-y-0">
+                    {solution.implementationSteps.map((step, idx) => (
+                        <div key={idx} className="flex gap-4 pb-6 last:pb-0 relative group">
+                            {/* Vertical Line */}
+                            {idx !== solution.implementationSteps.length - 1 && (
+                                <div className="absolute left-[11px] top-8 bottom-0 w-px bg-white/[0.08] group-hover:bg-white/20 transition-colors"></div>
+                            )}
+                            
+                            <div className="w-6 h-6 rounded-full bg-[#1a1d24] border border-white/20 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 z-10 text-gray-500 group-hover:text-purple-400 group-hover:border-primary/50 transition-colors shadow-lg">
+                                {idx + 1}
+                            </div>
+                            <p className="text-sm text-gray-300 leading-relaxed pt-0.5 group-hover:text-gray-100 transition-colors">{step}</p>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+
+                <div className="mt-auto pt-6 border-t border-white/[0.08]">
+                   <div className="bg-gradient-to-br from-purple-500/5 to-purple-500/[0.02] p-5 rounded-2xl border border-white/[0.08] hover:border-primary/30 transition-all group">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent">
+                                <Briefcase size={16} />
+                            </div>
+                            <h5 className="font-bold text-white text-sm">Déléguer cette tâche ?</h5>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                            Envoyez ce guide et les fichiers à votre webmaster ou demandez l'assistance d'un expert certifié AEO.
+                        </p>
+                        <button 
+                            onClick={handleContactExpert}
+                            className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-400 hover:to-violet-500 font-bold rounded-full transition-colors flex items-center justify-center gap-2 text-xs uppercase tracking-wide shadow-lg transform active:scale-95"
+                        >
+                            <UserCheck size={14} />
+                            Trouver un Webmaster
+                        </button>
+                   </div>
+                </div>
+              </div>
+
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default GenerationModal;

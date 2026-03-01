@@ -1,0 +1,90 @@
+export const dynamic = 'force-dynamic';
+
+import { createClient } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { ExtractionResults } from '@/components/documents/extraction-results';
+import { FileText, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import type { Document } from '@/types';
+
+const statusIcons = {
+  pending: Clock,
+  processing: Clock,
+  completed: CheckCircle2,
+  failed: XCircle,
+};
+
+export default async function DocumentDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: doc } = await supabase
+    .from('documents')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (!doc) notFound();
+
+  const document = doc as Document;
+  const StatusIcon = statusIcons[document.status];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-4">
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-950 p-3">
+            <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">{document.file_name}</h1>
+            <p className="text-sm text-muted-foreground">
+              Uploaded {formatDistanceToNow(new Date(document.created_at), { addSuffix: true })}
+              {document.processing_time_ms && ` · Processed in ${(document.processing_time_ms / 1000).toFixed(1)}s`}
+            </p>
+          </div>
+        </div>
+        <Badge variant={document.status === 'completed' ? 'default' : document.status === 'failed' ? 'destructive' : 'secondary'}>
+          <StatusIcon className="h-3 w-3 mr-1" />
+          {document.status.charAt(0).toUpperCase() + document.status.slice(1)}
+        </Badge>
+      </div>
+
+      {document.status === 'completed' && document.extracted_data && (
+        <ExtractionResults
+          data={document.extracted_data}
+          documentId={document.id}
+        />
+      )}
+
+      {document.status === 'pending' && (
+        <div className="text-center py-16 text-muted-foreground">
+          <Clock className="mx-auto h-12 w-12 mb-4 opacity-50" />
+          <p className="text-lg font-medium">Document pending processing</p>
+          <p className="text-sm">This document is waiting to be processed by AI</p>
+        </div>
+      )}
+
+      {document.status === 'processing' && (
+        <div className="text-center py-16 text-muted-foreground">
+          <div className="mx-auto h-12 w-12 mb-4 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-lg font-medium">Processing with AI...</p>
+          <p className="text-sm">Extracting data from your document</p>
+        </div>
+      )}
+
+      {document.status === 'failed' && (
+        <div className="text-center py-16 text-destructive">
+          <XCircle className="mx-auto h-12 w-12 mb-4 opacity-50" />
+          <p className="text-lg font-medium">Processing failed</p>
+          <p className="text-sm">There was an error processing this document</p>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,559 @@
+ CLAUDE CODE — Générateur E-E-A-T Complet
+
+## OBJECTIF
+
+Créer un module **"E-E-A-T Builder"** pour CitedBy.ai qui génère tous les éléments d'autorité nécessaires pour être cité par les IA.
+
+**E-E-A-T = Experience, Expertise, Authoritativeness, Trustworthiness**
+
+---
+
+## POURQUOI C'EST CRUCIAL POUR L'AEO
+
+Les IA (ChatGPT, Claude, Perplexity) priorisent les sources avec :
+- **Auteurs identifiés** avec credentials vérifiables
+- **Entités reconnues** dans leur domaine
+- **Preuves sociales** (avis, certifications, presse)
+- **Signaux de confiance** (HTTPS, mentions légales, ancienneté)
+
+---
+
+## 6 OUTILS À CRÉER
+
+### 1. Author Bio Generator
+Génère une bio auteur optimisée pour chaque expert/rédacteur.
+
+**Output :**
+- Bio courte (50 mots) pour signature articles
+- Bio longue (150 mots) pour page auteur
+- Schema.org Person complet
+- Liens sociaux structurés
+
+### 2. About Page Generator
+Génère une page "À Propos" complète avec tous les signaux E-E-A-T.
+
+**Output :**
+- HTML complet de la page
+- Schema.org Organization/Person
+- Blocs : Histoire, Équipe, Mission, Chiffres clés, Certifications
+
+### 3. Trust Signals Generator
+Génère les blocs de confiance à intégrer sur le site.
+
+**Output :**
+- Bloc "Certifications & Partenaires"
+- Bloc "Ils parlent de nous" (presse)
+- Bloc "Avis clients" avec Schema.org
+- Badges de confiance (garanties, paiement sécurisé)
+
+### 4. Expert Credentials Generator
+Génère les credentials détaillées pour chaque expert.
+
+**Output :**
+- Liste des diplômes (Schema.org `hasCredential`)
+- Formations (`alumniOf`)
+- Récompenses (`award`)
+- Publications (`author` de `ScholarlyArticle`)
+
+### 5. Source Citation Block Generator
+Génère le bloc "À propos de l'auteur" pour les articles.
+
+**Output :**
+- Encart auteur pour fin d'article
+- Mini-bio avec photo
+- Liens vers page auteur et LinkedIn
+- Date de dernière vérification
+
+### 6. E-E-A-T Audit & Score
+Analyse une URL et génère un score E-E-A-T avec recommandations.
+
+**Output :**
+- Score global /100
+- Scores par pilier (Experience, Expertise, Authority, Trust)
+- Liste des éléments manquants
+- Actions prioritaires
+
+---
+
+## ARCHITECTURE FICHIERS
+
+```
+src/
+├── types/eeat.ts
+├── services/eeat/
+│   ├── prompts.ts
+│   ├── author-bio-generator.ts
+│   ├── about-page-generator.ts
+│   ├── trust-signals-generator.ts
+│   ├── credentials-generator.ts
+│   ├── citation-block-generator.ts
+│   └── eeat-auditor.ts
+├── components/eeat/
+│   ├── EeatDashboard.tsx
+│   ├── AuthorBioGenerator.tsx
+│   ├── AboutPageGenerator.tsx
+│   ├── TrustSignalsGenerator.tsx
+│   ├── CredentialsGenerator.tsx
+│   ├── CitationBlockGenerator.tsx
+│   └── EeatAuditor.tsx
+└── app/(dashboard)/outils/eeat/page.tsx
+```
+
+---
+
+## TYPES TYPESCRIPT
+
+```typescript
+// types/eeat.ts
+
+// === AUTEUR / PERSONNE ===
+interface AuthorProfile {
+  id: string;
+  name: string;
+  slug: string;
+  jobTitle: string;
+  organization: string;
+  
+  // Experience
+  yearsExperience: number;
+  specializations: string[];
+  notableProjects?: string[];
+  
+  // Expertise
+  credentials: Credential[];
+  certifications: Certification[];
+  education: Education[];
+  publications?: Publication[];
+  speakingEngagements?: Event[];
+  
+  // Authority
+  socialProfiles: SocialProfile[];
+  mediaAppearances?: MediaMention[];
+  awards?: Award[];
+  
+  // Trust
+  verifiedBy?: string;
+  lastVerified?: string;
+  
+  // Media
+  photoUrl?: string;
+  
+  // Bios générées
+  bioShort?: string;  // 50 mots
+  bioLong?: string;   // 150 mots
+}
+
+interface Credential {
+  type: 'degree' | 'certification' | 'license' | 'membership';
+  name: string;
+  issuer: string;
+  year?: number;
+  url?: string;
+  credentialId?: string;
+}
+
+interface Education {
+  degree: string;
+  field: string;
+  institution: string;
+  year: number;
+  honors?: string;
+}
+
+interface Certification {
+  name: string;
+  issuer: string;
+  dateObtained: string;
+  dateExpires?: string;
+  credentialUrl?: string;
+}
+
+interface Publication {
+  title: string;
+  type: 'book' | 'article' | 'paper' | 'study';
+  publisher?: string;
+  date: string;
+  url?: string;
+  coAuthors?: string[];
+}
+
+interface Award {
+  name: string;
+  issuer: string;
+  year: number;
+  description?: string;
+}
+
+interface SocialProfile {
+  platform: 'linkedin' | 'twitter' | 'github' | 'youtube' | 'other';
+  url: string;
+  followers?: number;
+}
+
+interface MediaMention {
+  outlet: string;
+  title: string;
+  date: string;
+  url?: string;
+  type: 'interview' | 'quote' | 'feature' | 'podcast';
+}
+
+// === ORGANISATION ===
+interface OrganizationProfile {
+  name: string;
+  legalName?: string;
+  type: 'Organization' | 'LocalBusiness' | 'Corporation';
+  
+  // Experience
+  foundingDate: string;
+  industry: string;
+  employeeCount?: { min: number; max: number };
+  
+  // Expertise
+  specializations: string[];
+  servicesOffered: string[];
+  
+  // Authority
+  certifications: Certification[];
+  awards: Award[];
+  partnerships: string[];
+  mediaAppearances: MediaMention[];
+  clients?: string[]; // Logos clients notables
+  
+  // Trust
+  reviews: ReviewAggregate[];
+  guarantees: string[];
+  accreditations: string[];
+  
+  // Contact
+  address: Address;
+  phone?: string;
+  email: string;
+  
+  // Social
+  socialProfiles: SocialProfile[];
+  
+  // Media
+  logoUrl?: string;
+}
+
+interface ReviewAggregate {
+  platform: 'google' | 'trustpilot' | 'facebook' | 'yelp' | 'other';
+  rating: number;
+  count: number;
+  url?: string;
+}
+
+interface Address {
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+}
+
+// === TRUST SIGNALS ===
+interface TrustSignals {
+  certifications: {
+    name: string;
+    logo?: string;
+    issuer: string;
+    verifyUrl?: string;
+  }[];
+  
+  securityBadges: {
+    type: 'ssl' | 'pci' | 'gdpr' | 'secure_payment';
+    provider?: string;
+  }[];
+  
+  guarantees: {
+    type: 'money_back' | 'satisfaction' | 'warranty' | 'free_returns';
+    duration?: string;
+    details: string;
+  }[];
+  
+  socialProof: {
+    metric: string; // "50,000+ clients"
+    icon?: string;
+  }[];
+  
+  pressMentions: {
+    outlet: string;
+    logo?: string;
+    quote?: string;
+    url?: string;
+  }[];
+}
+
+// === E-E-A-T AUDIT ===
+interface EeatAudit {
+  url: string;
+  date: string;
+  
+  scores: {
+    overall: number;
+    experience: number;
+    expertise: number;
+    authoritativeness: number;
+    trustworthiness: number;
+  };
+  
+  findings: {
+    category: 'experience' | 'expertise' | 'authority' | 'trust';
+    status: 'present' | 'missing' | 'incomplete';
+    element: string;
+    impact: 'high' | 'medium' | 'low';
+    recommendation?: string;
+  }[];
+  
+  priorityActions: {
+    action: string;
+    impact: number;
+    effort: 'low' | 'medium' | 'high';
+    tool: string; // Quel outil EEAT utiliser
+  }[];
+}
+
+// === OUTPUTS GÉNÉRÉS ===
+interface GeneratedAuthorBio {
+  bioShort: string;
+  bioLong: string;
+  schemaOrg: string; // JSON-LD Person
+  htmlBlock: string; // Bloc HTML prêt à intégrer
+}
+
+interface GeneratedAboutPage {
+  html: string;
+  schemaOrg: string;
+  sections: {
+    hero: string;
+    story: string;
+    team: string;
+    values: string;
+    numbers: string;
+    certifications: string;
+    cta: string;
+  };
+}
+
+interface GeneratedTrustBlock {
+  html: string;
+  css: string;
+  schemaOrg?: string;
+}
+
+interface GeneratedCitationBlock {
+  html: string;
+  schemaOrg: string;
+}
+```
+
+---
+
+## PROMPTS GEMINI
+
+```typescript
+// services/eeat/prompts.ts
+
+export const PROMPT_AUTHOR_BIO = `
+Tu es expert en personal branding et E-E-A-T pour le SEO/AEO.
+
+## PROFIL AUTEUR
+{{AUTHOR_DATA}}
+
+## GÉNÈRE
+
+1. **Bio courte (50 mots)** pour signature articles
+   - Commence par le titre/expertise
+   - Mentionne l'organisation
+   - Inclut 1-2 credentials clés
+   - Finit par un élément différenciant
+
+2. **Bio longue (150 mots)** pour page auteur
+   - Parcours et expérience
+   - Expertise et spécialisations
+   - Credentials et certifications
+   - Réalisations notables
+   - Pourquoi faire confiance
+
+## FORMAT JSON
+{
+  "bioShort": "...",
+  "bioLong": "...",
+  "keyCredentials": ["...", "..."],
+  "uniqueValueProposition": "..."
+}
+`;
+
+export const PROMPT_ABOUT_PAGE = `
+Tu es expert en copywriting et E-E-A-T.
+
+## DONNÉES ORGANISATION
+{{ORG_DATA}}
+
+## GÉNÈRE une page "À Propos" avec ces sections :
+
+1. **Hero** - Accroche + proposition de valeur (50 mots)
+2. **Notre Histoire** - Récit fondateur authentique (150 mots)
+3. **Notre Équipe** - Présentation des experts clés
+4. **Nos Valeurs** - 3-4 valeurs avec explications
+5. **Chiffres Clés** - Stats impressionnantes (clients, années, projets)
+6. **Certifications** - Liste avec contexte
+7. **CTA** - Appel à l'action final
+
+## RÈGLES
+- Ton professionnel mais humain
+- Inclure des données chiffrées
+- Mettre en avant les preuves d'autorité
+- Créer de la confiance
+
+## FORMAT JSON avec chaque section en HTML
+`;
+
+export const PROMPT_TRUST_SIGNALS = `
+Génère des blocs de confiance HTML/CSS pour :
+
+## DONNÉES
+{{TRUST_DATA}}
+
+## BLOCS À GÉNÉRER
+
+1. **Certifications** - Grille de logos avec tooltips
+2. **Presse** - "Ils parlent de nous" avec citations
+3. **Avis** - Résumé des notes + extraits meilleurs avis
+4. **Garanties** - Icônes + textes des garanties
+5. **Chiffres** - Compteurs animés (clients, années, etc.)
+
+## FORMAT : HTML + CSS inline (Tailwind classes)
+`;
+
+export const PROMPT_EEAT_AUDIT = `
+Analyse cette page pour E-E-A-T :
+
+## CONTENU HTML
+{{PAGE_HTML}}
+
+## URL
+{{URL}}
+
+## ANALYSE CHAQUE PILIER
+
+### EXPERIENCE (Le créateur a-t-il une expérience réelle ?)
+- Témoignages de première main
+- Études de cas vécues
+- Photos/vidéos originales
+- Détails spécifiques au métier
+
+### EXPERTISE (Le créateur est-il qualifié ?)
+- Auteur identifié avec bio
+- Credentials visibles
+- Profondeur du contenu
+- Exactitude des informations
+
+### AUTHORITATIVENESS (Le créateur est-il reconnu ?)
+- Mentions presse
+- Backlinks de sites d'autorité
+- Citations par des pairs
+- Ancienneté du domaine
+
+### TRUSTWORTHINESS (Le site est-il fiable ?)
+- HTTPS
+- Mentions légales
+- Contact visible
+- Avis vérifiables
+- Politique de confidentialité
+
+## FORMAT JSON avec scores et recomation blocs HTML/CSS
+
+### EeatAuditor.tsx
+- Input URL à analyser
+- Affichage scores radar
+- Liste findings
+- Actions recommandées avec liens vers outils
+
+---
+
+## SCHEMA.ORG GÉNÉRÉS
+
+### Person (Auteur)
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "{{URL}}/#author-{{SLUG}}",
+  "name": "{{NAME}}",
+  "jobTitle": "{{JOB_TITLE}}",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "{{ORG_NAME}}"
+  },
+  "description": "{{BIO_LONG}}",
+  "image": "{{PHOTO_URL}}",
+  "sameAs": ["{{LINKEDIN}}", "{{TWITTER}}"],
+  "hasCredential": [
+    {
+      "@type": "EducationalOccupationalCredential",
+      "name": "{{CREDENTIAL_NAME}}",
+      "credentialCategory": "{{TYPE}}",
+      "recognizedBy": {
+        "@type": "Organization",
+        "name": "{{ISSUER}}"
+      }
+    }
+  ],
+  "alumniOf": {
+    "@type": "EducationalOrganization",
+    "name": "{{SCHOOL}}"
+  },
+  "award": ["{{AWARD_1}}", "{{AWARD_2}}"],
+  "knowsAbout": ["{{TOPIC_1}}", "{{TOPIC_2}}"]
+}
+```
+
+### Organization avec Trust
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{NAME}}",
+  "foundingDate": "{{FOUNDING_DATE}}",
+  "numberOfEmployees": {
+    "@type": "QuantitativeValue",
+    "minValue": {{MIN}},
+    "maxValue": {{MAX}}
+  },
+  "hasCredential": [...],
+  "award": [...],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{RATING}}",
+    "reviewCount": "{{COUNT}}",
+    "bestRating": "5"
+  },
+  "review": [...]
+}
+```
+
+---
+
+## COÛTS CRÉDITS
+
+| Outil | Crédits |
+|-------|---------|
+| Author Bio | 3 |
+| About Page | 8 |
+| Trust Signals | 5 |
+| Credentials | 3 |
+| Citation Block | 2 |
+| E-E-A-T Audit | 5 |
+
+---
+
+## COMMANDES CRÉATION
+
+```bash
+mkdir -p src/services/eeat src/components/eeat
+mkdir -p src/app/\(dashboard\)/outils/eeat
+
+touch src/types/eeat.ts
+touch src/services/eeat/{prompts,author-bio-generator,about-page-generator,trust-signals-generator,credentials-generator,citation-block-generator,eeat-auditor}.ts
+touch src/components/eeat/{EeatDashboard,AuthorBioGenerator

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitedBy.ai - AEO/GEO Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#050505',
+                        surface: '#0e0e0e',
+                        surfaceHighlight: '#161616',
+                        primary: '#a855f7',
+                        primaryDark: '#7c3aed',
+                        secondary: '#e2d6ff',
+                        accent: '#c084fc',
+                        danger: '#ef4444',
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'Inter', 'sans-serif'],
+                        serif: ['Instrument Serif', 'serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'shimmer': 'shimmer 2.5s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        shimmer: {
+                            '0%, 100%': { opacity: '0.4' },
+                            '50%': { opacity: '0.8' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        fadeInUp: {
+                            from: { opacity: '0', transform: 'translateY(20px)' },
+                            to: { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* ═══════════════════════════════════════════
+           CITEDBY.AI — PREMIUM DESIGN SYSTEM
+           ═══════════════════════════════════════════ */
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'DM Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ── Noise Texture Overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 256px 256px;
+        }
+
+        /* ── Gradient Text ── */
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #a855f7 35%, #c084fc 65%, #e879f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-text-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── Glass Panel ── */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px) saturate(1.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 1.25rem;
+        }
+
+        /* ── Ninja Card — Premium Surface ── */
+        .ninja-card {
+            background: linear-gradient(145deg, rgba(18,18,18,0.95) 0%, rgba(12,12,12,0.98) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .ninja-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(168,85,247,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .ninja-card:hover {
+            border-color: rgba(168, 85, 247, 0.2);
+            box-shadow: 0 4px 24px rgba(168, 85, 247, 0.06), 0 0 0 1px rgba(168,85,247,0.08), 0 8px 40px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+        .ninja-card:hover::before {
+            opacity: 1;
+        }
+
+        /* ── Gradient Border ── */
+        .gradient-border {
+            position: relative;
+            border-radius: 1.25rem;
+            background: linear-gradient(145deg, rgba(18,18,18,0.95) 0%, rgba(12,12,12,0.98) 100%);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 1.25rem;
+            padding: 1px;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #e879f9, #a855f7);
+            background-size: 300% 300%;
+            animation: gradientShift 6s ease infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* ── Premium Button ── */
+        .btn-gradient {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+            color: #fff;
+            border-radius: 9999px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+        .btn-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+            z-index: 1;
+        }
+        .btn-gradient:hover {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.35), 0 0 60px rgba(168, 85, 247, 0.12);
+            transform: translateY(-1px);
+        }
+        .btn-gradient:hover::before {
+            left: 100%;
+        }
+        .btn-gradient:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* ── Ambient Glow Orb ── */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ── Icon Box ── */
+        .icon-box {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(139,92,246,0.06));
+            border: 1px solid rgba(168,85,247,0.1);
+            color: #c084fc;
+            transition: all 0.3s ease;
+        }
+        .group:hover .icon-box {
+            background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(139,92,246,0.1));
+            border-color: rgba(168,85,247,0.25);
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(168,85,247,0.1);
+        }
+
+        /* ── Section Badge ── */
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* ── Dot Grid Background ── */
+        .dot-grid {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* ── Animations ── */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+
+        /* ── Custom Scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168,85,247,0.4);
+        }
+
+        /* ── Selection ── */
+        ::selection {
+            background: rgba(168, 85, 247, 0.3);
+            color: #fff;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+    "tailwindcss": "https://esm.sh/tailwindcss@^4.1.18",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@^3.4.0",
+    "next/": "https://esm.sh/next@^16.1.4/",
+    "next": "https://esm.sh/next@^16.1.4",
+    "@supabase/ssr": "https://esm.sh/@supabase/ssr@^0.8.0",
+    "clsx": "https://esm.sh/clsx@^2.1.1",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.90.1",
+    "stripe": "https://esm.sh/stripe@^20.2.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

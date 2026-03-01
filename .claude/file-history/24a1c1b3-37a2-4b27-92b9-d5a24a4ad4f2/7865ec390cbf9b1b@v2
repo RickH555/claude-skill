@@ -1,0 +1,30 @@
+# CitedBy.ai — Instructions Projet
+
+## Architecture
+- SPA Vite + React avec routing dans App.tsx
+- Pages dans pages/ (24 fichiers .tsx)
+- Services dans services/ (12 fichiers .ts)
+- Composants dans components/ (6 fichiers)
+- i18n dans i18n/ (FR/EN/ES)
+- Design : dark theme Tailwind
+
+## Commandes
+- npm run dev → Vite dev server sur localhost:3000
+- npm run build → Build production Vite
+- npm run preview → Preview production build
+
+## Stack technique
+- **Frontend** : React 18, Tailwind CSS (CDN), Lucide Icons
+- **AI** : Google Gemini (@google/genai) avec fallback simulation
+- **Auth** : Supabase (Auth + PostgreSQL)
+- **Paiement** : Stripe
+- **i18n** : Systeme custom React Context (FR/EN/ES)
+- **Validation** : Zod + React Hook Form
+- **Charts** : Recharts
+
+## Regles importantes
+- NE PAS migrer vers Next.js. L'architecture est Vite SPA.
+- NE PAS modifier services/analyzer.ts, services/criteria.ts, services/generator.ts
+- NE PAS supprimer de fichiers existants
+- Toute generation IA utilise GoogleGenAI avec fallback simulation si API key absente
+- Le design est dark theme : bg-[#1a1d21], border-white/5, rounded-2xl

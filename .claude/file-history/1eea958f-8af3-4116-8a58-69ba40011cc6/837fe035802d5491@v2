@@ -1,0 +1,266 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import {
+  ArrowLeft,
+  Globe,
+  CheckCircle2,
+  Cpu,
+  Building2,
+  ExternalLink,
+} from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/page-header";
+import { ProgressBar } from "@/components/progress-bar";
+import ScoreRing from "@/components/ScoreRing";
+import { MOCK_DIRECTORY_ENTRIES } from "@/lib/mock-data";
+
+const MOCK_CATEGORY_SCORES = [
+  { name: "Contenu", score: 78, description: "Qualite et structure du contenu" },
+  { name: "Technique", score: 65, description: "Performance et accessibilite technique" },
+  { name: "Donnees Structurees", score: 55, description: "Schema.org et meta-donnees" },
+  { name: "Autorite", score: 82, description: "Backlinks et reputation du domaine" },
+  { name: "Citabilite", score: 70, description: "Capacite a etre cite par les IA" },
+];
+
+const MOCK_ENGINE_SCORES = [
+  { name: "ChatGPT", score: 75, icon: "🤖" },
+  { name: "Perplexity", score: 68, icon: "🔍" },
+  { name: "Gemini", score: 52, icon: "✨" },
+  { name: "Claude", score: 71, icon: "🧠" },
+  { name: "Copilot", score: 44, icon: "💻" },
+];
+
+function getScoreColor(score: number): string {
+  if (score >= 80) return "text-emerald-400";
+  if (score >= 60) return "text-amber-400";
+  if (score >= 40) return "text-orange-400";
+  return "text-red-400";
+}
+
+function getScoreBgColor(score: number): string {
+  if (score >= 80) return "bg-emerald-500";
+  if (score >= 60) return "bg-amber-500";
+  if (score >= 40) return "bg-orange-500";
+  return "bg-red-500";
+}
+
+export default function DirectoryDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
+
+  const entry = MOCK_DIRECTORY_ENTRIES.find((e) => e.id === id);
+
+  if (!entry) {
+    return (
+      <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+        <Link
+          href="/app/directory"
+          className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors mb-8"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour a l&apos;annuaire
+        </Link>
+        <Card className="p-12 text-center">
+          <Building2 className="h-12 w-12 mx-auto text-white/20 mb-4" />
+          <h3 className="text-lg font-semibold text-white mb-2">
+            Entreprise introuvable
+          </h3>
+          <p className="text-white/40 text-sm mb-6">
+            L&apos;entreprise demandee n&apos;existe pas dans l&apos;annuaire.
+          </p>
+          <Link href="/app/directory">
+            <Button>Retour a l&apos;annuaire</Button>
+          </Link>
+        </Card>
+      </div>
+    );
+  }
+
+  // Derive category scores based on the entity's score with some variation
+  const categoryScores = MOCK_CATEGORY_SCORES.map((cat) => ({
+    ...cat,
+    score: Math.min(100, Math.max(10, cat.score + (entry.score - 72) + Math.floor(Math.random() * 0))),
+  }));
+
+  const engineScores = MOCK_ENGINE_SCORES.slice(0, entry.engines).map((eng) => ({
+    ...eng,
+    score: Math.min(100, Math.max(10, eng.score + (entry.score - 72))),
+  }));
+
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      {/* Back link */}
+      <Link
+        href="/app/directory"
+        className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors mb-6"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Retour a l&apos;annuaire
+      </Link>
+
+      <PageHeader
+        title={entry.name}
+        description={`Profil AEO de ${entry.name}`}
+        breadcrumbs={[
+          { label: "Annuaire", href: "/app/directory" },
+          { label: entry.name },
+        ]}
+      />
+
+      {/* Entity Profile Header */}
+      <Card className="p-6 sm:p-8 mb-6">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          {/* Score Ring */}
+          <div className="shrink-0">
+            <ScoreRing score={entry.score} size={140} strokeWidth={10} />
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 mb-3">
+              <h2 className="text-2xl font-bold text-white">{entry.name}</h2>
+              {entry.verified && (
+                <Badge variant="success">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Verifie
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-white/50 mb-4">
+              <span className="flex items-center gap-1.5">
+                <Globe className="h-4 w-4" />
+                {entry.domain}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Building2 className="h-4 w-4" />
+                {entry.industry}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Cpu className="h-4 w-4" />
+                {entry.engines} moteur{entry.engines !== 1 ? "s" : ""} IA
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <Badge variant="outline">{entry.industry}</Badge>
+              <Badge
+                variant={
+                  entry.score >= 70
+                    ? "success"
+                    : entry.score >= 50
+                    ? "warning"
+                    : "destructive"
+                }
+              >
+                Score {entry.score}/100
+              </Badge>
+            </div>
+          </div>
+
+          {/* External link */}
+          <div className="shrink-0">
+            <a
+              href={`https://${entry.domain}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-xl border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Visiter
+            </a>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Category Scores */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Scores par categorie</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-5">
+              {categoryScores.map((category) => (
+                <div key={category.name}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div>
+                      <span className="text-sm font-medium text-white">
+                        {category.name}
+                      </span>
+                      <p className="text-xs text-white/30">{category.description}</p>
+                    </div>
+                    <span
+                      className={`text-sm font-bold ${getScoreColor(
+                        category.score
+                      )}`}
+                    >
+                      {category.score}/100
+                    </span>
+                  </div>
+                  <ProgressBar value={category.score} size="md" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Engine Breakdown */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Performance par moteur IA</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {engineScores.map((engine) => (
+                <div
+                  key={engine.name}
+                  className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/5"
+                >
+                  <span className="text-2xl shrink-0 w-10 text-center">
+                    {engine.icon}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm font-medium text-white">
+                        {engine.name}
+                      </span>
+                      <span
+                        className={`text-sm font-bold ${getScoreColor(
+                          engine.score
+                        )}`}
+                      >
+                        {engine.score}
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${getScoreBgColor(
+                          engine.score
+                        )}`}
+                        style={{ width: `${engine.score}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {entry.engines < 5 && (
+                <div className="p-3 rounded-xl border border-dashed border-white/10 text-center">
+                  <p className="text-xs text-white/30">
+                    {5 - entry.engines} moteur{5 - entry.engines > 1 ? "s" : ""} non analyse{5 - entry.engines > 1 ? "s" : ""}
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

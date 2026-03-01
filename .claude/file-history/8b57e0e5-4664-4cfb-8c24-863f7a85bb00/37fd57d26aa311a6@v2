@@ -1,0 +1,180 @@
+'use client';
+
+import React, { useState, useEffect, Suspense } from 'react';
+import { usePathname } from 'next/navigation';
+import { useAppContext } from '@/lib/app-context';
+import AppShell from '@/components/layout/AppShell';
+import CommandPalettePanel from '@/components/CommandPalette';
+import ShortcutsModal from '@/components/ShortcutsModal';
+import OnboardingModal from '@/components/OnboardingModal';
+import { AlertTriangle, X, ArrowUp, Plus } from 'lucide-react';
+import { getViewNameFromPath } from '@/lib/route-map';
+
+export default function AppShellWrapper({ children }: { children: React.ReactNode }) {
+  const {
+    user, animatedCredits, showOnboarding, setShowOnboarding, showCelebration,
+    isCommandPaletteOpen, setIsCommandPaletteOpen,
+    isShortcutsOpen, setIsShortcutsOpen,
+    isSidebarCollapsed, setIsSidebarCollapsed,
+    lowCreditsDismissed, setLowCreditsDismissed,
+    navigateTo, handleLogout, handleSectionChange, activeSection,
+  } = useAppContext();
+
+  const pathname = usePathname() ?? '/';
+  const currentView = getViewNameFromPath(pathname);
+
+  // Keyboard listeners
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(!isCommandPaletteOpen);
+      }
+      if (e.key === 'Escape') {
+        setIsCommandPaletteOpen(false);
+        setIsShortcutsOpen(false);
+      }
+      if (e.key === '?' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        setIsShortcutsOpen(!isShortcutsOpen);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isCommandPaletteOpen, isShortcutsOpen, setIsCommandPaletteOpen, setIsShortcutsOpen]);
+
+  // Public pages (home, login) — no shell
+  const isPublicPage = ['home', 'login'].includes(currentView);
+  if (isPublicPage && !user) {
+    return (
+      <div className="min-h-screen bg-[#0F172A]">
+        {/* Celebration overlay */}
+        {showCelebration && <CelebrationOverlay />}
+        {/* Onboarding */}
+        <OnboardingModal
+          show={showOnboarding}
+          onClose={() => setShowOnboarding(false)}
+          onNavigate={(view: string) => navigateTo(view)}
+        />
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Celebration overlay */}
+      {showCelebration && <CelebrationOverlay />}
+
+      {/* Onboarding */}
+      <OnboardingModal
+        show={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onNavigate={(view: string) => navigateTo(view)}
+      />
+
+      {/* Command Palette */}
+      {user && isCommandPaletteOpen && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={() => setIsCommandPaletteOpen(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <CommandPalettePanel
+            onClose={() => setIsCommandPaletteOpen(false)}
+            onNavigate={(view: string) => { navigateTo(view); setIsCommandPaletteOpen(false); }}
+          />
+        </div>
+      )}
+
+      {/* Shortcuts Modal */}
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
+
+      {/* Authenticated layout with AppShell */}
+      <AppShell
+        user={user}
+        activeSection={activeSection}
+        activePage={currentView}
+        onSectionChange={handleSectionChange}
+        onNavigate={(v) => navigateTo(v)}
+        animatedCredits={animatedCredits}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onLogout={handleLogout}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+      >
+        {/* Low Credits Warning */}
+        {user && user.credits <= 10 && !lowCreditsDismissed && currentView !== 'recharge' && (
+          <div className="mx-4 mt-3 mb-1 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
+            <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+            <p className="text-sm text-amber-300 flex-1">
+              Credits bientot epuises ({user.credits} restants).{' '}
+              <button onClick={() => navigateTo('recharge')} className="underline font-semibold hover:text-amber-200">Recharger maintenant</button>
+            </p>
+            <button onClick={() => setLowCreditsDismissed(true)} className="text-amber-400/60 hover:text-amber-300"><X size={14} /></button>
+          </div>
+        )}
+
+        <Suspense fallback={
+          <div className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="h-8 w-48 skeleton-shimmer rounded-xl" />
+              <div className="h-10 w-36 skeleton-shimmer rounded-full" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[1,2,3,4].map(i => <div key={i} className="h-28 skeleton-shimmer rounded-2xl border border-white/[0.04]" />)}
+            </div>
+            <div className="h-64 skeleton-shimmer rounded-2xl border border-white/[0.04]" />
+          </div>
+        }>
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {children}
+          </div>
+        </Suspense>
+
+        {/* Floating Action Button — New Audit */}
+        {user && !['analyze', 'login', 'home'].includes(currentView) && (
+          <button
+            onClick={() => navigateTo('analyze')}
+            className="fixed bottom-8 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 shadow-xl shadow-purple-900/40 flex items-center justify-center text-white hover:scale-110 hover:shadow-2xl hover:shadow-purple-800/50 transition-all duration-300 group"
+            title="Nouvel Audit AEO"
+          >
+            <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+          </button>
+        )}
+
+        {/* Back to Top */}
+        <BackToTopButton />
+      </AppShell>
+    </>
+  );
+}
+
+function CelebrationOverlay() {
+  return (
+    <div className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center">
+      <div className="text-center animate-in fade-in zoom-in duration-500">
+        <div className="text-6xl mb-4 animate-bounce">&#127881;</div>
+        <div className="bg-[#13131d]/90 backdrop-blur-xl border border-purple-500/30 rounded-2xl px-8 py-5 shadow-2xl shadow-purple-900/30">
+          <h3 className="text-xl font-bold text-white mb-1">Premier audit reussi !</h3>
+          <p className="text-sm text-purple-300">Votre parcours AEO commence maintenant</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BackToTopButton() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  if (!visible) return null;
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      className="fixed bottom-8 right-[5.5rem] z-40 w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.1] backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.12] transition-all duration-200"
+      title="Retour en haut"
+    >
+      <ArrowUp size={16} />
+    </button>
+  );
+}

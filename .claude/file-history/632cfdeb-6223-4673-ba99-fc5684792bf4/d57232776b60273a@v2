@@ -1,0 +1,185 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Lightbulb,
+  CheckCircle2,
+  Clock,
+  ArrowUpRight,
+  Zap,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
+
+interface Rec {
+  id: string;
+  priority: "critical" | "high" | "medium" | "low";
+  title: string;
+  description: string;
+  action: string;
+  effort: "low" | "medium" | "high";
+  impact: "low" | "medium" | "high";
+  category: string;
+  status: "open" | "in_progress" | "done";
+}
+
+// Mock data — will come from Supabase recommendations table
+const MOCK_RECS: Rec[] = [
+  {
+    id: "1",
+    priority: "critical",
+    title: "Ajouter du Schema.org Organization",
+    description: "Votre site n'a pas de balisage Schema.org. Les moteurs IA s'appuient fortement sur les donnees structurees pour comprendre votre entite.",
+    action: "Generer et implementer le Schema.org Organization + WebSite",
+    effort: "low",
+    impact: "high",
+    category: "Donnees structurees",
+    status: "open",
+  },
+  {
+    id: "2",
+    priority: "high",
+    title: "Optimiser le robots.txt pour les bots IA",
+    description: "Votre robots.txt bloque certains crawlers IA (GPTBot, ClaudeBot). Cela empeche les moteurs IA d'indexer votre contenu.",
+    action: "Mettre a jour le robots.txt pour autoriser les bots IA",
+    effort: "low",
+    impact: "high",
+    category: "Technique",
+    status: "open",
+  },
+  {
+    id: "3",
+    priority: "medium",
+    title: "Creer une page FAQ structuree",
+    description: "Les FAQs sont une source privilegiee pour les reponses IA. Ajoutez une page FAQ avec balisage FAQPage.",
+    action: "Creer une page /faq avec Schema.org FAQPage",
+    effort: "medium",
+    impact: "high",
+    category: "Contenu",
+    status: "in_progress",
+  },
+  {
+    id: "4",
+    priority: "low",
+    title: "Ameliorer les meta descriptions",
+    description: "Vos meta descriptions sont generiques. Des descriptions plus specifiques aident les IA a comprendre le contenu de chaque page.",
+    action: "Recrire les meta descriptions avec des mots-cles AEO",
+    effort: "medium",
+    impact: "medium",
+    category: "SEO/AEO",
+    status: "done",
+  },
+];
+
+const PRIORITY_CONFIG: Record<string, { icon: React.ElementType; color: string; label: string; variant: "destructive" | "warning" | "default" | "secondary" }> = {
+  critical: { icon: AlertTriangle, color: "text-red-400", label: "Critique", variant: "destructive" },
+  high: { icon: Zap, color: "text-orange-400", label: "Haute", variant: "warning" },
+  medium: { icon: Info, color: "text-blue-400", label: "Moyenne", variant: "default" },
+  low: { icon: Info, color: "text-white/40", label: "Basse", variant: "secondary" },
+};
+
+const STATUS_CONFIG: Record<string, { label: string; variant: "secondary" | "default" | "success" }> = {
+  open: { label: "A faire", variant: "secondary" },
+  in_progress: { label: "En cours", variant: "default" },
+  done: { label: "Termine", variant: "success" },
+};
+
+export default function RecommendationsPage() {
+  const [filter, setFilter] = useState<string>("all");
+
+  const filtered = filter === "all"
+    ? MOCK_RECS
+    : MOCK_RECS.filter((r) => r.status === filter);
+
+  const openCount = MOCK_RECS.filter((r) => r.status === "open").length;
+  const doneCount = MOCK_RECS.filter((r) => r.status === "done").length;
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-serif font-bold text-white">Recommandations</h2>
+        <div className="flex gap-2">
+          {[
+            { id: "all", label: "Toutes" },
+            { id: "open", label: "A faire" },
+            { id: "in_progress", label: "En cours" },
+            { id: "done", label: "Terminees" },
+          ].map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                filter === f.id
+                  ? "bg-primary/10 text-primary"
+                  : "text-white/40 hover:text-white/70 hover:bg-white/5"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">A traiter</p>
+          <p className="text-3xl font-bold text-amber-400">{openCount}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Terminees</p>
+          <p className="text-3xl font-bold text-emerald-400">{doneCount}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Progression</p>
+          <p className="text-3xl font-bold text-white">{MOCK_RECS.length > 0 ? Math.round((doneCount / MOCK_RECS.length) * 100) : 0}%</p>
+        </Card>
+      </div>
+
+      {/* Recommendations List */}
+      <div className="space-y-3">
+        {filtered.map((rec) => {
+          const priority = PRIORITY_CONFIG[rec.priority];
+          const status = STATUS_CONFIG[rec.status];
+          const PriorityIcon = priority.icon;
+
+          return (
+            <Card key={rec.id} className="p-5">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <PriorityIcon size={18} className={priority.color} />
+                  <h3 className="font-semibold text-white">{rec.title}</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={priority.variant}>{priority.label}</Badge>
+                  <Badge variant={status.variant}>{status.label}</Badge>
+                </div>
+              </div>
+              <p className="text-sm text-white/50 mb-3 ml-8">{rec.description}</p>
+              <div className="flex items-center justify-between ml-8">
+                <div className="flex items-center gap-4 text-xs text-white/30">
+                  <span className="flex items-center gap-1">
+                    <Clock size={12} /> Effort: {rec.effort}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <ArrowUpRight size={12} /> Impact: {rec.impact}
+                  </span>
+                  <span>{rec.category}</span>
+                </div>
+                {rec.status !== "done" && (
+                  <Button size="sm" variant="outline">
+                    Generer la solution
+                  </Button>
+                )}
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

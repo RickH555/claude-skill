@@ -1,0 +1,46 @@
+import { type FormEvent, useState } from 'react'
+import { Link } from 'react-router-dom'
+import Button from '../../components/ui/Button.tsx'
+import Input from '../../components/ui/Input.tsx'
+
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState('')
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    console.log('Réinitialisation du mot de passe', { email })
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 rounded-xl bg-white p-8 shadow-sm"
+    >
+      <h2 className="text-center text-xl font-semibold text-gray-900">
+        Mot de passe oublié
+      </h2>
+
+      <p className="text-center text-sm text-gray-600">
+        Entrez votre email pour recevoir un lien de réinitialisation.
+      </p>
+
+      <Input
+        label="Email"
+        type="email"
+        placeholder="vous@exemple.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <Button type="submit" className="w-full">
+        Réinitialiser
+      </Button>
+
+      <p className="text-center text-sm text-gray-600">
+        <Link to="/login" className="text-blue-600 hover:underline">
+          Retour à la connexion
+        </Link>
+      </p>
+    </form>
+  )
+}

@@ -1,0 +1,212 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+
+/**
+ * Content AEO Scorer — evaluates any text for AEO quality
+ * Returns a score 0-100 with actionable suggestions
+ */
+
+export interface AEOScoreResult {
+  score: number
+  breakdown: {
+    structure: number       // H1/H2/H3, paragraphs, lists
+    answerFirst: number     // Direct answer in first paragraph
+    dataDensity: number     // Numbers, stats, facts
+    citability: number      // Self-contained snippets, FAQ
+    technicalAccuracy: number // Expert vocabulary, no fluff
+    schemaReady: number     // Structured data potential
+  }
+  suggestions: AEOSuggestion[]
+  summary: string
+}
+
+export interface AEOSuggestion {
+  priority: "critical" | "high" | "medium" | "low"
+  category: string
+  issue: string
+  fix: string
+  example?: string
+}
+
+const getApiKey = () => {
+  if (typeof process !== "undefined" && process.env?.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// Rule-based pre-scoring (fast, no API needed)
+export function quickScore(content: string): { score: number; flags: string[] } {
+  const flags: string[] = [];
+  let score = 50; // baseline
+
+  // Structure checks
+  const hasH1 = /^#\s/m.test(content);
+  const hasH2 = /^##\s/m.test(content);
+  const h2Count = (content.match(/^##\s/gm) || []).length;
+  if (hasH1) score += 5; else flags.push("Pas de titre H1");
+  if (hasH2) score += 5; else flags.push("Pas de sous-titres H2");
+  if (h2Count >= 3) score += 5;
+
+  // Answer-First pattern
+  const firstParagraph = content.split("\n\n")[0] || "";
+  if (firstParagraph.length > 50 && firstParagraph.length < 300) {
+    score += 5;
+  } else {
+    flags.push("Premier paragraphe trop court ou trop long pour le pattern Answer-First");
+  }
+
+  // Data density (numbers, %, stats)
+  const numbers = content.match(/\d+[%€$]?/g) || [];
+  if (numbers.length >= 5) score += 10;
+  else if (numbers.length >= 2) score += 5;
+  else flags.push("Manque de donnees chiffrees");
+
+  // Lists (bullet points or numbered)
+  const lists = content.match(/^[-*\d+.]\s/gm) || [];
+  if (lists.length >= 3) score += 5;
+  else flags.push("Ajoutez des listes a puces pour la scannabilite");
+
+  // FAQ section
+  const hasFAQ = /faq|questions?\s*(frequentes|courantes)/i.test(content) ||
+    (content.match(/\?\n/g) || []).length >= 3;
+  if (hasFAQ) score += 10;
+  else flags.push("Ajoutez une section FAQ (extractible par les IA)");
+
+  // Content length
+  const wordCount = content.split(/\s+/).length;
+  if (wordCount >= 500) score += 5;
+  else if (wordCount < 200) { score -= 5; flags.push("Contenu trop court (< 200 mots)"); }
+
+  // Schema.org markers
+  const hasSchema = /schema\.org|@type|json-ld/i.test(content);
+  if (hasSchema) score += 5;
+  else flags.push("Pas de Schema.org detecte");
+
+  return { score: Math.max(0, Math.min(100, score)), flags };
+}
+
+// Deep AI-powered scoring
+export async function deepScore(
+  content: string,
+  contentType: string,
+  brandName?: string,
+  language: string = "fr"
+): Promise<AEOScoreResult> {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    // Fallback to rule-based scoring
+    const { score, flags } = quickScore(content);
+    return {
+      score,
+      breakdown: {
+        structure: Math.min(100, score + 10),
+        answerFirst: Math.min(100, score - 5),
+        dataDensity: Math.min(100, score - 10),
+        citability: Math.min(100, score + 5),
+        technicalAccuracy: Math.min(100, score),
+        schemaReady: Math.min(100, score - 15),
+      },
+      suggestions: flags.map((f, i) => ({
+        priority: i === 0 ? "high" as const : "medium" as const,
+        category: "general",
+        issue: f,
+        fix: `Corrigez: ${f}`,
+      })),
+      summary: `Score AEO calcule par analyse heuristique (pas de cle API). Score: ${score}/100.`,
+    };
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        score: { type: Type.NUMBER, description: "Score AEO global 0-100" },
+        breakdown: {
+          type: Type.OBJECT,
+          properties: {
+            structure: { type: Type.NUMBER },
+            answerFirst: { type: Type.NUMBER },
+            dataDensity: { type: Type.NUMBER },
+            citability: { type: Type.NUMBER },
+            technicalAccuracy: { type: Type.NUMBER },
+            schemaReady: { type: Type.NUMBER },
+          },
+          required: ["structure", "answerFirst", "dataDensity", "citability", "technicalAccuracy", "schemaReady"],
+        },
+        suggestions: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              priority: { type: Type.STRING },
+              category: { type: Type.STRING },
+              issue: { type: Type.STRING },
+              fix: { type: Type.STRING },
+              example: { type: Type.STRING },
+            },
+            required: ["priority", "category", "issue", "fix"],
+          },
+        },
+        summary: { type: Type.STRING },
+      },
+      required: ["score", "breakdown", "suggestions", "summary"],
+    };
+
+    const prompt = `Analyse le contenu suivant pour sa qualite AEO (Answer Engine Optimization).
+Le contenu est de type "${contentType}"${brandName ? ` pour la marque "${brandName}"` : ""}.
+
+CRITERES D'EVALUATION (chaque critere note sur 100) :
+1. **Structure** : Hierarchie H1>H2>H3, paragraphes courts, listes
+2. **Answer-First** : Premiere phrase = reponse directe, extractible par les IA
+3. **Data Density** : Donnees chiffrees, statistiques, faits verifiables
+4. **Citability** : Sections auto-suffisantes, FAQ, snippets extractibles
+5. **Technical Accuracy** : Vocabulaire expert, precision, pas de fluff
+6. **Schema Ready** : Potentiel Schema.org, donnees structurees
+
+Fournis 3-7 suggestions actionnables avec priorite (critical/high/medium/low).
+Reponds en ${language === "fr" ? "francais" : language === "es" ? "espagnol" : "anglais"}.
+
+CONTENU A ANALYSER :
+${content.slice(0, 8000)}`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        systemInstruction: "Tu es un expert AEO (Answer Engine Optimization). Tu evalues le contenu pour sa capacite a etre cite par les moteurs IA (ChatGPT, Perplexity, Claude, Gemini). Sois precis et actionnable.",
+        responseMimeType: "application/json",
+        responseSchema: schema,
+        temperature: 0.3,
+      },
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    return JSON.parse(output) as AEOScoreResult;
+  } catch (error) {
+    console.error("Content scoring failed:", error);
+    const { score, flags } = quickScore(content);
+    return {
+      score,
+      breakdown: {
+        structure: score,
+        answerFirst: score,
+        dataDensity: score,
+        citability: score,
+        technicalAccuracy: score,
+        schemaReady: score,
+      },
+      suggestions: flags.map((f) => ({
+        priority: "medium" as const,
+        category: "general",
+        issue: f,
+        fix: f,
+      })),
+      summary: `Score AEO par fallback heuristique: ${score}/100.`,
+    };
+  }
+}

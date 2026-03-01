@@ -1,0 +1,257 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+
+// Helper to safely get env var
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// ================================================================
+// TYPES
+// ================================================================
+
+export interface SchemaInput {
+  name: string;
+  url: string;
+  logoUrl: string;
+  description: string;
+  socialProfiles: string[];
+  contactPhone: string;
+  contactEmail: string;
+  alternateName: string;
+}
+
+export interface SchemaResult {
+  content: string;       // Stringified JSON-LD
+  typesCount: number;    // Number of @type entries in the @graph
+  byteSize: number;      // Approximate byte size
+}
+
+// ================================================================
+// SYSTEM PROMPT — Expert AEO / Schema.org Engineering
+// ================================================================
+
+const SCHEMA_SYSTEM_PROMPT = `
+# ROLE
+Tu es un Expert Senior en Schema.org, Knowledge Graph Optimization et AEO (Answer Engine Optimization) chez CitedBy.ai.
+Tu maitrises les donnees structurees JSON-LD, les Knowledge Graphs de Google, Bing, Apple et les mecanismes d'enrichissement des reponses IA (ChatGPT, Claude, Gemini, Perplexity, AI Overviews).
+
+# MISSION
+Genere un balisage JSON-LD Schema.org complet et optimise pour maximiser :
+1. La presence dans le Knowledge Panel Google
+2. La desambiguation de l'entite pour les LLMs
+3. Les rich results (resultats enrichis) dans les SERPs
+4. La citabilite par les moteurs de reponse IA (Answer Engines)
+
+# EXPERTISE SCHEMA.ORG POUR L'AEO
+
+Les LLMs et moteurs de reponse IA exploitent activement le Schema.org pour :
+- **Identifier l'entite** : @type Organization/LocalBusiness + @id canonique = ancrage d'identite
+- **Desambiguer** : sameAs (liens reseaux sociaux, Wikidata, CrunchBase) = signaux de confirmation
+- **Verifier les faits** : contactPoint, address, foundingDate = donnees verifiables
+- **Construire le Knowledge Graph** : Les relations @id entre entites creent un graphe exploitable
+- **Generer des rich results** : SearchAction, FAQPage, BreadcrumbList = visibilite SERP
+
+# STRUCTURE DU JSON-LD
+
+Le balisage doit utiliser un @graph contenant au minimum :
+
+1. **Organization** (ou sous-type pertinent) :
+   - @id canonique (url/#organization)
+   - name, alternateName, url, description
+   - logo (ImageObject avec url, width, height)
+   - sameAs (TOUS les profils sociaux = signaux de desambiguation critiques)
+   - contactPoint (telephone, email, contactType)
+   - address (si disponible)
+   - foundingDate, numberOfEmployees (si disponible)
+
+2. **WebSite** :
+   - @id canonique (url/#website)
+   - name, url, publisher (reference @id Organization)
+   - potentialAction SearchAction (pour le sitelinks searchbox Google)
+   - inLanguage (langue du site)
+
+3. **WebPage** (page d'accueil) :
+   - @id canonique (url/#webpage)
+   - name, description, url
+   - isPartOf (reference @id WebSite)
+   - about (reference @id Organization)
+   - primaryImageOfPage (logo)
+
+4. **BreadcrumbList** (optionnel mais recommande) :
+   - Navigation structuree pour Google
+
+# REGLES
+- JSON-LD valide avec @context "https://schema.org"
+- Utiliser un @graph array pour regrouper les entites
+- Chaque entite doit avoir un @id unique et canonique
+- Les references entre entites utilisent {"@id": "..."}
+- Pas de champs vides : omets les proprietes non renseignees
+- Les URLs doivent etre absolus
+- Les descriptions doivent etre factuelles, jamais promotionnelles
+- sameAs est CRITIQUE pour l'AEO : chaque profil social = un signal de desambiguation
+- Reponds en JSON pur sans Markdown fences
+`;
+
+// ================================================================
+// FALLBACK — Local generation (existing logic preserved)
+// ================================================================
+
+const fallbackGeneration = (data: SchemaInput): SchemaResult => {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${data.url}/#organization`,
+        "name": data.name,
+        "url": data.url,
+        "logo": {
+          "@type": "ImageObject",
+          "url": data.logoUrl
+        },
+        "description": data.description,
+        "alternateName": data.alternateName || undefined,
+        "sameAs": data.socialProfiles.filter(url => url.length > 0),
+        "contactPoint": (data.contactPhone || data.contactEmail) ? {
+          "@type": "ContactPoint",
+          "telephone": data.contactPhone || undefined,
+          "email": data.contactEmail || undefined,
+          "contactType": "customer service"
+        } : undefined
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${data.url}/#website`,
+        "url": data.url,
+        "name": data.name,
+        "publisher": {
+          "@id": `${data.url}/#organization`
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": `${data.url}/search?q={search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  };
+
+  const content = JSON.stringify(schema, null, 2);
+  return {
+    content,
+    typesCount: schema["@graph"].length,
+    byteSize: new TextEncoder().encode(content).length,
+  };
+};
+
+// ================================================================
+// LEGACY EXPORT — Synchronous local generation (kept for compatibility)
+// ================================================================
+
+export const generateJsonLd = (data: SchemaInput): string => {
+  return fallbackGeneration(data).content;
+};
+
+// ================================================================
+// MAIN EXPORT — GEMINI-POWERED GENERATION
+// ================================================================
+
+export const generateSchemaWithAI = async (data: SchemaInput): Promise<SchemaResult> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn("API_KEY not found, using local Schema.org generation.");
+    return fallbackGeneration(data);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        jsonLd: { type: Type.STRING, description: "The complete JSON-LD Schema.org markup as a stringified JSON object" },
+        typesCount: { type: Type.NUMBER, description: "Number of @type entries in the @graph array" },
+        byteSize: { type: Type.NUMBER, description: "Approximate byte size of the JSON-LD content" },
+      },
+      required: ["jsonLd", "typesCount", "byteSize"],
+    };
+
+    const socialProfilesDesc = data.socialProfiles
+      .filter(url => url.length > 0)
+      .map(url => `- ${url}`)
+      .join('\n');
+
+    const prompt = `
+      INFORMATIONS DE L'ENTITE :
+      - Nom : ${data.name}
+      ${data.alternateName ? `- Nom alternatif : ${data.alternateName}` : ''}
+      - URL : ${data.url}
+      - Description : ${data.description}
+      - Logo URL : ${data.logoUrl}
+
+      CONTACT :
+      ${data.contactEmail ? `- Email : ${data.contactEmail}` : ''}
+      ${data.contactPhone ? `- Telephone : ${data.contactPhone}` : ''}
+
+      ${socialProfilesDesc ? `PROFILS SOCIAUX (sameAs — critiques pour la desambiguation) :\n${socialProfilesDesc}` : 'PROFILS SOCIAUX : Aucun renseigne'}
+
+      MISSION :
+      Genere un balisage JSON-LD Schema.org complet et optimise pour maximiser la visibilite dans le Knowledge Graph de Google et la citabilite par les moteurs de reponse IA.
+
+      Le balisage doit inclure au minimum :
+      - Organization avec @id, name, url, logo (ImageObject), description, sameAs, contactPoint
+      - WebSite avec @id, name, url, publisher (reference Organization), potentialAction (SearchAction)
+      - WebPage pour la page d'accueil avec @id, name, url, isPartOf (WebSite), about (Organization)
+
+      Enrichis le balisage avec toutes les proprietes Schema.org pertinentes basees sur les informations fournies.
+      Assure-toi que chaque entite a un @id canonique unique et que les references entre entites sont correctes.
+
+      Le champ "jsonLd" de ta reponse doit contenir le JSON-LD complet stringify.
+      Calcule typesCount (nombre d'entites dans @graph) et byteSize (taille approximative en octets).
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: SCHEMA_SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.2,
+      },
+    });
+
+    let output = response.text;
+    if (!output) {
+      throw new Error("Empty response from AI");
+    }
+
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    // Try to pretty-print the inner JSON if it was stringified
+    let content = parsed.jsonLd;
+    try {
+      const innerJson = JSON.parse(content);
+      content = JSON.stringify(innerJson, null, 2);
+    } catch {
+      // Already a string or not valid JSON, keep as-is
+    }
+
+    return {
+      content,
+      typesCount: parsed.typesCount,
+      byteSize: parsed.byteSize,
+    };
+  } catch (error) {
+    console.error("Schema.org AI generation failed:", error);
+    return fallbackGeneration(data);
+  }
+};

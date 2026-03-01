@@ -1,0 +1,268 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  FolderOpen,
+  Settings,
+  LogOut,
+  CreditCard,
+  BarChart3,
+  Menu,
+  X,
+  Crown,
+  Plug,
+  Key,
+  Search,
+  ChevronDown,
+  Sparkles,
+  PenTool,
+  Shield,
+  FileJson,
+  Code,
+  BookOpen,
+  Globe,
+  Fuel,
+  Users,
+  User,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useWorkspace } from "@/lib/workspace-context";
+import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
+import { NotificationBell } from "@/components/notifications";
+import { LanguageSelector } from "@/i18n/LanguageSelector";
+
+interface SidebarProps {
+  user: { email: string; id: string };
+}
+
+const MAIN_NAV = [
+  { href: "/app", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/app/analyze", label: "Analyser", icon: Search },
+  { href: "/app/projects", label: "Projets", icon: FolderOpen },
+  { href: "/app/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/app/executive", label: "Executif", icon: Crown },
+];
+
+const GENERATIVE_TOOLS = [
+  { href: "/app/generative-tools", label: "Vue d'ensemble", icon: Sparkles },
+  { href: "/app/generative-tools/smc-studio", label: "SMC Studio", icon: PenTool },
+  { href: "/app/generative-tools/content-writer", label: "Content Writer", icon: BookOpen },
+  { href: "/app/generative-tools/reputation", label: "Reputation", icon: Shield },
+  { href: "/app/generative-tools/source-of-truth", label: "Source of Truth", icon: Globe },
+  { href: "/app/generative-tools/schema-org", label: "Schema.org", icon: FileJson },
+  { href: "/app/generative-tools/robots-txt", label: "robots.txt", icon: Code },
+];
+
+const OTHER_NAV = [
+  { href: "/app/directory", label: "Annuaire", icon: Globe },
+  { href: "/app/recharge", label: "Credits", icon: Fuel },
+  { href: "/app/affiliation", label: "Affiliation", icon: Users },
+];
+
+const SETTINGS_NAV = [
+  { href: "/app/settings", label: "General", icon: Settings },
+  { href: "/app/settings/billing", label: "Abonnement", icon: CreditCard },
+  { href: "/app/settings/api", label: "API", icon: Key },
+  { href: "/app/settings/integrations", label: "Integrations", icon: Plug },
+];
+
+export function Sidebar({ user }: SidebarProps) {
+  const pathname = usePathname();
+  const { workspace } = useWorkspace();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(
+    pathname.startsWith("/app/generative-tools")
+  );
+  const [settingsOpen, setSettingsOpen] = useState(
+    pathname.startsWith("/app/settings")
+  );
+
+  const planBadge: Record<string, { label: string; variant: "default" | "success" | "warning" }> = {
+    starter: { label: "Starter", variant: "default" },
+    pro: { label: "Pro", variant: "success" },
+    agency: { label: "Agency", variant: "warning" },
+  };
+
+  const currentPlan = planBadge[workspace?.plan || "starter"] || planBadge.starter;
+
+  const isActive = (href: string) => {
+    if (href === "/app") return pathname === "/app";
+    if (href === "/app/generative-tools") return pathname === "/app/generative-tools";
+    return pathname.startsWith(href);
+  };
+
+  const NavLink = ({ href, label, icon: Icon }: { href: string; label: string; icon: React.ElementType }) => (
+    <Link
+      href={href}
+      onClick={() => setMobileOpen(false)}
+      className={cn(
+        "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors",
+        isActive(href)
+          ? "bg-primary/10 text-primary"
+          : "text-white/50 hover:text-white hover:bg-white/5"
+      )}
+    >
+      <Icon size={16} />
+      {label}
+    </Link>
+  );
+
+  const navContent = (
+    <>
+      {/* Logo */}
+      <div className="p-5 border-b border-white/5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-black font-serif font-bold text-lg">
+            C
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="font-bold text-lg text-white">CitedBy.ai</span>
+            {workspace && (
+              <p className="text-[10px] text-white/40 truncate">
+                {workspace.name}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Nav */}
+      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto" aria-label="Navigation principale">
+        {MAIN_NAV.map((item) => (
+          <NavLink key={item.href} {...item} />
+        ))}
+
+        {/* Generative Tools Section */}
+        <div className="pt-3 pb-1">
+          <button
+            onClick={() => setToolsOpen(!toolsOpen)}
+            className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] uppercase tracking-wider text-white/30 hover:text-white/50 transition-colors"
+          >
+            <span>Outils generatifs</span>
+            <ChevronDown size={12} className={cn("transition-transform", toolsOpen && "rotate-180")} />
+          </button>
+        </div>
+        {toolsOpen && (
+          <div className="space-y-0.5 animate-fade-in">
+            {GENERATIVE_TOOLS.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
+          </div>
+        )}
+
+        <div className="my-2 border-t border-white/5" />
+
+        {OTHER_NAV.map((item) => (
+          <NavLink key={item.href} {...item} />
+        ))}
+
+        {/* Settings Section */}
+        <div className="pt-3 pb-1">
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] uppercase tracking-wider text-white/30 hover:text-white/50 transition-colors"
+          >
+            <span>Parametres</span>
+            <ChevronDown size={12} className={cn("transition-transform", settingsOpen && "rotate-180")} />
+          </button>
+        </div>
+        {settingsOpen && (
+          <div className="space-y-0.5 animate-fade-in">
+            {SETTINGS_NAV.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
+          </div>
+        )}
+      </nav>
+
+      {/* Credits Display */}
+      {workspace && (
+        <div className="mx-3 mb-2 p-3 rounded-xl bg-white/[0.03] border border-white/5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] text-white/40 uppercase">Credits</span>
+            <Link href="/app/recharge" className="text-[10px] text-primary hover:text-primary/80">
+              Recharger
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <Zap size={14} className="text-primary" />
+            <span className="text-sm font-bold text-white">{workspace.credits_remaining}</span>
+            <span className="text-[10px] text-white/30">restants</span>
+          </div>
+          <div className="w-full h-1 bg-white/5 rounded-full mt-2 overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full"
+              style={{ width: `${Math.min((workspace.credits_remaining / 1000) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* User Section */}
+      <div className="p-3 border-t border-white/5">
+        <div className="flex items-center gap-3 px-2 py-2">
+          <Avatar fallback={user.email} size="sm" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">{user.email}</p>
+            <Badge variant={currentPlan.variant} className="mt-0.5">
+              {currentPlan.label}
+            </Badge>
+          </div>
+          <NotificationBell />
+        </div>
+        <div className="flex items-center gap-1 px-2 mt-1">
+          <Link
+            href="/app/account"
+            className="flex-1 flex items-center gap-2 px-2 py-1.5 text-xs text-white/40 hover:text-white/70 hover:bg-white/5 rounded-lg transition-colors"
+          >
+            <User size={12} /> Mon compte
+          </Link>
+          <LanguageSelector />
+        </div>
+        <form action="/auth/signout" method="post">
+          <button className="w-full mt-1 flex items-center gap-2 px-4 py-2 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/5 rounded-lg transition-colors">
+            <LogOut size={12} /> Deconnexion
+          </button>
+        </form>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile toggle */}
+      <button
+        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-xl bg-[#1a1d21] border border-white/10"
+        onClick={() => setMobileOpen(!mobileOpen)}
+        aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+        aria-expanded={mobileOpen}
+      >
+        {mobileOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "w-[260px] border-r border-white/5 bg-[#0d0f12] flex flex-col sticky top-0 h-screen z-40 transition-transform shrink-0",
+          "md:translate-x-0",
+          mobileOpen ? "translate-x-0 fixed inset-y-0 left-0" : "-translate-x-full fixed md:relative"
+        )}
+      >
+        {navContent}
+      </aside>
+    </>
+  );
+}

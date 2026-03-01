@@ -1,0 +1,21 @@
+import React from 'react';
+import { Search } from 'lucide-react';
+
+interface SearchBarProps {
+  onOpen?: () => void;
+}
+
+export default function SearchBar({ onOpen }: SearchBarProps) {
+  return (
+    <button
+      onClick={onOpen}
+      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-tertiary)] text-sm hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)] transition-all duration-150 min-w-[200px]"
+    >
+      <Search size={14} />
+      <span className="flex-1 text-left text-[13px]">Rechercher...</span>
+      <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-mono bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-tertiary)]">
+        <span className="text-[10px]">⌘</span>K
+      </kbd>
+    </button>
+  );
+}

@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CitedBy.ai — Soyez cité par ChatGPT, Perplexity et Gemini</title>
+  <meta name="description" content="Analysez votre contenu sur 50 critères AEO, vérifiez vos citations dans les moteurs IA, et générez les corrections pour être recommandé par ChatGPT, Perplexity et Gemini.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://citedby.ai">
+  <meta property="og:title" content="CitedBy.ai — Le Semrush de l'ère IA">
+  <meta property="og:description" content="Vos concurrents sont cités par ChatGPT. Pas vous. Analysez et optimisez votre visibilité dans les moteurs IA.">
+  <meta property="og:image" content="https://citedby.ai/og-image.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CitedBy.ai — Soyez cité par ChatGPT, Perplexity et Gemini">
+  <meta name="twitter:description" content="Le premier outil d'Answer Engine Optimization complet.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CitedBy.ai",
+    "description": "Plateforme d'Answer Engine Optimization (AEO) pour être cité par les moteurs IA",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "29",
+      "highPrice": "199",
+      "priceCurrency": "EUR",
+      "offerCount": "3"
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: #09090B;
+      color: #A1A1AA;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+
+    ::selection { background: rgba(59,130,246,0.3); color: #fff; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(161,161,170,0.2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(161,161,170,0.35); }
+
+    /* ── TOKENS ── */
+    :root {
+      --bg: #09090B;
+      --surface: #18181B;
+      --surface-alt: #0F0F12;
+      --border: #27272A;
+      --border-subtle: #1E1E22;
+      --text-primary: #FAFAFA;
+      --text-secondary: #A1A1AA;
+      --text-muted: #71717A;
+      --text-faint: #52525B;
+      --blue: #3B82F6;
+      --blue-dim: rgba(59,130,246,0.1);
+      --blue-border: rgba(59,130,246,0.2);
+      --green: #22C55E;
+      --green-dim: rgba(34,197,94,0.1);
+      --green-border: rgba(34,197,94,0.2);
+      --red: #EF4444;
+      --red-dim: rgba(239,68,68,0.08);
+      --red-border: rgba(239,68,68,0.15);
+      --purple: #A855F7;
+      --purple-dim: rgba(168,85,247,0.1);
+      --purple-border: rgba(168,85,247,0.2);
+      --emerald-grad: linear-gradient(135deg, #34D399, #6EE7B7);
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --max-w: 1120px;
+      --nav-h: 64px;
+    }
+
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+    .section { padding: 96px 24px; }
+
+    /* ── FONTS ── */
+    .font-display { font-family: var(--font-display); }
+    .font-mono { font-family: var(--font-mono); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes barFill {
+      from { width: 0%; }
+    }
+
+    .animate-on-scroll { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+    .animate-on-scroll.slide-left { transform: translateX(-40px); }
+    .animate-on-scroll.slide-left.visible { transform: translateX(0); }
+    .animate-on-scroll.slide-right { transform: translateX(40px); }
+    .animate-on-scroll.slide-right.visible { transform: translateX(0); }
+    .animate-on-scroll.scale-up { transform: scale(0.95); }
+    .animate-on-scroll.scale-up.visible { transform: scale(1); }
+
+    /* Stagger delays */
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      height: var(--nav-h);
+      display: flex; align-items: center;
+      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(9,9,11,0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom-color: var(--border-subtle);
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 0 24px;
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: var(--text-primary); }
+    .nav-logo-icon { width: 28px; height: 28px; background: var(--blue); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-link { font-size: 14px; font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+    .nav-link:hover { color: var(--text-primary); }
+    .nav-cta {
+      background: #fff; color: #000; font-size: 14px; font-weight: 600;
+      padding: 8px 18px; border-radius: 8px; transition: all 0.2s;
+    }
+    .nav-cta:hover { background: #E4E4E7; transform: scale(1.02); }
+
+    .nav-mobile-toggle { display: none; color: var(--text-secondary); font-size: 14px; font-weight: 600; }
+    .nav-mobile-menu {
+      display: none; position: fixed; top: var(--nav-h); left: 0; right: 0;
+      background: rgba(9,9,11,0.95); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 24px; flex-direction: column; gap: 16px;
+    }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a { font-size: 16px; color: var(--text-secondary); padding: 8px 0; font-weight: 500; }
+    .nav-mobile-menu .nav-cta { display: block; text-align: center; margin-top: 8px; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-mobile-toggle { display: block; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 90vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 128px 24px 80px; position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.15), transparent),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px;
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 880px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 100px;
+      background: var(--blue-dim); border: 1px solid var(--blue-border);
+      font-size: 13px; font-weight: 500; color: #60A5FA;
+      animation: fadeIn 0.6s ease-out both;
+    }
+    .hero-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+
+    .hero h1 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(36px, 6vw, 72px); line-height: 1.08;
+      letter-spacing: -0.025em; color: var(--text-primary);
+      margin-top: 28px;
+      animation: fadeInUp 0.7s ease-out 0.1s both;
+    }
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, #34D399, #6EE7B7);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero h1 .line-break {
+      display: block; font-size: clamp(30px, 5vw, 56px); margin-top: 4px;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px); color: var(--text-secondary);
+      max-width: 640px; margin: 24px auto 0; line-height: 1.7;
+      animation: fadeInUp 0.6s ease-out 0.25s both;
+    }
+
+    .hero-ctas {
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+      margin-top: 40px; flex-wrap: wrap;
+      animation: fadeInUp 0.5s ease-out 0.4s both;
+    }
+    .btn-primary {
+      background: #fff; color: #000; font-weight: 600; font-size: 16px;
+      padding: 14px 32px; border-radius: 10px;
+      box-shadow: 0 0 24px rgba(255,255,255,0.08);
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: #E4E4E7; transform: scale(1.02); box-shadow: 0 0 32px rgba(255,255,255,0.12); }
+    .btn-secondary {
+      color: var(--text-secondary); font-weight: 500; font-size: 16px;
+      padding: 14px 24px; transition: color 0.2s;
+    }
+    .btn-secondary:hover { color: var(--text-primary); }
+    .btn-secondary .arrow { display: inline-block; transition: transform 0.2s; }
+    .btn-secondary:hover .arrow { transform: translateX(3px); }
+
+    .hero-proof {
+      display: flex; align-items: center; justify-content: center; gap: 24px;
+      margin-top: 40px; flex-wrap: wrap;
+      animation: fadeInUp 0.5s ease-out 0.55s both;
+    }
+    .hero-proof span { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+    .hero-proof .check { color: var(--green); margin-right: 4px; }
+
+    /* ── PRODUCT MOCKUP ── */
+    .mockup-wrapper {
+      max-width: 960px; margin: -40px auto 0; padding: 0 24px;
+      position: relative; z-index: 3;
+    }
+    .mockup {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 20px 60px -10px rgba(0,0,0,0.5);
+    }
+    .mockup-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border-subtle);
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-dot.r { background: rgba(239,68,68,0.5); }
+    .mockup-dot.y { background: rgba(234,179,8,0.5); }
+    .mockup-dot.g { background: rgba(34,197,94,0.5); }
+    .mockup-url { font-size: 12px; color: var(--text-faint); margin-left: 12px; font-family: var(--font-mono); }
+
+    .mockup-body { padding: 24px; }
+    .mockup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .mockup-stat {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle);
+      border-radius: 12px; padding: 16px;
+    }
+    .mockup-stat-label { font-size: 12px; color: var(--text-faint); }
+    .mockup-stat-value { font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--text-primary); margin-top: 4px; }
+    .mockup-stat-delta { font-size: 12px; color: #34D399; margin-top: 4px; }
+
+    .mockup-scores { margin-top: 16px; }
+    .mockup-engine {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border-subtle);
+    }
+    .mockup-engine:last-child { border-bottom: none; }
+    .mockup-engine-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mockup-engine-name { font-size: 13px; font-weight: 600; color: var(--text-primary); width: 90px; flex-shrink: 0; }
+    .mockup-engine-score { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--text-primary); width: 50px; flex-shrink: 0; text-align: right; }
+    .mockup-bar-track { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .mockup-bar-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); width: 0; }
+
+    .mockup-alert {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 16px; padding: 14px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+    .mockup-alert-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--blue-dim); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .mockup-alert-text { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .mockup-alert-sub { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+
+    @media (max-width: 640px) {
+      .mockup-grid { grid-template-columns: 1fr; }
+      .mockup-engine { flex-wrap: wrap; gap: 8px; }
+      .mockup-bar-track { width: 100%; }
+    }
+
+    /* ── PROBLEM / SOLUTION ── */
+    .problem-section { padding: 96px 24px; }
+    .problem-title {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(28px, 4vw, 44px); color: var(--text-primary);
+      text-align: center; letter-spacing: -0.02em; margin-bottom: 48px;
+    }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      gap: 24px; max-width: 960px; margin: 0 auto; align-items: stretch;
+    }
+    .problem-col {
+      border-radius: 16px; padding: 32px;
+    }
+    .problem-col.before { background: var(--red-dim); border: 1px solid var(--red-border); }
+    .problem-col.after { background: var(--green-dim); border: 1px solid var(--green-border); }
+    .problem-col-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; }
+    .problem-col.before .problem-col-label { color: #F87171; }
+    .problem-col.after .problem-col-label { color: #4ADE80; }
+    .problem-row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; }
+    .problem-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+    .problem-col.before .problem-icon { color: #F87171; }
+    .problem-col.after .problem-icon { color: #4ADE80; }
+    .problem-text { font-size: 15px; color: var(--text-secondary); line-height: 1.5; }
+
+    .problem-arrow {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: var(--text-faint);
+    }
+
+    @media (max-width: 768px) {
+      .problem-grid { grid-template-columns: 1fr; }
+      .problem-arrow { transform: rotate(90deg); padding: 8px 0; }
+    }
+
+    /* ── FEATURES ── */
+    .features-section { padding: 96px 24px; background: var(--surface-alt); }
+    .section-label {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #60A5FA; text-align: center;
+    }
+    .section-title {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(28px, 4vw, 48px); color: var(--text-primary);
+      text-align: center; letter-spacing: -0.02em; margin-top: 12px; line-height: 1.15;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--text-secondary); text-align: center;
+      max-width: 600px; margin: 16px auto 0; line-height: 1.7;
+    }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 20px; max-width: var(--max-w); margin: 56px auto 0;
+    }
+    .feature-card {
+      background: rgba(24,24,27,0.5); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .feature-card:hover { border-color: var(--text-faint); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 20px;
+    }
+    .feature-icon.blue { background: var(--blue-dim); }
+    .feature-icon.green { background: var(--green-dim); }
+    .feature-icon.purple { background: var(--purple-dim); }
+    .feature-card h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+    .feature-card p { font-size: 15px; color: var(--text-muted); line-height: 1.65; }
+
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── METRICS ── */
+    .metrics-section { padding: 96px 24px; }
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 24px; max-width: var(--max-w); margin: 0 auto;
+    }
+    .metric-card { text-align: center; padding: 24px; }
+    .metric-value {
+      font-family: var(--font-mono); font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700; color: var(--text-primary);
+    }
+    .metric-label {
+      font-size: 13px; color: var(--text-faint); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-top: 8px; font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps-section { padding: 96px 24px; }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 40px; max-width: 960px; margin: 56px auto 0;
+      position: relative;
+    }
+    .steps-line {
+      display: none; position: absolute; top: 20px; left: 16%; right: 16%;
+      border-top: 2px dashed var(--border); z-index: 0;
+    }
+    @media (min-width: 769px) { .steps-line { display: block; } }
+
+    .step { text-align: center; position: relative; z-index: 1; }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid var(--blue-border); background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-weight: 700; font-size: 16px;
+      color: #60A5FA; margin: 0 auto;
+    }
+    .step h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 16px; }
+    .step p { font-size: 15px; color: var(--text-muted); margin-top: 8px; line-height: 1.6; }
+
+    @media (max-width: 768px) {
+      .steps-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+
+    /* ── ENGINE SCORING ── */
+    .scoring-section { padding: 96px 24px; background: var(--surface-alt); }
+    .scoring-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px; max-width: 720px; margin: 48px auto 0;
+    }
+    .scoring-engine {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px 0; border-bottom: 1px solid var(--border-subtle);
+    }
+    .scoring-engine:last-child { border-bottom: none; }
+    .scoring-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .scoring-name { font-size: 15px; font-weight: 600; color: var(--text-primary); width: 100px; flex-shrink: 0; }
+    .scoring-val { font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); width: 65px; text-align: right; flex-shrink: 0; }
+    .scoring-track { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .scoring-fill { height: 100%; border-radius: 4px; width: 0; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+    .scoring-hint { font-size: 13px; color: var(--text-faint); margin-top: 4px; padding-left: 126px; }
+
+    @media (max-width: 640px) {
+      .scoring-engine { flex-wrap: wrap; gap: 8px; }
+      .scoring-track { width: 100%; order: 4; }
+      .scoring-hint { padding-left: 0; }
+    }
+
+    /* ── PRICING ── */
+    .pricing-section { padding: 96px 24px; }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 20px; max-width: var(--max-w); margin: 56px auto 0; align-items: start;
+    }
+    .pricing-card {
+      border-radius: 16px; padding: 32px; position: relative;
+      background: rgba(24,24,27,0.3); border: 1px solid var(--border);
+    }
+    .pricing-card.highlighted {
+      background: var(--surface); border-color: var(--blue-border);
+      box-shadow: 0 0 0 1px rgba(59,130,246,0.08), 0 8px 40px rgba(0,0,0,0.3);
+    }
+    .pricing-popular {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: #fff; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 14px; border-radius: 100px;
+    }
+    .pricing-name { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+    .pricing-price { margin-top: 12px; }
+    .pricing-amount { font-size: 40px; font-weight: 700; color: var(--text-primary); }
+    .pricing-currency { font-size: 16px; color: var(--text-muted); }
+    .pricing-period { font-size: 14px; color: var(--text-faint); }
+    .pricing-features { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .pricing-feature { display: flex; gap: 8px; font-size: 14px; color: var(--text-secondary); align-items: flex-start; }
+    .pricing-check { color: var(--green); flex-shrink: 0; margin-top: 2px; font-size: 14px; }
+    .pricing-cta {
+      display: block; width: 100%; text-align: center;
+      margin-top: 28px; padding: 12px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; transition: all 0.2s;
+    }
+    .pricing-cta.primary { background: #fff; color: #000; }
+    .pricing-cta.primary:hover { background: #E4E4E7; }
+    .pricing-cta.secondary { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+    .pricing-cta.secondary:hover { border-color: var(--text-faint); color: var(--text-primary); }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+    }
+
+    /* ── FAQ ── */
+    .faq-section { padding: 96px 24px; background: var(--surface-alt); }
+    .faq-list { max-width: 720px; margin: 48px auto 0; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-question {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 0; cursor: pointer; text-align: left;
+      font-size: 15px; font-weight: 500; color: var(--text-secondary);
+      transition: color 0.2s; background: none; border: none;
+      font-family: var(--font-body);
+    }
+    .faq-question:hover { color: var(--text-primary); }
+    .faq-chevron {
+      width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.3s;
+      color: var(--text-faint);
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0; overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s;
+      opacity: 0;
+    }
+    .faq-item.open .faq-answer { opacity: 1; }
+    .faq-answer-inner { padding-bottom: 20px; font-size: 15px; color: var(--text-muted); line-height: 1.7; }
+
+    /* ── CTA FINAL ── */
+    .final-cta-section {
+      padding: 96px 24px; text-align: center; position: relative; overflow: hidden;
+    }
+    .final-cta-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(59,130,246,0.08), transparent);
+    }
+    .final-cta-content { position: relative; z-index: 1; }
+    .final-cta-title {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(26px, 4vw, 42px); color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .final-cta-sub { font-size: 18px; color: var(--text-secondary); margin-top: 16px; line-height: 1.6; }
+    .final-cta-note { font-size: 13px; color: var(--text-faint); margin-top: 16px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #0A0A0C; border-top: 1px solid rgba(39,39,42,0.5);
+      padding: 64px 24px 0;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 48px; max-width: var(--max-w); margin: 0 auto;
+    }
+    .footer-brand p { font-size: 14px; color: var(--text-faint); margin-top: 12px; line-height: 1.6; max-width: 260px; }
+    .footer-col-title {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--text-faint); margin-bottom: 16px;
+    }
+    .footer-link { display: block; font-size: 14px; color: var(--text-muted); padding: 4px 0; transition: color 0.2s; }
+    .footer-link:hover { color: var(--text-secondary); }
+    .footer-bottom {
+      border-top: 1px solid rgba(39,39,42,0.3); margin-top: 48px;
+      padding: 24px 0; text-align: center;
+      font-size: 13px; color: var(--text-faint);
+      max-width: var(--max-w); margin-left: auto; margin-right: auto;
+    }
+
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════ NAV ══════════ -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="nav-logo-icon">C</span>
+        CitedBy.ai
+      </a>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Fonctionnalités</a>
+        <a href="#pricing" class="nav-link">Tarifs</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="#cta-final" class="nav-cta">Essai gratuit</a>
+      </div>
+      <button class="nav-mobile-toggle" id="nav-toggle" aria-label="Menu">Menu</button>
+    </div>
+    <div class="nav-mobile-menu" id="nav-menu">
+      <a href="#features">Fonctionnalités</a>
+      <a href="#pricing">Tarifs</a>
+      <a href="#faq">FAQ</a>
+      <a href="#cta-final" class="nav-cta">Essai gratuit</a>
+    </div>
+  </nav>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Lancé en 2025 — Le premier outil AEO complet
+      </div>
+      <h1>
+        Vos concurrents sont cités par<br>
+        <span class="gradient-text">ChatGPT.</span>
+        <span class="line-break">Pas vous.</span>
+      </h1>
+      <p class="hero-sub">
+        CitedBy.ai analyse votre contenu sur 50&nbsp;critères AEO,
+        vérifie vos citations dans les moteurs IA,
+        et génère les corrections pour être recommandé
+        par ChatGPT, Perplexity et Gemini.
+      </p>
+      <div class="hero-ctas">
+        <a href="#cta-final" class="btn-primary">Analyser mon site gratuitement</a>
+        <a href="#how" class="btn-secondary">Voir la démo <span class="arrow">→</span></a>
+      </div>
+      <div class="hero-proof">
+        <span><span class="check">✓</span> 50 critères analysés</span>
+        <span><span class="check">✓</span> 3 moteurs IA</span>
+        <span><span class="check">✓</span> Résultats en 30 secondes</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ PRODUCT MOCKUP ══════════ -->
+  <div class="mockup-wrapper animate-on-scroll scale-up" id="mockup">
+    <div class="mockup">
+      <div class="mockup-bar">
+        <span class="mockup-dot r"></span>
+        <span class="mockup-dot y"></span>
+        <span class="mockup-dot g"></span>
+        <span class="mockup-url">citedby.ai/audit/monsite.fr</span>
+      </div>
+      <div class="mockup-body">
+        <div class="mockup-grid">
+          <div class="mockup-stat">
+            <div class="mockup-stat-label">Score AEO Global</div>
+            <div class="mockup-stat-value">78<span style="font-size:16px;color:var(--text-faint)">/100</span></div>
+            <div class="mockup-stat-delta">+12 pts ce mois</div>
+          </div>
+          <div class="mockup-stat">
+            <div class="mockup-stat-label">Citations détectées</div>
+            <div class="mockup-stat-value">23</div>
+            <div class="mockup-stat-delta">+8 cette semaine</div>
+          </div>
+          <div class="mockup-stat">
+            <div class="mockup-stat-label">Critères optimisés</div>
+            <div class="mockup-stat-value">41<span style="font-size:16px;color:var(--text-faint)">/50</span></div>
+            <div class="mockup-stat-delta">9 restants</div>
+          </div>
+        </div>
+        <div class="mockup-scores">
+          <div class="mockup-engine">
+            <span class="mockup-engine-dot" style="background:#22C55E"></span>
+            <span class="mockup-engine-name">ChatGPT</span>
+            <div class="mockup-bar-track"><div class="mockup-bar-fill" data-width="82" style="background:#22C55E"></div></div>
+            <span class="mockup-engine-score">82/100</span>
+          </div>
+          <div class="mockup-engine">
+            <span class="mockup-engine-dot" style="background:#3B82F6"></span>
+            <span class="mockup-engine-name">Perplexity</span>
+            <div class="mockup-bar-track"><div class="mockup-bar-fill" data-width="74" style="background:#3B82F6"></div></div>
+            <span class="mockup-engine-score">74/100</span>
+          </div>
+          <div class="mockup-engine">
+            <span class="mockup-engine-dot" style="background:#A855F7"></span>
+            <span class="mockup-engine-name">Gemini</span>
+            <div class="mockup-bar-track"><div class="mockup-bar-fill" data-width="58" style="background:#A855F7"></div></div>
+            <span class="mockup-engine-score">58/100</span>
+          </div>
+        </div>
+        <div class="mockup-alert">
+          <div class="mockup-alert-icon">🔔</div>
+          <div>
+            <div class="mockup-alert-text">Nouvelle citation détectée</div>
+            <div class="mockup-alert-sub">Votre page "/guide-seo" a été citée par ChatGPT — il y a 2 heures</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PROBLEM / SOLUTION ══════════ -->
+  <section class="problem-section section">
+    <h2 class="problem-title font-display animate-on-scroll">Le SEO traditionnel ne suffit plus.</h2>
+    <div class="problem-grid">
+      <div class="problem-col before animate-on-scroll slide-left">
+        <div class="problem-col-label">Avant CitedBy.ai</div>
+        <div class="problem-row"><span class="problem-icon">✗</span><span class="problem-text">Invisible sur ChatGPT et Perplexity</span></div>
+        <div class="problem-row"><span class="problem-icon">✗</span><span class="problem-text">Aucune donnée sur les moteurs IA</span></div>
+        <div class="problem-row"><span class="problem-icon">✗</span><span class="problem-text">Corrections à deviner</span></div>
+        <div class="problem-row"><span class="problem-icon">✗</span><span class="problem-text">Aucun suivi de vos citations IA</span></div>
+      </div>
+      <div class="problem-arrow animate-on-scroll">→</div>
+      <div class="problem-col after animate-on-scroll slide-right">
+        <div class="problem-col-label">Avec CitedBy.ai</div>
+        <div class="problem-row"><span class="problem-icon">✓</span><span class="problem-text">Cité dans les réponses IA</span></div>
+        <div class="problem-row"><span class="problem-icon">✓</span><span class="problem-text">Score AEO mesuré par moteur</span></div>
+        <div class="problem-row"><span class="problem-icon">✓</span><span class="problem-text">Code prêt à copier-coller</span></div>
+        <div class="problem-row"><span class="problem-icon">✓</span><span class="problem-text">Monitoring temps réel des citations</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FEATURES ══════════ -->
+  <section class="features-section" id="features">
+    <div class="section-label animate-on-scroll">Fonctionnalités</div>
+    <h2 class="section-title animate-on-scroll delay-1">Comment CitedBy.ai vous rend visible dans l'ère IA</h2>
+    <p class="section-sub animate-on-scroll delay-2">Trois piliers pour passer de l'invisibilité IA à la recommandation systématique.</p>
+    <div class="features-grid">
+      <div class="feature-card animate-on-scroll delay-1">
+        <div class="feature-icon blue">🔍</div>
+        <h3>Analyser</h3>
+        <p>Audit de 50 critères AEO avec score pondéré par moteur IA (ChatGPT, Perplexity, Gemini). Score dynamique avec impact projeté de chaque optimisation.</p>
+      </div>
+      <div class="feature-card animate-on-scroll delay-2">
+        <div class="feature-icon green">🛠️</div>
+        <h3>Corriger</h3>
+        <p>Génération de solutions prêtes à implémenter : FAQ structurées, Schema.org JSON-LD, meta tags, introductions answer-first. Code HTML prêt à copier-coller.</p>
+      </div>
+      <div class="feature-card animate-on-scroll delay-3">
+        <div class="feature-icon purple">📊</div>
+        <h3>Mesurer</h3>
+        <p>Vérification de vos citations dans ChatGPT, Perplexity et Gemini. Taux de citation, position dans les réponses, benchmark concurrentiel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ METRICS ══════════ -->
+  <section class="metrics-section section">
+    <div class="metrics-grid">
+      <div class="metric-card animate-on-scroll">
+        <div class="metric-value"><span data-counter="50">0</span></div>
+        <div class="metric-label">Critères AEO analysés</div>
+      </div>
+      <div class="metric-card animate-on-scroll delay-1">
+        <div class="metric-value"><span data-counter="3">0</span></div>
+        <div class="metric-label">Moteurs IA supportés</div>
+      </div>
+      <div class="metric-card animate-on-scroll delay-2">
+        <div class="metric-value"><span data-counter="30">0</span><span style="color:var(--text-faint)">s</span></div>
+        <div class="metric-label">Pour un audit complet</div>
+      </div>
+      <div class="metric-card animate-on-scroll delay-3">
+        <div class="metric-value">+<span data-counter="35">0</span><span style="color:var(--text-faint)">%</span></div>
+        <div class="metric-label">Citations en moyenne</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ HOW IT WORKS ══════════ -->
+  <section class="steps-section section" id="how">
+    <div class="section-label animate-on-scroll">Comment ça marche</div>
+    <h2 class="section-title animate-on-scroll delay-1">Vos premières citations en 3 étapes</h2>
+    <div class="steps-grid">
+      <div class="steps-line"></div>
+      <div class="step animate-on-scroll delay-1">
+        <div class="step-num">1</div>
+        <h3>Entrez votre URL</h3>
+        <p>CitedBy analyse votre contenu en 30 secondes et note chaque critère par moteur IA.</p>
+      </div>
+      <div class="step animate-on-scroll delay-2">
+        <div class="step-num">2</div>
+        <h3>Implémentez les corrections</h3>
+        <p>Chaque solution est livrée avec du code prêt à copier-coller : FAQ, Schema.org, meta tags…</p>
+      </div>
+      <div class="step animate-on-scroll delay-3">
+        <div class="step-num">3</div>
+        <h3>Mesurez l'impact</h3>
+        <p>Le monitoring vérifie si ChatGPT, Perplexity et Gemini vous citent. Suivez votre progression.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ ENGINE SCORING ══════════ -->
+  <section class="scoring-section">
+    <div class="section-label animate-on-scroll">Scoring par moteur</div>
+    <h2 class="section-title animate-on-scroll delay-1">Un score dédié à chaque moteur IA</h2>
+    <p class="section-sub animate-on-scroll delay-2">Chaque IA a ses propres critères de sélection. CitedBy.ai les mesure séparément.</p>
+    <div class="scoring-card animate-on-scroll delay-3" id="scoring-card">
+      <div class="scoring-engine">
+        <span class="scoring-dot" style="background:#22C55E"></span>
+        <span class="scoring-name">ChatGPT</span>
+        <div class="scoring-track"><div class="scoring-fill" data-score="82" style="background:#22C55E"></div></div>
+        <span class="scoring-val">82/100</span>
+      </div>
+      <div style="padding-left:126px;padding-bottom:12px"><span style="font-size:13px;color:var(--text-faint)">Priorité : FAQ structurées, introductions answer-first</span></div>
+      <div class="scoring-engine">
+        <span class="scoring-dot" style="background:#3B82F6"></span>
+        <span class="scoring-name">Perplexity</span>
+        <div class="scoring-track"><div class="scoring-fill" data-score="74" style="background:#3B82F6"></div></div>
+        <span class="scoring-val">74/100</span>
+      </div>
+      <div style="padding-left:126px;padding-bottom:12px"><span style="font-size:13px;color:var(--text-faint)">Priorité : sources citées, fraîcheur du contenu</span></div>
+      <div class="scoring-engine">
+        <span class="scoring-dot" style="background:#A855F7"></span>
+        <span class="scoring-name">Gemini</span>
+        <div class="scoring-track"><div class="scoring-fill" data-score="58" style="background:#A855F7"></div></div>
+        <span class="scoring-val">58/100</span>
+      </div>
+      <div style="padding-left:126px"><span style="font-size:13px;color:var(--text-faint)">Priorité : Schema.org, données structurées</span></div>
+    </div>
+  </section>
+
+  <!-- ══════════ PRICING ══════════ -->
+  <section class="pricing-section section" id="pricing">
+    <div class="section-label animate-on-scroll">Tarifs</div>
+    <h2 class="section-title animate-on-scroll delay-1">Choisissez votre plan</h2>
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="pricing-card animate-on-scroll delay-1">
+        <div class="pricing-name">Starter</div>
+        <div class="pricing-price">
+          <span class="pricing-amount">29<span class="pricing-currency">€</span></span>
+          <span class="pricing-period">/mois</span>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 50 crédits</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 5 audits / mois</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 1 projet</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 3 moteurs IA</div>
+        </div>
+        <a href="#" class="pricing-cta secondary">Commencer</a>
+      </div>
+      <!-- Pro -->
+      <div class="pricing-card highlighted animate-on-scroll delay-2">
+        <span class="pricing-popular">Populaire</span>
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-price">
+          <span class="pricing-amount">79<span class="pricing-currency">€</span></span>
+          <span class="pricing-period">/mois</span>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 200 crédits</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Audits illimités</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 5 projets</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 3 moteurs IA</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Citations V3</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Benchmark concurrentiel</div>
+        </div>
+        <a href="#" class="pricing-cta primary">Essai 14 jours →</a>
+      </div>
+      <!-- Agence -->
+      <div class="pricing-card animate-on-scroll delay-3">
+        <div class="pricing-name">Agence</div>
+        <div class="pricing-price">
+          <span class="pricing-amount">199<span class="pricing-currency">€</span></span>
+          <span class="pricing-period">/mois</span>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 1 000 crédits</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Audits illimités</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Projets illimités</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> 3 moteurs IA</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Citations V3</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Benchmark</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> API access</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> White label</div>
+          <div class="pricing-feature"><span class="pricing-check">✓</span> Support prioritaire</div>
+        </div>
+        <a href="#" class="pricing-cta secondary">Contacter</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FAQ ══════════ -->
+  <section class="faq-section section" id="faq">
+    <div class="section-label animate-on-scroll">FAQ</div>
+    <h2 class="section-title animate-on-scroll delay-1">Questions fréquentes</h2>
+    <div class="faq-list">
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Qu'est-ce que l'AEO exactement ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">L'Answer Engine Optimization est l'optimisation de votre contenu web pour être cité dans les réponses des moteurs IA comme ChatGPT, Perplexity et Gemini. Contrairement au SEO classique qui vise les résultats de recherche Google, l'AEO vise à faire de votre site une source de référence que les IA recommandent directement à leurs utilisateurs.</div></div>
+      </div>
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Comment CitedBy.ai vérifie les citations ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Notre système interroge directement les APIs de ChatGPT, Perplexity et Gemini avec des requêtes pertinentes pour votre domaine. Il analyse les réponses pour détecter si votre marque, votre URL ou vos contenus sont mentionnés, cités ou recommandés. Le taux de citation est calculé sur plusieurs requêtes pour garantir la fiabilité statistique.</div></div>
+      </div>
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Combien de temps pour voir des résultats ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">L'audit est instantané (30 secondes). Les effets des optimisations AEO sur vos citations réelles dépendent de la fréquence de mise à jour des modèles IA, mais nos utilisateurs constatent en moyenne une amélioration du taux de citation de 20 à 40% en 4 à 8 semaines après implémentation des corrections.</div></div>
+      </div>
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Quels moteurs IA sont supportés ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">ChatGPT (OpenAI), Perplexity et Gemini (Google). Chaque moteur a ses propres critères de sélection des sources, c'est pourquoi CitedBy.ai calcule un score pondéré spécifique à chaque moteur.</div></div>
+      </div>
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Puis-je utiliser CitedBy.ai si je ne code pas ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Oui. Chaque solution générée est livrée avec du code prêt à copier-coller (HTML, JSON-LD) et des instructions d'implémentation pas à pas. Pour les CMS comme WordPress, Shopify ou Webflow, les instructions sont adaptées à votre plateforme.</div></div>
+      </div>
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Y a-t-il un essai gratuit ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Oui, le premier audit est gratuit. Vous pouvez analyser une URL sans créer de compte et voir votre score AEO, le détail des 50 critères et les scores par moteur. Les solutions détaillées et le monitoring de citations sont disponibles avec un abonnement.</div></div>
+      </div>
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Comment fonctionne le système de crédits ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Chaque action consomme des crédits : un audit (1 crédit), une vérification de citation (2 crédits), la génération d'une solution (1 crédit). Votre plan mensuel inclut un volume de crédits, et vous pouvez en acheter davantage à la demande.</div></div>
+      </div>
+
+      <div class="faq-item animate-on-scroll">
+        <button class="faq-question" aria-expanded="false">
+          Quelle différence avec Semrush ou Ahrefs ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Semrush et Ahrefs analysent votre visibilité sur les moteurs de recherche traditionnels (Google, Bing). CitedBy.ai analyse votre visibilité sur les moteurs IA (ChatGPT, Perplexity, Gemini). Les deux sont complémentaires : le SEO pour le trafic de recherche, l'AEO pour les citations IA.</div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════ CTA FINAL ══════════ -->
+  <section class="final-cta-section section" id="cta-final">
+    <div class="final-cta-bg" aria-hidden="true"></div>
+    <div class="final-cta-content">
+      <h2 class="final-cta-title font-display animate-on-scroll">Vos concurrents optimisent déjà pour l'IA.</h2>
+      <p class="final-cta-sub animate-on-scroll delay-1">Le premier audit est gratuit.<br>Découvrez votre score AEO en 30 secondes.</p>
+      <div style="margin-top:32px" class="animate-on-scroll delay-2">
+        <a href="#" class="btn-primary">Analyser mon site gratuitement</a>
+      </div>
+      <p class="final-cta-note animate-on-scroll delay-3">Pas de carte bancaire requise.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="font-size:15px">
+          <span class="nav-logo-icon" style="width:24px;height:24px;font-size:11px">C</span>
+          CitedBy.ai
+        </a>
+        <p>La plateforme d'Answer Engine Optimization pour être cité par les moteurs IA.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Produit</div>
+        <a href="#features" class="footer-link">Fonctionnalités</a>
+        <a href="#pricing" class="footer-link">Tarifs</a>
+        <a href="#" class="footer-link">Changelog</a>
+        <a href="#" class="footer-link">API</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Ressources</div>
+        <a href="#" class="footer-link">Blog</a>
+        <a href="#" class="footer-link">Guide AEO</a>
+        <a href="#" class="footer-link">Documentation</a>
+        <a href="#faq" class="footer-link">FAQ</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Légal</div>
+        <a href="#" class="footer-link">Mentions légales</a>
+        <a href="#" class="footer-link">Confidentialité</a>
+        <a href="#" class="footer-link">CGV</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 CitedBy.ai — Une solution AOE. Tous droits réservés.</div>
+  </footer>
+
+  <!-- ══════════ JS ══════════ -->
+  <script>
+    /* ── Nav scroll ── */
+    const nav = document.getElementById('nav');
+    const heroEl = document.getElementById('hero');
+    const navObserver = new IntersectionObserver(
+      ([e]) => nav.classList.toggle('scrolled', !e.isIntersecting),
+      { threshold: 0.1 }
+    );
+    navObserver.observe(heroEl);
+
+    /* ── Mobile menu ── */
+    const toggle = document.getElementById('nav-toggle');
+    const menu = document.getElementById('nav-menu');
+    toggle.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      toggle.textContent = open ? 'Fermer' : 'Menu';
+    });
+    menu.querySelectorAll('a').forEach(a =>
+      a.addEventListener('click', () => { menu.classList.remove('open'); toggle.textContent = 'Menu'; })
+    );
+
+    /* ── Scroll animations ── */
+    const scrollEls = document.querySelectorAll('.animate-on-scroll');
+    const scrollObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            scrollObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+    scrollEls.forEach(el => scrollObserver.observe(el));
+
+    /* ── Counter animation ── */
+    function animateCounter(el, target, duration) {
+      const start = performance.now();
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 4);
+        el.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+    const counters = document.querySelectorAll('[data-counter]');
+    const counterObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCounter(entry.target, parseInt(entry.target.dataset.counter), 1500);
+            counterObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    counters.forEach(c => counterObserver.observe(c));
+
+    /* ── Bar fill animations ── */
+    function observeBars(selector) {
+      const bars = document.querySelectorAll(selector);
+      const barObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const w = entry.target.dataset.width || entry.target.dataset.score;
+              entry.target.style.width = w + '%';
+              barObs.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      bars.forEach(b => barObs.observe(b));
+    }
+    observeBars('.mockup-bar-fill');
+    observeBars('.scoring-fill');
+
+    /* ── FAQ accordion ── */
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const isOpen = item.classList.contains('open');
+
+        // Close all
+        document.querySelectorAll('.faq-item.open').forEach(openItem => {
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-answer').style.maxHeight = '0';
+          openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+
+        // Open clicked (if was closed)
+        if (!isOpen) {
+          item.classList.add('open');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

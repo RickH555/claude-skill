@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Phase 1: Restaurer architecture SPA Vite",
+  "description": "Renommer _legacy_pages en pages, restaurer Vite, corriger package.json scripts, vérifier vite.config.ts et index.html",
+  "activeForm": "Restaurant l'architecture SPA Vite",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

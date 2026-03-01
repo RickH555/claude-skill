@@ -1,0 +1,61 @@
+'use client';
+import { Play } from 'lucide-react';
+import { useState } from 'react';
+
+export default function ProjectOverviewPage({ params }: { params: { id: string } }) {
+  const [isRunning, setIsRunning] = useState(false);
+
+  const handleRunAnalysis = async () => {
+    setIsRunning(true);
+    try {
+      await fetch('/api/runs/start', { 
+        method: 'POST',
+        body: JSON.stringify({ projectId: params.id })
+      });
+      // In a real app, you'd poll for status or use websockets
+      alert("Analyse lancée !"); // TODO: Replace with sonner toast
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-serif font-bold text-white">Vue d'ensemble</h2>
+        <button 
+          onClick={handleRunAnalysis}
+          disabled={isRunning}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50"
+        >
+          <Play size={16} /> {isRunning ? 'Analyse en cours...' : 'Lancer un Scan'}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="glass-panel p-6 rounded-xl border border-white/10">
+           <p className="text-xs text-gray-400 uppercase">Score AEO</p>
+           <p className="text-3xl font-bold text-white mt-2">65<span className="text-sm text-gray-500">/100</span></p>
+        </div>
+        <div className="glass-panel p-6 rounded-xl border border-white/10">
+           <p className="text-xs text-gray-400 uppercase">Mentions Marque</p>
+           <p className="text-3xl font-bold text-white mt-2">12</p>
+        </div>
+        <div className="glass-panel p-6 rounded-xl border border-white/10">
+           <p className="text-xs text-gray-400 uppercase">Citations URL</p>
+           <p className="text-3xl font-bold text-white mt-2">5</p>
+        </div>
+        <div className="glass-panel p-6 rounded-xl border border-white/10">
+           <p className="text-xs text-gray-400 uppercase">Recommandations</p>
+           <p className="text-3xl font-bold text-accent mt-2">8</p>
+        </div>
+      </div>
+
+      <div className="glass-panel p-6 rounded-xl border border-white/10 min-h-[400px] flex items-center justify-center text-gray-500">
+        [Graphique d'évolution Visibilité sur 30 jours]
+      </div>
+    </div>
+  );
+}

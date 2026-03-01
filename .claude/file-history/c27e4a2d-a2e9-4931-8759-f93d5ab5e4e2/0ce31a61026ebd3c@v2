@@ -1,0 +1,40 @@
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+
+interface LoyaltyCardProps {
+  programName: string;
+  merchantName?: string;
+  type: 'stamp' | 'points';
+  balance: number;
+  target: number;
+  tier: string;
+}
+
+export default function LoyaltyCard({ programName, merchantName, type, balance, target, tier }: LoyaltyCardProps) {
+  const progress = Math.min(100, (balance / target) * 100);
+  const tierVariant = tier === 'vip' ? 'accent' : tier === 'gold' ? 'warning' : tier === 'silver' ? 'blue' : 'default';
+
+  return (
+    <Card hover className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">{programName}</h3>
+          {merchantName && (
+            <p className="text-[11px] text-[var(--text-tertiary)]">{merchantName}</p>
+          )}
+        </div>
+        <Badge variant={tierVariant}>{tier.toUpperCase()}</Badge>
+      </div>
+
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-[13px]">
+          <span className="text-[var(--text-secondary)]">{balance} / {target} {type === 'stamp' ? 'tampons' : 'points'}</span>
+          <span className="font-medium text-[var(--accent)]">{Math.round(progress)}%</span>
+        </div>
+        <div className="h-2 w-full rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+          <div className="h-full bg-[var(--accent)] rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+    </Card>
+  );
+}

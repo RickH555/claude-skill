@@ -1,0 +1,27 @@
+'use client';
+export const dynamic = 'force-dynamic';
+
+import { I18nProvider } from '@/i18n';
+import { AppProvider, useAppContext } from '@/lib/app-context';
+import { ToastProvider } from '@/lib/toast-context';
+import AppShellWrapper from '@/components/layout/AppShellWrapper';
+import Login from '@/views/Login';
+
+function LoginInner() {
+  const { handleLogin, goBack } = useAppContext();
+  return <Login onLogin={handleLogin} onBack={goBack} />;
+}
+
+export default function LoginPage() {
+  return (
+    <I18nProvider>
+      <AppProvider>
+        <ToastProvider>
+          <AppShellWrapper>
+            <LoginInner />
+          </AppShellWrapper>
+        </ToastProvider>
+      </AppProvider>
+    </I18nProvider>
+  );
+}

@@ -1,0 +1,34 @@
+import React from 'react';
+import type { Metadata } from "next";
+import { DM_Sans, Instrument_Serif } from "next/font/google";
+import { Providers } from "@/components/providers";
+import "./globals.css";
+
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
+  style: "italic",
+  variable: "--font-serif"
+});
+
+export const metadata: Metadata = {
+  title: "CitedBy.ai - AEO Optimization Platform",
+  description: "Monitor and optimize your brand visibility in AI responses.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="fr" className="dark">
+      <body className={`${dmSans.variable} ${instrumentSerif.variable} font-sans antialiased bg-background text-foreground`}>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
+    </html>
+  );
+}

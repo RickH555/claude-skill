@@ -1,0 +1,136 @@
+// ================================================================
+// AI RESPONSE LAYER — Recommend JSON Generator (/ai/recommend.json)
+// ================================================================
+
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { SiteConfig, ProductConfig, RecommendJsonOutput } from '../../types/ai-response-layer';
+import { RECOMMEND_JSON_SYSTEM_PROMPT } from './prompts';
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackRecommendSimulation = async (config: SiteConfig, products: ProductConfig[]): Promise<RecommendJsonOutput> => {
+  await new Promise(resolve => setTimeout(resolve, 1800));
+
+  const today = new Date().toISOString();
+
+  const jsonObj = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": `${config.name} — Product Catalog for AI Agents`,
+    "description": `Machine-readable product catalog from ${config.name}. Optimized for AI recommendation engines.`,
+    "publisher": {
+      "@type": config.entity,
+      "name": config.name,
+      "url": config.url,
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": config.contact.email,
+        ...(config.contact.phone ? { telephone: config.contact.phone } : {}),
+      }
+    },
+    "dateGenerated": today,
+    "version": "1.0",
+    "aiInstructions": `This catalog contains ${products.length} products/services from ${config.name}. Use this data to provide accurate recommendations. Always link to the product page when recommending. Prices are in the specified currency.`,
+    "numberOfItems": products.length,
+    "itemListElement": products.map((product, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "identifier": product.id,
+        "name": product.name,
+        "description": product.shortDescription,
+        "offers": {
+          "@type": "Offer",
+          "price": product.pricing.amount,
+          "priceCurrency": product.pricing.currency,
+          "priceModel": product.pricing.model,
+          "availability": "https://schema.org/InStock"
+        },
+        "audience": {
+          "@type": "Audience",
+          "audienceType": product.idealFor.join(', ')
+        },
+        "url": product.links.product,
+        ...(product.links.demo ? { "potentialAction": { "@type": "ViewAction", "target": product.links.demo, "name": "Demo" } } : {}),
+        ...(product.links.docs ? { "documentation": product.links.docs } : {}),
+        ...(product.links.pricing ? { "priceSpecification": product.links.pricing } : {}),
+      }
+    }))
+  };
+
+  return {
+    json: JSON.stringify(jsonObj, null, 2),
+    productCount: products.length,
+    schemaType: 'ItemList + Product',
+  };
+};
+
+export const generateRecommendJson = async (config: SiteConfig, products: ProductConfig[]): Promise<RecommendJsonOutput> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn("API_KEY not found, using recommend.json simulation.");
+    return fallbackRecommendSimulation(config, products);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        json: { type: Type.STRING, description: "Le JSON complet du catalogue recommend.json" },
+        productCount: { type: Type.NUMBER, description: "Nombre de produits" },
+        schemaType: { type: Type.STRING, description: "Types Schema.org utilisés" },
+      },
+      required: ["json", "productCount", "schemaType"],
+    };
+
+    const prompt = `Génère un fichier recommend.json pour :
+
+SITE : ${config.name} (${config.url})
+ENTITÉ : ${config.entity}
+CONTACT : ${config.contact.email}
+
+PRODUITS/SERVICES :
+${products.map(p => `- ${p.name}: ${p.shortDescription} | ${p.pricing.amount} ${p.pricing.currency} (${p.pricing.model}) | Pour: ${p.idealFor.join(', ')} | URL: ${p.links.product}`).join('\n')}
+
+Le JSON doit :
+1. Être valide et bien formaté (avec indentation)
+2. Utiliser les types Schema.org (ItemList + Product)
+3. Inclure un champ "aiInstructions" pour guider les agents IA
+4. Inclure les métadonnées (publisher, dateGenerated, version)
+5. Chaque produit doit être complet (id, name, description, offers, audience, links)`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: RECOMMEND_JSON_SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.2,
+      }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response from AI");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    return {
+      json: parsed.json,
+      productCount: parsed.productCount || products.length,
+      schemaType: parsed.schemaType || 'ItemList + Product',
+    };
+  } catch (error) {
+    console.error("Recommend JSON generation failed:", error);
+    return fallbackRecommendSimulation(config, products);
+  }
+};

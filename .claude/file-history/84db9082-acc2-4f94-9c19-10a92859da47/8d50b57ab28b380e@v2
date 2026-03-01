@@ -1,0 +1,89 @@
+import { chromium } from 'playwright';
+
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const BROKEN = ['/about','/blog','/changelog','/contact','/docs','/features','/help','/privacy','/support','/terms'];
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+
+  // Login
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+
+  const allPages = [
+    '/', '/pricing', '/login', '/signup', '/forgot-password',
+    '/dashboard', '/dashboard/documents', '/dashboard/documents/upload',
+    '/dashboard/surveys', '/dashboard/surveys/create',
+    '/dashboard/templates', '/dashboard/templates/new',
+    '/dashboard/settings', '/dashboard/settings/team',
+    '/dashboard/settings/billing', '/dashboard/settings/api-keys',
+  ];
+
+  console.log('Scanning ALL links (visible and hidden) on every page...\n');
+
+  const issues = [];
+
+  for (const pg of allPages) {
+    await page.goto(`${APP}${pg}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => null);
+    await page.waitForTimeout(800);
+
+    // Scroll to bottom to trigger lazy content
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(500);
+
+    const allAnchors = await page.evaluate((brokenList) => {
+      const results = [];
+      document.querySelectorAll('a[href]').forEach(a => {
+        const href = a.getAttribute('href') || '';
+        const cleanHref = href.split('?')[0].split('#')[0];
+        if (brokenList.includes(cleanHref) || brokenList.includes(href)) {
+          results.push({
+            href: href,
+            text: a.textContent?.trim().substring(0, 50),
+            visible: a.offsetParent !== null,
+            inFooter: !!a.closest('footer'),
+            inNav: !!a.closest('nav, header'),
+            inSidebar: !!a.closest('aside, [class*="sidebar"], [class*="Sidebar"]'),
+          });
+        }
+      });
+      return results;
+    }, BROKEN);
+
+    if (allAnchors.length > 0) {
+      console.log(`Page: ${pg}`);
+      allAnchors.forEach(a => {
+        const location = a.inNav ? '[NAVBAR]' : a.inFooter ? '[FOOTER]' : a.inSidebar ? '[SIDEBAR]' : '[CONTENT]';
+        const vis = a.visible ? 'visible' : 'hidden';
+        console.log(`  ${location} "${a.text}" -> ${a.href} (${vis})`);
+        issues.push({ page: pg, text: a.text, href: a.href, location, visible: a.visible });
+      });
+      console.log('');
+    }
+  }
+
+  console.log('\n========================================');
+  console.log(`TOTAL: ${issues.length} links pointing to 404 pages`);
+  console.log('========================================\n');
+
+  // Group by target
+  const byTarget = {};
+  issues.forEach(i => {
+    const key = i.href;
+    if (!byTarget[key]) byTarget[key] = [];
+    byTarget[key].push(i);
+  });
+
+  Object.entries(byTarget).forEach(([target, links]) => {
+    console.log(`${target} (${links.length} links):`);
+    links.forEach(l => console.log(`  from ${l.page} "${l.text}" ${l.location} ${l.visible ? '' : '(hidden)'}`));
+    console.log('');
+  });
+
+  await browser.close();
+})();

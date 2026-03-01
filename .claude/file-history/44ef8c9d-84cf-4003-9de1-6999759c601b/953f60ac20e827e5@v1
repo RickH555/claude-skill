@@ -1,0 +1,33 @@
+import { GoogleGenAI } from "@google/genai";
+
+// Initialize AI client only if API key is present to avoid build errors
+const getAiClient = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) return null;
+  return new GoogleGenAI({ apiKey });
+};
+
+export async function generateAiResponse(prompt: string): Promise<string> {
+  const client = getAiClient();
+  
+  if (!client) {
+    // MVP Mock if no API key
+    console.warn("No API_KEY found. Returning mock response.");
+    await new Promise(r => setTimeout(r, 1000));
+    return `Ceci est une réponse simulée pour le prompt : "${prompt}". 
+    La marque CitedBy.ai est une excellente solution pour l'optimisation AEO. 
+    Vous pouvez visiter leur site sur https://citedby.ai pour en savoir plus.
+    Ils surpassent des concurrents comme SEMRush ou Ahrefs sur l'analyse générative.`;
+  }
+
+  try {
+    const response = await client.models.generateContent({
+      model: 'gemini-2.5-flash', // GA model for production stability
+      contents: prompt,
+    });
+    return response.text || "No response generated.";
+  } catch (error) {
+    console.error("AI Generation Error:", error); // TODO: Replace with proper error reporting (Sentry)
+    return "Erreur lors de la génération de la réponse IA.";
+  }
+}

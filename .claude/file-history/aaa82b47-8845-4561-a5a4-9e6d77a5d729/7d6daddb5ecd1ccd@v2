@@ -1,0 +1,714 @@
+import React, { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import { User, AnalysisResult, SMCContent, GeneratedSolution, MegaGenerationStatus } from './types';
+import { analyzeUrl } from './services/analyzer';
+import { db } from './services/database';
+import { megaGenerate } from './services/mega-generator';
+import Home from './pages/Home';
+
+// Lazy-loaded pages for bundle optimization
+const Login = lazy(() => import('./pages/Login'));
+const Analyze = lazy(() => import('./pages/Analyze'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const GenerativeTools = lazy(() => import('./pages/GenerativeTools'));
+const Results = lazy(() => import('./pages/Results').then(m => ({ default: m.Results })));
+const HistoryView = lazy(() => import('./pages/History'));
+const SMCStudio = lazy(() => import('./pages/SMCStudio'));
+const SourceOfTruth = lazy(() => import('./pages/SourceOfTruth'));
+const SchemaOrg = lazy(() => import('./pages/SchemaOrg'));
+const PublisherRequest = lazy(() => import('./pages/PublisherRequest'));
+const RobotsTxt = lazy(() => import('./pages/RobotsTxt'));
+const Directory = lazy(() => import('./pages/Directory'));
+const DirectoryEntity = lazy(() => import('./pages/DirectoryEntity'));
+const Recharge = lazy(() => import('./pages/Recharge'));
+const Projects = lazy(() => import('./pages/Projects'));
+const Account = lazy(() => import('./pages/Account'));
+const Clients = lazy(() => import('./pages/Clients'));
+const Affiliation = lazy(() => import('./pages/Affiliation'));
+const ContentWriter = lazy(() => import('./pages/ContentWriter'));
+const Reputation = lazy(() => import('./pages/Reputation'));
+const BotTracking = lazy(() => import('./pages/BotTracking'));
+const Messages = lazy(() => import('./pages/Messages'));
+const AlertsAEO = lazy(() => import('./pages/AlertsAEO'));
+const MissionOrders = lazy(() => import('./pages/MissionOrders'));
+const BlogOptimizer = lazy(() => import('./pages/BlogOptimizer'));
+const AiResponseLayer = lazy(() => import('./pages/AiResponseLayer'));
+const LlmsTxtGenerator = lazy(() => import('./pages/LlmsTxtGenerator'));
+const AnswerFirstAudit = lazy(() => import('./pages/AnswerFirstAudit'));
+const AiCitationSimulator = lazy(() => import('./pages/AiCitationSimulator'));
+const EeatBuilder = lazy(() => import('./pages/EeatBuilder'));
+const AiMonitoring = lazy(() => import('./pages/AiMonitoring'));
+const MultilingualCitations = lazy(() => import('./pages/MultilingualCitations'));
+const Integrations = lazy(() => import('./pages/Integrations'));
+const ApiDeveloper = lazy(() => import('./pages/ApiDeveloper'));
+const Plan = lazy(() => import('./pages/Plan'));
+const AnalyticsIntegrations = lazy(() => import('./pages/AnalyticsIntegrations'));
+import {
+  Plus, AlertTriangle, X
+} from 'lucide-react';
+// Layout components
+import AppShell from './components/layout/AppShell';
+
+// Extracted components
+import { Toast, ToastContext, ToastContainer } from './components/ToastSystem';
+export { useToast } from './components/ToastSystem';
+import CommandPalettePanel from './components/CommandPalette';
+import ShortcutsModal from './components/ShortcutsModal';
+import OnboardingModal from './components/OnboardingModal';
+
+// Animated number hook for smooth credit transitions
+const useAnimatedNumber = (value: number, duration = 600) => {
+  const [display, setDisplay] = useState(value);
+  const prevValue = useRef(value);
+  useEffect(() => {
+    if (prevValue.current === value) return;
+    const start = prevValue.current;
+    const diff = value - start;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(start + diff * eased));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+    prevValue.current = value;
+  }, [value, duration]);
+  return display;
+};
+
+const PLAN_LIMITS = {
+  free: 1,
+  pro: 3,
+  enterprise: 1000 // Illimité en pratique
+};
+
+// ═══ Navigation 2 niveaux ═══
+
+// Section → premier sous-item (navigation auto lors du changement de section)
+const FIRST_PAGE_PER_SECTION: Record<string, string> = {
+  'dashboard':   'dashboard',
+  'analyse':     'new-analysis',
+  'citations':   'ai-monitoring',
+  'outils':      'smc-studio',
+  'technique':   'schema-org',
+  'marketplace': 'publisher-search',
+  'compte':      'account',
+};
+
+// Page → section à laquelle elle appartient (reverse mapping)
+const PAGE_TO_SECTION: Record<string, string> = {
+  // Dashboard
+  'dashboard': 'dashboard',
+  // Analyse
+  'new-analysis': 'analyse', 'analyze': 'analyse', 'results': 'analyse',
+  'audit-aeo': 'analyse', 'action-plan': 'analyse', 'rescan': 'analyse',
+  'history': 'analyse',
+  // Citations
+  'ai-monitoring': 'citations', 'citation-dashboard': 'citations',
+  'ai-citation-simulator': 'citations', 'ai-response-layer': 'citations',
+  'bot-tracking': 'citations', 'alerts-aeo': 'citations', 'alerts': 'citations', 'multilingual': 'citations',
+  // Outils
+  'smc-studio': 'outils', 'blog-optimizer': 'outils', 'content-writer': 'outils',
+  'answer-first': 'outils', 'answer-first-audit': 'outils',
+  'eeat-builder': 'outils', 'reputation': 'outils', 'generative-tools': 'outils',
+  // Technique
+  'schema-org': 'technique', 'robots-txt': 'technique',
+  'source-of-truth': 'technique', 'llms-txt': 'technique',
+  // Marketplace
+  'publisher-search': 'marketplace', 'publisher-request': 'marketplace',
+  'directory': 'marketplace', 'directory-entity': 'marketplace',
+  'clients': 'marketplace', 'messages': 'marketplace', 'mission-orders': 'marketplace',
+  // Compte
+  'account': 'compte', 'profile': 'compte', 'subscription': 'compte',
+  'plan': 'compte', 'credits': 'compte', 'recharge': 'compte',
+  'projects': 'compte', 'api-keys': 'compte', 'api-developer': 'compte',
+  'affiliation': 'compte', 'integrations': 'compte', 'invoices': 'compte',
+};
+
+const App: React.FC = () => {
+  return <AppContent />;
+};
+
+const AppContent: React.FC = () => {
+  // ── Toast system ──
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const showToast = useCallback((type: Toast['type'], message: string) => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, type, message }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500);
+  }, []);
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  // ── 2-level routing ──
+  const [currentView, setCurrentView] = useState<string>('home');
+  const [activeSection, setActiveSection] = useState<string>('dashboard');
+  const [viewHistory, setViewHistory] = useState<string[]>([]);
+
+  const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+  const [history, setHistory] = useState<AnalysisResult[]>([]);
+
+  // Load history from DB on mount
+  useEffect(() => {
+    const loadedHistory = db.getAll();
+    setHistory(loadedHistory);
+  }, []);
+
+  // Bibliothèques de contenu généré
+  const [smcLibrary, setSmcLibrary] = useState<SMCContent[]>([]);
+  const [truthLibrary, setTruthLibrary] = useState<SMCContent[]>([]);
+  const [schemaLibrary, setSchemaLibrary] = useState<SMCContent[]>([]);
+  const [robotsLibrary, setRobotsLibrary] = useState<SMCContent[]>([]);
+
+  const [megaStatus, setMegaStatus] = useState<MegaGenerationStatus>('idle');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [resultsTab, setResultsTab] = useState<'overview' | 'details' | 'archives' | 'recommendations'>('overview');
+  const [publisherRequestData, setPublisherRequestData] = useState<{ topic: string, url: string, brief: string } | null>(null);
+  const [initialRechargePackId, setInitialRechargePackId] = useState<number | null>(null);
+  const [initialAccountTab, setInitialAccountTab] = useState<'profile' | 'subscription' | 'billing'>('profile');
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Command Palette (Ctrl+K) & Keyboard Shortcuts (?)
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [lowCreditsDismissed, setLowCreditsDismissed] = useState(false);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setIsCommandPaletteOpen(false);
+        setIsShortcutsOpen(false);
+      }
+      if (e.key === '?' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        setIsShortcutsOpen(prev => !prev);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // ── Welcome Onboarding Modal ──
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Default user is NULL to allow testing the login flow
+  const [user, setUser] = useState<User | null>(null);
+  const animatedCredits = useAnimatedNumber(user?.credits ?? 0);
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  // Show onboarding modal on first login
+  useEffect(() => {
+    if (user && !localStorage.getItem('citedby_onboarded')) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
+
+  // Calcul du nombre de projets consommé sur le mois en cours (Renouvellement mensuel)
+  const monthlyProjectCount = useMemo(() => {
+    if (history.length === 0) return 0;
+
+    const now = new Date();
+    const billingCycleStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const projectCreationDates = new Map<string, Date>();
+
+    history.forEach(h => {
+        let hostname;
+        try { hostname = new URL(h.url).hostname; } catch(e) { hostname = h.url; }
+
+        const analysisDate = new Date(h.timestamp);
+
+        if (!projectCreationDates.has(hostname)) {
+            projectCreationDates.set(hostname, analysisDate);
+        } else {
+            if (analysisDate < projectCreationDates.get(hostname)!) {
+                projectCreationDates.set(hostname, analysisDate);
+            }
+        }
+    });
+
+    let count = 0;
+    projectCreationDates.forEach((creationDate) => {
+        if (creationDate >= billingCycleStart) {
+            count++;
+        }
+    });
+
+    return count;
+  }, [history]);
+
+  // Vérifier si le plan d'action est complet
+  const actionPlanStatus = useMemo(() => {
+    if (history.length === 0) return { complete: false, completed: 0, total: 0 };
+    const latest = history[history.length - 1];
+    const total = latest.recommendations.length;
+    const completed = latest.recommendations.filter(rec =>
+      latest.generatedSolutions?.[rec.id]
+    ).length;
+    return { complete: total > 0 && completed === total, completed, total };
+  }, [history]);
+
+  // ── Navigation (stable callbacks — no re-render cascade) ──
+  const navigateTo = useCallback((view: string) => {
+    setIsMobileMenuOpen(false);
+    if (view !== 'recharge') setInitialRechargePackId(null);
+    if (view !== 'account') setInitialAccountTab('profile');
+    setCurrentView(prev => {
+      setViewHistory(h => [...h, prev]);
+      return view;
+    });
+    const section = PAGE_TO_SECTION[view];
+    if (section) setActiveSection(section);
+  }, []);
+
+  const handleSectionChange = useCallback((section: string) => {
+    const firstPage = FIRST_PAGE_PER_SECTION[section] || section;
+    navigateTo(firstPage);
+  }, [navigateTo]);
+
+  const handlePageChange = useCallback((page: string) => {
+    navigateTo(page);
+  }, [navigateTo]);
+
+  const goBack = useCallback(() => {
+    setIsMobileMenuOpen(false);
+    setViewHistory(prev => {
+      if (prev.length > 0) {
+        const newHistory = [...prev];
+        const prevView = newHistory.pop();
+        if (prevView) setCurrentView(prevView);
+        return newHistory;
+      }
+      setCurrentView('home');
+      return [];
+    });
+  }, []);
+
+  const handleDirectRecharge = useCallback((packId: number) => {
+    setInitialRechargePackId(packId);
+    navigateTo('recharge');
+  }, [navigateTo]);
+
+  const handleAnalyze = async (url: string) => {
+    if (user) {
+        const limit = PLAN_LIMITS[user.plan] || 1;
+        let hostname = url;
+        try { hostname = new URL(url).hostname; } catch(e) {}
+
+        const isExistingProject = history.some(h => {
+            try { return new URL(h.url).hostname === hostname; }
+            catch(e) { return false; }
+        });
+
+        if (!isExistingProject && monthlyProjectCount >= limit) {
+            alert(`Limite de nouveaux projets atteinte pour ce mois (${monthlyProjectCount}/${limit}). Passez au plan supérieur pour ajouter plus de projets.`);
+            setInitialAccountTab('subscription');
+            navigateTo('account');
+            return;
+        }
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const result = await analyzeUrl(url);
+      setAnalysisData(result);
+
+      const updatedHistory = db.add(result);
+      setHistory(updatedHistory);
+
+      if (history.length === 0) {
+        setShowCelebration(true);
+        setTimeout(() => setShowCelebration(false), 3000);
+      }
+
+      showToast('success', 'Audit terminé avec succès !');
+
+      setMegaStatus('generating');
+      megaGenerate(url).then(cache => {
+        if (cache) {
+          const preGenerated = { status: 'completed' as const, generatedAt: new Date().toISOString(), ...cache };
+          setHistory(prev => {
+            if (prev.length === 0) return prev;
+            const updated = { ...prev[0], preGenerated };
+            db.update(0, updated);
+            return [updated, ...prev.slice(1)];
+          });
+          setAnalysisData(prev => prev ? { ...prev, preGenerated } : prev);
+          setMegaStatus('completed');
+        } else {
+          setMegaStatus('failed');
+        }
+      }).catch(() => setMegaStatus('failed'));
+
+      setResultsTab('details');
+      navigateTo('projects');
+    } catch (error) {
+      console.error("Analysis failed", error);
+      alert("Erreur lors de l'analyse. Veuillez réessayer.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleViewAnalysis = (result: AnalysisResult, tab: any = 'overview') => {
+    setAnalysisData(result);
+    setResultsTab(tab);
+    navigateTo('projects');
+  };
+
+  const handleViewDirectoryEntity = (result: AnalysisResult) => {
+    setAnalysisData(result);
+    navigateTo('directory-entity');
+  };
+
+  const handleUpdateAnalysis = (index: number, updatedData: Partial<AnalysisResult>) => {
+    const updatedHistory = db.update(index, updatedData);
+    setHistory(updatedHistory);
+  };
+
+  const handleSaveSolution = useCallback((analysisId: string, recommendationId: string, solution: GeneratedSolution) => {
+    const timestamp = new Date().toISOString();
+    const solutionWithMeta = { ...solution, timestamp };
+
+    setAnalysisData(prev => {
+        if (!prev || prev.timestamp !== analysisId) return prev;
+        return {
+            ...prev,
+            generatedSolutions: {
+                ...(prev.generatedSolutions || {}),
+                [recommendationId]: solutionWithMeta
+            }
+        };
+    });
+
+    setHistory(prevHistory => {
+        const index = prevHistory.findIndex(item => item.timestamp === analysisId);
+        if (index !== -1) {
+            const updatedItem = {
+                ...prevHistory[index],
+                generatedSolutions: {
+                    ...(prevHistory[index].generatedSolutions || {}),
+                    [recommendationId]: solutionWithMeta
+                }
+            };
+            const newHistory = [...prevHistory];
+            newHistory[index] = updatedItem;
+            db.update(index, updatedItem);
+            return newHistory;
+        }
+        return prevHistory;
+    });
+  }, []);
+
+  const handleAddToSmcLibrary = useCallback((item: SMCContent) => setSmcLibrary(prev => [item, ...prev]), []);
+  const handleAddToTruthLibrary = useCallback((item: SMCContent) => setTruthLibrary(prev => [item, ...prev]), []);
+  const handleAddToSchemaLibrary = useCallback((item: SMCContent) => setSchemaLibrary(prev => [item, ...prev]), []);
+  const handleAddToRobotsLibrary = useCallback((item: SMCContent) => setRobotsLibrary(prev => [item, ...prev]), []);
+
+  const handleNavigateToPublisher = useCallback((data: { topic: string, url: string, brief: string }) => {
+    setPublisherRequestData(data);
+    navigateTo('publisher-request');
+  }, [navigateTo]);
+
+  const handleNavigateToDirectory = useCallback(() => {
+    navigateTo('directory');
+  }, [navigateTo]);
+
+  const handleDeductCredits = (amount: number): boolean => {
+    if (!user) {
+        if(confirm("Vous devez être connecté pour effectuer cette action. Se connecter maintenant ?")) {
+            navigateTo('login');
+        }
+        return false;
+    }
+
+    if (user.credits < amount) {
+        alert(`Solde GTO Gas insuffisant pour générer cette solution.\n\nIl vous manque ${amount - user.credits} crédits.\n\nRedirection vers la station de recharge...`);
+        navigateTo('recharge');
+        return false;
+    }
+
+    setUser(prev => prev ? { ...prev, credits: prev.credits - amount } : null);
+    return true;
+  };
+
+  const handleRecharge = (amount: number, planLevel: 'free' | 'pro' | 'enterprise') => {
+    if (!user) return;
+    setUser({
+        ...user,
+        credits: user.credits + amount,
+        plan: planLevel
+    });
+  };
+
+  const handleUpgradePlan = (newPlan: 'free' | 'pro' | 'enterprise') => {
+    if (!user) return;
+    setUser({ ...user, plan: newPlan });
+  };
+
+  const handleLogin = useCallback((loggedInUser: User) => {
+    setUser(loggedInUser);
+    setViewHistory(['home']);
+    setCurrentView('dashboard');
+    setActiveSection('dashboard');
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    setIsMobileMenuOpen(false);
+    setUser(null);
+    setCurrentView('home');
+    setActiveSection('dashboard');
+    setViewHistory([]);
+  }, []);
+
+  useEffect(() => {
+    if (!user && isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [user, isMobileMenuOpen]);
+
+  // ── Render page content ──
+  const renderPage = () => {
+    switch (currentView) {
+      case 'home':
+        return <Home onNavigate={navigateTo} user={user} onDirectRecharge={handleDirectRecharge} />;
+      case 'login':
+        return <Login onLogin={handleLogin} onBack={goBack} />;
+      case 'dashboard':
+        return <Dashboard onBack={goBack} history={history} onView={handleViewAnalysis} onNavigate={navigateTo} />;
+      case 'new-analysis':
+      case 'analyze':
+        return <Analyze onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />;
+      case 'generative-tools':
+        return <GenerativeTools onNavigate={navigateTo} history={history} megaStatus={megaStatus} />;
+      case 'results':
+      case 'audit-aeo':
+        return analysisData ? <Results data={analysisData} onBack={goBack} user={user} onDeductCredits={handleDeductCredits} onSaveSolution={handleSaveSolution} initialTab={resultsTab as any} onNewAnalysis={() => navigateTo('new-analysis')} /> : null;
+      case 'action-plan':
+      case 'projects':
+      case 'rescan':
+        return <Projects onBack={goBack} onNavigateToAnalysis={() => navigateTo('new-analysis')} user={user} history={history} onViewAnalysis={handleViewAnalysis} projectCount={monthlyProjectCount} maxProjects={user ? PLAN_LIMITS[user.plan] : 1} onNavigateToPlan={() => { setInitialAccountTab('subscription'); navigateTo('account'); }} onDeductCredits={handleDeductCredits} onSaveSolution={handleSaveSolution} onNewAnalysis={() => navigateTo('new-analysis')} onNavigateToRecharge={() => navigateTo('credits')} initialUrl={analysisData?.url} initialTab={resultsTab} />;
+      case 'history':
+        return <HistoryView onBack={goBack} history={history} onView={handleViewAnalysis} />;
+      case 'citation-dashboard':
+      case 'ai-monitoring':
+        return <AiMonitoring onBack={goBack} onNavigate={navigateTo} onDeductCredits={handleDeductCredits} user={user} />;
+      case 'tracked-queries':
+      case 'benchmark':
+      case 'monthly-report':
+        return <PlaceholderPage title={currentView === 'tracked-queries' ? 'Requêtes cibles' : currentView === 'benchmark' ? 'Benchmark' : 'Rapports mensuels'} />;
+      case 'multilingual':
+        return <MultilingualCitations onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+      case 'alerts':
+      case 'alerts-aeo':
+        return <AlertsAEO onBack={goBack} user={user} onNavigate={navigateTo} />;
+      case 'smc-studio':
+        return <SMCStudio onBack={goBack} user={user} onDeductCredits={handleDeductCredits} library={smcLibrary} onAddToLibrary={handleAddToSmcLibrary} onNavigateToPublisher={handleNavigateToPublisher} onNavigateToDirectory={handleNavigateToDirectory} />;
+      case 'blog-optimizer':
+        return <BlogOptimizer onBack={goBack} user={user} onDeductCredits={handleDeductCredits} onNavigateToPublisher={handleNavigateToPublisher} />;
+      case 'schema-org':
+        return <SchemaOrg onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} savedFiles={schemaLibrary} onSaveFile={handleAddToSchemaLibrary} />;
+      case 'robots-txt':
+        return <RobotsTxt onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} onUpdateAnalysis={handleUpdateAnalysis} savedFiles={robotsLibrary} onSaveFile={handleAddToRobotsLibrary} />;
+      case 'source-of-truth':
+        return <SourceOfTruth onBack={goBack} history={history} user={user} onDeductCredits={handleDeductCredits} savedFiles={truthLibrary} onSaveFile={handleAddToTruthLibrary} />;
+      case 'llms-txt':
+        return <LlmsTxtGenerator onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
+      case 'content-writer':
+        return <ContentWriter onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+      case 'ai-response-layer':
+        return <AiResponseLayer onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+      case 'answer-first':
+      case 'answer-first-audit':
+        return <AnswerFirstAudit onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
+      case 'ai-citation-simulator':
+        return <AiCitationSimulator onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+      case 'eeat-builder':
+        return <EeatBuilder onBack={goBack} user={user} onDeductCredits={handleDeductCredits} history={history} />;
+      case 'reputation':
+        return <Reputation onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+      case 'bot-tracking':
+        return <BotTracking onBack={goBack} user={user} />;
+      case 'publisher-search':
+      case 'publisher-request':
+        return <PublisherRequest onBack={goBack} user={user} data={publisherRequestData} />;
+      case 'my-orders':
+      case 'publisher-dashboard':
+        return <PlaceholderPage title={currentView === 'my-orders' ? 'Mes commandes' : 'Espace publisher'} />;
+      case 'directory':
+        return <Directory onBack={goBack} onViewEntity={handleViewDirectoryEntity} onNavigateToPlan={() => { setInitialAccountTab('subscription'); navigateTo('account'); }} user={user} directClientCount={monthlyProjectCount} maxClients={user ? PLAN_LIMITS[user.plan] : 1} actionPlanComplete={actionPlanStatus.complete} actionPlanProgress={actionPlanStatus} onNavigateToActionPlan={() => { setResultsTab('recommendations'); navigateTo('projects'); }} />;
+      case 'directory-entity':
+        return analysisData ? <DirectoryEntity data={analysisData} onBack={goBack} /> : null;
+      case 'profile':
+      case 'subscription':
+      case 'account':
+        return <Account user={user} onLogout={handleLogout} onNavigate={navigateTo} onUpgrade={handleUpgradePlan} projectCount={monthlyProjectCount} maxProjects={user ? PLAN_LIMITS[user.plan] : 1} initialTab={currentView === 'subscription' ? 'subscription' : initialAccountTab} />;
+      case 'plan':
+        return <Plan onBack={goBack} user={user} onUpgrade={handleUpgradePlan} />;
+      case 'credits':
+      case 'recharge':
+        return <Recharge onBack={goBack} onRecharge={handleRecharge} user={user} onNavigate={navigateTo} initialPackId={initialRechargePackId} />;
+      case 'invoices':
+        return <PlaceholderPage title="Facturation" />;
+      case 'api-keys':
+      case 'api-developer':
+        return <ApiDeveloper onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+      case 'affiliation':
+        return <Affiliation onBack={goBack} user={user} />;
+      case 'integrations':
+        return <Integrations onBack={goBack} user={user} onDeductCredits={handleDeductCredits} />;
+      case 'analytics-integrations':
+        return <AnalyticsIntegrations onBack={goBack} user={user} />;
+      case 'clients':
+        return <Clients onBack={goBack} onNavigate={navigateTo} user={user} directClientCount={monthlyProjectCount} maxClients={user ? PLAN_LIMITS[user.plan] : 1} />;
+      case 'mission-orders':
+        return <MissionOrders onBack={goBack} user={user} onNavigate={navigateTo} />;
+      case 'messages':
+        return <Messages onBack={goBack} user={user} />;
+      default:
+        return <PlaceholderPage title="Page introuvable" />;
+    }
+  };
+
+  // Public pages (no AppShell)
+  const isPublicPage = ['home', 'login'].includes(currentView);
+
+  return (
+    <ToastContext.Provider value={{ showToast }}>
+    <div className="min-h-screen font-sans text-gray-100 selection:bg-primary/30">
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+      {/* First Audit Celebration */}
+      {showCelebration && (
+        <div className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center">
+          <div className="text-center animate-in fade-in zoom-in duration-500">
+            <div className="text-6xl mb-4 animate-bounce">🎉</div>
+            <div className="bg-[#13131d]/90 backdrop-blur-xl border border-purple-500/30 rounded-2xl px-8 py-5 shadow-2xl shadow-purple-900/30">
+              <h3 className="text-xl font-bold text-white mb-1">Premier audit réussi !</h3>
+              <p className="text-sm text-purple-300">Votre parcours AEO commence maintenant</p>
+            </div>
+          </div>
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 rounded-full"
+              style={{
+                background: ['#a855f7', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'][i % 5],
+                left: `${20 + Math.random() * 60}%`,
+                top: `${20 + Math.random() * 60}%`,
+                animation: `fade-in 0.3s ease-out ${i * 50}ms both, slide-in-from-bottom 1.5s ease-out ${i * 50}ms both`,
+                opacity: 0,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Welcome Onboarding Modal */}
+      <OnboardingModal
+        show={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onNavigate={(view: string) => navigateTo(view)}
+      />
+
+      {/* Command Palette (Ctrl+K) */}
+      {user && isCommandPaletteOpen && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={() => setIsCommandPaletteOpen(false)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <CommandPalettePanel
+            onClose={() => setIsCommandPaletteOpen(false)}
+            onNavigate={(view: string) => { navigateTo(view); setIsCommandPaletteOpen(false); }}
+          />
+        </div>
+      )}
+
+      {/* Keyboard Shortcuts Modal (?) */}
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
+
+      {/* Content */}
+      {isPublicPage ? (
+        // Public pages — raw, no AppShell
+        <div className="bg-black min-h-screen">
+          <Suspense fallback={<div className="min-h-screen bg-black" />}>
+            {renderPage()}
+          </Suspense>
+        </div>
+      ) : (
+        // Authenticated pages — wrapped in AppShell
+        <AppShell
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+          activePage={currentView}
+          onPageChange={handlePageChange}
+          credits={animatedCredits}
+          plan={user?.plan || 'free'}
+          user={user ? { name: user.name, email: user.email } : null}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+          onLogoClick={() => navigateTo('dashboard')}
+        >
+          {/* Low Credits Warning Banner */}
+          {user && user.credits <= 10 && !lowCreditsDismissed && currentView !== 'credits' && currentView !== 'recharge' && (
+            <div className="mb-4 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
+              <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+              <p className="text-sm text-amber-300 flex-1">Crédits bientôt épuisés ({user.credits} restants). <button onClick={() => navigateTo('credits')} className="underline font-semibold hover:text-amber-200">Recharger maintenant</button></p>
+              <button onClick={() => setLowCreditsDismissed(true)} className="text-amber-400/60 hover:text-amber-300"><X size={14} /></button>
+            </div>
+          )}
+
+          <Suspense fallback={
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="h-8 w-48 skeleton-shimmer rounded-xl" />
+                <div className="h-10 w-36 skeleton-shimmer rounded-full" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {[1,2,3,4].map(i => <div key={i} className="h-28 skeleton-shimmer rounded-2xl border border-white/[0.04]" />)}
+              </div>
+              <div className="h-64 skeleton-shimmer rounded-2xl border border-white/[0.04]" />
+            </div>
+          }>
+            <div key={currentView} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+              {renderPage()}
+            </div>
+          </Suspense>
+
+          {/* Floating Action Button — New Audit */}
+          {user && (
+            <button
+              onClick={() => navigateTo('new-analysis')}
+              className="fixed bottom-8 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 shadow-xl shadow-blue-900/40 flex items-center justify-center text-white hover:scale-110 hover:shadow-2xl transition-all duration-300 group"
+              title="Nouvel Audit AEO"
+            >
+              <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+            </button>
+          )}
+        </AppShell>
+      )}
+    </div>
+    </ToastContext.Provider>
+  );
+};
+
+// Placeholder page for features not yet implemented
+function PlaceholderPage({ title }: { title: string }) {
+  return (
+    <div>
+      <div className="border-b border-slate-800 -mx-6 md:-mx-8 -mt-6 md:-mt-8 mb-6">
+        <div className="px-6 md:px-8 py-5">
+          <h1 className="text-2xl font-semibold text-white tracking-tight">{title}</h1>
+          <p className="text-sm text-slate-400 mt-1">Coming soon</p>
+        </div>
+      </div>
+      <div className="flex items-center justify-center h-64 rounded-xl border border-dashed border-slate-700">
+        <p className="text-slate-500">Cette fonctionnalité arrive bientôt.</p>
+      </div>
+    </div>
+  );
+}
+
+export default App;

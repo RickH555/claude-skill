@@ -1,0 +1,689 @@
+import React, { useState, useRef } from 'react';
+import { User } from '../types';
+import {
+  SiteConfig, QueryPageConfig, ProductConfig,
+  HubOutput, QueryPageOutput, RecommendJsonOutput, SitemapAiOutput,
+  AI_LAYER_CREDITS,
+} from '../types/ai-response-layer';
+import { generateHub, generateQueryPage, generateRecommendJson, generateSitemapAi } from '../services/ai-response-layer';
+import {
+  ArrowLeft, Globe, FileQuestion, ShoppingBag, MapPin,
+  Loader2, Copy, Check, Download, Plus, Trash2, ChevronRight,
+  Sparkles, Zap, Eye, Code, FileText, AlertCircle,
+} from 'lucide-react';
+
+interface Props {
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+}
+
+type TabId = 'hub' | 'query' | 'recommend' | 'sitemap';
+
+const TABS: { id: TabId; label: string; icon: React.ElementType; desc: string; cost: number }[] = [
+  { id: 'hub', label: 'Hub Central', icon: Globe, desc: '/ai/index.html', cost: AI_LAYER_CREDITS.hub },
+  { id: 'query', label: 'Query Page', icon: FileQuestion, desc: '/ai/query/[slug].html', cost: AI_LAYER_CREDITS.queryPage },
+  { id: 'recommend', label: 'Recommend JSON', icon: ShoppingBag, desc: '/ai/recommend.json', cost: AI_LAYER_CREDITS.recommendJson },
+  { id: 'sitemap', label: 'Sitemap AI', icon: MapPin, desc: '/sitemap-ai.xml', cost: AI_LAYER_CREDITS.sitemapAi },
+];
+
+// ── Shared Components ──
+
+const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">{children}</h3>
+);
+
+const InputField: React.FC<{
+  label: string; value: string; onChange: (v: string) => void;
+  placeholder?: string; required?: boolean; type?: string;
+}> = ({ label, value, onChange, placeholder, required, type = 'text' }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-300 mb-1.5">
+      {label} {required && <span className="text-red-400">*</span>}
+    </label>
+    <input
+      type={type}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50 transition-colors"
+    />
+  </div>
+);
+
+const TextAreaField: React.FC<{
+  label: string; value: string; onChange: (v: string) => void;
+  placeholder?: string; rows?: number;
+}> = ({ label, value, onChange, placeholder, rows = 3 }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-300 mb-1.5">{label}</label>
+    <textarea
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={rows}
+      className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
+    />
+  </div>
+);
+
+// ── Code Preview with Copy ──
+const CodePreview: React.FC<{ code: string; language: string; title: string }> = ({ code, language, title }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const ext = language === 'xml' ? 'xml' : language === 'json' ? 'json' : 'html';
+    const mime = language === 'xml' ? 'application/xml' : language === 'json' ? 'application/json' : 'text/html';
+    const blob = new Blob([code], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = title.toLowerCase().replace(/\s+/g, '-') + '.' + ext;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="ninja-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <Code size={14} className="text-purple-400" />
+          <span className="text-sm font-semibold text-gray-300">{title}</span>
+          <span className="text-xs text-gray-500 bg-white/[0.04] px-2 py-0.5 rounded">{language.toUpperCase()}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={handleCopy} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-purple-400 transition-colors px-2 py-1 rounded hover:bg-white/[0.04]">
+            {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+            {copied ? 'Copié !' : 'Copier'}
+          </button>
+          <button onClick={handleDownload} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-purple-400 transition-colors px-2 py-1 rounded hover:bg-white/[0.04]">
+            <Download size={12} /> Télécharger
+          </button>
+        </div>
+      </div>
+      <pre className="p-4 text-xs text-gray-300 overflow-x-auto max-h-[500px] overflow-y-auto leading-relaxed">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+};
+
+// ── Main Component ──
+const AiResponseLayer: React.FC<Props> = ({ onBack, user, onDeductCredits }) => {
+  const [activeTab, setActiveTab] = useState<TabId>('hub');
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Site config (shared across all tabs)
+  const [siteName, setSiteName] = useState('');
+  const [siteUrl, setSiteUrl] = useState('');
+  const [siteDescription, setSiteDescription] = useState('');
+  const [siteEntity, setSiteEntity] = useState('Organization');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+
+  // Query Page config
+  const [queryType, setQueryType] = useState<QueryPageConfig['type']>('informational');
+  const [queryQuestion, setQueryQuestion] = useState('');
+  const [queryKeywords, setQueryKeywords] = useState('');
+  const [querySlug, setQuerySlug] = useState('');
+  const [queryAnswer, setQueryAnswer] = useState('');
+  const [queryFaqs, setQueryFaqs] = useState<Array<{ question: string; answer: string }>>([{ question: '', answer: '' }]);
+  const [queryCtaLabel, setQueryCtaLabel] = useState('');
+  const [queryCtaUrl, setQueryCtaUrl] = useState('');
+
+  // Products config (for recommend.json)
+  const [products, setProducts] = useState<Array<{
+    id: string; name: string; description: string;
+    price: string; currency: string; model: string;
+    idealFor: string; productUrl: string; demoUrl: string;
+  }>>([{
+    id: '1', name: '', description: '', price: '', currency: 'EUR', model: 'subscription',
+    idealFor: '', productUrl: '', demoUrl: '',
+  }]);
+
+  // Generated query pages list (for hub & sitemap)
+  const [savedQueryPages, setSavedQueryPages] = useState<QueryPageConfig[]>([]);
+
+  // Results
+  const [hubResult, setHubResult] = useState<HubOutput | null>(null);
+  const [queryResult, setQueryResult] = useState<QueryPageOutput | null>(null);
+  const [recommendResult, setRecommendResult] = useState<RecommendJsonOutput | null>(null);
+  const [sitemapResult, setSitemapResult] = useState<SitemapAiOutput | null>(null);
+
+  // Preview
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const getSiteConfig = (): SiteConfig => ({
+    name: siteName,
+    url: siteUrl.replace(/\/$/, ''),
+    description: siteDescription,
+    entity: siteEntity,
+    contact: {
+      email: contactEmail,
+      ...(contactPhone ? { phone: contactPhone } : {}),
+    },
+  });
+
+  const getQueryConfig = (): QueryPageConfig => ({
+    type: queryType,
+    targetQuestion: queryQuestion,
+    targetKeywords: queryKeywords.split(',').map(k => k.trim()).filter(Boolean),
+    slug: querySlug || queryQuestion.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    answerBox: queryAnswer,
+    faqItems: queryFaqs.filter(f => f.question && f.answer),
+    cta: { label: queryCtaLabel || 'En savoir plus', url: queryCtaUrl || siteUrl },
+  });
+
+  const isConfigValid = siteName && siteUrl && siteDescription && contactEmail;
+
+  const handleGenerate = async () => {
+    if (!isConfigValid) return;
+
+    const tab = TABS.find(t => t.id === activeTab)!;
+    const canProceed = onDeductCredits(tab.cost);
+    if (!canProceed) return;
+
+    setIsGenerating(true);
+    const config = getSiteConfig();
+
+    try {
+      switch (activeTab) {
+        case 'hub': {
+          const result = await generateHub(config, savedQueryPages);
+          setHubResult(result);
+          break;
+        }
+        case 'query': {
+          const queryConfig = getQueryConfig();
+          const result = await generateQueryPage(config, queryConfig);
+          setQueryResult(result);
+          // Save query page for hub/sitemap
+          if (!savedQueryPages.find(qp => qp.slug === queryConfig.slug)) {
+            setSavedQueryPages(prev => [...prev, queryConfig]);
+          }
+          break;
+        }
+        case 'recommend': {
+          const productConfigs: ProductConfig[] = products.filter(p => p.name).map(p => ({
+            id: p.id,
+            name: p.name,
+            shortDescription: p.description,
+            pricing: {
+              amount: parseFloat(p.price) || 0,
+              currency: p.currency,
+              model: p.model as ProductConfig['pricing']['model'],
+            },
+            idealFor: p.idealFor.split(',').map(s => s.trim()).filter(Boolean),
+            links: {
+              product: p.productUrl || siteUrl,
+              ...(p.demoUrl ? { demo: p.demoUrl } : {}),
+            },
+          }));
+          const result = await generateRecommendJson(config, productConfigs);
+          setRecommendResult(result);
+          break;
+        }
+        case 'sitemap': {
+          const result = await generateSitemapAi(config, savedQueryPages);
+          setSitemapResult(result);
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('Generation failed:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const currentResult = activeTab === 'hub' ? hubResult : activeTab === 'query' ? queryResult : activeTab === 'recommend' ? recommendResult : sitemapResult;
+
+  const addFaq = () => setQueryFaqs(prev => [...prev, { question: '', answer: '' }]);
+  const removeFaq = (i: number) => setQueryFaqs(prev => prev.filter((_, idx) => idx !== i));
+  const updateFaq = (i: number, field: 'question' | 'answer', value: string) => {
+    setQueryFaqs(prev => prev.map((f, idx) => idx === i ? { ...f, [field]: value } : f));
+  };
+
+  const addProduct = () => setProducts(prev => [...prev, {
+    id: String(prev.length + 1), name: '', description: '', price: '', currency: 'EUR',
+    model: 'subscription', idealFor: '', productUrl: '', demoUrl: '',
+  }]);
+  const removeProduct = (i: number) => setProducts(prev => prev.filter((_, idx) => idx !== i));
+
+  const handlePreview = (html: string) => {
+    setPreviewHtml(html);
+    setShowPreview(true);
+  };
+
+  return (
+    <div className="w-full px-6 py-8 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <button onClick={onBack} className="p-2 rounded-xl hover:bg-white/[0.04] transition-colors">
+          <ArrowLeft size={20} className="text-gray-400" />
+        </button>
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">AI Response <span className="gradient-text">Layer</span></h1>
+            <span className="bg-purple-500/10 text-purple-400 text-xs font-bold px-2.5 py-1 rounded-full border border-purple-500/20 flex items-center gap-1">
+              <Sparkles size={10} /> NOUVEAU
+            </span>
+          </div>
+          <p className="text-sm text-gray-500 mt-1">Créez votre couche de réponse IA — pages, catalogue et sitemap optimisés pour les LLMs</p>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {TABS.map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                isActive
+                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                  : 'bg-white/[0.02] text-gray-400 border border-white/[0.06] hover:bg-white/[0.04] hover:text-gray-300'
+              }`}
+            >
+              <Icon size={16} />
+              <span>{tab.label}</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded ${isActive ? 'bg-purple-500/20 text-purple-300' : 'bg-white/[0.04] text-gray-500'}`}>
+                {tab.cost} Gas
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Left Column — Configuration */}
+        <div className="space-y-6">
+          {/* Site Config (always visible) */}
+          <div className="ninja-card p-6">
+            <SectionTitle>Configuration du Site</SectionTitle>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Nom du site" value={siteName} onChange={setSiteName} placeholder="MonEntreprise" required />
+                <InputField label="URL du site" value={siteUrl} onChange={setSiteUrl} placeholder="https://example.com" required />
+              </div>
+              <TextAreaField label="Description" value={siteDescription} onChange={setSiteDescription} placeholder="Description de votre entreprise/site..." rows={2} />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Type d'entité</label>
+                  <select
+                    value={siteEntity}
+                    onChange={e => setSiteEntity(e.target.value)}
+                    className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                  >
+                    <option value="Organization">Organization</option>
+                    <option value="LocalBusiness">LocalBusiness</option>
+                    <option value="Person">Person</option>
+                    <option value="Corporation">Corporation</option>
+                    <option value="EducationalOrganization">EducationalOrganization</option>
+                  </select>
+                </div>
+                <InputField label="Email de contact" value={contactEmail} onChange={setContactEmail} placeholder="contact@example.com" required type="email" />
+              </div>
+              <InputField label="Téléphone (optionnel)" value={contactPhone} onChange={setContactPhone} placeholder="+33 1 23 45 67 89" />
+            </div>
+          </div>
+
+          {/* Tab-specific configuration */}
+          {activeTab === 'hub' && (
+            <div className="ninja-card p-6">
+              <SectionTitle>Hub Central — /ai/index.html</SectionTitle>
+              <p className="text-sm text-gray-500 mb-4">
+                Le Hub centralise toutes vos ressources AI. Il référence automatiquement vos Query Pages créées ({savedQueryPages.length} enregistrée{savedQueryPages.length > 1 ? 's' : ''}).
+              </p>
+              {savedQueryPages.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-xs font-medium text-gray-400">Query Pages référencées :</span>
+                  {savedQueryPages.map((qp, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm text-gray-300 bg-white/[0.02] rounded-lg px-3 py-2 border border-white/[0.04]">
+                      <FileQuestion size={14} className="text-purple-400" />
+                      <span className="flex-1 truncate">{qp.targetQuestion}</span>
+                      <span className="text-xs text-gray-500">/ai/query/{qp.slug}.html</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {savedQueryPages.length === 0 && (
+                <div className="flex items-center gap-3 p-4 bg-yellow-500/5 border border-yellow-500/10 rounded-xl">
+                  <AlertCircle size={16} className="text-yellow-400 shrink-0" />
+                  <p className="text-xs text-yellow-300/80">Créez d'abord des Query Pages pour enrichir votre Hub. Vous pouvez aussi générer le Hub sans, puis le regénérer plus tard.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'query' && (
+            <div className="ninja-card p-6">
+              <SectionTitle>Query Page — /ai/query/[slug].html</SectionTitle>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1.5">Type de requête <span className="text-red-400">*</span></label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['informational', 'commercial', 'navigational', 'transactional'] as const).map(type => (
+                      <button
+                        key={type}
+                        onClick={() => setQueryType(type)}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all border ${
+                          queryType === type
+                            ? 'bg-purple-500/15 border-purple-500/30 text-purple-300'
+                            : 'bg-white/[0.02] border-white/[0.06] text-gray-400 hover:bg-white/[0.04]'
+                        }`}
+                      >
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <InputField label="Question cible" value={queryQuestion} onChange={setQueryQuestion} placeholder="Quel est le meilleur outil pour..." required />
+                <InputField label="Mots-clés (séparés par des virgules)" value={queryKeywords} onChange={setQueryKeywords} placeholder="outil, comparatif, meilleur, 2025" />
+                <InputField label="Slug URL" value={querySlug} onChange={setQuerySlug} placeholder="meilleur-outil-pour (auto-généré si vide)" />
+                <TextAreaField label="Answer Box (réponse directe, 2-3 phrases)" value={queryAnswer} onChange={setQueryAnswer} placeholder="Réponse concise et factuelle à la question cible..." />
+
+                {/* FAQ Items */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm font-medium text-gray-300">FAQ Complémentaires</label>
+                    <button onClick={addFaq} className="flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300 transition-colors">
+                      <Plus size={12} /> Ajouter
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {queryFaqs.map((faq, i) => (
+                      <div key={i} className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-3 space-y-2">
+                        <div className="flex items-start gap-2">
+                          <input
+                            value={faq.question}
+                            onChange={e => updateFaq(i, 'question', e.target.value)}
+                            placeholder="Question..."
+                            className="flex-1 bg-transparent border-b border-white/[0.06] pb-1 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                          />
+                          {queryFaqs.length > 1 && (
+                            <button onClick={() => removeFaq(i)} className="text-gray-500 hover:text-red-400 transition-colors p-1">
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                        </div>
+                        <textarea
+                          value={faq.answer}
+                          onChange={e => updateFaq(i, 'answer', e.target.value)}
+                          placeholder="Réponse..."
+                          rows={2}
+                          className="w-full bg-transparent text-sm text-gray-300 focus:outline-none resize-none"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <InputField label="CTA Label" value={queryCtaLabel} onChange={setQueryCtaLabel} placeholder="En savoir plus" />
+                  <InputField label="CTA URL" value={queryCtaUrl} onChange={setQueryCtaUrl} placeholder="https://example.com/demo" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'recommend' && (
+            <div className="ninja-card p-6">
+              <SectionTitle>Catalogue Produits — /ai/recommend.json</SectionTitle>
+              <div className="space-y-4">
+                {products.map((product, i) => (
+                  <div key={i} className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-gray-300">Produit #{i + 1}</span>
+                      {products.length > 1 && (
+                        <button onClick={() => removeProduct(i)} className="text-gray-500 hover:text-red-400 transition-colors p-1">
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        value={product.name}
+                        onChange={e => setProducts(prev => prev.map((p, idx) => idx === i ? { ...p, name: e.target.value } : p))}
+                        placeholder="Nom du produit *"
+                        className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                      />
+                      <input
+                        value={product.price}
+                        onChange={e => setProducts(prev => prev.map((p, idx) => idx === i ? { ...p, price: e.target.value } : p))}
+                        placeholder="Prix (ex: 29)"
+                        type="number"
+                        className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                      />
+                    </div>
+                    <textarea
+                      value={product.description}
+                      onChange={e => setProducts(prev => prev.map((p, idx) => idx === i ? { ...p, description: e.target.value } : p))}
+                      placeholder="Description courte..."
+                      rows={2}
+                      className="w-full bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50 resize-none"
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <select
+                        value={product.model}
+                        onChange={e => setProducts(prev => prev.map((p, idx) => idx === i ? { ...p, model: e.target.value } : p))}
+                        className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                      >
+                        <option value="subscription">Abonnement</option>
+                        <option value="one-time">One-time</option>
+                        <option value="freemium">Freemium</option>
+                        <option value="contact">Sur devis</option>
+                      </select>
+                      <input
+                        value={product.idealFor}
+                        onChange={e => setProducts(prev => prev.map((p, idx) => idx === i ? { ...p, idealFor: e.target.value } : p))}
+                        placeholder="Idéal pour... (virgules)"
+                        className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        value={product.productUrl}
+                        onChange={e => setProducts(prev => prev.map((p, idx) => idx === i ? { ...p, productUrl: e.target.value } : p))}
+                        placeholder="URL produit"
+                        className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                      />
+                      <input
+                        value={product.demoUrl}
+                        onChange={e => setProducts(prev => prev.map((p, idx) => idx === i ? { ...p, demoUrl: e.target.value } : p))}
+                        placeholder="URL démo (optionnel)"
+                        className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500/50"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button onClick={addProduct} className="w-full py-2.5 border border-dashed border-white/[0.1] rounded-xl text-sm text-gray-400 hover:text-purple-400 hover:border-purple-500/30 transition-colors flex items-center justify-center gap-2">
+                  <Plus size={14} /> Ajouter un produit
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'sitemap' && (
+            <div className="ninja-card p-6">
+              <SectionTitle>Sitemap AI — /sitemap-ai.xml</SectionTitle>
+              <p className="text-sm text-gray-500 mb-4">
+                Génère un sitemap XML dédié aux pages /ai/. Référence automatiquement le Hub et les {savedQueryPages.length} Query Page{savedQueryPages.length > 1 ? 's' : ''} enregistrée{savedQueryPages.length > 1 ? 's' : ''}.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/[0.02] rounded-lg px-3 py-2 border border-white/[0.04]">
+                  <Globe size={14} className="text-purple-400" />
+                  <span>/ai/index.html</span>
+                  <span className="ml-auto text-xs text-green-400">priority: 1.0</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-300 bg-white/[0.02] rounded-lg px-3 py-2 border border-white/[0.04]">
+                  <ShoppingBag size={14} className="text-purple-400" />
+                  <span>/ai/recommend.json</span>
+                  <span className="ml-auto text-xs text-blue-400">priority: 0.8</span>
+                </div>
+                {savedQueryPages.map((qp, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm text-gray-300 bg-white/[0.02] rounded-lg px-3 py-2 border border-white/[0.04]">
+                    <FileQuestion size={14} className="text-purple-400" />
+                    <span className="truncate">/ai/query/{qp.slug}.html</span>
+                    <span className="ml-auto text-xs text-yellow-400">priority: 0.9</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Generate Button */}
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerating || !isConfigValid}
+            className={`w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-300 ${
+              isGenerating || !isConfigValid
+                ? 'bg-gray-700/50 text-gray-500 cursor-not-allowed'
+                : 'btn-gradient text-white hover:shadow-xl hover:shadow-purple-900/30 hover:-translate-y-0.5'
+            }`}
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Génération en cours...
+              </>
+            ) : (
+              <>
+                <Zap size={16} />
+                Générer {TABS.find(t => t.id === activeTab)?.label} ({TABS.find(t => t.id === activeTab)?.cost} Gas)
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Right Column — Results */}
+        <div className="space-y-6">
+          {!currentResult && !isGenerating && (
+            <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+              <div className="p-4 bg-purple-500/10 rounded-2xl mb-4">
+                {activeTab === 'hub' && <Globe size={40} className="text-purple-400" />}
+                {activeTab === 'query' && <FileQuestion size={40} className="text-purple-400" />}
+                {activeTab === 'recommend' && <ShoppingBag size={40} className="text-purple-400" />}
+                {activeTab === 'sitemap' && <MapPin size={40} className="text-purple-400" />}
+              </div>
+              <h3 className="text-lg font-bold text-gray-300 mb-2">{TABS.find(t => t.id === activeTab)?.label}</h3>
+              <p className="text-sm text-gray-500 max-w-sm">
+                Configurez les paramètres à gauche puis cliquez sur "Générer" pour créer votre {TABS.find(t => t.id === activeTab)?.desc}
+              </p>
+            </div>
+          )}
+
+          {isGenerating && (
+            <div className="ninja-card p-12 flex flex-col items-center justify-center text-center">
+              <Loader2 size={40} className="text-purple-400 animate-spin mb-4" />
+              <h3 className="text-lg font-bold text-gray-300 mb-2">Génération en cours...</h3>
+              <p className="text-sm text-gray-500">Notre IA structure votre contenu pour les moteurs de réponse</p>
+            </div>
+          )}
+
+          {/* Hub Result */}
+          {hubResult && activeTab === 'hub' && !isGenerating && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Check size={16} className="text-emerald-400" />
+                <span className="text-sm font-semibold text-emerald-300">Hub Central généré</span>
+                <button
+                  onClick={() => handlePreview(hubResult.html)}
+                  className="ml-auto flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.04]"
+                >
+                  <Eye size={12} /> Aperçu
+                </button>
+              </div>
+              <CodePreview code={hubResult.html} language="html" title="ai/index.html" />
+            </div>
+          )}
+
+          {/* Query Result */}
+          {queryResult && activeTab === 'query' && !isGenerating && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Check size={16} className="text-emerald-400" />
+                <span className="text-sm font-semibold text-emerald-300">Query Page générée</span>
+                <button
+                  onClick={() => handlePreview(queryResult.html)}
+                  className="ml-auto flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.04]"
+                >
+                  <Eye size={12} /> Aperçu
+                </button>
+              </div>
+              <div className="ninja-card p-3">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <FileText size={12} />
+                  <span>Slug: <code className="text-purple-300">/ai/query/{queryResult.slug}.html</code></span>
+                </div>
+              </div>
+              <CodePreview code={queryResult.html} language="html" title={`ai/query/${queryResult.slug}.html`} />
+            </div>
+          )}
+
+          {/* Recommend Result */}
+          {recommendResult && activeTab === 'recommend' && !isGenerating && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Check size={16} className="text-emerald-400" />
+                <span className="text-sm font-semibold text-emerald-300">{recommendResult.productCount} produit{recommendResult.productCount > 1 ? 's' : ''} catalogué{recommendResult.productCount > 1 ? 's' : ''}</span>
+              </div>
+              <CodePreview code={recommendResult.json} language="json" title="ai/recommend.json" />
+            </div>
+          )}
+
+          {/* Sitemap Result */}
+          {sitemapResult && activeTab === 'sitemap' && !isGenerating && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Check size={16} className="text-emerald-400" />
+                <span className="text-sm font-semibold text-emerald-300">{sitemapResult.urlCount} URL{sitemapResult.urlCount > 1 ? 's' : ''} indexée{sitemapResult.urlCount > 1 ? 's' : ''}</span>
+              </div>
+              <CodePreview code={sitemapResult.xml} language="xml" title="sitemap-ai.xml" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#13131d] border border-white/[0.08] rounded-2xl w-full max-w-5xl h-[80vh] flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+              <span className="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                <Eye size={14} className="text-purple-400" /> Aperçu de la page
+              </span>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="text-gray-400 hover:text-white transition-colors p-1"
+              >
+                ✕
+              </button>
+            </div>
+            <iframe
+              ref={iframeRef}
+              className="flex-1 w-full bg-white"
+              title="Preview"
+              sandbox=""
+              srcDoc={previewHtml}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AiResponseLayer;

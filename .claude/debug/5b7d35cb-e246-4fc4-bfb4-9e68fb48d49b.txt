@@ -1,0 +1,41 @@
+2026-02-09T18:55:34.937Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-09T18:55:34.943Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-09T18:55:34.943Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-09T18:55:34.945Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-09T18:55:36.547Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-09T18:55:36.933Z [DEBUG] Applying permission update: Adding 1 allow rule(s) to destination 'localSettings': ["Bash(npx vite build)"]
+2026-02-09T18:55:36.934Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-09T18:55:37.112Z [DEBUG] Loading plugin frontend-design from source: "./plugins/frontend-design"
+2026-02-09T18:55:37.119Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-09T18:55:37.124Z [DEBUG] [STARTUP] Running setup()...
+2026-02-09T18:55:37.141Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-09T18:55:37.145Z [DEBUG] Passes: Using fresh cached eligibility data
+2026-02-09T18:55:37.146Z [DEBUG] Error log sink initialized
+2026-02-09T18:55:37.467Z [DEBUG] [STARTUP] setup() completed in 343ms
+2026-02-09T18:55:37.467Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-09T18:55:37.548Z [DEBUG] Loaded 0 unique skills (managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-02-09T18:55:37.640Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1
+2026-02-09T18:55:37.646Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-02-09T18:55:37.652Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:55:37.718Z [DEBUG] Plugin frontend-design@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:55:37.718Z [DEBUG] Copied local plugin frontend-design to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\frontend-design\2cd88e7947b7
+2026-02-09T18:55:37.750Z [DEBUG] Loading plugin feature-dev from source: "./plugins/feature-dev"
+2026-02-09T18:55:37.761Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:55:37.765Z [DEBUG] Plugin feature-dev@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:55:37.765Z [DEBUG] Copied local plugin feature-dev to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\feature-dev\2cd88e7947b7
+2026-02-09T18:55:37.780Z [DEBUG] Loading plugin code-simplifier from source: "./plugins/code-simplifier"
+2026-02-09T18:55:37.783Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-09T18:55:37.785Z [DEBUG] Plugin code-simplifier@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:55:37.785Z [DEBUG] Copied local plugin code-simplifier to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\code-simplifier\1.0.0
+2026-02-09T18:55:37.807Z [DEBUG] Loading plugin typescript-lsp from source: "./plugins/typescript-lsp"
+2026-02-09T18:55:37.810Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-09T18:55:37.811Z [DEBUG] Plugin typescript-lsp@claude-plugins-official version 1.0.0 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:55:37.811Z [DEBUG] Copied local plugin typescript-lsp to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\typescript-lsp\1.0.0
+2026-02-09T18:55:37.813Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-02-09T18:55:37.825Z [DEBUG] Loading plugin context7 from source: "./external_plugins/context7"
+2026-02-09T18:55:37.934Z [DEBUG] Using git SHA for context7@claude-plugins-official: 2cd88e7947b7
+2026-02-09T18:55:37.935Z [DEBUG] Plugin context7@claude-plugins-official version 2cd88e7947b7 already cached at C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:55:37.935Z [DEBUG] Copied local plugin context7 to versioned cache: C:\Users\User\.claude\plugins\cache\claude-plugins-official\context7\2cd88e7947b7
+2026-02-09T18:55:37.949Z [DEBUG] Loading plugin superpowers from source: {"source":"url","url":"https://github.com/obra/superpowers.git"}
+2026-02-09T18:55:37.949Z [DEBUG] No version found for superpowers@claude-plugins-official, using 'unknown'
+2026-02-09T18:55:38.006Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1770663338006_j9kjgu

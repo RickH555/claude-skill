@@ -1,0 +1,92 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { AuthorProfile, GeneratedCitationBlock } from "../../types/eeat";
+import { PROMPT_CITATION_BLOCK } from "./prompts";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackSimulation = async (profile: AuthorProfile, articleTitle?: string): Promise<GeneratedCitationBlock> => {
+  await new Promise(resolve => setTimeout(resolve, 1200));
+
+  const specs = profile.specializations.slice(0, 3).join(', ');
+  const linkedin = profile.socialProfiles.find(s => s.platform === 'linkedin');
+  const today = new Date().toISOString().split('T')[0];
+
+  const miniBio = `${profile.name} est ${profile.jobTitle} chez ${profile.organization}, avec ${profile.yearsExperience} ans d'experience en ${specs}. ${profile.credentials.length > 0 ? `Certifie ${profile.credentials[0].name}.` : ''}`;
+
+  const html = `<div class="mt-12 p-6 bg-[#111111] border border-white/[0.06] rounded-2xl">
+  <div class="flex items-center gap-2 mb-4">
+    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">A propos de l'auteur</span>
+    <div class="flex-1 h-px bg-white/5"></div>
+  </div>
+  <div class="flex items-start gap-4">
+    ${profile.photoUrl
+      ? `<img src="${profile.photoUrl}" alt="${profile.name}" class="w-14 h-14 rounded-full object-cover border-2 border-purple-500/30 shrink-0" />`
+      : `<div class="w-14 h-14 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-lg shrink-0">${profile.name.charAt(0)}</div>`
+    }
+    <div class="flex-1">
+      <h4 class="text-base font-bold text-white">${profile.name}</h4>
+      <p class="text-sm text-purple-400 font-medium">${profile.jobTitle} — ${profile.organization}</p>
+      <p class="text-sm text-gray-400 mt-2 leading-relaxed">${miniBio}</p>
+      <div class="flex items-center gap-4 mt-3">
+        ${linkedin ? `<a href="${linkedin.url}" target="_blank" rel="noopener" class="text-xs text-blue-400 hover:underline flex items-center gap-1">LinkedIn ↗</a>` : ''}
+        <span class="text-[10px] text-gray-600">Verifie le ${today}</span>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+  const schemaOrg = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": profile.name,
+    "jobTitle": profile.jobTitle,
+    "worksFor": { "@type": "Organization", "name": profile.organization },
+    "description": miniBio,
+    ...(profile.photoUrl && { "image": profile.photoUrl }),
+    "sameAs": profile.socialProfiles.map(s => s.url),
+    "knowsAbout": profile.specializations,
+  }, null, 2);
+
+  return { html, schemaOrg };
+};
+
+export const generateCitationBlock = async (profile: AuthorProfile, articleTitle?: string): Promise<GeneratedCitationBlock> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.warn("API_KEY not found, using simulation.");
+    return fallbackSimulation(profile, articleTitle);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        html: { type: Type.STRING, description: "Bloc HTML auteur pour fin d'article" },
+        schemaOrg: { type: Type.STRING, description: "Schema.org Person JSON-LD" },
+      },
+      required: ["html", "schemaOrg"],
+    };
+
+    const prompt = `${PROMPT_CITATION_BLOCK}\n\n## PROFIL\n${JSON.stringify(profile, null, 2)}\n${articleTitle ? `## ARTICLE: ${articleTitle}` : ''}\n\nGenere le bloc citation auteur.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3 }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(output);
+  } catch (error) {
+    console.error("Citation Block generation failed:", error);
+    return fallbackSimulation(profile, articleTitle);
+  }
+};

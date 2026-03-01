@@ -1,0 +1,730 @@
+import React, { useState, useMemo } from 'react';
+import {
+  Bell, AlertTriangle, CheckCircle2, XCircle, Shield, Settings, ArrowLeft,
+  Search, Filter, Info, ChevronDown, ChevronUp, ExternalLink, Clock,
+  TrendingDown, Bot, FileCode, Code, Eye, BarChart3, ToggleLeft, ToggleRight
+} from 'lucide-react';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface AlertsAEOProps {
+  onBack: () => void;
+  user: { name: string; plan: string; credits: number } | null;
+  onNavigate?: (view: string) => void;
+}
+
+type AlertSeverity = 'critical' | 'warning' | 'info' | 'resolved';
+
+interface AEOAlert {
+  id: string;
+  severity: AlertSeverity;
+  title: string;
+  description: string;
+  details: string;
+  affectedUrl: string;
+  timestamp: string;
+  relativeTime: string;
+  category: string;
+}
+
+interface AlertSetting {
+  id: string;
+  label: string;
+  description: string;
+  enabled: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Severity configuration
+// ---------------------------------------------------------------------------
+
+const SEVERITY_CONFIG: Record<AlertSeverity, {
+  icon: React.ElementType;
+  color: string;
+  bg: string;
+  border: string;
+  badge: string;
+  label: string;
+}> = {
+  critical: {
+    icon: XCircle,
+    color: 'text-red-400',
+    bg: 'bg-red-500/10',
+    border: 'border-l-red-500',
+    badge: 'bg-red-500/15 text-red-400 border-red-500/20',
+    label: 'Critique',
+  },
+  warning: {
+    icon: AlertTriangle,
+    color: 'text-yellow-400',
+    bg: 'bg-yellow-500/10',
+    border: 'border-l-yellow-500',
+    badge: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
+    label: 'Warning',
+  },
+  info: {
+    icon: Info,
+    color: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+    border: 'border-l-blue-500',
+    badge: 'bg-blue-500/15 text-blue-400 border-blue-500/20',
+    label: 'Info',
+  },
+  resolved: {
+    icon: CheckCircle2,
+    color: 'text-green-400',
+    bg: 'bg-green-500/10',
+    border: 'border-l-green-500',
+    badge: 'bg-green-500/15 text-green-400 border-green-500/20',
+    label: 'Résolu',
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Demo data
+// ---------------------------------------------------------------------------
+
+const DEMO_ALERTS: AEOAlert[] = [
+  {
+    id: 'alert-001',
+    severity: 'critical',
+    title: 'Score AEO en chute libre (-23 pts)',
+    description: 'Le score AEO de votre page principale est passé de 82 à 59 en 24h. Cela pourrait affecter significativement votre visibilité dans les réponses IA.',
+    details: 'Analyse détaillée : La baisse est principalement due à une modification récente du contenu qui a supprimé plusieurs balises Schema.org structurées. Les sections FAQ et HowTo ont été retirées lors de la dernière mise à jour. Recommandation : restaurer les données structurées et ajouter des balises Question/Answer pour améliorer le score.',
+    affectedUrl: 'monsite.com/guide-seo-2025',
+    timestamp: '2025-06-15T14:30:00Z',
+    relativeTime: 'Il y a 2h',
+    category: 'score',
+  },
+  {
+    id: 'alert-002',
+    severity: 'critical',
+    title: 'Citation IA perdue sur ChatGPT',
+    description: 'Votre site n\'apparaît plus dans les réponses de ChatGPT pour la requête "meilleur outil SEO 2025". Perte de visibilité critique.',
+    details: 'Votre contenu était cité dans 78% des réponses ChatGPT pour cette requête la semaine dernière. Depuis hier, le taux est tombé à 0%. Un concurrent (seotool.io) semble avoir pris votre place avec un contenu mis à jour. Action recommandée : mettre à jour votre contenu avec des données 2025 récentes et renforcer l\'autorité de la page.',
+    affectedUrl: 'monsite.com/comparatif-outils-seo',
+    timestamp: '2025-06-15T12:00:00Z',
+    relativeTime: 'Il y a 4h',
+    category: 'citation',
+  },
+  {
+    id: 'alert-003',
+    severity: 'warning',
+    title: 'Nouveau bot IA détecté : Grok-Crawler',
+    description: 'Un nouveau crawler IA (Grok-Crawler, xAI) a été détecté sur votre site. 47 pages crawlées en 3h. Aucune règle robots.txt configurée.',
+    details: 'Le bot Grok-Crawler (User-Agent: Grok-Crawler/1.0) a commencé à indexer votre site ce matin. Il crawle principalement vos pages de blog et documentation. Votre robots.txt actuel ne contient aucune directive pour ce bot. Nous recommandons de définir des règles d\'accès appropriées.',
+    affectedUrl: 'monsite.com (global)',
+    timestamp: '2025-06-15T11:15:00Z',
+    relativeTime: 'Il y a 5h',
+    category: 'bot',
+  },
+  {
+    id: 'alert-004',
+    severity: 'warning',
+    title: 'Changement robots.txt détecté',
+    description: 'Votre fichier robots.txt a été modifié. La directive "Allow: /blog/" pour GPTBot a été supprimée, ce qui pourrait bloquer l\'indexation IA.',
+    details: 'Modification détectée à 09:42 ce matin. Les changements incluent : suppression de "User-agent: GPTBot / Allow: /blog/" et ajout de "User-agent: * / Disallow: /api/". Cela impacte potentiellement l\'accès de GPTBot et ClaudeBot à votre contenu blog. Vérifiez si ce changement est intentionnel.',
+    affectedUrl: 'monsite.com/robots.txt',
+    timestamp: '2025-06-15T09:42:00Z',
+    relativeTime: 'Il y a 7h',
+    category: 'robots',
+  },
+  {
+    id: 'alert-005',
+    severity: 'warning',
+    title: 'Taux de citation Perplexity en baisse',
+    description: 'Le taux de citation de votre domaine sur Perplexity AI a baissé de 12% cette semaine par rapport à la semaine précédente.',
+    details: 'Semaine précédente : 34% de taux de citation moyen. Cette semaine : 22%. Les requêtes les plus impactées concernent "formation marketing digital" et "stratégie content marketing". Un concurrent a publié un guide complet qui semble être préféré par Perplexity.',
+    affectedUrl: 'monsite.com/formation-marketing',
+    timestamp: '2025-06-15T08:00:00Z',
+    relativeTime: 'Il y a 8h',
+    category: 'citation',
+  },
+  {
+    id: 'alert-006',
+    severity: 'info',
+    title: 'Nouvelle source de trafic IA identifiée',
+    description: 'Copilot (Microsoft) génère désormais du trafic vers votre site. 23 visites détectées cette semaine via des réponses IA.',
+    details: 'Microsoft Copilot cite désormais votre contenu pour des requêtes liées à "optimisation AEO" et "référencement IA". Le trafic provient principalement de Copilot intégré à Bing et Edge. C\'est une opportunité de renforcer votre positionnement sur cette plateforme.',
+    affectedUrl: 'monsite.com/blog/aeo-guide',
+    timestamp: '2025-06-14T18:00:00Z',
+    relativeTime: 'Il y a 22h',
+    category: 'citation',
+  },
+  {
+    id: 'alert-007',
+    severity: 'info',
+    title: 'Erreur Schema.org détectée sur 3 pages',
+    description: 'Le validateur a détecté des erreurs dans les balises Schema.org de 3 pages. Les champs "author" et "dateModified" sont manquants.',
+    details: 'Pages concernées :\n- /blog/guide-aeo (manque "author", "dateModified")\n- /blog/seo-tips-2025 (manque "dateModified")\n- /services/audit (manque "author", "publisher")\nCes champs sont importants pour que les IA puissent correctement attribuer et dater votre contenu.',
+    affectedUrl: 'monsite.com (3 pages)',
+    timestamp: '2025-06-14T14:30:00Z',
+    relativeTime: 'Hier',
+    category: 'schema',
+  },
+  {
+    id: 'alert-008',
+    severity: 'info',
+    title: 'Pic de crawl IA détecté',
+    description: 'Le volume de crawl IA a augmenté de 340% sur les dernières 6h. Principalement GPTBot et ClaudeBot.',
+    details: 'Volume normal : ~50 requêtes/heure. Volume actuel : ~220 requêtes/heure. Les bots se concentrent sur vos pages /blog/ et /docs/. Cela peut indiquer une re-indexation en cours ou un intérêt accru pour votre contenu récemment mis à jour. Aucune action requise si votre serveur supporte la charge.',
+    affectedUrl: 'monsite.com (global)',
+    timestamp: '2025-06-14T10:00:00Z',
+    relativeTime: 'Hier',
+    category: 'bot',
+  },
+  {
+    id: 'alert-009',
+    severity: 'resolved',
+    title: 'Score AEO restauré sur /pricing',
+    description: 'Le score AEO de la page /pricing est remonté à 78 (était à 45). Les corrections Schema.org ont été prises en compte.',
+    details: 'Suite à l\'alerte du 12 juin, les corrections apportées (ajout de données structurées Product, FAQ et Organization) ont été indexées par les crawlers IA. Le score est passé de 45 à 78 en 48h. Continuez à monitorer pour confirmer la stabilité.',
+    affectedUrl: 'monsite.com/pricing',
+    timestamp: '2025-06-14T08:00:00Z',
+    relativeTime: 'Hier',
+    category: 'score',
+  },
+  {
+    id: 'alert-010',
+    severity: 'resolved',
+    title: 'Directive robots.txt corrigée pour ClaudeBot',
+    description: 'La directive Allow pour ClaudeBot a été correctement ajoutée au robots.txt. Le bot peut à nouveau accéder au contenu.',
+    details: 'Suite à l\'alerte du 10 juin signalant un blocage involontaire de ClaudeBot, la directive a été mise à jour. ClaudeBot a repris le crawl avec succès : 34 pages indexées depuis la correction. Le taux de citation sur Claude devrait se rétablir sous 48-72h.',
+    affectedUrl: 'monsite.com/robots.txt',
+    timestamp: '2025-06-13T16:00:00Z',
+    relativeTime: 'Il y a 2 jours',
+    category: 'robots',
+  },
+];
+
+const DEFAULT_SETTINGS: AlertSetting[] = [
+  { id: 'score-drop', label: 'Score AEO en baisse', description: 'Alerte si le score AEO baisse de plus de 10 points', enabled: true },
+  { id: 'new-bot', label: 'Nouveau bot détecté', description: 'Notification lors de la détection d\'un nouveau crawler IA', enabled: true },
+  { id: 'citation-lost', label: 'Citation IA perdue', description: 'Alerte si une citation IA disparaît', enabled: true },
+  { id: 'robots-change', label: 'Changement robots.txt', description: 'Alerte en cas de modification du robots.txt', enabled: true },
+  { id: 'schema-error', label: 'Erreur Schema.org', description: 'Notification pour les erreurs de données structurées', enabled: false },
+];
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+const AlertsAEO: React.FC<AlertsAEOProps> = ({ onBack, user, onNavigate }) => {
+  const [activeFilter, setActiveFilter] = useState<'all' | AlertSeverity>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedAlertId, setExpandedAlertId] = useState<string | null>(null);
+  const [resolvedAlerts, setResolvedAlerts] = useState<Set<string>>(new Set());
+  const [alertSettings, setAlertSettings] = useState<AlertSetting[]>(DEFAULT_SETTINGS);
+
+  // Derive alert list with resolved overrides
+  const alerts = useMemo(() => {
+    return DEMO_ALERTS.map((alert) => {
+      if (resolvedAlerts.has(alert.id) && alert.severity !== 'resolved') {
+        return { ...alert, severity: 'resolved' as AlertSeverity };
+      }
+      return alert;
+    });
+  }, [resolvedAlerts]);
+
+  // Filter + search
+  const filteredAlerts = useMemo(() => {
+    let list = alerts;
+
+    if (activeFilter !== 'all') {
+      list = list.filter((a) => a.severity === activeFilter);
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (a) =>
+          a.title.toLowerCase().includes(q) ||
+          a.description.toLowerCase().includes(q) ||
+          a.affectedUrl.toLowerCase().includes(q)
+      );
+    }
+
+    return list;
+  }, [alerts, activeFilter, searchQuery]);
+
+  // KPI counts
+  const kpis = useMemo(() => {
+    const critical = alerts.filter((a) => a.severity === 'critical').length;
+    const warning = alerts.filter((a) => a.severity === 'warning').length;
+    const info = alerts.filter((a) => a.severity === 'info').length;
+    const resolved = alerts.filter((a) => a.severity === 'resolved').length;
+    return { critical, warning, info, resolved };
+  }, [alerts]);
+
+  const totalActive = kpis.critical + kpis.warning + kpis.info;
+
+  // Handlers
+  const toggleExpand = (id: string) => {
+    setExpandedAlertId((prev) => (prev === id ? null : id));
+  };
+
+  const markResolved = (id: string) => {
+    setResolvedAlerts((prev) => new Set(prev).add(id));
+    setExpandedAlertId(null);
+  };
+
+  const toggleSetting = (settingId: string) => {
+    setAlertSettings((prev) =>
+      prev.map((s) => (s.id === settingId ? { ...s, enabled: !s.enabled } : s))
+    );
+  };
+
+  // Category icon helper
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'score': return TrendingDown;
+      case 'citation': return Eye;
+      case 'bot': return Bot;
+      case 'robots': return FileCode;
+      case 'schema': return Code;
+      default: return Bell;
+    }
+  };
+
+  // Filter buttons config
+  const filterButtons: { key: 'all' | AlertSeverity; label: string; color: string; count?: number }[] = [
+    { key: 'all', label: 'Toutes', color: 'text-white bg-white/10', count: alerts.length },
+    { key: 'critical', label: 'Critiques', color: 'text-red-400 bg-red-500/10', count: kpis.critical },
+    { key: 'warning', label: 'Warnings', color: 'text-yellow-400 bg-yellow-500/10', count: kpis.warning },
+    { key: 'info', label: 'Info', color: 'text-blue-400 bg-blue-500/10', count: kpis.info },
+    { key: 'resolved', label: 'Résolues', color: 'text-green-400 bg-green-500/10', count: kpis.resolved },
+  ];
+
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
+
+  return (
+    <div className="w-full px-4 sm:px-6 py-6 sm:py-8 animate-in fade-in duration-500">
+
+      {/* ---- Header ---- */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onBack}
+            className="p-2 rounded-xl bg-[#111111] border border-white/[0.08] hover:bg-white/10 transition-colors"
+            aria-label="Retour"
+          >
+            <ArrowLeft size={20} className="text-gray-400" />
+          </button>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold font-sans text-white">
+                Alertes AEO
+              </h1>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-primary/20">
+                <Bell size={13} />
+                {totalActive} active{totalActive > 1 ? 's' : ''}
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              Surveillez et gérez les alertes de votre visibilité IA en temps réel
+            </p>
+          </div>
+        </div>
+
+        {user && (
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <Shield size={14} className="text-purple-400" />
+            <span>Plan {user.plan}</span>
+            <span className="text-white/20">|</span>
+            <span>{user.credits} crédits</span>
+          </div>
+        )}
+      </div>
+
+      {/* ---- KPI Row ---- */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Critical */}
+        <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-5 transition-all hover:border-red-500/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 rounded-xl bg-red-500/10">
+              <XCircle size={20} className="text-red-400" />
+            </div>
+            <span className="text-3xl font-bold text-red-400">{kpis.critical}</span>
+          </div>
+          <p className="text-sm font-semibold text-gray-300">Alertes Critiques</p>
+          <p className="text-xs text-gray-500 mt-0.5">Action immédiate requise</p>
+        </div>
+
+        {/* Warning */}
+        <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-5 transition-all hover:border-yellow-500/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 rounded-xl bg-yellow-500/10">
+              <AlertTriangle size={20} className="text-yellow-400" />
+            </div>
+            <span className="text-3xl font-bold text-yellow-400">{kpis.warning}</span>
+          </div>
+          <p className="text-sm font-semibold text-gray-300">Alertes Warning</p>
+          <p className="text-xs text-gray-500 mt-0.5">A surveiller de près</p>
+        </div>
+
+        {/* Info */}
+        <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-5 transition-all hover:border-blue-500/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 rounded-xl bg-blue-500/10">
+              <Info size={20} className="text-blue-400" />
+            </div>
+            <span className="text-3xl font-bold text-blue-400">{kpis.info}</span>
+          </div>
+          <p className="text-sm font-semibold text-gray-300">Alertes Info</p>
+          <p className="text-xs text-gray-500 mt-0.5">Pour information</p>
+        </div>
+
+        {/* Resolved */}
+        <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-5 transition-all hover:border-green-500/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 rounded-xl bg-green-500/10">
+              <CheckCircle2 size={20} className="text-green-400" />
+            </div>
+            <span className="text-3xl font-bold text-green-400">{kpis.resolved}</span>
+          </div>
+          <p className="text-sm font-semibold text-gray-300">Résolues ce mois</p>
+          <p className="text-xs text-gray-500 mt-0.5">Problèmes corrigés</p>
+        </div>
+      </div>
+
+      {/* ---- Main layout: Alert list + Sidebar ---- */}
+      <div className="flex flex-col lg:flex-row gap-6">
+
+        {/* ---- Left: Alert list (2/3) ---- */}
+        <div className="w-full lg:w-2/3 space-y-6">
+
+          {/* Filter bar */}
+          <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              {/* Filter pills */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <Filter size={16} className="text-gray-500 mr-1 hidden sm:block" />
+                {filterButtons.map((btn) => (
+                  <button
+                    key={btn.key}
+                    onClick={() => setActiveFilter(btn.key)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeFilter === btn.key
+                        ? `${btn.color} border border-current/20`
+                        : 'text-gray-500 hover:text-gray-300 bg-transparent'
+                    }`}
+                  >
+                    {btn.label}
+                    {btn.count !== undefined && (
+                      <span className="ml-1.5 opacity-70">({btn.count})</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search */}
+              <div className="relative w-full sm:w-auto sm:ml-auto">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Rechercher une alerte..."
+                  className="bg-[#1a1d21] border border-white/[0.08] rounded-xl py-2 pl-9 pr-4 text-sm text-gray-300 focus:outline-none focus:border-purple-500/50 w-full sm:w-64 placeholder:text-gray-600"
+                />
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* Alert cards */}
+          <div className="space-y-3">
+            {filteredAlerts.length === 0 ? (
+              <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-12 text-center">
+                <Bell size={40} className="text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400 font-semibold">Aucune alerte trouvée</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {searchQuery ? 'Essayez un autre terme de recherche' : 'Aucune alerte dans cette catégorie'}
+                </p>
+              </div>
+            ) : (
+              filteredAlerts.map((alert, index) => {
+                const config = SEVERITY_CONFIG[alert.severity];
+                const SeverityIcon = config.icon;
+                const CategoryIcon = getCategoryIcon(alert.category);
+                const isExpanded = expandedAlertId === alert.id;
+                const isResolvable = alert.severity !== 'resolved';
+
+                return (
+                  <div
+                    key={alert.id}
+                    className={`bg-[#111111] border border-white/[0.08] rounded-2xl overflow-hidden transition-all duration-300 hover:border-white/[0.12] ${
+                      index < 3 ? 'animate-in fade-in duration-500' : ''
+                    }`}
+                    style={{ animationDelay: `${index * 80}ms` }}
+                  >
+                    {/* Card with colored left border */}
+                    <div className={`border-l-4 ${config.border} p-4 sm:p-5`}>
+
+                      {/* Top row: icon + title + timestamp */}
+                      <div className="flex items-start gap-3">
+                        {/* Severity + Category icons */}
+                        <div className="flex flex-col items-center gap-1.5 mt-0.5">
+                          <div className={`p-1.5 rounded-lg ${config.bg}`}>
+                            <SeverityIcon size={16} className={config.color} />
+                          </div>
+                          <CategoryIcon size={12} className="text-gray-600" />
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-1.5">
+                            <h3 className="text-sm sm:text-base font-bold text-white leading-tight">
+                              {alert.title}
+                            </h3>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${config.badge}`}>
+                                {config.label}
+                              </span>
+                              <span className="flex items-center gap-1 text-xs text-gray-500 whitespace-nowrap">
+                                <Clock size={11} />
+                                {alert.relativeTime}
+                              </span>
+                            </div>
+                          </div>
+
+                          <p className="text-sm text-gray-400 leading-relaxed mb-2">
+                            {alert.description}
+                          </p>
+
+                          {/* Affected URL */}
+                          <div className="flex items-center gap-1.5 mb-3">
+                            <ExternalLink size={12} className="text-gray-600" />
+                            <span className="text-xs text-purple-400/80 font-mono truncate">
+                              {alert.affectedUrl}
+                            </span>
+                          </div>
+
+                          {/* Expanded details */}
+                          {isExpanded && (
+                            <div className="bg-[#1a1d21] border border-white/[0.06] rounded-xl p-4 mb-3 animate-in fade-in duration-300">
+                              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                                Détails complets
+                              </h4>
+                              <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">
+                                {alert.details}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Action buttons */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <button
+                              onClick={() => toggleExpand(alert.id)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
+                            >
+                              {isExpanded ? (
+                                <>
+                                  <ChevronUp size={13} />
+                                  Masquer détails
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown size={13} />
+                                  Voir détails
+                                </>
+                              )}
+                            </button>
+
+                            {isResolvable && (
+                              <button
+                                onClick={() => markResolved(alert.id)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-500/10 hover:bg-green-500/20 text-green-400 transition-colors"
+                              >
+                                <CheckCircle2 size={13} />
+                                Marquer résolu
+                              </button>
+                            )}
+
+                            {alert.severity === 'resolved' && (
+                              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-500/10 text-green-400/60 cursor-default">
+                                <CheckCircle2 size={13} />
+                                Résolu
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* ---- Right: Sidebar (1/3) ---- */}
+        <div className="w-full lg:w-1/3 space-y-6">
+
+          {/* Configuration des alertes */}
+          <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-5">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="p-2 rounded-xl bg-purple-500/10">
+                <Settings size={18} className="text-purple-400" />
+              </div>
+              <h2 className="text-base font-bold text-white">Configuration des alertes</h2>
+            </div>
+
+            <div className="space-y-1">
+              {alertSettings.map((setting) => (
+                <div
+                  key={setting.id}
+                  className="flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-white/[0.02] transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-300">{setting.label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">{setting.description}</p>
+                  </div>
+                  <button
+                    onClick={() => toggleSetting(setting.id)}
+                    className="shrink-0 transition-colors"
+                    aria-label={`Toggle ${setting.label}`}
+                  >
+                    {setting.enabled ? (
+                      <ToggleRight size={28} className="text-purple-400" />
+                    ) : (
+                      <ToggleLeft size={28} className="text-gray-600" />
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-white/[0.06]">
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 transition-colors">
+                <Bell size={15} />
+                Configurer les notifications
+              </button>
+            </div>
+          </div>
+
+          {/* Résumé hebdomadaire */}
+          <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-5">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="p-2 rounded-xl bg-blue-500/10">
+                <BarChart3 size={18} className="text-blue-400" />
+              </div>
+              <h2 className="text-base font-bold text-white">Résumé hebdomadaire</h2>
+            </div>
+
+            {/* Mini chart placeholder */}
+            <div className="bg-[#1a1d21] border border-white/[0.06] rounded-xl p-4 mb-4">
+              <div className="flex items-end justify-between gap-1.5 h-24">
+                {[
+                  { day: 'Lun', critical: 1, warning: 2, info: 1 },
+                  { day: 'Mar', critical: 0, warning: 3, info: 2 },
+                  { day: 'Mer', critical: 2, warning: 1, info: 0 },
+                  { day: 'Jeu', critical: 1, warning: 2, info: 3 },
+                  { day: 'Ven', critical: 0, warning: 1, info: 1 },
+                  { day: 'Sam', critical: 0, warning: 0, info: 2 },
+                  { day: 'Dim', critical: 1, warning: 1, info: 0 },
+                ].map((d) => {
+                  const total = d.critical + d.warning + d.info;
+                  const maxH = 80; // px
+                  const scale = total > 0 ? total / 7 : 0;
+
+                  return (
+                    <div key={d.day} className="flex flex-col items-center gap-1 flex-1">
+                      <div className="flex flex-col-reverse gap-0.5 w-full max-w-[20px]">
+                        {d.critical > 0 && (
+                          <div
+                            className="bg-red-500/60 rounded-sm w-full"
+                            style={{ height: `${(d.critical / 7) * maxH}px` }}
+                          />
+                        )}
+                        {d.warning > 0 && (
+                          <div
+                            className="bg-yellow-500/60 rounded-sm w-full"
+                            style={{ height: `${(d.warning / 7) * maxH}px` }}
+                          />
+                        )}
+                        {d.info > 0 && (
+                          <div
+                            className="bg-blue-500/60 rounded-sm w-full"
+                            style={{ height: `${(d.info / 7) * maxH}px` }}
+                          />
+                        )}
+                        {total === 0 && (
+                          <div className="bg-white/5 rounded-sm w-full" style={{ height: '4px' }} />
+                        )}
+                      </div>
+                      <span className="text-[10px] text-gray-600">{d.day}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Weekly stats */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">Total cette semaine</span>
+                <span className="font-bold text-white">21 alertes</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">Temps moyen résolution</span>
+                <span className="font-bold text-white">4.2h</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">Taux de résolution</span>
+                <span className="font-bold text-green-400">87%</span>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-white/[0.06]">
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Clock size={12} />
+                <span>Mis à jour il y a 15 min</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick actions */}
+          <div className="bg-[#111111] border border-white/[0.08] rounded-2xl p-5">
+            <h3 className="text-sm font-bold text-white mb-3">Actions rapides</h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => onNavigate?.('bot-tracking')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/[0.04] transition-colors text-left"
+              >
+                <Bot size={16} className="text-purple-400 shrink-0" />
+                Voir le suivi des bots IA
+              </button>
+              <button
+                onClick={() => onNavigate?.('robots-txt')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/[0.04] transition-colors text-left"
+              >
+                <FileCode size={16} className="text-blue-400 shrink-0" />
+                Configurer robots.txt
+              </button>
+              <button
+                onClick={() => onNavigate?.('schema-org')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/[0.04] transition-colors text-left"
+              >
+                <Code size={16} className="text-green-400 shrink-0" />
+                Générateur Schema.org
+              </button>
+              <button
+                onClick={() => onNavigate?.('dashboard')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/[0.04] transition-colors text-left"
+              >
+                <BarChart3 size={16} className="text-yellow-400 shrink-0" />
+                Retour au Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AlertsAEO;

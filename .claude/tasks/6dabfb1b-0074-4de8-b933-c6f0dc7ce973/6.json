@@ -1,0 +1,9 @@
+{
+  "id": "6",
+  "subject": "Phase 5: Déploiement local et test",
+  "description": "npm install, tsc --noEmit, vérifier intégrité fichiers, lancer npm run dev",
+  "activeForm": "Testant le déploiement local",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

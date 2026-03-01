@@ -1,0 +1,875 @@
+import React, { useState, useMemo } from 'react';
+import {
+  ClipboardList, ArrowLeft, Search, Filter, Clock, CheckCircle2, XCircle, Play,
+  Globe, TrendingUp, User as UserIcon, Mail, Building2, Calendar, DollarSign,
+  ChevronDown, ChevronUp, AlertTriangle, Star, FileText, ExternalLink,
+  ArrowRight, RefreshCw, Eye, BarChart3, Target, Zap, Shield, Lock, Unlock,
+  Upload, Link, Image, Code, FileCheck, AlertCircle, ThumbsUp, ThumbsDown,
+  ScanLine, ArrowUpRight, Banknote, ShieldCheck, Loader2
+} from 'lucide-react';
+import type { User } from '../types';
+
+type MissionStatus = 'nouveau' | 'accepte' | 'en_cours' | 'livraison' | 'termine' | 'refuse';
+type EscrowStatus = 'bloque' | 'en_validation' | 'libere' | 'litige';
+type ProofType = 'lien' | 'capture' | 'code' | 'audit';
+type PlatformValidation = 'en_attente' | 'valide' | 'non_conforme';
+
+interface DeliverableProof {
+  type: ProofType;
+  label: string;
+  url?: string;
+  description: string;
+  submittedAt: string;
+}
+
+interface MissionRecommendation {
+  id: string;
+  title: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  category: string;
+  // Delivery proof
+  proof?: DeliverableProof;
+  platformValidation?: PlatformValidation;
+}
+
+interface MissionOrder {
+  id: string;
+  clientName: string;
+  clientEmail: string;
+  clientCompany: string;
+  clientPhone?: string;
+  analyzedUrl: string;
+  aeoScore: number;
+  auditDate: string;
+  recommendations: MissionRecommendation[];
+  status: MissionStatus;
+  budget: number;
+  currency: string;
+  deadline: string;
+  createdAt: string;
+  updatedAt: string;
+  notes?: string;
+  completedRecommendations?: string[];
+  // Escrow & Validation
+  escrowStatus?: EscrowStatus;
+  postAuditScore?: number;
+  postAuditDate?: string;
+  isReauditing?: boolean;
+}
+
+interface MissionOrdersProps {
+  onBack: () => void;
+  user: User | null;
+  onNavigate: (view: string) => void;
+}
+
+// --- Demo data ---
+const DEMO_MISSIONS: MissionOrder[] = [
+  {
+    id: 'MIS-2026-001',
+    clientName: 'Sophie Martin',
+    clientEmail: 'sophie.martin@techvision.fr',
+    clientCompany: 'TechVision SAS',
+    clientPhone: '+33 6 12 34 56 78',
+    analyzedUrl: 'https://www.techvision.fr',
+    aeoScore: 34,
+    auditDate: '2026-02-10T14:30:00Z',
+    recommendations: [
+      { id: 'r1', title: 'Ajouter des données structurées Schema.org (Organization + FAQ)', priority: 'critical', category: 'Schema.org' },
+      { id: 'r2', title: 'Optimiser le robots.txt pour les crawlers IA', priority: 'high', category: 'Robots.txt' },
+      { id: 'r3', title: 'Créer une page Source of Truth canonique', priority: 'high', category: 'Source of Truth' },
+      { id: 'r4', title: 'Ajouter des FAQ structurées sur chaque page service', priority: 'medium', category: 'Contenu' },
+    ],
+    status: 'nouveau',
+    budget: 2500,
+    currency: 'EUR',
+    deadline: '2026-03-15',
+    createdAt: '2026-02-12T09:00:00Z',
+    updatedAt: '2026-02-12T09:00:00Z',
+    notes: 'Le client souhaite être cité dans les réponses ChatGPT pour ses services cloud.',
+  },
+  {
+    id: 'MIS-2026-002',
+    clientName: 'Jean-Pierre Dubois',
+    clientEmail: 'jp.dubois@greenleaf.eco',
+    clientCompany: 'GreenLeaf Énergie',
+    analyzedUrl: 'https://www.greenleaf-energie.fr',
+    aeoScore: 22,
+    auditDate: '2026-02-08T10:15:00Z',
+    recommendations: [
+      { id: 'r1', title: 'Restructurer entièrement le contenu pour les LLMs', priority: 'critical', category: 'Contenu' },
+      { id: 'r2', title: 'Implémenter JSON-LD Schema.org (LocalBusiness + Service)', priority: 'critical', category: 'Schema.org' },
+      { id: 'r3', title: 'Créer un hub de contenu expert énergie renouvelable', priority: 'high', category: 'SMC Studio' },
+      { id: 'r4', title: 'Configurer robots.txt pour autoriser les bots IA', priority: 'high', category: 'Robots.txt' },
+      { id: 'r5', title: 'Ajouter des citations et sources vérifiables', priority: 'medium', category: 'Crédibilité' },
+    ],
+    status: 'accepte',
+    budget: 4800,
+    currency: 'EUR',
+    deadline: '2026-04-01',
+    createdAt: '2026-02-09T11:30:00Z',
+    updatedAt: '2026-02-11T16:45:00Z',
+    escrowStatus: 'bloque',
+    notes: 'Budget validé par le directeur marketing. Priorité sur Schema.org et contenu expert.',
+  },
+  {
+    id: 'MIS-2026-003',
+    clientName: 'Marie Leclerc',
+    clientEmail: 'marie@boutique-artisan.com',
+    clientCompany: 'Boutique Artisan',
+    clientPhone: '+33 7 98 76 54 32',
+    analyzedUrl: 'https://boutique-artisan.com',
+    aeoScore: 45,
+    auditDate: '2026-02-01T08:00:00Z',
+    recommendations: [
+      { id: 'r1', title: 'Optimiser les fiches produits pour les réponses IA', priority: 'high', category: 'Contenu',
+        proof: { type: 'lien', label: 'Fiches produits optimisées', url: 'https://boutique-artisan.com/products', description: '12 fiches produits réécrites avec format Q&A et données structurées Product.', submittedAt: '2026-02-10T14:00:00Z' },
+        platformValidation: 'valide'
+      },
+      { id: 'r2', title: 'Ajouter Schema.org Product + Review sur chaque fiche', priority: 'high', category: 'Schema.org',
+        proof: { type: 'code', label: 'JSON-LD Product + Review', url: '', description: 'Schema.org Product avec AggregateRating déployé sur les 12 fiches.', submittedAt: '2026-02-11T10:00:00Z' },
+        platformValidation: 'valide'
+      },
+      { id: 'r3', title: 'Créer une FAQ dynamique par catégorie', priority: 'medium', category: 'FAQ',
+        proof: { type: 'lien', label: 'FAQ par catégorie', url: 'https://boutique-artisan.com/faq', description: '5 pages FAQ créées (bijoux, céramique, textile, bois, cuir) avec Schema FAQPage.', submittedAt: '2026-02-12T16:00:00Z' },
+        platformValidation: 'en_attente'
+      },
+    ],
+    status: 'livraison',
+    budget: 1800,
+    currency: 'EUR',
+    deadline: '2026-03-01',
+    createdAt: '2026-02-02T14:00:00Z',
+    updatedAt: '2026-02-13T10:30:00Z',
+    completedRecommendations: ['r1', 'r2', 'r3'],
+    escrowStatus: 'en_validation',
+    postAuditScore: 71,
+    postAuditDate: '2026-02-13T09:00:00Z',
+  },
+  {
+    id: 'MIS-2026-004',
+    clientName: 'Alexandre Moreau',
+    clientEmail: 'a.moreau@financeplus.fr',
+    clientCompany: 'Finance Plus',
+    analyzedUrl: 'https://www.financeplus.fr',
+    aeoScore: 58,
+    auditDate: '2026-01-20T16:00:00Z',
+    recommendations: [
+      { id: 'r1', title: 'Ajouter des données structurées FinancialService', priority: 'high', category: 'Schema.org',
+        proof: { type: 'code', label: 'JSON-LD FinancialService', url: '', description: 'Schema.org FinancialService + FAQPage déployé sur toutes les pages.', submittedAt: '2026-02-05T11:00:00Z' },
+        platformValidation: 'valide'
+      },
+      { id: 'r2', title: 'Optimiser le contenu expert en conformité RGPD', priority: 'medium', category: 'Contenu',
+        proof: { type: 'lien', label: 'Pages conformes', url: 'https://www.financeplus.fr/expertise', description: '8 articles experts réécrits avec sources vérifiables et conformité RGPD.', submittedAt: '2026-02-08T14:00:00Z' },
+        platformValidation: 'valide'
+      },
+    ],
+    status: 'termine',
+    budget: 3200,
+    currency: 'EUR',
+    deadline: '2026-02-10',
+    createdAt: '2026-01-21T09:00:00Z',
+    updatedAt: '2026-02-09T17:00:00Z',
+    completedRecommendations: ['r1', 'r2'],
+    escrowStatus: 'libere',
+    postAuditScore: 82,
+    postAuditDate: '2026-02-09T10:00:00Z',
+    notes: 'Mission terminée avec succès. Score AEO passé de 58 à 82. Fonds libérés.',
+  },
+  {
+    id: 'MIS-2026-005',
+    clientName: 'Laura Chen',
+    clientEmail: 'laura.chen@startuplab.io',
+    clientCompany: 'StartupLab',
+    analyzedUrl: 'https://startuplab.io',
+    aeoScore: 15,
+    auditDate: '2026-02-11T12:00:00Z',
+    recommendations: [
+      { id: 'r1', title: 'Refonte complète de la stratégie contenu AEO', priority: 'critical', category: 'Contenu' },
+      { id: 'r2', title: 'Implémenter Schema.org SoftwareApplication', priority: 'critical', category: 'Schema.org' },
+      { id: 'r3', title: 'Construire une Source of Truth LLM complète', priority: 'high', category: 'Source of Truth' },
+      { id: 'r4', title: 'Créer un blog AEO-optimisé avec 20 articles', priority: 'high', category: 'SMC Studio' },
+      { id: 'r5', title: 'Optimiser les méta-données pour les crawlers IA', priority: 'medium', category: 'Technique' },
+      { id: 'r6', title: 'Ajouter un chatbot FAQ sur le site', priority: 'low', category: 'UX' },
+    ],
+    status: 'nouveau',
+    budget: 7500,
+    currency: 'EUR',
+    deadline: '2026-05-01',
+    createdAt: '2026-02-13T08:00:00Z',
+    updatedAt: '2026-02-13T08:00:00Z',
+    notes: 'Startup en pré-seed. Budget conséquent, souhaite une visibilité maximale dans les IA génératives.',
+  },
+  {
+    id: 'MIS-2026-006',
+    clientName: 'Thomas Bernard',
+    clientEmail: 'thomas@immoprime.fr',
+    clientCompany: 'ImmoPrime',
+    analyzedUrl: 'https://www.immoprime.fr',
+    aeoScore: 41,
+    auditDate: '2026-02-05T09:30:00Z',
+    recommendations: [
+      { id: 'r1', title: 'Ajouter Schema.org RealEstateAgent + LocalBusiness', priority: 'critical', category: 'Schema.org' },
+      { id: 'r2', title: 'Créer du contenu expert immobilier local', priority: 'high', category: 'Contenu' },
+      { id: 'r3', title: 'FAQ structurée par ville et type de bien', priority: 'medium', category: 'FAQ' },
+    ],
+    status: 'refuse',
+    budget: 2000,
+    currency: 'EUR',
+    deadline: '2026-03-20',
+    createdAt: '2026-02-06T10:00:00Z',
+    updatedAt: '2026-02-07T14:00:00Z',
+    notes: 'Refusé — budget insuffisant pour le scope demandé. Proposer un package réduit.',
+  },
+  {
+    id: 'MIS-2026-007',
+    clientName: 'Camille Petit',
+    clientEmail: 'camille@wellnesszone.fr',
+    clientCompany: 'WellnessZone',
+    analyzedUrl: 'https://wellnesszone.fr',
+    aeoScore: 28,
+    auditDate: '2026-02-12T15:00:00Z',
+    recommendations: [
+      { id: 'r1', title: 'Données structurées HealthAndBeautyBusiness', priority: 'critical', category: 'Schema.org',
+        proof: { type: 'code', label: 'JSON-LD déployé', url: '', description: 'Schema.org HealthAndBeautyBusiness implémenté sur la page d\'accueil et les 4 pages services.', submittedAt: '2026-02-14T08:00:00Z' },
+        platformValidation: 'en_attente'
+      },
+      { id: 'r2', title: 'Contenu expertise bien-être avec sources médicales', priority: 'high', category: 'Contenu' },
+      { id: 'r3', title: 'Robots.txt optimisé pour bots IA santé', priority: 'high', category: 'Robots.txt',
+        proof: { type: 'lien', label: 'robots.txt en ligne', url: 'https://wellnesszone.fr/robots.txt', description: 'Robots.txt mis à jour : GPTBot, ClaudeBot, Google-Extended autorisés. Crawl-delay optimal.', submittedAt: '2026-02-13T17:00:00Z' },
+        platformValidation: 'valide'
+      },
+      { id: 'r4', title: 'Source of Truth avec certifications et accréditations', priority: 'medium', category: 'Source of Truth' },
+    ],
+    status: 'en_cours',
+    budget: 3500,
+    currency: 'EUR',
+    deadline: '2026-03-25',
+    createdAt: '2026-02-13T16:00:00Z',
+    updatedAt: '2026-02-14T09:00:00Z',
+    completedRecommendations: ['r1', 'r3'],
+    escrowStatus: 'bloque',
+  },
+];
+
+const STATUS_CONFIG: Record<MissionStatus, { label: string; color: string; bg: string; icon: React.ElementType }> = {
+  nouveau: { label: 'Nouveau', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', icon: Star },
+  accepte: { label: 'Accepté', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20', icon: CheckCircle2 },
+  en_cours: { label: 'En cours', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20', icon: Play },
+  livraison: { label: 'En validation', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20', icon: FileCheck },
+  termine: { label: 'Terminé', color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20', icon: CheckCircle2 },
+  refuse: { label: 'Refusé', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20', icon: XCircle },
+};
+
+const ESCROW_CONFIG: Record<EscrowStatus, { label: string; color: string; icon: React.ElementType; desc: string }> = {
+  bloque: { label: 'Fonds bloqués', color: 'text-amber-400', icon: Lock, desc: 'Les fonds sont sécurisés en escrow. Ils seront libérés après validation par CitedBy.ai.' },
+  en_validation: { label: 'En validation CitedBy.ai', color: 'text-purple-400', icon: ShieldCheck, desc: 'Le travail est soumis. CitedBy.ai vérifie la conformité des livrables avant de libérer les fonds.' },
+  libere: { label: 'Fonds libérés', color: 'text-green-400', icon: Unlock, desc: 'CitedBy.ai a validé le travail. Les fonds ont été versés à l\'agence.' },
+  litige: { label: 'Litige en cours', color: 'text-red-400', icon: AlertCircle, desc: 'Livraison jugée non conforme. Un médiateur CitedBy.ai intervient.' },
+};
+
+const PROOF_ICONS: Record<ProofType, React.ElementType> = {
+  lien: Link,
+  capture: Image,
+  code: Code,
+  audit: ScanLine,
+};
+
+const PRIORITY_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
+  critical: { label: 'Critique', color: 'text-red-400', dot: 'bg-red-400' },
+  high: { label: 'Haute', color: 'text-orange-400', dot: 'bg-orange-400' },
+  medium: { label: 'Moyenne', color: 'text-yellow-400', dot: 'bg-yellow-400' },
+  low: { label: 'Basse', color: 'text-gray-400', dot: 'bg-gray-400' },
+};
+
+const VALIDATION_CONFIG: Record<PlatformValidation, { label: string; color: string; icon: React.ElementType }> = {
+  en_attente: { label: 'En vérification', color: 'text-gray-400 bg-white/5 border-white/10', icon: Clock },
+  valide: { label: 'Validé CitedBy.ai', color: 'text-green-400 bg-green-500/10 border-green-500/20', icon: ShieldCheck },
+  non_conforme: { label: 'Non conforme', color: 'text-red-400 bg-red-500/10 border-red-500/20', icon: ThumbsDown },
+};
+
+const MissionOrders: React.FC<MissionOrdersProps> = ({ onBack, user, onNavigate }) => {
+  const [missions, setMissions] = useState<MissionOrder[]>(DEMO_MISSIONS);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<MissionStatus | 'all'>('all');
+  const [expandedMission, setExpandedMission] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'date' | 'budget' | 'score'>('date');
+  const [proofModal, setProofModal] = useState<{ missionId: string; recId: string } | null>(null);
+  const [proofForm, setProofForm] = useState({ type: 'lien' as ProofType, description: '', url: '' });
+
+  const kpis = useMemo(() => ({
+    total: missions.length,
+    nouveau: missions.filter(m => m.status === 'nouveau').length,
+    en_cours: missions.filter(m => ['accepte', 'en_cours', 'livraison'].includes(m.status)).length,
+    termine: missions.filter(m => m.status === 'termine').length,
+    refuse: missions.filter(m => m.status === 'refuse').length,
+    totalBudget: missions.filter(m => m.status !== 'refuse').reduce((sum, m) => sum + m.budget, 0),
+    avgScore: Math.round(missions.reduce((sum, m) => sum + m.aeoScore, 0) / missions.length),
+    escrowBloque: missions.filter(m => m.escrowStatus === 'bloque' || m.escrowStatus === 'en_validation').reduce((s, m) => s + m.budget, 0),
+  }), [missions]);
+
+  const filteredMissions = useMemo(() => {
+    let filtered = missions;
+    if (statusFilter !== 'all') filtered = filtered.filter(m => m.status === statusFilter);
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(m =>
+        m.clientName.toLowerCase().includes(q) || m.clientCompany.toLowerCase().includes(q) ||
+        m.analyzedUrl.toLowerCase().includes(q) || m.id.toLowerCase().includes(q)
+      );
+    }
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'budget') return b.budget - a.budget;
+      if (sortBy === 'score') return a.aeoScore - b.aeoScore;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [missions, statusFilter, searchQuery, sortBy]);
+
+  const handleStatusChange = (missionId: string, newStatus: MissionStatus) => {
+    setMissions(prev => prev.map(m => {
+      if (m.id !== missionId) return m;
+      const updates: Partial<MissionOrder> = { status: newStatus, updatedAt: new Date().toISOString() };
+      if (newStatus === 'accepte') updates.escrowStatus = 'bloque';
+      if (newStatus === 'livraison') updates.escrowStatus = 'en_validation';
+      if (newStatus === 'termine') updates.escrowStatus = 'libere';
+      return { ...m, ...updates };
+    }));
+  };
+
+  const handleToggleRecommendation = (missionId: string, recId: string) => {
+    setMissions(prev => prev.map(m => {
+      if (m.id !== missionId) return m;
+      const completed = m.completedRecommendations || [];
+      const isCompleted = completed.includes(recId);
+      return {
+        ...m,
+        completedRecommendations: isCompleted ? completed.filter(id => id !== recId) : [...completed, recId],
+        updatedAt: new Date().toISOString(),
+      };
+    }));
+  };
+
+  const handleSubmitProof = () => {
+    if (!proofModal || !proofForm.description.trim()) return;
+    setMissions(prev => prev.map(m => {
+      if (m.id !== proofModal.missionId) return m;
+      return {
+        ...m,
+        recommendations: m.recommendations.map(r => {
+          if (r.id !== proofModal.recId) return r;
+          return {
+            ...r,
+            proof: {
+              type: proofForm.type,
+              label: proofForm.type === 'lien' ? 'Lien livrable' : proofForm.type === 'code' ? 'Code livré' : proofForm.type === 'capture' ? 'Capture d\'écran' : 'Rapport d\'audit',
+              url: proofForm.url,
+              description: proofForm.description,
+              submittedAt: new Date().toISOString(),
+            },
+            platformValidation: 'en_attente' as PlatformValidation,
+          };
+        }),
+        updatedAt: new Date().toISOString(),
+      };
+    }));
+    setProofModal(null);
+    setProofForm({ type: 'lien', description: '', url: '' });
+  };
+
+  const handleReaudit = (missionId: string) => {
+    setMissions(prev => prev.map(m => m.id === missionId ? { ...m, isReauditing: true } : m));
+    // Simulated re-audit with random improvement
+    setTimeout(() => {
+      setMissions(prev => prev.map(m => {
+        if (m.id !== missionId) return m;
+        const improvement = Math.floor(Math.random() * 30) + 15;
+        const newScore = Math.min(100, m.aeoScore + improvement);
+        return { ...m, postAuditScore: newScore, postAuditDate: new Date().toISOString(), isReauditing: false };
+      }));
+    }, 3000);
+  };
+
+  const handleSubmitForValidation = (missionId: string) => {
+    handleStatusChange(missionId, 'livraison');
+  };
+
+  const formatDate = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  const formatBudget = (amount: number, currency: string) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format(amount);
+  const getScoreColor = (s: number) => s >= 70 ? 'text-green-400' : s >= 50 ? 'text-yellow-400' : s >= 30 ? 'text-orange-400' : 'text-red-400';
+  const getScoreBg = (s: number) => s >= 70 ? 'bg-green-500/20' : s >= 50 ? 'bg-yellow-500/20' : s >= 30 ? 'bg-orange-500/20' : 'bg-red-500/20';
+  const getDaysRemaining = (d: string) => Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
+
+  return (
+    <div className="p-4 md:p-8 w-full space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <button onClick={onBack} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center">
+                <ClipboardList size={20} className="text-white" />
+              </div>
+              Ordres de Mission
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">Demandes clients depuis CitedBy.ai Public</p>
+          </div>
+        </div>
+        <button onClick={() => setMissions([...missions])} className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all">
+          <RefreshCw size={15} /> Actualiser
+        </button>
+      </div>
+
+      {/* KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Nouvelles', value: kpis.nouveau, icon: Star, color: 'text-blue-400', bg: 'from-blue-500/10 to-blue-600/5' },
+          { label: 'En traitement', value: kpis.en_cours, icon: Play, color: 'text-amber-400', bg: 'from-amber-500/10 to-amber-600/5' },
+          { label: 'Terminées', value: kpis.termine, icon: CheckCircle2, color: 'text-green-400', bg: 'from-green-500/10 to-green-600/5' },
+          { label: 'Escrow bloqué', value: formatBudget(kpis.escrowBloque, 'EUR'), icon: Lock, color: 'text-purple-400', bg: 'from-purple-500/10 to-purple-600/5' },
+        ].map((kpi, i) => (
+          <div key={i} className={`bg-gradient-to-br ${kpi.bg} border border-white/[0.06] rounded-2xl p-4`}>
+            <div className="flex items-center gap-2 mb-2">
+              <kpi.icon size={16} className={kpi.color} />
+              <span className="text-xs text-gray-500 uppercase tracking-wider">{kpi.label}</span>
+            </div>
+            <p className={`text-2xl font-bold ${kpi.color}`}>{kpi.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4">
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Rechercher par client, entreprise, URL ou ID..."
+              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 transition-colors" />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: 'all' as const, label: 'Tous', count: missions.length },
+              { key: 'nouveau' as const, label: 'Nouveaux', count: kpis.nouveau },
+              { key: 'accepte' as const, label: 'Acceptés', count: missions.filter(m => m.status === 'accepte').length },
+              { key: 'en_cours' as const, label: 'En cours', count: missions.filter(m => m.status === 'en_cours').length },
+              { key: 'livraison' as const, label: 'Validation', count: missions.filter(m => m.status === 'livraison').length },
+              { key: 'termine' as const, label: 'Terminés', count: kpis.termine },
+              { key: 'refuse' as const, label: 'Refusés', count: kpis.refuse },
+            ].map(f => (
+              <button key={f.key} onClick={() => setStatusFilter(f.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${statusFilter === f.key ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'}`}>
+                {f.label} ({f.count})
+              </button>
+            ))}
+          </div>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+            className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-300 focus:outline-none focus:border-purple-500/50 cursor-pointer">
+            <option value="date">Plus récent</option>
+            <option value="budget">Budget</option>
+            <option value="score">Score AEO</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Mission List */}
+      <div className="space-y-3">
+        {filteredMissions.length === 0 ? (
+          <div className="bg-[#111111] border border-white/[0.06] rounded-2xl p-12 text-center">
+            <ClipboardList size={48} className="mx-auto text-gray-600 mb-4" />
+            <p className="text-gray-400 text-lg font-medium">Aucune mission trouvée</p>
+            <p className="text-gray-600 text-sm mt-1">Modifiez vos filtres ou attendez de nouvelles demandes</p>
+          </div>
+        ) : (
+          filteredMissions.map(mission => {
+            const isExpanded = expandedMission === mission.id;
+            const statusConf = STATUS_CONFIG[mission.status];
+            const StatusIcon = statusConf.icon;
+            const daysRemaining = getDaysRemaining(mission.deadline);
+            const completedCount = mission.completedRecommendations?.length || 0;
+            const totalRecs = mission.recommendations.length;
+            const progress = totalRecs > 0 ? Math.round((completedCount / totalRecs) * 100) : 0;
+            const proofsSubmitted = mission.recommendations.filter(r => r.proof).length;
+            const proofsApproved = mission.recommendations.filter(r => r.platformValidation === 'valide').length;
+            const allProofsSubmitted = proofsSubmitted === totalRecs;
+            const allApproved = proofsApproved === totalRecs;
+            const escrow = mission.escrowStatus ? ESCROW_CONFIG[mission.escrowStatus] : null;
+
+            return (
+              <div key={mission.id} className={`bg-[#111111] border rounded-2xl transition-all duration-200 ${isExpanded ? 'border-purple-500/30 shadow-lg shadow-purple-500/5' : 'border-white/[0.06] hover:border-white/[0.12]'}`}>
+                {/* Header */}
+                <div className="p-4 md:p-5 cursor-pointer" onClick={() => setExpandedMission(isExpanded ? null : mission.id)}>
+                  <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                    <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                      <div className={`relative w-12 h-12 rounded-xl ${getScoreBg(mission.aeoScore)} flex items-center justify-center flex-shrink-0`}>
+                        <span className={`text-lg font-bold ${getScoreColor(mission.aeoScore)}`}>{mission.aeoScore}</span>
+                        {mission.postAuditScore && (
+                          <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${getScoreBg(mission.postAuditScore)} flex items-center justify-center`}>
+                            <span className={`text-[9px] font-bold ${getScoreColor(mission.postAuditScore)}`}>{mission.postAuditScore}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-mono text-gray-500">{mission.id}</span>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${statusConf.bg} ${statusConf.color}`}>
+                            <StatusIcon size={11} /> {statusConf.label}
+                          </span>
+                          {escrow && mission.status !== 'nouveau' && mission.status !== 'refuse' && (
+                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border ${
+                              mission.escrowStatus === 'libere' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
+                              mission.escrowStatus === 'en_validation' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' :
+                              mission.escrowStatus === 'litige' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
+                              'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                            }`}>
+                              <escrow.icon size={9} /> {escrow.label}
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="text-white font-semibold mt-0.5 truncate">{mission.clientCompany}</h3>
+                        <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+                          <span className="flex items-center gap-1"><UserIcon size={11} /> {mission.clientName}</span>
+                          <span className="flex items-center gap-1 truncate"><Globe size={11} /> {mission.analyzedUrl.replace('https://', '')}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 md:gap-6">
+                      <div className="text-right hidden sm:block">
+                        <p className="text-sm font-bold text-white">{formatBudget(mission.budget, mission.currency)}</p>
+                        <div className="flex items-center gap-1 text-xs mt-0.5">
+                          <Calendar size={11} />
+                          <span className={daysRemaining < 0 ? 'text-red-400' : daysRemaining <= 7 ? 'text-amber-400' : 'text-gray-500'}>
+                            {daysRemaining < 0 ? `Dépassé de ${Math.abs(daysRemaining)}j` : daysRemaining === 0 ? "Aujourd'hui" : `${daysRemaining}j restants`}
+                          </span>
+                        </div>
+                      </div>
+                      {['en_cours', 'livraison', 'accepte'].includes(mission.status) && totalRecs > 0 && (
+                        <div className="w-16 hidden md:block">
+                          <div className="text-[10px] text-gray-500 text-right mb-1">{progress}%</div>
+                          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-purple-500 to-violet-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
+                          </div>
+                        </div>
+                      )}
+                      <div className="text-gray-500">{isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded */}
+                {isExpanded && (
+                  <div className="border-t border-white/[0.06] p-4 md:p-5 space-y-5 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {/* Client + Mission info */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
+                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2"><Building2 size={14} className="text-purple-400" /> Informations client</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center gap-2"><UserIcon size={13} className="text-gray-500" /><span className="text-gray-300">{mission.clientName}</span></div>
+                          <div className="flex items-center gap-2"><Mail size={13} className="text-gray-500" /><span className="text-gray-300">{mission.clientEmail}</span></div>
+                          <div className="flex items-center gap-2"><Building2 size={13} className="text-gray-500" /><span className="text-gray-300">{mission.clientCompany}</span></div>
+                          {mission.clientPhone && <div className="flex items-center gap-2"><span className="text-gray-500 text-xs">TEL</span><span className="text-gray-300">{mission.clientPhone}</span></div>}
+                        </div>
+                      </div>
+                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
+                        <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2"><FileText size={14} className="text-orange-400" /> Détails de la mission</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between"><span className="text-gray-500">URL analysée</span>
+                            <a href={mission.analyzedUrl} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                              {mission.analyzedUrl.replace('https://', '').replace('www.', '')} <ExternalLink size={11} />
+                            </a></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Score AEO initial</span><span className={`font-bold ${getScoreColor(mission.aeoScore)}`}>{mission.aeoScore}/100</span></div>
+                          {mission.postAuditScore && <div className="flex justify-between"><span className="text-gray-500">Score AEO après</span><span className={`font-bold ${getScoreColor(mission.postAuditScore)}`}>{mission.postAuditScore}/100 <span className="text-green-400 text-xs">(+{mission.postAuditScore - mission.aeoScore})</span></span></div>}
+                          <div className="flex justify-between"><span className="text-gray-500">Budget</span><span className="text-white font-semibold">{formatBudget(mission.budget, mission.currency)}</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Deadline</span><span className={daysRemaining < 0 ? 'text-red-400 font-semibold' : 'text-gray-300'}>{formatDate(mission.deadline)}</span></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Escrow Payment Card */}
+                    {escrow && mission.status !== 'nouveau' && mission.status !== 'refuse' && (
+                      <div className={`rounded-xl p-4 border ${
+                        mission.escrowStatus === 'libere' ? 'bg-green-500/5 border-green-500/15' :
+                        mission.escrowStatus === 'en_validation' ? 'bg-purple-500/5 border-purple-500/15' :
+                        mission.escrowStatus === 'litige' ? 'bg-red-500/5 border-red-500/15' :
+                        'bg-amber-500/5 border-amber-500/15'
+                      }`}>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                              mission.escrowStatus === 'libere' ? 'bg-green-500/20' :
+                              mission.escrowStatus === 'en_validation' ? 'bg-purple-500/20' :
+                              mission.escrowStatus === 'litige' ? 'bg-red-500/20' : 'bg-amber-500/20'
+                            }`}>
+                              <escrow.icon size={20} className={escrow.color} />
+                            </div>
+                            <div>
+                              <h4 className={`text-sm font-bold ${escrow.color}`}>{escrow.label}</h4>
+                              <p className="text-xs text-gray-500 mt-0.5 max-w-md">{escrow.desc}</p>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-lg font-bold text-white">{formatBudget(mission.budget, mission.currency)}</p>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-wider">Escrow</p>
+                          </div>
+                        </div>
+                        {/* Escrow progress steps */}
+                        <div className="mt-4 flex items-center gap-1">
+                          {['Paiement reçu', 'Travail en cours', 'Livraison soumise', 'Validation CitedBy.ai', 'Fonds libérés'].map((step, i) => {
+                            const stepsDone = mission.escrowStatus === 'libere' ? 5 : mission.escrowStatus === 'en_validation' ? 3 : mission.escrowStatus === 'bloque' ? (mission.status === 'en_cours' ? 2 : 1) : 0;
+                            const isActive = i < stepsDone;
+                            const isCurrent = i === stepsDone;
+                            return (
+                              <React.Fragment key={i}>
+                                <div className={`flex-1 h-1.5 rounded-full ${isActive ? 'bg-gradient-to-r from-purple-500 to-violet-500' : isCurrent ? 'bg-purple-500/30' : 'bg-white/10'}`} />
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-1.5 flex justify-between text-[9px] text-gray-600">
+                          <span>Paiement</span><span>Travail</span><span>Livraison</span><span>CitedBy.ai</span><span>Libération</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {mission.notes && (
+                      <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-3">
+                        <p className="text-sm text-amber-200/80 flex items-start gap-2">
+                          <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" /> {mission.notes}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Recommendations + Proofs */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-white mb-3 flex items-center justify-between">
+                        <span className="flex items-center gap-2"><Target size={14} className="text-cyan-400" /> Recommandations & Livrables ({completedCount}/{totalRecs})</span>
+                        {proofsSubmitted > 0 && <span className="text-[11px] text-gray-500">{proofsApproved}/{totalRecs} validés par CitedBy.ai</span>}
+                      </h4>
+                      <div className="space-y-2">
+                        {mission.recommendations.map(rec => {
+                          const isCompleted = mission.completedRecommendations?.includes(rec.id);
+                          const pConf = PRIORITY_CONFIG[rec.priority];
+                          const canToggle = ['en_cours', 'accepte', 'livraison'].includes(mission.status);
+                          const ProofIcon = rec.proof ? PROOF_ICONS[rec.proof.type] : null;
+                          const validConf = rec.platformValidation ? VALIDATION_CONFIG[rec.platformValidation] : null;
+                          const ValidIcon = validConf?.icon;
+
+                          return (
+                            <div key={rec.id} className={`rounded-xl border transition-all ${isCompleted ? 'bg-green-500/5 border-green-500/10' : 'bg-white/[0.02] border-white/[0.06]'}`}>
+                              <div className="flex items-center gap-3 p-3">
+                                {canToggle ? (
+                                  <button onClick={e => { e.stopPropagation(); handleToggleRecommendation(mission.id, rec.id); }}
+                                    className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all ${isCompleted ? 'bg-green-500 border-green-500 text-white' : 'border-white/20 hover:border-purple-400'}`}>
+                                    {isCompleted && <CheckCircle2 size={12} />}
+                                  </button>
+                                ) : (
+                                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${pConf.dot}`} />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className={`text-sm ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-200'}`}>{rec.title}</p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  {validConf && ValidIcon && (
+                                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium border ${validConf.color}`}>
+                                      <ValidIcon size={10} /> {validConf.label}
+                                    </span>
+                                  )}
+                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 text-gray-500">{rec.category}</span>
+                                  <span className={`text-[10px] font-medium ${pConf.color}`}>{pConf.label}</span>
+                                </div>
+                              </div>
+                              {/* Proof section */}
+                              {rec.proof && (
+                                <div className="mx-3 mb-3 p-2.5 bg-white/[0.03] border border-white/[0.06] rounded-lg">
+                                  <div className="flex items-start gap-2">
+                                    {ProofIcon && <ProofIcon size={13} className="text-purple-400 mt-0.5 flex-shrink-0" />}
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-300">{rec.proof.description}</p>
+                                      {rec.proof.url && (
+                                        <a href={rec.proof.url} target="_blank" rel="noopener noreferrer" className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 mt-1" onClick={e => e.stopPropagation()}>
+                                          {rec.proof.url.replace('https://', '')} <ExternalLink size={9} />
+                                        </a>
+                                      )}
+                                      <p className="text-[10px] text-gray-600 mt-1">Soumis le {formatDate(rec.proof.submittedAt)}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {/* Add proof button */}
+                              {!rec.proof && canToggle && isCompleted && (
+                                <div className="mx-3 mb-3">
+                                  <button onClick={e => { e.stopPropagation(); setProofModal({ missionId: mission.id, recId: rec.id }); setProofForm({ type: 'lien', description: '', url: '' }); }}
+                                    className="w-full py-2 border border-dashed border-purple-500/30 rounded-lg text-xs text-purple-400 hover:bg-purple-500/5 transition-colors flex items-center justify-center gap-1.5">
+                                    <Upload size={12} /> Ajouter une preuve de livraison
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Re-audit section */}
+                    {['en_cours', 'livraison'].includes(mission.status) && (
+                      <div className="bg-cyan-500/5 border border-cyan-500/15 rounded-xl p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <h4 className="text-sm font-semibold text-cyan-400 flex items-center gap-2"><ScanLine size={14} /> Re-audit AEO — Preuve d'amélioration</h4>
+                            <p className="text-xs text-gray-500 mt-1">Relancez l'audit CitedBy.ai pour prouver l'amélioration du score au client.</p>
+                          </div>
+                          {mission.postAuditScore ? (
+                            <div className="text-center flex-shrink-0">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-lg font-bold ${getScoreColor(mission.aeoScore)}`}>{mission.aeoScore}</span>
+                                <ArrowRight size={16} className="text-gray-500" />
+                                <span className={`text-lg font-bold ${getScoreColor(mission.postAuditScore)}`}>{mission.postAuditScore}</span>
+                              </div>
+                              <p className="text-green-400 text-xs font-bold">+{mission.postAuditScore - mission.aeoScore} points</p>
+                              {mission.postAuditDate && <p className="text-[10px] text-gray-600 mt-0.5">{formatDate(mission.postAuditDate)}</p>}
+                            </div>
+                          ) : (
+                            <button onClick={e => { e.stopPropagation(); handleReaudit(mission.id); }}
+                              disabled={mission.isReauditing}
+                              className="px-4 py-2.5 bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-xl text-sm font-medium hover:bg-cyan-500/30 transition-all disabled:opacity-50 flex items-center gap-2 flex-shrink-0">
+                              {mission.isReauditing ? <><Loader2 size={14} className="animate-spin" /> Audit en cours...</> : <><ScanLine size={14} /> Lancer le re-audit</>}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-white/[0.06]">
+                      {mission.status === 'nouveau' && (
+                        <>
+                          <button onClick={e => { e.stopPropagation(); handleStatusChange(mission.id, 'accepte'); }}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-medium hover:bg-emerald-500/30 transition-all">
+                            <CheckCircle2 size={15} /> Accepter la mission
+                          </button>
+                          <button onClick={e => { e.stopPropagation(); handleStatusChange(mission.id, 'refuse'); }}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-sm font-medium hover:bg-red-500/20 transition-all">
+                            <XCircle size={15} /> Refuser
+                          </button>
+                        </>
+                      )}
+                      {mission.status === 'accepte' && (
+                        <button onClick={e => { e.stopPropagation(); handleStatusChange(mission.id, 'en_cours'); }}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl text-sm font-medium hover:bg-amber-500/30 transition-all">
+                          <Play size={15} /> Démarrer la mission
+                        </button>
+                      )}
+                      {mission.status === 'en_cours' && (
+                        <>
+                          <button onClick={e => { e.stopPropagation(); handleSubmitForValidation(mission.id); }}
+                            disabled={!allProofsSubmitted}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-xl text-sm font-medium hover:bg-purple-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            title={!allProofsSubmitted ? `${totalRecs - proofsSubmitted} preuve(s) manquante(s)` : ''}>
+                            <FileCheck size={15} /> Soumettre pour validation
+                          </button>
+                          {!allProofsSubmitted && (
+                            <span className="flex items-center gap-1 text-xs text-gray-500 px-2">
+                              <AlertCircle size={12} /> {totalRecs - proofsSubmitted} preuve(s) à fournir avant soumission
+                            </span>
+                          )}
+                        </>
+                      )}
+                      {mission.status === 'livraison' && allApproved && (
+                        <button onClick={e => { e.stopPropagation(); handleStatusChange(mission.id, 'termine'); }}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl text-sm font-medium hover:bg-green-500/30 transition-all">
+                          <Unlock size={15} /> Libérer les fonds
+                        </button>
+                      )}
+                      {mission.status === 'livraison' && !allApproved && (
+                        <div className="flex flex-col gap-1">
+                          <span className="flex items-center gap-2 px-4 py-2.5 text-purple-400/70 text-sm">
+                            <ShieldCheck size={15} /> En attente de validation CitedBy.ai ({proofsApproved}/{totalRecs} validés)
+                          </span>
+                          <span className="text-[10px] text-gray-600 px-4 italic">La validation finale par le client sera disponible sur le site public CitedBy.ai</span>
+                        </div>
+                      )}
+                      {mission.status === 'refuse' && (
+                        <button onClick={e => { e.stopPropagation(); handleStatusChange(mission.id, 'nouveau'); }}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl text-sm font-medium hover:bg-blue-500/20 transition-all">
+                          <RefreshCw size={15} /> Remettre en nouveau
+                        </button>
+                      )}
+                      {mission.status === 'termine' && (
+                        <div className="flex items-center gap-2 px-4 py-2.5 text-green-400/70 text-sm">
+                          <Shield size={15} /> Mission clôturée — Fonds libérés le {formatDate(mission.updatedAt)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Summary */}
+      <div className="bg-[#111111] border border-white/[0.06] rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm">
+        <div className="flex items-center gap-4 text-gray-500">
+          <span>{filteredMissions.length} mission{filteredMissions.length > 1 ? 's' : ''}</span>
+          <span className="hidden md:inline">|</span>
+          <span className="hidden md:inline">Score moyen : <span className={`font-bold ${getScoreColor(kpis.avgScore)}`}>{kpis.avgScore}/100</span></span>
+        </div>
+        <div className="text-gray-500 text-xs">Mise à jour : {new Date().toLocaleString('fr-FR')}</div>
+      </div>
+
+      {/* Proof submission modal */}
+      {proofModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setProofModal(null)} />
+          <div className="relative bg-[#111111] border border-white/[0.08] rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="p-5 border-b border-white/[0.06]">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2"><Upload size={18} className="text-purple-400" /> Preuve de livraison</h2>
+              <p className="text-xs text-gray-500 mt-1">Fournissez la preuve que cette tâche est réalisée.</p>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2">Type de preuve</label>
+                <div className="flex gap-2">
+                  {([
+                    { key: 'lien' as const, label: 'Lien URL', icon: Link },
+                    { key: 'code' as const, label: 'Code', icon: Code },
+                    { key: 'capture' as const, label: 'Capture', icon: Image },
+                    { key: 'audit' as const, label: 'Audit', icon: ScanLine },
+                  ]).map(t => (
+                    <button key={t.key} onClick={() => setProofForm(p => ({ ...p, type: t.key }))}
+                      className={`flex-1 py-2 rounded-xl text-xs font-medium border flex items-center justify-center gap-1.5 transition-all ${proofForm.type === t.key ? 'bg-purple-500/20 border-purple-500/30 text-purple-300' : 'bg-white/[0.03] border-white/[0.06] text-gray-500 hover:bg-white/[0.06]'}`}>
+                      <t.icon size={13} /> {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {(proofForm.type === 'lien' || proofForm.type === 'capture') && (
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">URL du livrable</label>
+                  <input type="url" value={proofForm.url} onChange={e => setProofForm(p => ({ ...p, url: e.target.value }))} placeholder="https://..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50" />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Description du travail réalisé *</label>
+                <textarea value={proofForm.description} onChange={e => setProofForm(p => ({ ...p, description: e.target.value }))} placeholder="Décrivez ce qui a été fait, les modifications apportées, les fichiers livrés..."
+                  rows={3} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50 resize-none" />
+              </div>
+            </div>
+            <div className="p-5 border-t border-white/[0.06] flex justify-between">
+              <button onClick={() => setProofModal(null)} className="px-4 py-2.5 text-sm text-gray-400 hover:text-white transition-colors">Annuler</button>
+              <button onClick={handleSubmitProof} disabled={!proofForm.description.trim()}
+                className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 transition-all">
+                <Upload size={14} /> Soumettre la preuve
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MissionOrders;

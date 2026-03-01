@@ -1,0 +1,9 @@
+{
+  "id": "27",
+  "subject": "Create register page",
+  "description": "Create src/app/(auth)/register/page.tsx for merchant registration",
+  "activeForm": "Creating register page",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

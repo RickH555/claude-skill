@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Phase 0: Diagnostic initial du projet",
+  "description": "Vérifier l'état actuel du projet avant toute modification : _legacy_pages/, services/, fichiers clés",
+  "activeForm": "Diagnostiquant l'état du projet",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

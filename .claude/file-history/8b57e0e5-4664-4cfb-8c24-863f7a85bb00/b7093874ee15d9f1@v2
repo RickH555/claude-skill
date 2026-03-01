@@ -1,0 +1,96 @@
+# CitedBy.ai — Instructions Projet
+
+> **Derniere mise a jour** : 2026-02-21 — Migration Next.js App Router terminee
+
+## Architecture
+
+- **Next.js App Router** — Single frontend framework (Vite SPA eliminated)
+- **43 pages** in `views/` (original components) wrapped by `app/(app)/*/page.tsx`
+- **17 AI API routes** in `app/api/ai/` (server-side Gemini calls)
+- **20+ services** in `services/` (15 root + 3 subdirectories)
+- **15 composants** in `components/`
+- **i18n** in `i18n/` (FR/EN/ES) — custom React Context
+- **Data layer** : localStorage (via `services/database.ts`)
+- Design : dark theme Tailwind, accents purple/violet
+
+## Commandes
+
+- `npm run dev` → Next.js dev server (port 3000)
+- `npm run build` → Production build
+- `npm start` → Start production server
+- `npm run lint` → ESLint
+- `npm test` → Vitest
+
+## Stack technique
+
+- **Frontend** : Next.js 14 App Router, React 18, Tailwind CSS, Lucide Icons
+- **AI** : Google Gemini (@google/genai) via server-side API routes, fallback simulation
+- **Auth** : Supabase (Auth) + localStorage mock login
+- **Paiement** : Stripe (interface unifiee StripeCheckout)
+- **i18n** : Custom React Context (FR/EN/ES)
+- **Validation** : Zod + React Hook Form
+- **Charts** : Recharts
+- **PDF** : jsPDF
+
+## Project Structure
+
+```
+app/
+  (app)/              ← Authenticated routes with AppShell
+    layout.tsx        ← I18nProvider > AppProvider > ToastProvider > AppShellWrapper
+    dashboard/page.tsx
+    analyze/page.tsx
+    projects/page.tsx
+    results/page.tsx
+    history/page.tsx
+    monitoring/       ← ai/, alerts/, bot-tracking/, reputation/
+    citations/        ← tracked-queries/, detail/, benchmark/, alerts/, etc.
+    tools/            ← smc-studio/, content-writer/, blog-optimizer/, etc.
+    marketplace/      ← entity/, publisher/, clients/, affiliation/, missions/, messages/
+    settings/         ← recharge/, integrations/, api-developer/
+  (auth)/             ← Supabase auth (login, register)
+  (public)/           ← Landing page (/)
+  api/
+    ai/               ← 17 AI service routes
+    stripe/           ← Checkout, portal, webhook
+    auth/signout/
+    runs/start/
+  layout.tsx          ← Root layout (Inter font, dark theme)
+  globals.css         ← Merged SPA + Next.js CSS
+
+views/                ← Original page components (36 + 8 v3)
+components/
+  layout/             ← AppShell, AppShellWrapper, AppSidebar, TopNav, PageHeader
+  CommandPalette.tsx, ToastSystem.tsx, OnboardingModal.tsx, etc.
+services/             ← AI services, database, analyzer
+lib/
+  app-context.tsx     ← Central state provider (extracted from old App.tsx)
+  toast-context.tsx   ← Toast notification provider
+  route-map.ts        ← VIEW_TO_PATH mapping + section detection
+  api-client.ts       ← Client-side wrappers for AI API routes
+  supabase/           ← Supabase client/server/middleware
+i18n/                 ← Localization (FR/EN/ES)
+```
+
+## Regles importantes
+
+- Gemini API calls go through server-side API routes (`app/api/ai/`)
+- Pages in `views/` receive props from `useAppContext()` via page wrappers
+- NE PAS modifier services/analyzer.ts, services/criteria.ts, services/generator.ts
+- AI generation uses GoogleGenAI with fallback simulation if API key absent
+- Design: dark theme bg-[#0F172A], border-white/5, rounded-2xl
+- Palette accents: gradient purple-500 → violet-600, text-purple-400
+- AI Overviews uses rose #f43f5e
+
+## Key Patterns
+
+### Adding a new page
+1. Create view component in `views/NewPage.tsx`
+2. Add route mapping in `lib/route-map.ts`
+3. Create `app/(app)/section/new-page/page.tsx` wrapper using `useAppContext()`
+4. Add to sidebar in `components/layout/AppSidebar.tsx`
+
+### Adding a new AI service
+1. Create service in `services/new-service.ts`
+2. Create API route in `app/api/ai/new-service/route.ts`
+3. Add client wrapper in `lib/api-client.ts`

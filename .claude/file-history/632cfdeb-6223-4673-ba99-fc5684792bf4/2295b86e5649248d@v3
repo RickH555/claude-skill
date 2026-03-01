@@ -1,0 +1,647 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
+import {
+  FileText,
+  Sparkles,
+  Download,
+  Copy,
+  Check,
+  PenTool,
+  Globe,
+  Code,
+  FileJson,
+  Plus,
+  Mail,
+  Share2,
+  Newspaper,
+  Megaphone,
+  BookOpen,
+  BarChart3,
+  Eye,
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle,
+  Send,
+} from "lucide-react";
+import { toast } from "sonner";
+import { getProjectContentsClient } from "@/lib/db-client";
+import { useWorkspace } from "@/lib/workspace-context";
+import type { GeneratedContentRow } from "@/lib/db";
+
+const TYPE_CONFIG: Record<string, { icon: React.ElementType; label: string }> = {
+  landing_page: { icon: PenTool, label: "Landing Page" },
+  schema_org: { icon: FileJson, label: "Schema.org" },
+  robots_txt: { icon: Code, label: "robots.txt" },
+  blog_post: { icon: FileText, label: "Article Blog" },
+  meta_tags: { icon: Globe, label: "Meta Tags" },
+  product_description: { icon: BookOpen, label: "Description Produit" },
+  sales_email: { icon: Mail, label: "Email Commercial" },
+  social_post: { icon: Share2, label: "Post Social" },
+  press_release: { icon: Megaphone, label: "Communique de presse" },
+  case_study: { icon: BarChart3, label: "Etude de cas" },
+  newsletter: { icon: Newspaper, label: "Newsletter" },
+};
+
+const STATUS_BADGES: Record<string, { label: string; variant: "secondary" | "warning" | "success" | "default" }> = {
+  draft: { label: "Brouillon", variant: "secondary" },
+  review: { label: "En revue", variant: "warning" },
+  approved: { label: "Approuve", variant: "default" },
+  published: { label: "Publie", variant: "success" },
+};
+
+const CONTENT_TYPE_OPTIONS = [
+  { value: "product_description", label: "Description Produit" },
+  { value: "landing_page", label: "Landing Page" },
+  { value: "sales_email", label: "Email Commercial" },
+  { value: "meta_tags", label: "Meta Tags" },
+  { value: "social_post", label: "Post Social Media" },
+  { value: "press_release", label: "Communique de Presse" },
+  { value: "case_study", label: "Etude de Cas" },
+  { value: "newsletter", label: "Newsletter" },
+];
+
+const VERTICAL_OPTIONS = [
+  { value: "general", label: "General" },
+  { value: "saas", label: "SaaS / Tech" },
+  { value: "ecommerce", label: "E-commerce" },
+  { value: "immobilier", label: "Immobilier" },
+  { value: "restauration", label: "Restauration" },
+  { value: "sante", label: "Sante" },
+  { value: "finance", label: "Finance" },
+  { value: "juridique", label: "Juridique" },
+  { value: "education", label: "Education" },
+];
+
+const TONE_OPTIONS = [
+  { value: "professionnel", label: "Professionnel" },
+  { value: "decontracte", label: "Decontracte" },
+  { value: "autoritaire", label: "Autoritaire" },
+  { value: "empathique", label: "Empathique" },
+  { value: "technique", label: "Technique" },
+];
+
+// Mock data when DB is not available
+const MOCK_PACKS: GeneratedContentRow[] = [
+  {
+    id: "1",
+    project_id: "",
+    workspace_id: "",
+    created_by: null,
+    content_type: "landing_page",
+    title: "Page d'accueil optimisee AEO",
+    content: "Decouvrez comment CitedBy.ai aide les entreprises a devenir la reference des intelligences artificielles...",
+    meta_description: null,
+    aeo_score: 87,
+    aeo_tips: ["Ajoutez une section FAQ", "Renforcez les donnees chiffrees"],
+    schema_markup: null,
+    status: "published",
+    metadata: {},
+    created_at: "2024-05-18",
+    updated_at: "2024-05-18",
+  },
+  {
+    id: "2",
+    project_id: "",
+    workspace_id: "",
+    created_by: null,
+    content_type: "meta_tags",
+    title: "Schema.org Organization + WebSite",
+    content: '{"@context": "https://schema.org", "@type": "Organization", "name": "CitedBy.ai"...}',
+    meta_description: null,
+    aeo_score: 95,
+    aeo_tips: [],
+    schema_markup: null,
+    status: "review",
+    metadata: {},
+    created_at: "2024-05-19",
+    updated_at: "2024-05-19",
+  },
+  {
+    id: "3",
+    project_id: "",
+    workspace_id: "",
+    created_by: null,
+    content_type: "product_description",
+    title: "robots.txt optimise IA",
+    content: "User-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /...",
+    meta_description: null,
+    aeo_score: 92,
+    aeo_tips: [],
+    schema_markup: null,
+    status: "draft",
+    metadata: {},
+    created_at: "2024-05-20",
+    updated_at: "2024-05-20",
+  },
+];
+
+export default function PacksPage() {
+  const params = useParams();
+  const projectId = params.id as string;
+  const { workspace } = useWorkspace();
+
+  const [contents, setContents] = useState<GeneratedContentRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [previewContent, setPreviewContent] = useState<GeneratedContentRow | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+
+  // Form state
+  const [formData, setFormData] = useState({
+    contentType: "product_description",
+    vertical: "general",
+    brandName: "",
+    brandUrl: "",
+    productOrService: "",
+    targetAudience: "",
+    tone: "professionnel",
+    additionalContext: "",
+  });
+
+  useEffect(() => {
+    loadContents();
+  }, [projectId]);
+
+  const loadContents = async () => {
+    try {
+      const data = await getProjectContentsClient(projectId);
+      setContents(data.length > 0 ? data : MOCK_PACKS);
+    } catch {
+      setContents(MOCK_PACKS);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = (id: string, content: string) => {
+    navigator.clipboard.writeText(content);
+    setCopied(id);
+    toast.success("Copie dans le presse-papier");
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const handleGenerate = async () => {
+    if (!formData.brandName || !formData.productOrService) {
+      toast.error("Remplissez le nom de marque et le produit/service");
+      return;
+    }
+
+    setGenerating(true);
+    toast.loading("Generation du contenu en cours...", { id: "gen" });
+
+    try {
+      const res = await fetch("/api/content/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId,
+          workspaceId: workspace?.id,
+          ...formData,
+          language: "fr",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success(`Contenu genere ! Score AEO: ${data.content.aeo_score}/100`, {
+          id: "gen",
+          duration: 5000,
+        });
+        setContents((prev) => [data.content, ...prev]);
+        setShowModal(false);
+        setFormData({
+          contentType: "product_description",
+          vertical: "general",
+          brandName: formData.brandName,
+          brandUrl: formData.brandUrl,
+          productOrService: "",
+          targetAudience: "",
+          tone: "professionnel",
+          additionalContext: "",
+        });
+      } else {
+        toast.error(data.error || "Erreur lors de la generation", { id: "gen" });
+      }
+    } catch {
+      toast.error("Erreur de connexion", { id: "gen" });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const WORKFLOW_TRANSITIONS: Record<string, { next?: { status: string; label: string; icon: React.ElementType }; prev?: { status: string; label: string } }> = {
+    draft: { next: { status: "review", label: "Soumettre en revue", icon: Send } },
+    review: {
+      next: { status: "approved", label: "Approuver", icon: CheckCircle },
+      prev: { status: "draft", label: "Retour brouillon" },
+    },
+    approved: {
+      next: { status: "published", label: "Publier", icon: CheckCircle },
+      prev: { status: "review", label: "Retour en revue" },
+    },
+    published: { prev: { status: "draft", label: "Depublier" } },
+  };
+
+  const handleStatusChange = async (contentId: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/content/${contentId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setContents((prev) =>
+          prev.map((c) => (c.id === contentId ? { ...c, status: newStatus as GeneratedContentRow["status"] } : c))
+        );
+        if (previewContent?.id === contentId) {
+          setPreviewContent({ ...previewContent, status: newStatus as GeneratedContentRow["status"] });
+        }
+        toast.success(`Statut mis a jour : ${STATUS_BADGES[newStatus]?.label || newStatus}`);
+      } else {
+        toast.error(data.error || "Erreur de mise a jour");
+      }
+    } catch {
+      toast.error("Erreur de connexion");
+    }
+  };
+
+  const filteredContents = filterStatus === "all"
+    ? contents
+    : contents.filter((c) => c.status === filterStatus);
+
+  const avgScore = contents.length > 0
+    ? Math.round(contents.reduce((s, c) => s + (c.aeo_score || 0), 0) / contents.length)
+    : 0;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-serif font-bold text-white">Packs Contenu</h2>
+        <Button onClick={() => setShowModal(true)}>
+          <Plus size={16} /> Generer du contenu
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Contenus generes</p>
+          <p className="text-3xl font-bold text-white">{contents.length}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Score AEO moyen</p>
+          <p className="text-3xl font-bold text-emerald-400">{avgScore}</p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">Publies</p>
+          <p className="text-3xl font-bold text-primary">
+            {contents.filter((c) => c.status === "published").length}
+          </p>
+        </Card>
+        <Card className="p-5">
+          <p className="text-xs text-white/40 uppercase mb-1">En revue</p>
+          <p className="text-3xl font-bold text-amber-400">
+            {contents.filter((c) => c.status === "review").length}
+          </p>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-2 mb-6">
+        {["all", "draft", "review", "approved", "published"].map((status) => (
+          <button
+            key={status}
+            onClick={() => setFilterStatus(status)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              filterStatus === status
+                ? "bg-primary/20 text-primary"
+                : "bg-white/5 text-white/40 hover:text-white/60"
+            }`}
+          >
+            {status === "all" ? "Tous" : STATUS_BADGES[status]?.label || status}
+          </button>
+        ))}
+      </div>
+
+      {/* Content Grid */}
+      {filteredContents.length === 0 ? (
+        <EmptyState
+          icon={<FileText size={32} />}
+          title="Aucun contenu"
+          description="Generez votre premier contenu optimise AEO."
+          action={<Button onClick={() => setShowModal(true)}><Plus size={16} /> Generer</Button>}
+        />
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredContents.map((pack) => {
+            const typeInfo = TYPE_CONFIG[pack.content_type] || { icon: FileText, label: pack.content_type };
+            const statusInfo = STATUS_BADGES[pack.status] || STATUS_BADGES.draft;
+            const TypeIcon = typeInfo.icon;
+
+            return (
+              <Card key={pack.id} className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <TypeIcon size={16} className="text-primary" />
+                      <span className="text-xs text-white/40">{typeInfo.label}</span>
+                    </div>
+                    <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                  </div>
+                  <CardTitle className="text-base">{pack.title}</CardTitle>
+                </CardHeader>
+
+                <CardContent className="flex-1">
+                  <div className="bg-white/[0.02] rounded-lg p-3 border border-white/5">
+                    <p className="text-xs text-white/50 font-mono line-clamp-3">
+                      {pack.content.slice(0, 200)}
+                    </p>
+                  </div>
+
+                  {/* AEO Score Bar */}
+                  {pack.aeo_score != null && (
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1">
+                          <Sparkles size={12} className="text-primary" />
+                          <span className="text-xs font-medium text-primary">
+                            AEO {pack.aeo_score}/100
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-white/30">
+                          {new Date(pack.created_at).toLocaleDateString("fr-FR")}
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            pack.aeo_score >= 80
+                              ? "bg-emerald-500"
+                              : pack.aeo_score >= 60
+                              ? "bg-amber-500"
+                              : "bg-red-500"
+                          }`}
+                          style={{ width: `${pack.aeo_score}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AEO Tips */}
+                  {pack.aeo_tips && pack.aeo_tips.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {pack.aeo_tips.slice(0, 2).map((tip, i) => (
+                        <p key={i} className="text-[10px] text-white/30 flex items-start gap-1">
+                          <Sparkles size={8} className="text-amber-400 mt-0.5 shrink-0" />
+                          {tip}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+
+                {/* Workflow Actions */}
+                {(() => {
+                  const wf = WORKFLOW_TRANSITIONS[pack.status];
+                  return wf?.next ? (
+                    <div className="px-4 pb-2">
+                      <button
+                        onClick={() => handleStatusChange(pack.id, wf.next!.status)}
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                      >
+                        <ArrowRight size={12} /> {wf.next.label}
+                      </button>
+                    </div>
+                  ) : null;
+                })()}
+
+                <CardFooter className="gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="flex-1"
+                    onClick={() => setPreviewContent(pack)}
+                  >
+                    <Eye size={14} /> Voir
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="flex-1"
+                    onClick={() => handleCopy(pack.id, pack.content)}
+                  >
+                    {copied === pack.id ? <Check size={14} /> : <Copy size={14} />}
+                    {copied === pack.id ? "Copie" : "Copier"}
+                  </Button>
+                  <Button size="sm" variant="outline" className="flex-1">
+                    <Download size={14} /> Export
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Generate Modal */}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} size="lg">
+        <ModalHeader onClose={() => setShowModal(false)}>
+          <h3 className="text-lg font-semibold text-white">Generer du contenu AEO</h3>
+          <p className="text-sm text-white/40 mt-1">
+            Creez du contenu optimise pour etre cite par les moteurs IA
+          </p>
+        </ModalHeader>
+        <ModalBody>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Select
+                label="Type de contenu"
+                options={CONTENT_TYPE_OPTIONS}
+                value={formData.contentType}
+                onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
+              />
+              <Select
+                label="Vertical metier"
+                options={VERTICAL_OPTIONS}
+                value={formData.vertical}
+                onChange={(e) => setFormData({ ...formData, vertical: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Nom de marque *"
+                placeholder="Ex: CitedBy.ai"
+                value={formData.brandName}
+                onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
+              />
+              <Input
+                label="URL du site"
+                placeholder="https://..."
+                value={formData.brandUrl}
+                onChange={(e) => setFormData({ ...formData, brandUrl: e.target.value })}
+              />
+            </div>
+
+            <Input
+              label="Produit ou service *"
+              placeholder="Ex: Plateforme d'optimisation AEO"
+              value={formData.productOrService}
+              onChange={(e) => setFormData({ ...formData, productOrService: e.target.value })}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Audience cible"
+                placeholder="Ex: Responsables marketing B2B"
+                value={formData.targetAudience}
+                onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
+              />
+              <Select
+                label="Ton"
+                options={TONE_OPTIONS}
+                value={formData.tone}
+                onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
+              />
+            </div>
+
+            <Textarea
+              label="Contexte additionnel"
+              placeholder="Informations supplementaires, mots-cles, angle souhaite..."
+              value={formData.additionalContext}
+              onChange={(e) => setFormData({ ...formData, additionalContext: e.target.value })}
+              rows={3}
+            />
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="ghost" onClick={() => setShowModal(false)}>
+            Annuler
+          </Button>
+          <Button onClick={handleGenerate} isLoading={generating}>
+            <Sparkles size={16} /> Generer
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* Preview Modal */}
+      <Modal isOpen={!!previewContent} onClose={() => setPreviewContent(null)} size="xl">
+        {previewContent && (
+          <>
+            <ModalHeader onClose={() => setPreviewContent(null)}>
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-semibold text-white">{previewContent.title}</h3>
+                <Badge variant={STATUS_BADGES[previewContent.status]?.variant || "secondary"}>
+                  {STATUS_BADGES[previewContent.status]?.label || previewContent.status}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                {previewContent.aeo_score != null && (
+                  <span className="text-sm text-primary font-medium flex items-center gap-1">
+                    <Sparkles size={14} /> Score AEO: {previewContent.aeo_score}/100
+                  </span>
+                )}
+                <span className="text-xs text-white/30">
+                  {new Date(previewContent.created_at).toLocaleDateString("fr-FR")}
+                </span>
+              </div>
+            </ModalHeader>
+            <ModalBody>
+              <div className="bg-white/[0.02] rounded-xl p-6 border border-white/5 mb-4">
+                <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">
+                  {previewContent.content}
+                </div>
+              </div>
+
+              {previewContent.meta_description && (
+                <div className="mb-4">
+                  <p className="text-xs text-white/40 uppercase mb-1">Meta Description</p>
+                  <p className="text-sm text-white/70 bg-white/5 rounded-lg p-3">
+                    {previewContent.meta_description}
+                  </p>
+                </div>
+              )}
+
+              {previewContent.aeo_tips && previewContent.aeo_tips.length > 0 && (
+                <div>
+                  <p className="text-xs text-white/40 uppercase mb-2">Suggestions AEO</p>
+                  <div className="space-y-2">
+                    {previewContent.aeo_tips.map((tip, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-2 p-2 rounded-lg bg-amber-500/5 border border-amber-500/10"
+                      >
+                        <Sparkles size={12} className="text-amber-400 mt-0.5 shrink-0" />
+                        <p className="text-xs text-white/60">{tip}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              {/* Workflow transition buttons */}
+              {(() => {
+                const wf = WORKFLOW_TRANSITIONS[previewContent.status];
+                return (
+                  <>
+                    {wf?.prev && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleStatusChange(previewContent.id, wf.prev!.status)}
+                      >
+                        <ArrowLeft size={14} /> {wf.prev.label}
+                      </Button>
+                    )}
+                    <div className="flex-1" />
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleCopy(previewContent.id, previewContent.content)}
+                    >
+                      <Copy size={14} /> Copier
+                    </Button>
+                    <Button variant="outline">
+                      <Download size={14} /> Exporter
+                    </Button>
+                    {wf?.next && (
+                      <Button
+                        onClick={() => handleStatusChange(previewContent.id, wf.next!.status)}
+                      >
+                        {wf.next.label} <ArrowRight size={14} />
+                      </Button>
+                    )}
+                  </>
+                );
+              })()}
+            </ModalFooter>
+          </>
+        )}
+      </Modal>
+    </div>
+  );
+}

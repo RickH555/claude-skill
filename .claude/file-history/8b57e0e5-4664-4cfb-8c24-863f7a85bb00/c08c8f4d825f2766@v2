@@ -1,0 +1,13 @@
+'use client';
+import dynamicImport from 'next/dynamic';
+import { useAppContext } from '@/lib/app-context';
+
+const TrackedQueriesPage = dynamicImport(
+  () => import('@/views/v3/TrackedQueriesPage'),
+  { ssr: false }
+);
+
+export default function TrackedQueriesPageWrapper() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return <TrackedQueriesPage onBack={goBack} user={user} onNavigate={navigateTo} />;
+}

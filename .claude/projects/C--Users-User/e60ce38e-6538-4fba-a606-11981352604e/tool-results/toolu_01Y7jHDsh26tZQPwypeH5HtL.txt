@@ -1,0 +1,288 @@
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-257-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-258-  // Show onboarding modal on first login
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-259-  useEffect(() => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:260:    if (user && !localStorage.getItem('citedby_onboarded')) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-261-      setShowOnboarding(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-262-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx-263-  }, [user]);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-33-const LOCALE_STORAGE_KEY = 'citedby_locale';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-34-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-35-const getInitialLocale = (): Locale => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx:36:  // 1. Check localStorage
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-37-  if (typeof window !== 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx:38:    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-39-    if (stored && ['fr', 'en', 'es'].includes(stored)) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-40-      return stored as Locale;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-41-    }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-64-  const setLocale = useCallback((newLocale: Locale) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-65-    setLocaleState(newLocale);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-66-    if (typeof window !== 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx:67:      localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-68-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-69-  }, []);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-70-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-71-  // Persist on change
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-72-  useEffect(() => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-73-    if (typeof window !== 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx:74:      localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-75-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-76-  }, [locale]);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\i18n\context.tsx-77-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-7-  if (!show) return null;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-8-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-9-  const handleSkip = () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx:10:    localStorage.setItem('citedby_onboarded', 'true');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-11-    onClose();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-12-  };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-13-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-90-            </p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-91-            <button
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-92-              onClick={() => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx:93:                localStorage.setItem('citedby_onboarded', 'true');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-94-                onClose();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-95-                onNavigate('analyze');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-96-              }}
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-100-            </button>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-101-            <button
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-102-              onClick={() => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx:103:                localStorage.setItem('citedby_onboarded', 'true');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-104-                onClose();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-105-                onNavigate('dashboard');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx-106-              }}
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\tests\database.test.ts-30-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\tests\database.test.ts-31-describe('database service', () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\tests\database.test.ts-32-  beforeEach(() => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\tests\database.test.ts:33:    localStorage.clear();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\tests\database.test.ts-34-  });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\tests\database.test.ts-35-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\tests\database.test.ts-36-  it('getAll returns empty array when no data', () => {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-35-  // White Label state
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-36-  const [whiteLabel, setWhiteLabel] = useState(() => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-37-    try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:38:      const saved = localStorage.getItem('citedby-whitelabel');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-39-      return saved ? JSON.parse(saved) : { logoUrl: '', agencyName: '', primaryColor: '#a855f7', secondaryColor: '#7c3aed' };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-40-    } catch { return { logoUrl: '', agencyName: '', primaryColor: '#a855f7', secondaryColor: '#7c3aed' }; }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-41-  });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-42-  const [wlSaved, setWlSaved] = useState(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-43-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-44-  const handleSaveWhiteLabel = () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:45:    localStorage.setItem('citedby-whitelabel', JSON.stringify(whiteLabel));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-46-    setWlSaved(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-47-    setTimeout(() => setWlSaved(false), 2000);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx-48-  };
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\EeatBuilder.tsx-460-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\EeatBuilder.tsx-461-  const handleClearHistory = () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\EeatBuilder.tsx-462-    if (window.confirm('Supprimer tout l\'historique des audits ?')) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\EeatBuilder.tsx:463:      localStorage.removeItem('citedby-eeat-history');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\EeatBuilder.tsx-464-      setAuditHistory([]);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\EeatBuilder.tsx-465-      setSelectedComparison(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\EeatBuilder.tsx-466-    }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-13-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-14-function loadIntegrations(): Integration[] {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-15-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts:16:    const raw = localStorage.getItem(STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-17-    return raw ? JSON.parse(raw) : [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-18-  } catch {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-19-    return [];
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-21-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-22-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-23-function saveIntegrations(list: Integration[]): void {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts:24:  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-25-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-26-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\integrations.ts-27-// --- Public API ---
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-8-const HISTORY_KEY = 'citedby_scheduled_scan_history';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-9-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-10-export function getSchedules(): MonitoringSchedule[] {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts:11:  const raw = localStorage.getItem(SCHEDULES_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-12-  if (!raw) return [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-13-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-14-    return JSON.parse(raw) as MonitoringSchedule[];
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-18-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-19-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-20-function persistSchedules(schedules: MonitoringSchedule[]): void {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts:21:  localStorage.setItem(SCHEDULES_KEY, JSON.stringify(schedules));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-22-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-23-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-24-export function saveSchedule(
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-106-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-107-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-108-export function getScheduledHistory(): ScheduledScanResult[] {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts:109:  const raw = localStorage.getItem(HISTORY_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-110-  if (!raw) return [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-111-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-112-    return JSON.parse(raw) as ScheduledScanResult[];
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-116-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-117-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-118-function persistHistory(history: ScheduledScanResult[]): void {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts:119:  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-120-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-121-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\scheduling.ts-122-export function checkAndRunPendingScans(): ScheduledScanResult[] {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-17-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-18-export function getAdConnections(): AdConnection[] {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-19-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts:20:    const raw = localStorage.getItem(STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-21-    return raw ? JSON.parse(raw) : [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-22-  } catch {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-23-    return [];
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-25-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-26-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-27-function saveConnections(connections: AdConnection[]): void {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts:28:  localStorage.setItem(STORAGE_KEY, JSON.stringify(connections));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-29-}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-30-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-31-const MOCK_ACCOUNTS: Record<AdPlatform, { names: string[]; prefix: string }> = {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-38-  if (typeof window === 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-39-    return { email: demoProfile.email, fullName: demoProfile.full_name ?? 'Compte Demo' };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-40-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx:41:  const raw = window.localStorage.getItem(DEMO_AUTH_STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-42-  if (!raw) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-43-    return { email: demoProfile.email, fullName: demoProfile.full_name ?? 'Compte Demo' };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-44-  }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-57-  if (typeof window === 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-58-    return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-59-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx:60:  window.localStorage.setItem(
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-61-    DEMO_AUTH_STORAGE_KEY,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-62-    JSON.stringify({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-63-      email,
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-95-  if (typeof window === 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-96-    return buildDemoProfile(email, fullName);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-97-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx:98:  const raw = window.localStorage.getItem(DEMO_PROFILE_STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-99-  if (!raw) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-100-    return buildDemoProfile(email, fullName);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-101-  }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-111-  if (typeof window === 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-112-    return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-113-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx:114:  window.localStorage.setItem(DEMO_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-115-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-116-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-117-/**
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-396-      setUser(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-397-      setProfile(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-398-      if (typeof window !== 'undefined') {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx:399:        window.localStorage.removeItem(DEMO_AUTH_STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx:400:        window.localStorage.removeItem(DEMO_PROFILE_STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-401-      }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-402-      return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\hooks\useAuth.tsx-403-    }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-3-import { PROMPT_EEAT_AUDIT } from "./prompts";
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-4-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-5-// ═══════════════════════════════════════════
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts:6:// E-E-A-T AUDIT HISTORY (localStorage)
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-7-// ═══════════════════════════════════════════
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-8-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-9-const STORAGE_KEY = 'citedby-eeat-history';
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-49-  // Keep max 50 entries
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-50-  if (history.length > 50) history.length = 50;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-51-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts:52:    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-53-  } catch (e) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts:54:    console.warn('Failed to save audit history to localStorage:', e);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-55-  }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-56-  return entry;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-57-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-58-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-59-export const getAuditHistory = (): EeatAuditHistoryEntry[] => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-60-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts:61:    const raw = localStorage.getItem(STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-62-    if (!raw) return [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-63-    return JSON.parse(raw) as EeatAuditHistoryEntry[];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-64-  } catch {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-94-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-95-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-96-export const clearAuditHistory = (): void => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts:97:  localStorage.removeItem(STORAGE_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-98-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-99-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\eeat\eeat-auditor.ts-100-// ═══════════════════════════════════════════
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-8-  getAll: (): AnalysisResult[] => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-9-    if (typeof window === 'undefined') return [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-10-    try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts:11:      const item = localStorage.getItem(DB_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-12-      return item ? JSON.parse(item) : [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-13-    } catch (error) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-14-      console.error('Error reading from DB', error);
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-21-    const current = db.getAll();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-22-    // Add to beginning of list
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-23-    const updated = [analysis, ...current];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts:24:    localStorage.setItem(DB_KEY, JSON.stringify(updated));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-25-    return updated;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-26-  },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-27-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-30-    const current = db.getAll();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-31-    if (current[index]) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-32-      current[index] = { ...current[index], ...updatedData };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts:33:      localStorage.setItem(DB_KEY, JSON.stringify(current));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-34-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-35-    return current;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-36-  },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-37-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-38-  // Clear database
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-39-  clear: () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts:40:    localStorage.removeItem(DB_KEY);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-41-    return [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-42-  },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\database.ts-43-  
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-30-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-31-export const getApiKeys = (): ApiKey[] => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-32-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts:33:    const raw = localStorage.getItem(STORAGE_KEYS.apiKeys);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-34-    return raw ? JSON.parse(raw) : [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-35-  } catch {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-36-    return [];
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-38-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-39-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-40-const saveApiKeys = (keys: ApiKey[]): void => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts:41:  localStorage.setItem(STORAGE_KEYS.apiKeys, JSON.stringify(keys));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-42-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-43-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-44-export const createApiKey = (name: string): ApiKey => {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-81-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-82-export const getWebhooks = (): Webhook[] => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-83-  try {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts:84:    const raw = localStorage.getItem(STORAGE_KEYS.webhooks);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-85-    return raw ? JSON.parse(raw) : [];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-86-  } catch {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-87-    return [];
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-89-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-90-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-91-const saveWebhooks = (webhooks: Webhook[]): void => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts:92:  localStorage.setItem(STORAGE_KEYS.webhooks, JSON.stringify(webhooks));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-93-};
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-94-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\api-developer.ts-95-export const createWebhook = (url: string, events: WebhookEvent[]): Webhook => {

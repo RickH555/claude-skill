@@ -1,0 +1,168 @@
+2026-02-11T22:23:08.999Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-11T22:23:09.003Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-11T22:23:09.003Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-11T22:23:09.003Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-11T22:23:09.059Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-11T22:23:09.151Z [DEBUG] Applying permission update: Adding 17 allow rule(s) to destination 'localSettings': ["Bash(npx vite build)","Bash(npx claude-code-templates@latest:*)","WebSearch","Bash(echo:*)","Bash(gh auth status:*)","Bash(ls:*)","Bash(npm run build:*)","Bash(npm run dev:*)","Bash(start http://localhost:3000)","Bash(node -e:*)","Bash(npx --yes playwright install:*)","Bash(npx --yes playwright screenshot:*)","Bash(dir:*)","Bash(npm install:*)","Bash(node:*)","Bash(npx next start:*)","Bash(taskkill:*)"]
+2026-02-11T22:23:09.152Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-11T22:23:09.237Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-11T22:23:09.240Z [DEBUG] [STARTUP] Running setup()...
+2026-02-11T22:23:09.240Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-11T22:23:09.256Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-11T22:23:09.278Z [DEBUG] Passes: Cache stale, returning cached data and refreshing in background
+2026-02-11T22:23:09.280Z [DEBUG] Error log sink initialized
+2026-02-11T22:23:09.333Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-11T22:23:09.333Z [DEBUG] Total plugin skills loaded: 0
+2026-02-11T22:23:09.333Z [DEBUG] Total plugin commands loaded: 0
+2026-02-11T22:23:09.339Z [DEBUG] [STARTUP] setup() completed in 99ms
+2026-02-11T22:23:09.339Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-11T22:23:09.386Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-11T22:23:09.892Z [DEBUG] Total plugin agents loaded: 0
+2026-02-11T22:23:09.902Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1
+2026-02-11T22:23:09.947Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-02-11T22:23:09.954Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=C:\Users\User\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\vendor\ripgrep\x64-win32\rg.exe)
+2026-02-11T22:23:09.976Z [DEBUG] Loaded 8 unique skills (8 unconditional, 0 conditional, managed: 0, user: 1, project: 0, additional: 0, legacy commands: 7)
+2026-02-11T22:23:09.977Z [DEBUG] getSkills returning: 8 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-02-11T22:23:09.986Z [DEBUG] [STARTUP] Commands and agents loaded in 647ms
+2026-02-11T22:23:09.989Z [DEBUG] Layout engine: yoga
+2026-02-11T22:23:10.066Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-02-11T22:23:10.085Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-02-11T22:23:10.297Z [DEBUG] [keybindings] Watching for changes to C:\Users\User\.claude\keybindings.json
+2026-02-11T22:23:10.617Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29984.1770848590617
+2026-02-11T22:23:10.617Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T22:23:10.618Z [DEBUG] Temp file written successfully, size: 10752 bytes
+2026-02-11T22:23:10.619Z [DEBUG] Applied original permissions to temp file
+2026-02-11T22:23:10.619Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29984.1770848590617 to C:\Users\User\.claude.json
+2026-02-11T22:23:10.620Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T22:23:10.621Z [DEBUG] Passes eligibility cached for org 0e714d1f-2f2f-4c21-91c1-17b70825dbc6: true
+2026-02-11T22:23:12.319Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.local.json.tmp.29984.1770848592319
+2026-02-11T22:23:12.319Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T22:23:12.320Z [DEBUG] Temp file written successfully, size: 786 bytes
+2026-02-11T22:23:12.321Z [DEBUG] Applied original permissions to temp file
+2026-02-11T22:23:12.321Z [DEBUG] Renaming C:\Users\User\.claude\settings.local.json.tmp.29984.1770848592319 to C:\Users\User\.claude\settings.local.json
+2026-02-11T22:23:12.321Z [DEBUG] File C:\Users\User\.claude\settings.local.json written atomically
+2026-02-11T22:23:12.383Z [DEBUG] Grove: Using fresh cached config
+2026-02-11T22:23:12.495Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-11T22:23:12.523Z [DEBUG] Git remote URL: null
+2026-02-11T22:23:12.523Z [DEBUG] No git remote URL found
+2026-02-11T22:23:12.523Z [DEBUG] Not in a GitHub repository, skipping path mapping update
+2026-02-11T22:23:12.759Z [DEBUG] [STARTUP] showSetupScreens() completed in 2693ms
+2026-02-11T22:23:12.759Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-11T22:23:12.759Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-11T22:23:12.759Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-11T22:23:12.801Z [DEBUG] Total LSP servers loaded: 0
+2026-02-11T22:23:12.801Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-11T22:23:12.801Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-11T22:23:12.801Z [DEBUG] LSP server manager initialized successfully
+2026-02-11T22:23:12.802Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-11T22:23:57.371Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T22:23:57.371Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T22:23:57.381Z [DEBUG] Passes: Using fresh cached eligibility data
+2026-02-11T22:23:57.387Z [DEBUG] [STARTUP] MCP configs loaded in 48235ms
+2026-02-11T22:23:57.417Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-02-11T22:23:57.424Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29984.1770848637424
+2026-02-11T22:23:57.425Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T22:23:57.426Z [DEBUG] Temp file written successfully, size: 10752 bytes
+2026-02-11T22:23:57.426Z [DEBUG] Applied original permissions to temp file
+2026-02-11T22:23:57.426Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29984.1770848637424 to C:\Users\User\.claude.json
+2026-02-11T22:23:57.427Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T22:23:57.434Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-11T22:23:57.434Z [DEBUG] Found 0 hook matchers in settings
+2026-02-11T22:23:57.434Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-02-11T22:23:57.438Z [DEBUG] Loaded 18 installed plugins from C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-11T22:23:57.438Z [DEBUG] Initialized versioned plugins system with 18 plugins
+2026-02-11T22:23:57.518Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T22:23:57.566Z [DEBUG] [keybindings] KeybindingSetup initialized with 101 bindings, 0 warnings
+2026-02-11T22:23:57.688Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29984.1770848637688
+2026-02-11T22:23:57.688Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T22:23:57.689Z [DEBUG] Temp file written successfully, size: 10752 bytes
+2026-02-11T22:23:57.689Z [DEBUG] Applied original permissions to temp file
+2026-02-11T22:23:57.689Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29984.1770848637688 to C:\Users\User\.claude.json
+2026-02-11T22:23:57.690Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T22:23:57.700Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29984.1770848637700
+2026-02-11T22:23:57.700Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T22:23:57.701Z [DEBUG] Temp file written successfully, size: 10752 bytes
+2026-02-11T22:23:57.701Z [DEBUG] Applied original permissions to temp file
+2026-02-11T22:23:57.701Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29984.1770848637700 to C:\Users\User\.claude.json
+2026-02-11T22:23:57.702Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T22:23:57.721Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-02-11T22:23:57.732Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-02-11T22:23:57.735Z [DEBUG] performStartupChecks called
+2026-02-11T22:23:57.735Z [DEBUG] Starting background plugin installations
+2026-02-11T22:23:57.736Z [DEBUG] performBackgroundPluginInstallations called
+2026-02-11T22:23:57.746Z [DEBUG] Loaded 1 CLAUDE.md/rules files:
+  [Project] C:\Users\User\CLAUDE.md (6340 chars)
+2026-02-11T22:23:57.803Z [DEBUG] Watching for changes in setting files C:\Users\User\.claude\settings.json, C:\Users\User\.claude\settings.local.json...
+2026-02-11T22:23:57.866Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-11T22:23:57.902Z [DEBUG] MCP server "github": Starting connection with timeout of 30000ms
+2026-02-11T22:23:57.951Z [DEBUG] MCP server "puppeteer": Starting connection with timeout of 30000ms
+2026-02-11T22:23:57.991Z [DEBUG] MCP server "slack": Starting connection with timeout of 30000ms
+2026-02-11T22:23:58.035Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-11T22:23:58.036Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-02-11T22:23:58.036Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-02-11T22:23:58.054Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-02-11T22:23:58.061Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-02-11T22:23:58.068Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-11T22:23:58.068Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-11T22:23:58.081Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-11T22:23:58.243Z [DEBUG] Watching for changes in skill/command directories: C:\Users\User\.claude\skills, C:\Users\User\.claude\commands, C:\Users\User\.claude\skills, C:\Users\User\.claude\commands...
+2026-02-11T22:23:58.429Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29984.1770848638429
+2026-02-11T22:23:58.430Z [DEBUG] Preserving file permissions: 100666
+2026-02-11T22:23:58.431Z [DEBUG] Temp file written successfully, size: 10752 bytes
+2026-02-11T22:23:58.431Z [DEBUG] Applied original permissions to temp file
+2026-02-11T22:23:58.431Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29984.1770848638429 to C:\Users\User\.claude.json
+2026-02-11T22:23:58.433Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-11T22:23:58.439Z [DEBUG] [claudeai-mcp] Fetched 2 servers
+2026-02-11T22:23:58.444Z [DEBUG] MCP server "claude.ai Supabase": Initializing claude.ai proxy transport for server mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-11T22:23:58.445Z [DEBUG] MCP server "claude.ai Supabase": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-11T22:23:58.447Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy transport created successfully
+2026-02-11T22:23:58.452Z [DEBUG] MCP server "claude.ai Supabase": Starting connection with timeout of 30000ms
+2026-02-11T22:23:58.454Z [DEBUG] MCP server "claude.ai Gamma": Initializing claude.ai proxy transport for server mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-11T22:23:58.454Z [DEBUG] MCP server "claude.ai Gamma": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-11T22:23:58.454Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy transport created successfully
+2026-02-11T22:23:58.457Z [DEBUG] MCP server "claude.ai Gamma": Starting connection with timeout of 30000ms
+2026-02-11T22:23:58.519Z [DEBUG] Org fast mode: disabled (extra_usage_disabled)
+2026-02-11T22:23:58.833Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy connection failed after 389ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY34i1pC9867PrECqAdc3"}
+2026-02-11T22:23:58.833Z [ERROR] MCP server "claude.ai Supabase" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY34i1pC9867PrECqAdc3"}
+2026-02-11T22:23:58.861Z [DEBUG] MCP server "claude.ai Supabase": Authentication required for claude.ai proxy server
+2026-02-11T22:23:58.885Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy connection failed after 431ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY34i1rRsdJKEDjtUAQfF"}
+2026-02-11T22:23:58.885Z [ERROR] MCP server "claude.ai Gamma" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CY34i1rRsdJKEDjtUAQfF"}
+2026-02-11T22:23:58.886Z [DEBUG] MCP server "claude.ai Gamma": Authentication required for claude.ai proxy server
+2026-02-11T22:24:05.138Z [ERROR] MCP server "slack" Server stderr: npm warn deprecated @modelcontextprotocol/server-slack@2025.4.25: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+Please set SLACK_BOT_TOKEN and SLACK_TEAM_ID environment variables
+2026-02-11T22:24:05.139Z [DEBUG] MCP server "slack": Connection failed after 7151ms: MCP error -32000: Connection closed
+2026-02-11T22:24:05.139Z [ERROR] MCP server "slack" Connection failed: MCP error -32000: Connection closed
+2026-02-11T22:24:06.062Z [ERROR] MCP server "github" Server stderr: npm warn deprecated @modelcontextprotocol/server-github@2025.4.8: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+GitHub MCP Server running on stdio
+2026-02-11T22:24:06.062Z [DEBUG] MCP server "github": Successfully connected to undefined server in 8177ms
+2026-02-11T22:24:06.062Z [DEBUG] MCP server "github": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"serverVersion":{"name":"github-mcp-server","version":"0.6.2"}}
+2026-02-11T22:24:28.002Z [DEBUG] MCP server "puppeteer": Connection timeout triggered after 30055ms (limit: 30000ms)
+2026-02-11T22:24:28.003Z [ERROR] MCP server "puppeteer" Server stderr: npm warn deprecated @modelcontextprotocol/server-puppeteer@2025.5.12: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated puppeteer@23.11.1: < 24.15.0 is no longer supported
+2026-02-11T22:24:28.004Z [DEBUG] MCP server "puppeteer": Connection failed after 30056ms: MCP server "puppeteer" connection timed out after 30000ms
+2026-02-11T22:24:28.004Z [ERROR] MCP server "puppeteer" Connection failed: MCP server "puppeteer" connection timed out after 30000ms
+2026-02-11T22:24:28.008Z [DEBUG] MCP server "filesystem": Starting connection with timeout of 30000ms
+2026-02-11T22:24:28.050Z [DEBUG] MCP server "memory": Starting connection with timeout of 30000ms
+2026-02-11T22:24:28.102Z [DEBUG] MCP server "sequential-thinking": Starting connection with timeout of 30000ms
+2026-02-11T22:24:58.051Z [DEBUG] MCP server "filesystem": Connection timeout triggered after 30045ms (limit: 30000ms)
+2026-02-11T22:24:58.052Z [ERROR] MCP server "filesystem" Server stderr: npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-02-11T22:24:58.054Z [DEBUG] MCP server "filesystem": Connection failed after 30047ms: MCP server "filesystem" connection timed out after 30000ms
+2026-02-11T22:24:58.055Z [ERROR] MCP server "filesystem" Connection failed: MCP server "filesystem" connection timed out after 30000ms
+2026-02-11T22:24:58.104Z [DEBUG] MCP server "memory": Connection timeout triggered after 30056ms (limit: 30000ms)
+2026-02-11T22:24:58.106Z [DEBUG] MCP server "memory": Connection failed after 30057ms: MCP server "memory" connection timed out after 30000ms
+2026-02-11T22:24:58.106Z [ERROR] MCP server "memory" Connection failed: MCP server "memory" connection timed out after 30000ms
+2026-02-11T22:24:58.255Z [DEBUG] MCP server "sequential-thinking": Connection timeout triggered after 30154ms (limit: 30000ms)
+2026-02-11T22:24:58.256Z [DEBUG] MCP server "sequential-thinking": Connection failed after 30155ms: MCP server "sequential-thinking" connection timed out after 30000ms
+2026-02-11T22:24:58.257Z [ERROR] MCP server "sequential-thinking" Connection failed: MCP server "sequential-thinking" connection timed out after 30000ms
+2026-02-11T22:24:58.278Z [DEBUG] MCP server "brave-search": Starting connection with timeout of 30000ms
+2026-02-11T22:24:58.380Z [DEBUG] MCP server "google-maps": Starting connection with timeout of 30000ms
+2026-02-11T22:25:05.680Z [ERROR] MCP server "brave-search" Server stderr: npm warn deprecated @modelcontextprotocol/server-brave-search@0.6.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+Error: BRAVE_API_KEY environment variable is required
+2026-02-11T22:25:05.681Z [DEBUG] MCP server "brave-search": Connection failed after 7417ms: MCP error -32000: Connection closed
+2026-02-11T22:25:05.681Z [ERROR] MCP server "brave-search" Connection failed: MCP error -32000: Connection closed
+2026-02-11T22:25:06.599Z [ERROR] MCP server "google-maps" Server stderr: npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated @modelcontextprotocol/server-google-maps@0.6.2: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+GOOGLE_MAPS_API_KEY environment variable is not set
+2026-02-11T22:25:06.599Z [DEBUG] MCP server "google-maps": Connection failed after 8223ms: MCP error -32000: Connection closed
+2026-02-11T22:25:06.599Z [ERROR] MCP server "google-maps" Connection failed: MCP error -32000: Connection closed

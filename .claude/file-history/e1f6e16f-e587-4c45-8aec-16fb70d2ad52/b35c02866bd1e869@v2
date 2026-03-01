@@ -1,0 +1,132 @@
+export const SITE = {
+  name: "citedby.ai",
+  company: "AOE",
+  tagline: "Discover who's citing your research — powered by AI.",
+  description:
+    "Track citations in real-time, uncover hidden connections between papers, and amplify your academic impact with intelligent analytics.",
+} as const;
+
+export interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export const FEATURES: Feature[] = [
+  {
+    icon: "🔍",
+    title: "Real-Time Citation Tracking",
+    description:
+      "Get instant alerts when your work is cited. No more manual searches across dozens of databases.",
+  },
+  {
+    icon: "🧠",
+    title: "AI-Powered Insights",
+    description:
+      "Our models analyze citation context to tell you how your work is being referenced — support, contrast, or extension.",
+  },
+  {
+    icon: "🌐",
+    title: "Citation Network Graph",
+    description:
+      "Visualize the web of influence around your papers. Discover clusters, key authors, and emerging trends.",
+  },
+  {
+    icon: "📊",
+    title: "Impact Analytics",
+    description:
+      "Go beyond h-index. Measure real influence with contextual metrics, field-normalized scores, and trend data.",
+  },
+  {
+    icon: "🔗",
+    title: "Cross-Platform Sync",
+    description:
+      "Connect your ORCID, Google Scholar, Semantic Scholar, and institutional profiles in one unified dashboard.",
+  },
+  {
+    icon: "🚀",
+    title: "Smart Recommendations",
+    description:
+      "AI suggests collaborators, relevant papers, and journals where your work would have the most impact.",
+  },
+];
+
+export interface Step {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export const STEPS: Step[] = [
+  {
+    number: "01",
+    title: "Connect your profiles",
+    description:
+      "Link your ORCID, Google Scholar, or upload a BibTeX file. We do the rest.",
+  },
+  {
+    number: "02",
+    title: "AI scans the literature",
+    description:
+      "Our engine crawls millions of papers and preprints to find every mention of your work.",
+  },
+  {
+    number: "03",
+    title: "Get actionable insights",
+    description:
+      "Receive a dashboard with citation context, network graphs, and impact metrics — updated daily.",
+  },
+];
+
+export interface PricingTier {
+  name: string;
+  price: string;
+  period: string;
+  features: string[];
+  highlighted: boolean;
+  cta: string;
+}
+
+export const PRICING: PricingTier[] = [
+  {
+    name: "Researcher",
+    price: "Free",
+    period: "",
+    features: [
+      "Track up to 20 papers",
+      "Weekly citation alerts",
+      "Basic analytics dashboard",
+      "ORCID integration",
+    ],
+    highlighted: false,
+    cta: "Get Started",
+  },
+  {
+    name: "Pro",
+    price: "$12",
+    period: "/month",
+    features: [
+      "Unlimited papers",
+      "Real-time citation alerts",
+      "AI citation context analysis",
+      "Network graph visualization",
+      "Priority support",
+    ],
+    highlighted: true,
+    cta: "Start Free Trial",
+  },
+  {
+    name: "Institution",
+    price: "Custom",
+    period: "",
+    features: [
+      "Unlimited researchers",
+      "Department-level analytics",
+      "API access",
+      "SSO & admin panel",
+      "Dedicated account manager",
+    ],
+    highlighted: false,
+    cta: "Contact Sales",
+  },
+];

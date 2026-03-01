@@ -1,0 +1,44 @@
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import Card from '../../components/ui/Card.tsx'
+
+interface DataPoint {
+  month: string
+  citations: number
+}
+
+const data: DataPoint[] = [
+  { month: 'Août', citations: 120 },
+  { month: 'Sept', citations: 210 },
+  { month: 'Oct', citations: 340 },
+  { month: 'Nov', citations: 450 },
+  { month: 'Déc', citations: 580 },
+  { month: 'Jan', citations: 720 },
+]
+
+export default function AnalyticsPage() {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Analytiques</h2>
+
+      <Card title="Évolution des citations (6 mois)">
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="citations"
+                stroke="#2563eb"
+                strokeWidth={2}
+                dot={{ fill: '#2563eb' }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+    </div>
+  )
+}

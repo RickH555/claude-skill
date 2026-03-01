@@ -1,0 +1,98 @@
+// components/layout/TopNav.tsx
+// Barre horizontale — style Linear/Vercel, glassmorphism subtil
+// Desktop : barre fixe pleine largeur
+// Mobile  : masquée (la navigation mobile est dans Sidebar.tsx)
+
+import React from 'react';
+import { Coins } from 'lucide-react';
+
+const SECTIONS = [
+  { id: 'dashboard',    label: 'Dashboard' },
+  { id: 'analyse',      label: 'Analyse' },
+  { id: 'citations',    label: 'Citations' },
+  { id: 'outils',       label: 'Outils' },
+  { id: 'technique',    label: 'Technique' },
+  { id: 'marketplace',  label: 'Marketplace' },
+  { id: 'compte',       label: 'Compte' },
+];
+
+export { SECTIONS };
+
+interface TopNavProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+  credits: number;
+  user: { name: string; email: string } | null;
+  onOpenCommandPalette?: () => void;
+  onLogoClick?: () => void;
+}
+
+function TopNav({
+  activeSection,
+  onSectionChange,
+  credits,
+  user,
+  onOpenCommandPalette,
+  onLogoClick,
+}: TopNavProps) {
+  return (
+    <header className="hidden md:flex h-14 shrink-0 bg-[#09090B]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/[0.06] items-center">
+
+      {/* ── Left — Logo (aligned with sidebar width) ── */}
+      <div
+        className="w-60 flex items-center px-5 h-full border-r border-white/[0.06] cursor-pointer flex-shrink-0"
+        onClick={onLogoClick}
+      >
+        <span className="text-[var(--text-primary)] font-semibold text-[15px] tracking-tight">Cited</span>
+        <span className="text-[var(--accent-text)] font-semibold text-[15px]">By</span>
+        <span className="text-[var(--text-tertiary)] font-normal text-[13px]">.ai</span>
+      </div>
+
+      {/* ── Center — Section tabs ── */}
+      <nav className="flex items-center gap-1 px-4 flex-1">
+        {SECTIONS.map(section => (
+          <button
+            key={section.id}
+            onClick={() => onSectionChange(section.id)}
+            className={`px-3 py-1.5 rounded-md text-[13px] font-medium cursor-pointer transition-all duration-150 ${
+              activeSection === section.id
+                ? 'text-white bg-white/[0.08]'
+                : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]'
+            }`}
+          >
+            {section.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* ── Right — ⌘K + Credits + Avatar ── */}
+      <div className="flex items-center gap-3 pr-5 flex-shrink-0">
+        {onOpenCommandPalette && (
+          <button
+            onClick={onOpenCommandPalette}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-white/[0.06] text-zinc-600 text-xs hover:border-white/[0.1] hover:text-zinc-500 transition-all"
+          >
+            <kbd className="font-mono text-[11px]">⌘K</kbd>
+          </button>
+        )}
+
+        {user && (
+          <div className="flex items-center gap-1.5 text-[13px] text-zinc-500">
+            <span className="font-medium text-zinc-300">{credits}</span>
+            <Coins className="w-3.5 h-3.5 text-blue-400" />
+          </div>
+        )}
+
+        <div className="h-5 w-px bg-white/[0.08]" />
+
+        {user && (
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[11px] text-white font-semibold ring-1 ring-white/[0.1]">
+            {user.name?.charAt(0)?.toUpperCase() || 'U'}
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
+
+export default React.memo(TopNav);

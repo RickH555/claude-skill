@@ -1,0 +1,316 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+
+// Helper to safely get env var
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// Helper to simulate delay
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// ─── Interfaces ────────────────────────────────────────────────────────────────
+
+export interface AIEngineResponse {
+  engine: 'ChatGPT' | 'Claude' | 'Perplexity' | 'Gemini';
+  response: string;
+  mentionType: 'direct' | 'indirect' | 'comparison' | 'absent';
+  mentionScore: number;
+  sentiment: 'positive' | 'neutral' | 'negative';
+  citationPresent: boolean;
+  excerpt: string;
+}
+
+export interface CitationSimulationResult {
+  query: string;
+  brandName: string;
+  brandUrl: string;
+  overallScore: number;
+  engines: AIEngineResponse[];
+  improvements: string[];
+  competitorsMentioned: string[];
+}
+
+// ─── Industry competitor mapping ───────────────────────────────────────────────
+
+const INDUSTRY_COMPETITORS: Record<string, string[]> = {
+  saas: ['HubSpot', 'Salesforce', 'Monday.com', 'Notion', 'Airtable', 'Zendesk'],
+  ecommerce: ['Shopify', 'WooCommerce', 'BigCommerce', 'PrestaShop', 'Magento'],
+  marketing: ['SEMrush', 'Ahrefs', 'Moz', 'Mailchimp', 'HubSpot', 'Buffer'],
+  finance: ['Stripe', 'PayPal', 'Square', 'Wise', 'Revolut', 'Qonto'],
+  sante: ['Doctolib', 'Qare', 'Alan', 'Livi', 'Maiia'],
+  immobilier: ['SeLoger', 'LeBonCoin', 'Bien\'ici', 'MeilleursAgents', 'PAP'],
+  education: ['Coursera', 'Udemy', 'OpenClassrooms', 'Skillshare', 'LinkedIn Learning'],
+  restauration: ['TheFork', 'Uber Eats', 'Deliveroo', 'Zenchef', 'Lightspeed'],
+  juridique: ['LegalStart', 'Captain Contrat', 'Legalplace', 'Rocket Lawyer'],
+  default: ['HubSpot', 'Salesforce', 'Stripe', 'Notion', 'Ahrefs'],
+};
+
+const getCompetitors = (industry?: string): string[] => {
+  if (!industry) return INDUSTRY_COMPETITORS.default;
+  const key = industry.toLowerCase().trim();
+  return INDUSTRY_COMPETITORS[key] || INDUSTRY_COMPETITORS.default;
+};
+
+// ─── Fallback simulation (no API key) ──────────────────────────────────────────
+
+const fallbackSimulation = async (
+  query: string,
+  brandName: string,
+  brandUrl: string,
+  industry?: string
+): Promise<CitationSimulationResult> => {
+  // Simulate processing time
+  await delay(3000);
+
+  const competitors = getCompetitors(industry);
+  const hostname = new URL(brandUrl).hostname;
+  const industryLabel = industry || 'technology';
+
+  // Pick 3 competitors to mention across engines
+  const mentionedCompetitors = competitors.slice(0, 3);
+
+  // ── ChatGPT response: conversational tone ──
+  const chatgptResponse: AIEngineResponse = {
+    engine: 'ChatGPT',
+    response: `Great question! When it comes to ${query}, there are several strong options in the ${industryLabel} space. ${mentionedCompetitors[0]} and ${mentionedCompetitors[1]} are widely recognized leaders that many businesses rely on. ${brandName} is also worth considering — they've been gaining traction with a focused approach to the problem. I'd recommend evaluating each based on your specific needs, budget, and team size to find the best fit.`,
+    mentionType: 'indirect',
+    mentionScore: 35,
+    sentiment: 'neutral',
+    citationPresent: false,
+    excerpt: `${brandName} is also worth considering — they've been gaining traction with a focused approach to the problem.`,
+  };
+
+  // ── Claude response: analytical and structured ──
+  const claudeResponse: AIEngineResponse = {
+    engine: 'Claude',
+    response: `Analyzing the ${industryLabel} landscape for "${query}", the market can be segmented into three tiers. Enterprise-grade solutions include ${mentionedCompetitors[0]} and ${mentionedCompetitors[1]}, which offer comprehensive feature sets but at higher price points. Mid-market alternatives such as ${mentionedCompetitors[2]} provide a balanced cost-to-value ratio. I don't have specific verified data about ${brandName} in my training set, so I'd recommend checking their website directly at ${hostname} for the most current information on their capabilities and positioning.`,
+    mentionType: 'indirect',
+    mentionScore: 20,
+    sentiment: 'neutral',
+    citationPresent: false,
+    excerpt: `I don't have specific verified data about ${brandName} in my training set, so I'd recommend checking their website directly at ${hostname}.`,
+  };
+
+  // ── Perplexity response: includes source citations ──
+  const perplexityResponse: AIEngineResponse = {
+    engine: 'Perplexity',
+    response: `Based on recent analysis, the top solutions for ${query} in ${industryLabel} include ${mentionedCompetitors[0]} (ranked #1 by G2 in 2025) and ${mentionedCompetitors[1]} [1]. ${mentionedCompetitors[2]} is also frequently recommended for mid-size businesses [2]. ${brandName} does not currently appear in major comparison rankings for this category, though their website (${hostname}) indicates active development in this space [3].\n\nSources:\n[1] g2.com/categories/${industryLabel}\n[2] capterra.com/reviews\n[3] ${hostname}`,
+    mentionType: 'absent',
+    mentionScore: 10,
+    sentiment: 'neutral',
+    citationPresent: true,
+    excerpt: `${brandName} does not currently appear in major comparison rankings for this category.`,
+  };
+
+  // ── Gemini response: factual and data-driven ──
+  const geminiResponse: AIEngineResponse = {
+    engine: 'Gemini',
+    response: `For "${query}", the ${industryLabel} market in 2025 is valued at approximately $XX billion globally. The primary vendors are ${mentionedCompetitors[0]} (market share ~25%), ${mentionedCompetitors[1]} (~18%), and ${mentionedCompetitors[2]} (~12%). ${brandName} is a newer entrant in this segment. According to available data, they offer services through ${hostname}, though detailed market share figures and independent reviews are limited at this time. Key selection criteria include pricing, integration capabilities, and customer support quality.`,
+    mentionType: 'direct',
+    mentionScore: 40,
+    sentiment: 'neutral',
+    citationPresent: false,
+    excerpt: `${brandName} is a newer entrant in this segment. According to available data, they offer services through ${hostname}, though detailed market share figures and independent reviews are limited.`,
+  };
+
+  const engines: AIEngineResponse[] = [
+    chatgptResponse,
+    claudeResponse,
+    perplexityResponse,
+    geminiResponse,
+  ];
+
+  // Calculate overall score as the average of all engine mention scores
+  const overallScore = Math.round(
+    engines.reduce((sum, e) => sum + e.mentionScore, 0) / engines.length
+  );
+
+  // Improvement suggestions
+  const improvements: string[] = [
+    `Create a comprehensive "About" page on ${hostname} with structured data (Schema.org Organization) so AI models can extract authoritative entity information.`,
+    `Publish original research, benchmarks, or case studies related to "${query}" to build topical authority that AI engines reference.`,
+    `Ensure ${brandName} is listed on major comparison platforms (G2, Capterra, TrustPilot) with verified reviews — Perplexity and ChatGPT heavily rely on these sources.`,
+    `Add FAQ sections with "Answer-First" formatting on key landing pages to increase the probability of direct AI citations.`,
+    `Build backlinks from authoritative industry publications and directories so AI models associate ${brandName} with the "${industryLabel}" topic cluster.`,
+    `Implement llms.txt and llms-full.txt files at ${hostname}/llms.txt to provide AI crawlers with a structured, canonical source of truth about your brand.`,
+  ];
+
+  return {
+    query,
+    brandName,
+    brandUrl,
+    overallScore,
+    engines,
+    improvements,
+    competitorsMentioned: mentionedCompetitors,
+  };
+};
+
+// ─── Gemini API call ───────────────────────────────────────────────────────────
+
+const simulateWithGemini = async (
+  query: string,
+  brandName: string,
+  brandUrl: string,
+  industry?: string
+): Promise<CitationSimulationResult> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error("No API key available");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
+  const engineResponseSchema: Schema = {
+    type: Type.OBJECT,
+    properties: {
+      engine: {
+        type: Type.STRING,
+        enum: ['ChatGPT', 'Claude', 'Perplexity', 'Gemini'],
+        description: "The AI engine being simulated",
+      },
+      response: {
+        type: Type.STRING,
+        description: "The simulated AI response text (3-5 sentences). ChatGPT: conversational. Claude: analytical and structured. Perplexity: include source citation format [1][2]. Gemini: factual and data-driven.",
+      },
+      mentionType: {
+        type: Type.STRING,
+        enum: ['direct', 'indirect', 'comparison', 'absent'],
+        description: "How the brand is mentioned: direct (by name in context), indirect (alluded to), comparison (mentioned alongside competitors), absent (not mentioned)",
+      },
+      mentionScore: {
+        type: Type.NUMBER,
+        description: "0-100 score of how prominently the brand is featured in the response",
+      },
+      sentiment: {
+        type: Type.STRING,
+        enum: ['positive', 'neutral', 'negative'],
+        description: "Sentiment of the mention toward the brand",
+      },
+      citationPresent: {
+        type: Type.BOOLEAN,
+        description: "Whether the engine includes a source citation or link for the brand",
+      },
+      excerpt: {
+        type: Type.STRING,
+        description: "The specific part of the response that mentions the brand, or empty string if absent",
+      },
+    },
+    required: ['engine', 'response', 'mentionType', 'mentionScore', 'sentiment', 'citationPresent', 'excerpt'],
+  };
+
+  const resultSchema: Schema = {
+    type: Type.OBJECT,
+    properties: {
+      overallScore: {
+        type: Type.NUMBER,
+        description: "0-100 average visibility score across all engines",
+      },
+      engines: {
+        type: Type.ARRAY,
+        items: engineResponseSchema,
+        description: "Simulated responses from 4 AI engines: ChatGPT, Claude, Perplexity, Gemini",
+      },
+      improvements: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: "4-6 actionable improvement suggestions to increase AI citation visibility",
+      },
+      competitorsMentioned: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: "Names of competitors mentioned across the simulated responses",
+      },
+    },
+    required: ['overallScore', 'engines', 'improvements', 'competitorsMentioned'],
+  };
+
+  const industryContext = industry ? `The brand operates in the "${industry}" industry.` : '';
+
+  const prompt = `
+    CONTEXT:
+    You are an expert in AI visibility and Answer Engine Optimization (AEO).
+    A user wants to understand how different AI engines would respond to a query about their brand.
+
+    INPUTS:
+    - User query: "${query}"
+    - Brand name: "${brandName}"
+    - Brand URL: ${brandUrl}
+    ${industryContext}
+
+    MISSION:
+    Simulate how each of the 4 major AI engines (ChatGPT, Claude, Perplexity, Gemini) would realistically respond to the query "${query}".
+
+    RULES FOR EACH ENGINE:
+    1. **ChatGPT**: Conversational, friendly tone. May mention the brand if it has strong web presence. Tends to recommend well-known solutions first.
+    2. **Claude**: Analytical, structured analysis. Cautious about unverified claims. Will note if it lacks training data on the brand.
+    3. **Perplexity**: Always includes numbered source citations [1][2][3]. Relies heavily on indexed web sources, comparison sites, and reviews.
+    4. **Gemini**: Factual, data-driven. Focuses on market data, statistics, and objective comparisons.
+
+    IMPORTANT:
+    - Be realistic: if the brand is not well-known, some engines should NOT mention it or mention it minimally.
+    - Each response should be 3-5 sentences of natural AI-style text.
+    - Vary the mentionType across engines (not all should be the same).
+    - Include real competitor names relevant to the industry.
+    - Provide 4-6 specific, actionable improvement suggestions.
+    - The overallScore should reflect the average mentionScore across engines.
+
+    Respond strictly in the JSON schema provided.
+  `;
+
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+    config: {
+      responseMimeType: 'application/json',
+      responseSchema: resultSchema,
+      temperature: 0.4,
+    },
+  });
+
+  let output = response.text;
+  if (!output) {
+    throw new Error("Empty response from AI");
+  }
+
+  // Clean up potentially leaked markdown fences despite JSON mode
+  output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+  const jsonResponse = JSON.parse(output);
+
+  return {
+    query,
+    brandName,
+    brandUrl,
+    overallScore: jsonResponse.overallScore,
+    engines: jsonResponse.engines,
+    improvements: jsonResponse.improvements,
+    competitorsMentioned: jsonResponse.competitorsMentioned,
+  };
+};
+
+// ─── Main exported function ────────────────────────────────────────────────────
+
+export const simulateCitation = async (
+  query: string,
+  brandName: string,
+  brandUrl: string,
+  industry?: string
+): Promise<CitationSimulationResult> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn("API_KEY not found or process.env unavailable, using fallback simulation.");
+    return fallbackSimulation(query, brandName, brandUrl, industry);
+  }
+
+  try {
+    return await simulateWithGemini(query, brandName, brandUrl, industry);
+  } catch (error) {
+    console.error("AI Citation Simulation failed:", error);
+    return fallbackSimulation(query, brandName, brandUrl, industry);
+  }
+};

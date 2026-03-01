@@ -1,0 +1,61 @@
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
+import { AuthProvider, useAuth } from './hooks/useAuth.tsx'
+import AuthLayout from './components/layout/AuthLayout.tsx'
+import DashboardLayout from './components/layout/DashboardLayout.tsx'
+import LoginPage from './pages/auth/LoginPage.tsx'
+import RegisterPage from './pages/auth/RegisterPage.tsx'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage.tsx'
+import DashboardPage from './pages/app/DashboardPage.tsx'
+import MonitoringPage from './pages/app/MonitoringPage.tsx'
+import AnalyticsPage from './pages/app/AnalyticsPage.tsx'
+import SettingsPage from './pages/app/SettingsPage.tsx'
+
+function ProtectedRoute() {
+  const { isAuthenticated, isLoading } = useAuth()
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <p className="text-gray-500">Chargement...</p>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  return <Outlet />
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Routes d'authentification */}
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          </Route>
+
+          {/* Routes protégées de l'application */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/app" element={<DashboardLayout />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="monitoring" element={<MonitoringPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+          </Route>
+
+          {/* Redirection par défaut */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  )
+}
+
+export default App

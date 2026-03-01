@@ -1,0 +1,73 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Card from '@/components/ui/Card';
+import { toast } from 'sonner';
+import type { Customer } from '@/lib/supabase/types';
+
+export default function CustomerSettings({ customer, userEmail }: { customer: Customer | null; userEmail: string }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState(customer?.full_name || '');
+  const [phone, setPhone] = useState(customer?.phone || '');
+
+  const handleSave = async () => {
+    if (!customer) return;
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('customers')
+      .update({ full_name: fullName || null, phone: phone || null })
+      .eq('id', customer.id);
+
+    if (error) { toast.error(error.message); setLoading(false); return; }
+    toast.success('Profil mis à jour !');
+    router.refresh();
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card padding="lg">
+        <h3 className="text-[15px] font-semibold text-[var(--text-primary)] mb-4">Mes informations</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="text-[13px] font-medium text-[var(--text-secondary)]">Email</label>
+            <p className="text-[13px] text-[var(--text-primary)] mt-1">{userEmail}</p>
+          </div>
+
+          <Input
+            label="Nom complet"
+            value={fullName}
+            onChange={e => setFullName(e.target.value)}
+            placeholder="Jean Dupont"
+          />
+
+          <Input
+            label="Téléphone"
+            type="tel"
+            value={phone}
+            onChange={e => setPhone(e.target.value)}
+            placeholder="+33 6 12 34 56 78"
+          />
+
+          <Button onClick={handleSave} loading={loading}>Sauvegarder</Button>
+        </div>
+      </Card>
+
+      <Card padding="lg">
+        <Button variant="danger" onClick={handleLogout}>Se déconnecter</Button>
+      </Card>
+    </div>
+  );
+}

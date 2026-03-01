@@ -1,0 +1,169 @@
+# CitedBy.ai Launch Campaign Design
+
+**Date**: 2026-02-25
+**Status**: Approved
+**Approach**: Product Hunt Blitz (4-week campaign)
+
+---
+
+## 1. Campaign Overview
+
+**Campaign name**: "Be Cited by AI" Launch
+**Goal**: Build a waitlist of 500+ email signups before opening access
+**Budget**: < EUR 1,000 (mostly organic)
+**Target audience**: B2B SaaS founders/marketers, digital/SEO agencies, content publishers
+**Channels**: Product Hunt, Twitter/X, LinkedIn, Hacker News, Reddit, Indie Hackers, blog, email
+
+## 2. Timeline
+
+| Week | Phase | Focus |
+|------|-------|-------|
+| Week 1 | Asset Creation | Waitlist page, demo video, screenshots, PH "coming soon" page |
+| Week 2 | Content & Community | Blog posts, social media content calendar, engage SEO communities |
+| Week 3 | Warm-up | Daily social posts, reach out to PH supporters/hunters, early access teasers |
+| Week 4 | Launch Week | PH launch (Tuesday), HN Show HN, LinkedIn viral post, Twitter thread, email blast |
+
+**Key milestones:**
+- Day -21: All assets ready (waitlist page, video, screenshots)
+- Day -14: PH "Coming Soon" page live, start collecting upvote pledges
+- Day -7: Pre-launch email to early supporters, final prep
+- Day 0: Launch day (Tuesday, 12:01 AM PT)
+- Day +7: Post-launch recap, nurture sequence begins
+
+## 3. Assets to Build
+
+### Waitlist / Lead Capture
+- Waitlist landing page on citedby.ai with email capture form, value prop, social proof counter
+- Lead magnet: Free "AEO Score Check" (simplified audit)
+
+### Product Hunt Assets
+- PH "Coming Soon" page (tagline, thumbnail, description)
+- Gallery images: 5 screenshots + 1 logo
+- Demo GIF/video (max 2 min)
+- Tagline (max 60 chars): "Get your brand cited by ChatGPT, Claude & Gemini"
+- Maker comment (first comment)
+- PH thumbnail (240x240px)
+
+### Social Media Content
+- Twitter/X launch thread (5-7 tweets)
+- LinkedIn launch post (long-form narrative with carousel)
+- Pre-launch teaser posts (10-15 posts across 2 weeks)
+
+### Blog Posts (3-4 articles)
+1. "What is AEO? Why SEO is no longer enough in 2026"
+2. "How ChatGPT decides which brands to recommend"
+3. "5 ways to get your brand cited by AI"
+4. (Optional) "We analyzed 100 brands' AI visibility - here's what we found"
+
+### Video
+- Product demo video (60-90 sec screen recording with voiceover)
+
+### Email Sequence
+- Waitlist confirmation email
+- Pre-launch nurture sequence (2-3 emails)
+- Launch day email
+
+## 4. Product Hunt Strategy
+
+### Page Setup
+
+**Tagline**: "Get your brand cited by ChatGPT, Claude & Gemini"
+
+**Description**: CitedBy.ai is the first platform for AI Engine Optimization (AEO). Audit your AI visibility score, monitor how AI bots crawl your site, and generate optimized content so ChatGPT, Claude, Perplexity, and Gemini recommend your brand. Free audit included.
+
+**Gallery (5 items)**:
+1. Hero screenshot - Dashboard with AI Visibility Score
+2. AI Monitoring - Bot tracking interface
+3. Generative Tools - SMC Studio / Content Writer
+4. Results comparison - Before/After AI visibility
+5. Demo GIF - 15-sec walkthrough of the audit flow
+
+**Maker Comment**: Personal story about why you built this, the "aha moment" about AEO, what makes it different. End with: "Reply here and I'll run a free AI visibility audit for your brand."
+
+### Pre-Launch Supporter Strategy
+- Post "Coming Soon" page 2 weeks before launch
+- Share link on LinkedIn, Twitter, SEO communities, Indie Hackers
+- Goal: 200+ followers on Coming Soon page
+- DM 50-100 active PH users personally
+
+### Launch Day Playbook
+1. 00:01 PT: Launch goes live, post maker comment
+2. Morning (EU): LinkedIn post + Twitter thread
+3. Midday: Engage every PH comment within 30 min
+4. Afternoon: Share in Slack/Discord communities
+5. Evening: Twitter update with live stats
+6. All day: Reply to every comment, thank every upvoter
+
+## 5. Social Media & Community Strategy
+
+### Twitter/X
+
+**Pre-launch (Weeks 2-3)**: 1 post/day. Mix of stats/data tweets, hot takes, mini-threads.
+
+Example posts:
+- "68% of ChatGPT responses don't cite sources. The ones that do? They follow a pattern. [thread]"
+- "SEO got you to page 1 of Google. AEO gets you into ChatGPT's answer. Different game, different rules."
+- "We asked 5 AI engines to recommend a CRM. Only 2 brands appeared in all 5. Guess which ones?"
+
+**Launch day thread (7 tweets)**:
+1. Hook: striking AEO stat
+2. The problem: brands are invisible to AI
+3. What we built: CitedBy.ai in one sentence
+4. How it works: 3-step explanation
+5. Key features: 3 bullet points
+6. Social proof / early results
+7. CTA: Product Hunt link + free audit offer
+
+### LinkedIn
+
+**Pre-launch (Weeks 2-3)**: 3 posts/week, longer form, narrative, professional tone. Focus on "the future of search" angle. Tag relevant SEO/marketing people.
+
+**Launch day**: Long-form story post (1,200+ words) with carousel images. Personal narrative ending with clear CTA.
+
+### Community Engagement
+
+**Where to post**: Reddit (r/SEO, r/SaaS, r/Entrepreneur, r/startups), Indie Hackers, Hacker News ("Show HN"), SEO Slack/Discord groups, Facebook SEO groups.
+
+**Rule**: 80% value, 20% product. Provide insights and answer questions first.
+
+### Founding Member Incentives
+- First 100 waitlist signups: Lifetime 30% discount on any plan
+- First 500: 3 months free on Pro plan
+
+## 6. Email & Waitlist Funnel
+
+### Waitlist Page
+- URL: citedby.ai/waitlist
+- Headline: "Be the first to know when AI recommends your brand"
+- Sub: "CitedBy.ai launches soon. Join the waitlist for early access + founding member pricing."
+- CTA: "Join the Waitlist"
+- Elements: email input, waitlist counter, 3 value props, social proof
+
+### Email Sequence
+
+**Email 1 - Welcome (immediate)**:
+Subject: "You're on the list - here's what's coming"
+Content: Thank them, what CitedBy.ai does, what to expect, social follow links
+
+**Email 2 - Value (Day 3)**:
+Subject: "Is your brand invisible to ChatGPT?"
+Content: Educational AEO explainer, stats, product tease
+
+**Email 3 - Social proof (Day 7)**:
+Subject: "X people are already on the waitlist"
+Content: Momentum update, early testimonial or case study preview
+
+**Email 4 - Launch day (Day ~21)**:
+Subject: "We're LIVE - your founding member access is ready"
+Content: Product Hunt link, signup link, founding member discount, urgency
+
+## 7. KPIs & Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Waitlist signups (pre-launch) | 500+ |
+| Product Hunt upvotes | 200+ (top 5 of the day) |
+| PH "Coming Soon" followers | 200+ |
+| Launch day website visits | 2,000+ |
+| Email open rate | 40%+ |
+| Conversion (waitlist to signup) | 15-20% |

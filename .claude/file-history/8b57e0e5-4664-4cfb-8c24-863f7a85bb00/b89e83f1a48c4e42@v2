@@ -1,0 +1,13 @@
+'use client';
+import dynamicImport from 'next/dynamic';
+import { useAppContext } from '@/lib/app-context';
+
+const CitationDetailPage = dynamicImport(
+  () => import('@/views/v3/CitationDetailPage'),
+  { ssr: false }
+);
+
+export default function CitationDetailPageWrapper() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return <CitationDetailPage onBack={goBack} user={user} onNavigate={navigateTo} />;
+}

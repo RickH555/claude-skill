@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Restore pages/ directory from _legacy_pages/",
+  "description": "Copy all files from _legacy_pages/ to pages/ to restore the SPA architecture that App.tsx depends on",
+  "activeForm": "Restoring pages/ directory",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

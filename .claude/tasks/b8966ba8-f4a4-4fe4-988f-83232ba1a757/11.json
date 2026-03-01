@@ -1,0 +1,9 @@
+{
+  "id": "11",
+  "subject": "Task 11-15: Supabase + Auth",
+  "description": "Supabase clients, unified migration, auth middleware, login/register pages",
+  "activeForm": "Setting up Supabase and auth",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

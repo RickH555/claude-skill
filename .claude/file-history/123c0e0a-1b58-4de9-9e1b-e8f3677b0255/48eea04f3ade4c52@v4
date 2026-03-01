@@ -1,0 +1,30 @@
+// ============================================
+// CitedBy.ai - Scheduling Types
+// ============================================
+
+export type ScheduleFrequency = 'daily' | 'weekly' | 'monthly'
+
+export interface MonitoringSchedule {
+  id: string
+  brandName: string
+  brandUrl: string
+  frequency: ScheduleFrequency
+  hour: string
+  dayOfWeek?: number
+  dayOfMonth?: number
+  emailNotification: boolean
+  active: boolean
+  createdAt: string
+  lastRun: string | null
+  nextRun: string
+}
+
+export interface ScheduledScanResult {
+  id: string
+  scheduleId: string
+  brandName: string
+  executedAt: string
+  citationsFound: number
+  citedCount: number
+  status: 'completed' | 'error'
+}

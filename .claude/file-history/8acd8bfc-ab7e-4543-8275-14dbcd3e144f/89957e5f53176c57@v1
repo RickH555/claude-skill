@@ -1,0 +1,43 @@
+'use client';
+import { useSearchParams } from 'next/navigation';
+import Account from '@/pages/Account';
+
+// Mock user for MVP — in production, fetch from Supabase session
+const MOCK_USER = {
+  id: 'user_abc123',
+  email: 'demo@citedby.ai',
+  name: 'Jean Dupont',
+  credits: 15,
+  plan: 'free' as const,
+  workspaceId: 'ws_001',
+  role: 'owner' as const,
+};
+
+export default function AccountPage() {
+  const searchParams = useSearchParams();
+  const tab = searchParams?.get('tab') as 'profile' | 'subscription' | 'billing' | 'api' | null;
+
+  const handleUpgrade = (plan: 'free' | 'pro' | 'enterprise') => {
+    console.log('Upgrade to:', plan);
+  };
+
+  const handleLogout = () => {
+    console.log('Logout');
+  };
+
+  const handleNavigate = (view: string) => {
+    console.log('Navigate to:', view);
+  };
+
+  return (
+    <Account
+      user={MOCK_USER}
+      onLogout={handleLogout}
+      onNavigate={handleNavigate}
+      onUpgrade={handleUpgrade}
+      monthlyProjectCount={1}
+      maxProjects={1}
+      initialTab={tab || 'profile'}
+    />
+  );
+}

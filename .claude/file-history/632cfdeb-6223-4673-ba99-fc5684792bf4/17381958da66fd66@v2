@@ -1,0 +1,48 @@
+import { NextRequest, NextResponse } from "next/server"
+import { authenticateApiKey } from "@/lib/api-auth"
+import { createClient } from "@/lib/supabase/server"
+
+/**
+ * GET /api/v1/runs?projectId=xxx&limit=10 — List analysis runs for a project
+ */
+export async function GET(req: NextRequest) {
+  const auth = await authenticateApiKey(req)
+  if (!auth.success) return auth.response
+
+  const projectId = req.nextUrl.searchParams.get("projectId")
+  if (!projectId) {
+    return NextResponse.json({ error: "projectId is required" }, { status: 400 })
+  }
+
+  const limit = Math.min(parseInt(req.nextUrl.searchParams.get("limit") || "10"), 50)
+
+  const supabase = createClient()
+
+  // Verify project belongs to workspace
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id")
+    .eq("id", projectId)
+    .eq("workspace_id", auth.context.workspaceId)
+    .single()
+
+  if (!project) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 })
+  }
+
+  const { data: runs, error } = await supabase
+    .from("analysis_runs")
+    .select("id, status, global_score, total_prompts, citations_found, mentions_found, started_at, completed_at, created_at")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    return NextResponse.json({ error: "Failed to fetch runs" }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    data: runs || [],
+    meta: { total: runs?.length || 0, limit },
+  })
+}

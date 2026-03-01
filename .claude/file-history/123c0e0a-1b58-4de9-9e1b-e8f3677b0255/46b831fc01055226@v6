@@ -1,0 +1,185 @@
+import { Suspense, lazy, useState, useEffect, useRef } from 'react';
+import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { AuthGuard } from './components/auth/AuthGuard';
+import { AppLayout } from './components/layout/AppLayout';
+import { AuthProvider, useAuth } from './hooks/useAuth';
+
+import AuthPage from './pages/AuthPage';
+import SectorSelectPage from './pages/SectorSelectPage';
+const RadarPage = lazy(() => import('./pages/RadarPage'));
+const ProspectDetailPage = lazy(() => import('./pages/ProspectDetailPage'));
+const PipelinePage = lazy(() => import('./pages/PipelinePage'));
+const SourcesPage = lazy(() => import('./pages/SourcesPage'));
+const StatsPage = lazy(() => import('./pages/StatsPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+
+const LoadingScreen = (): JSX.Element => (
+  <div className="flex min-h-screen items-center justify-center bg-leadradar-bg">
+    <div className="h-12 w-12 animate-spin rounded-full border-4 border-leadradar-border border-t-leadradar-accent" />
+  </div>
+);
+
+const ProtectedShell = (): JSX.Element => (
+  <AuthGuard>
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
+  </AuthGuard>
+);
+
+const CommandPalette: React.FC<{ isOpen: boolean; onClose: () => void; onNavigate: (view: string) => void; }> = ({ isOpen, onClose, onNavigate }) => {
+  const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+      setQuery('');
+    }
+  }, [isOpen]);
+
+  const commands = [
+    { id: 'analyze', label: 'Nouvel Audit AEO', icon: '\u{1F50D}', category: 'Navigation' },
+    { id: 'dashboard', label: 'Dashboard Pro', icon: '\u{1F4CA}', category: 'Navigation' },
+    { id: 'projects', label: 'Monitoring AEO', icon: '\u{1F4C8}', category: 'Navigation' },
+    { id: 'generative-tools', label: 'Outils G\u00e9n\u00e9ratifs', icon: '\u2728', category: 'Outils' },
+    { id: 'smc-studio', label: 'SMC Studio', icon: '\u270F\uFE0F', category: 'Outils' },
+    { id: 'content-writer', label: 'AI Content Writer', icon: '\u{1F4DD}', category: 'Outils' },
+    { id: 'reputation', label: 'R\u00e9putation IA', icon: '\u{1F6E1}\uFE0F', category: 'Outils' },
+    { id: 'source-of-truth', label: 'Source of Truth', icon: '\u{1F4C4}', category: 'Outils' },
+    { id: 'schema-org', label: 'Schema.org Generator', icon: '\u{1F527}', category: 'Outils' },
+    { id: 'robots-txt', label: 'Robots.txt Optimizer', icon: '\u{1F916}', category: 'Outils' },
+    { id: 'bot-tracking', label: 'Suivi Bots IA', icon: '\u{1F441}\uFE0F', category: 'Outils' },
+    { id: 'blog-optimizer', label: 'Blog Optimiser', icon: '\u{1F4F0}', category: 'Outils' },
+    { id: 'directory', label: 'Annuaire Index\u00e9', icon: '\u{1F4DA}', category: 'Navigation' },
+    { id: 'recharge', label: 'GTO Gas Station', icon: '\u26FD', category: 'Navigation' },
+    { id: 'clients', label: 'Base Clients', icon: '\u{1F465}', category: 'Navigation' },
+    { id: 'mission-orders', label: 'Ordres de Mission', icon: '\u{1F4CB}', category: 'Navigation' },
+    { id: 'alerts', label: 'Alertes AEO', icon: '\u{1F514}', category: 'Navigation' },
+    { id: 'account', label: 'Compte & Plan', icon: '\u{1F464}', category: 'Navigation' },
+    { id: 'affiliation', label: 'Programme Partenaire', icon: '\u{1F91D}', category: 'Navigation' },
+  ];
+
+  const filtered = query
+    ? commands.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
+    : commands;
+
+  const grouped = filtered.reduce((acc, cmd) => {
+    if (!acc[cmd.category]) acc[cmd.category] = [];
+    acc[cmd.category].push(cmd);
+    return acc;
+  }, {} as Record<string, typeof commands>);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className="relative w-full max-w-[560px] bg-[#13131d] border border-white/[0.1] rounded-2xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Search Input */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.08]">
+          <Search size={18} className="text-gray-500 shrink-0" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Rechercher une page, un outil..."
+            className="flex-1 bg-transparent text-white text-[15px] placeholder-gray-600 outline-none"
+          />
+          <kbd className="hidden sm:flex items-center gap-1 px-2 py-0.5 text-[10px] text-gray-600 bg-white/[0.04] border border-white/[0.08] rounded-md font-mono">
+            ESC
+          </kbd>
+        </div>
+
+        {/* Results */}
+        <div className="max-h-[340px] overflow-y-auto py-2 custom-scrollbar">
+          {Object.keys(grouped).length === 0 ? (
+            <div className="px-5 py-8 text-center text-gray-600 text-sm">Aucun r{'\u00e9'}sultat pour {'\u201C'}{query}{'\u201D'}</div>
+          ) : (
+            Object.entries(grouped).map(([category, cmds]) => (
+              <div key={category}>
+                <div className="px-5 py-2 text-[10px] font-bold text-gray-600 uppercase tracking-wider">{category}</div>
+                {cmds.map((cmd) => (
+                  <button
+                    key={cmd.id}
+                    onClick={() => { onNavigate(cmd.id); onClose(); }}
+                    className="w-full flex items-center gap-3 px-5 py-2.5 text-left hover:bg-white/[0.04] transition-colors group"
+                  >
+                    <span className="text-base">{cmd.icon}</span>
+                    <span className="text-[14px] text-gray-300 group-hover:text-white transition-colors">{cmd.label}</span>
+                  </button>
+                ))}
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-gray-600">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-[10px] font-mono">{'\u2191\u2193'}</kbd> naviguer</span>
+            <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded text-[10px] font-mono">{'\u21B5'}</kbd> ouvrir</span>
+          </div>
+          <span>CitedBy.ai</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AppContent = (): JSX.Element => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') {
+        setIsCommandPaletteOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const navigateTo = (view: string) => {
+    navigate('/' + view);
+  };
+
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      {user && <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} onNavigate={(view) => navigateTo(view)} />}
+      <Routes>
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/onboarding/sector" element={<SectorSelectPage />} />
+        <Route element={<ProtectedShell />}>
+          <Route index element={<Navigate replace to="/radar" />} />
+          <Route path="/radar" element={<RadarPage />} />
+          <Route path="/prospect/:id" element={<ProspectDetailPage />} />
+          <Route path="/pipeline" element={<PipelinePage />} />
+          <Route path="/sources" element={<SourcesPage />} />
+          <Route path="/statistiques" element={<StatsPage />} />
+          <Route path="/reglages" element={<SettingsPage />} />
+        </Route>
+        <Route path="*" element={<Navigate replace to="/radar" />} />
+      </Routes>
+    </Suspense>
+  );
+};
+
+const App = (): JSX.Element => (
+  <AuthProvider>
+    <AppContent />
+  </AuthProvider>
+);
+
+export default App;

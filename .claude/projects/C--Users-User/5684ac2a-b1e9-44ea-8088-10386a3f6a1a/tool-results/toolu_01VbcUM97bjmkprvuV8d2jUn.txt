@@ -1,0 +1,139 @@
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:51:import ShortcutsModal from './components/ShortcutsModal';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:52:import OnboardingModal from './components/OnboardingModal';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:250:  // ── Welcome Onboarding Modal ──
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:258:  // Show onboarding modal on first login
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:579:        <div className="fixed inset-0 z-[200] pointer-events-none flex items-center justify-center">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:604:      {/* Welcome Onboarding Modal */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:605:      <OnboardingModal
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:613:        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={() => setIsCommandPaletteOpen(false)}>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:622:      {/* Keyboard Shortcuts Modal (?) */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\App.tsx:623:      <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx:13:const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading }) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx:47:    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx:54:      {/* Modal Content */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\GenerationModal.tsx:194:export default GenerationModal;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\ShortcutsModal.tsx:4:const ShortcutsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\ShortcutsModal.tsx:8:    <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={onClose}>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\ShortcutsModal.tsx:19:            { keys: 'Esc', desc: 'Fermer les modales' },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\ShortcutsModal.tsx:37:export default ShortcutsModal;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx:4:const OnboardingModal: React.FC<{ show: boolean; onClose: () => void; onNavigate: (view: string) => void }> = ({ show, onClose, onNavigate }) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx:15:    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\OnboardingModal.tsx:132:export default OnboardingModal;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\SourceOfTruthModal.tsx:12:const SourceOfTruthModal: React.FC<Props> = ({ isOpen, onClose, project }) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\SourceOfTruthModal.tsx:80:    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\SourceOfTruthModal.tsx:248:export default SourceOfTruthModal;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\Sidebar.tsx:83:        className={`md:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx:77:    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]" onClick={onClose}>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\AiResponseLayer.tsx:660:      {/* Preview Modal */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\AiResponseLayer.tsx:662:        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\AiMonitoring.tsx:652:        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Affiliation.tsx:46:  // Marketing Modal State
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Affiliation.tsx:47:  const [showMarketingModal, setShowMarketingModal] = useState(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Affiliation.tsx:114:      {showMarketingModal && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Affiliation.tsx:115:        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Affiliation.tsx:116:            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowMarketingModal(false)}></div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Affiliation.tsx:122:                    <button onClick={() => setShowMarketingModal(false)} className="p-2 hover:bg-purple-500/10 rounded-full text-gray-500 hover:text-white transition-colors">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Affiliation.tsx:386:                        onClick={() => setShowMarketingModal(true)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:5:import GenerationModal from '../components/GenerationModal';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:18:  // Generation Modal State
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:19:  const [isModalOpen, setIsModalOpen] = useState(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:53:    setIsModalOpen(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:79:    setIsModalOpen(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:108:      <GenerationModal 
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:109:        isOpen={isModalOpen}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\ActionPlan.tsx:110:        onClose={() => setIsModalOpen(false)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:26:  const [upgradeModal, setUpgradeModal] = useState<{ planId: string; planName: string; newPrice: number } | null>(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:137:    setUpgradeModal({ planId, planName: targetPlan.name, newPrice: targetPlan.price });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:142:    if (!upgradeModal) return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:145:      const amountPaid = upgradeModal.newPrice - currentPlanPrice;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:153:        desc: `Upgrade ${planDetails.name} → ${upgradeModal.planName} (Prorata)`,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:158:      onUpgrade(upgradeModal.planId as any);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:164:  const handleCloseUpgradeModal = () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:165:    setUpgradeModal(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:217:      {upgradeModal && paymentStep === 'payment' && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:221:            productName={`Plan ${upgradeModal.planName}`}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:222:            productDescription={`Upgrade ${planDetails.name} → ${upgradeModal.planName}`}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:223:            amount={upgradeModal.newPrice - currentPlanPrice}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:225:              { label: `Nouveau plan (${upgradeModal.planName})`, value: `${upgradeModal.newPrice.toFixed(2)} €` },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:227:              { label: 'À payer aujourd\'hui', value: `${(upgradeModal.newPrice - currentPlanPrice).toFixed(2)} €`, highlight: true, separator: true },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:238:      {!(upgradeModal && paymentStep === 'payment') && (<>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:904:      {upgradeModal && paymentStep === 'success' && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:905:        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ left: 0, top: 0, width: '100vw', height: '100vh' }}>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:906:          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => !isProcessing && handleCloseUpgradeModal()} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:916:                    Vous êtes maintenant sur le plan <span className="text-purple-400 font-bold">{upgradeModal.planName}</span>.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:930:                    <span className="text-white">{upgradeModal.newPrice}€/mois</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:934:                  <button onClick={() => { handleCloseUpgradeModal(); setActiveTab('subscription'); }}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Account.tsx:938:                  <button onClick={() => { handleCloseUpgradeModal(); setActiveTab('billing'); }}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\prospect\ApproachModal.tsx:5:interface ApproachModalProps {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\prospect\ApproachModal.tsx:16: * Modale edition / copie / envoi email de message d'approche.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\prospect\ApproachModal.tsx:18:export const ApproachModal = ({
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\prospect\ApproachModal.tsx:26:}: ApproachModalProps): JSX.Element | null => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\components\prospect\ApproachModal.tsx:113:    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:365:  const [showNewClientModal, setShowNewClientModal] = useState(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:462:    setShowNewClientModal(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:506:    setShowNewClientModal(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:989:        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1035:      {showNewClientModal && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1036:        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1037:          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowNewClientModal(false)} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1039:            {/* Modal Header */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1046:                onClick={() => setShowNewClientModal(false)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1053:            {/* Modal Body */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1166:            {/* Modal Footer */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Clients.tsx:1169:                onClick={() => setShowNewClientModal(false)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Directory.tsx:669:        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Directory.tsx:700:        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:3:import { ApproachModal } from '../components/prospect/ApproachModal';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:44:  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:220:              setIsModalOpen(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:405:              setIsModalOpen(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:424:      <ApproachModal
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:425:        isOpen={isModalOpen}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\ProspectDetailPage.tsx:429:        onClose={() => setIsModalOpen(false)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:297:  const [proofModal, setProofModal] = useState<{ missionId: string; recId: string } | null>(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:353:    if (!proofModal || !proofForm.description.trim()) return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:355:      if (m.id !== proofModal.missionId) return m;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:359:          if (r.id !== proofModal.recId) return r;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:375:    setProofModal(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:702:                                  <button onClick={e => { e.stopPropagation(); setProofModal({ missionId: mission.id, recId: rec.id }); setProofForm({ type: 'lien', description: '', url: '' }); }}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:822:      {/* Proof submission modal */}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:823:      {proofModal && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:824:        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:825:          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setProofModal(null)} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\MissionOrders.tsx:862:              <button onClick={() => setProofModal(null)} className="px-4 py-2.5 text-sm text-gray-400 hover:text-white transition-colors">Annuler</button>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:18:  const [upgradeModal, setUpgradeModal] = useState<{ planId: string; planName: string; newPrice: number } | null>(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:71:    setUpgradeModal({ planId, planName: targetPlan.name, newPrice: targetPlan.price });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:76:    if (!upgradeModal) return;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:79:      const amountPaid = upgradeModal.newPrice - currentPlanPrice;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:87:        desc: `Upgrade ${currentPlanName} → ${upgradeModal.planName} (Prorata)`,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:92:      onUpgrade(upgradeModal.planId as any);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:98:  const handleCloseUpgradeModal = () => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:99:    setUpgradeModal(null);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:163:      {upgradeModal && paymentStep === 'payment' && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:167:            productName={`Plan ${upgradeModal.planName}`}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:168:            productDescription={`Upgrade ${currentPlanName} → ${upgradeModal.planName}`}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:169:            amount={upgradeModal.newPrice - currentPlanPrice}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:171:              { label: `Nouveau plan (${upgradeModal.planName})`, value: `${upgradeModal.newPrice.toFixed(2)} €` },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:173:              { label: 'À payer aujourd\'hui', value: `${(upgradeModal.newPrice - currentPlanPrice).toFixed(2)} €`, highlight: true, separator: true },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:184:      {!(upgradeModal && paymentStep === 'payment') && (<>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:445:      {upgradeModal && paymentStep === 'success' && (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:446:        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ left: 0, top: 0, width: '100vw', height: '100vh' }}>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:447:          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => !isProcessing && handleCloseUpgradeModal()} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:457:                    Vous êtes maintenant sur le plan <span className="text-purple-400 font-bold">{upgradeModal.planName}</span>.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:471:                    <span className="text-white">{upgradeModal.newPrice}€/mois</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:475:                  <button onClick={() => { handleCloseUpgradeModal(); setActiveTab('my-plan'); }}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Plan.tsx:479:                  <button onClick={() => { handleCloseUpgradeModal(); setActiveTab('billing'); }}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:7:import GenerationModal from '../components/GenerationModal';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:102:  // States for viewing archive modal
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:103:  const [isModalOpen, setIsModalOpen] = useState(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:128:    setIsModalOpen(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:224:              <div className="fixed inset-0 z-40" onClick={() => setIsProjectDropdownOpen(false)} />
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:358:              <GenerationModal
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:359:                isOpen={isModalOpen}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\pages\Projects.tsx:360:                onClose={() => setIsModalOpen(false)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx:37:  const [locationModalOpen, setLocationModalOpen] = useState<boolean>(false);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx:305:              setLocationModalOpen(true);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx:534:      {locationModalOpen ? (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx:535:        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx:561:                onClick={() => setLocationModalOpen(false)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\pages\SettingsPage.tsx:575:                  setLocationModalOpen(false);

@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Phase 2: Create services/reputation_service.ts",
+  "description": "Create the AI Reputation scanning service with scanReputation, generateReputationResponse functions, 3 prompts, GoogleGenAI + fallback pattern.",
+  "activeForm": "Creating reputation service",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

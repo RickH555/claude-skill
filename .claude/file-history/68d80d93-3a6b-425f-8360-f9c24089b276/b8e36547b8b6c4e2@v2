@@ -1,0 +1,74 @@
+// ═══════════════════════════════════════════════════════════════
+// AI MONITORING — Types
+// Track brand citations across ChatGPT, Claude, Perplexity, Gemini, AI Overviews
+// ═══════════════════════════════════════════════════════════════
+
+export type AIEngine = 'ChatGPT' | 'Claude' | 'Perplexity' | 'Gemini' | 'AI Overviews';
+export type Sentiment = 'positive' | 'neutral' | 'negative';
+
+export interface SentimentBreakdown {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
+
+export interface CitationEntry {
+  id: string;
+  engine: AIEngine;
+  query: string;
+  position: number;
+  date: string;
+  sentiment: Sentiment;
+  snippet: string;
+  url?: string;
+  confidence: number;
+}
+
+export interface EngineResult {
+  engine: AIEngine;
+  totalCitations: number;
+  shareOfVoice: number;
+  avgPosition: number;
+  sentiment: SentimentBreakdown;
+  trend: number; // percentage change vs previous period
+  topQueries: string[];
+}
+
+export interface CompetitorData {
+  name: string;
+  totalCitations: number;
+  shareOfVoice: number;
+  avgSentiment: number; // 0-100
+  trend: number;
+  dominantEngine: AIEngine;
+}
+
+export interface TimeSeriesPoint {
+  date: string;
+  citations: number;
+  chatgpt: number;
+  claude: number;
+  perplexity: number;
+  gemini: number;
+  aiOverviews: number;
+}
+
+export interface MonitoringResult {
+  brandName: string;
+  url: string;
+  scanDate: string;
+  period: '7d' | '30d' | '90d';
+  // KPIs
+  totalCitations: number;
+  shareOfVoice: number;
+  overallSentiment: SentimentBreakdown;
+  trend: number; // percentage change vs previous period
+  // Detailed data
+  engineResults: EngineResult[];
+  citations: CitationEntry[];
+  competitors: CompetitorData[];
+  timeSeries: TimeSeriesPoint[];
+  // Summary
+  summary: string;
+  recommendations: string[];
+}

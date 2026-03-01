@@ -1,0 +1,19 @@
+'use client';
+import dynamicImport from 'next/dynamic';
+import { useAppContext } from '@/lib/app-context';
+
+const CitationDashboardPage = dynamicImport(
+  () => import('@/views/v3/CitationDashboardPage'),
+  { ssr: false }
+);
+
+export default function CitationsPage() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return (
+    <CitationDashboardPage
+      onBack={goBack}
+      user={user}
+      onNavigate={navigateTo}
+    />
+  );
+}

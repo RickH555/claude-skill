@@ -1,0 +1,78 @@
+// ──────────────────────────────────────────
+// RoyallAzz — Database type definitions
+// ──────────────────────────────────────────
+
+export interface Merchant {
+  id: string;
+  email: string;
+  business_name: string;
+  logo_url: string | null;
+  plan: 'free' | 'pro' | 'business';
+  stripe_customer_id: string | null;
+  created_at: string;
+}
+
+export interface LoyaltyProgram {
+  id: string;
+  merchant_id: string;
+  name: string;
+  type: 'stamp' | 'points';
+  target: number;
+  welcome_bonus: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface Reward {
+  id: string;
+  program_id: string;
+  name: string;
+  discount_type: 'percentage' | 'fixed' | 'freebie';
+  discount_value: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface Customer {
+  id: string;
+  email: string;
+  full_name: string | null;
+  phone: string | null;
+  created_at: string;
+}
+
+export interface CustomerCard {
+  id: string;
+  customer_id: string;
+  program_id: string;
+  balance: number;
+  tier: 'bronze' | 'silver' | 'gold' | 'vip';
+  created_at: string;
+}
+
+export interface Transaction {
+  id: string;
+  card_id: string;
+  merchant_id: string;
+  type: 'earn' | 'redeem';
+  amount: number;
+  source: 'qr' | 'nfc' | 'manual' | 'api';
+  created_at: string;
+}
+
+export interface MerchantQrCode {
+  id: string;
+  merchant_id: string;
+  program_id: string;
+  qr_url: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface CustomerQrCode {
+  id: string;
+  customer_id: string;
+  secret_key: string;
+  is_active: boolean;
+  created_at: string;
+}

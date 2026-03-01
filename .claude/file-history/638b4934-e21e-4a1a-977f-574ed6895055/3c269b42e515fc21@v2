@@ -1,0 +1,203 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+interface LlmJsonConfig {
+  siteName: string;
+  siteUrl: string;
+  description: string;
+  entity: string;
+  services: Array<{ name: string; description: string; url?: string }>;
+  keyPages: Array<{ title: string; url: string; description: string }>;
+  contact: { email: string; phone?: string; address?: string };
+  socialLinks?: string[];
+  targetAudience?: string;
+  industry?: string;
+  foundedYear?: string;
+}
+
+interface LlmJsonResult {
+  content: string;
+  fieldCount: number;
+  byteSize: number;
+}
+
+const fallbackSimulation = async (config: LlmJsonConfig): Promise<LlmJsonResult> => {
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  const jsonObj: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": config.entity || "Organization",
+    name: config.siteName,
+    url: config.siteUrl,
+    description: config.description,
+  };
+
+  if (config.industry) {
+    jsonObj.industry = config.industry;
+  }
+  if (config.foundedYear) {
+    jsonObj.foundingDate = config.foundedYear;
+  }
+  if (config.targetAudience) {
+    jsonObj.audience = { "@type": "Audience", audienceType: config.targetAudience };
+  }
+
+  if (config.services.length > 0) {
+    jsonObj.hasOfferCatalog = {
+      "@type": "OfferCatalog",
+      name: "Services",
+      itemListElement: config.services.map(s => ({
+        "@type": "Offer",
+        name: s.name,
+        description: s.description,
+        ...(s.url ? { url: s.url } : {}),
+      })),
+    };
+  }
+
+  if (config.keyPages.length > 0) {
+    jsonObj.mainEntity = config.keyPages.map(p => ({
+      "@type": "WebPage",
+      name: p.title,
+      url: p.url,
+      description: p.description,
+    }));
+  }
+
+  const contactPoint: Record<string, string> = {
+    "@type": "ContactPoint",
+    email: config.contact.email,
+  };
+  if (config.contact.phone) contactPoint.telephone = config.contact.phone;
+  jsonObj.contactPoint = contactPoint;
+
+  if (config.contact.address) {
+    jsonObj.address = {
+      "@type": "PostalAddress",
+      streetAddress: config.contact.address,
+    };
+  }
+
+  if (config.socialLinks && config.socialLinks.length > 0) {
+    jsonObj.sameAs = config.socialLinks;
+  }
+
+  jsonObj.llmInstructions = {
+    preferredCitation: `${config.siteName} (${config.siteUrl})`,
+    doNotFabricate: true,
+    referenceUrl: config.siteUrl,
+  };
+
+  const content = JSON.stringify(jsonObj, null, 2);
+  const fieldCount = Object.keys(jsonObj).length;
+  const byteSize = new Blob([content]).size;
+
+  return { content, fieldCount, byteSize };
+};
+
+export const generateLlmJson = async (config: LlmJsonConfig): Promise<LlmJsonResult> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn("API_KEY not found or process.env unavailable, using simulation.");
+    return fallbackSimulation(config);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        content: { type: Type.STRING, description: "The complete JSON-LD content as a stringified JSON object" },
+        fieldCount: { type: Type.NUMBER, description: "The total number of top-level fields in the JSON-LD object" },
+        byteSize: { type: Type.NUMBER, description: "The byte size of the generated JSON content" },
+      },
+      required: ["content", "fieldCount", "byteSize"],
+    };
+
+    const servicesDescription = config.services
+      .map(s => `- ${s.name}: ${s.description}${s.url ? ` (${s.url})` : ''}`)
+      .join('\n');
+
+    const keyPagesDescription = config.keyPages
+      .map(p => `- ${p.title} (${p.url}): ${p.description}`)
+      .join('\n');
+
+    const contactDescription = [
+      `Email: ${config.contact.email}`,
+      config.contact.phone ? `Phone: ${config.contact.phone}` : null,
+      config.contact.address ? `Address: ${config.contact.address}` : null,
+    ].filter(Boolean).join(', ');
+
+    const prompt = `
+      CONTEXT:
+      You are an expert in creating structured JSON-LD data for LLMs. Generate a comprehensive JSON-LD object that helps Large Language Models accurately reference a website or organization.
+
+      SITE INFORMATION:
+      - Site Name: ${config.siteName}
+      - Site URL: ${config.siteUrl}
+      - Description: ${config.description}
+      - Entity Type: ${config.entity}
+      ${config.industry ? `- Industry: ${config.industry}` : ''}
+      ${config.foundedYear ? `- Founded: ${config.foundedYear}` : ''}
+      ${config.targetAudience ? `- Target Audience: ${config.targetAudience}` : ''}
+
+      SERVICES:
+      ${servicesDescription}
+
+      KEY PAGES:
+      ${keyPagesDescription}
+
+      CONTACT:
+      ${contactDescription}
+
+      ${config.socialLinks && config.socialLinks.length > 0 ? `SOCIAL LINKS:\n${config.socialLinks.map(l => `- ${l}`).join('\n')}` : ''}
+
+      YOUR MISSION:
+      Generate a comprehensive JSON-LD object (schema.org compatible) that represents this entity for LLM consumption.
+
+      Requirements:
+      - Use proper schema.org @context and @type
+      - Include all provided information as structured data
+      - Add an "llmInstructions" field with preferred citation format and reference guidelines
+      - Keep it factual — do NOT invent or hallucinate any information
+      - The "content" field in your response should be the prettified (2-space indent) JSON string
+
+      Return ONLY the JSON object matching the provided schema.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.2,
+      }
+    });
+
+    let output = response.text;
+    if (!output) {
+      throw new Error("Empty response from AI");
+    }
+
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const jsonResponse = JSON.parse(output);
+
+    return {
+      content: jsonResponse.content,
+      fieldCount: jsonResponse.fieldCount,
+      byteSize: jsonResponse.byteSize,
+    };
+  } catch (error) {
+    console.error("LLM JSON Generation failed:", error);
+    return fallbackSimulation(config);
+  }
+};

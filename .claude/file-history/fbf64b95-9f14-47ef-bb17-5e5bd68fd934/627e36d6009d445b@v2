@@ -1,0 +1,104 @@
+'use client';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+
+const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#6366f1', '#f43f5e', '#14b8a6'];
+
+interface ResponseChartProps {
+  question: {
+    id: string;
+    text: string;
+    type: string;
+    options?: string[];
+  };
+  answers: (string | number | string[])[];
+}
+
+export function ResponseChart({ question, answers }: ResponseChartProps) {
+  if (question.type === 'rating' || question.type === 'nps') {
+    const counts: Record<string, number> = {};
+    answers.forEach((a) => {
+      const key = String(a);
+      counts[key] = (counts[key] || 0) + 1;
+    });
+
+    const max = question.type === 'nps' ? 10 : 5;
+    const data = Array.from({ length: max }, (_, i) => ({
+      name: String(i + (question.type === 'nps' ? 0 : 1)),
+      count: counts[String(i + (question.type === 'nps' ? 0 : 1))] || 0,
+    }));
+
+    const avg = answers.length > 0
+      ? (answers.reduce((sum: number, a) => sum + Number(a), 0) / answers.length).toFixed(1)
+      : '0';
+
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">{question.text}</CardTitle>
+          <p className="text-2xl font-bold">{avg} <span className="text-sm font-normal text-muted-foreground">avg</span></p>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={data}>
+              <XAxis dataKey="name" fontSize={12} />
+              <YAxis fontSize={12} allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (question.type === 'multiple_choice' || question.type === 'single_choice' || question.type === 'yes_no') {
+    const counts: Record<string, number> = {};
+    answers.forEach((a) => {
+      if (Array.isArray(a)) {
+        a.forEach((v) => { counts[v] = (counts[v] || 0) + 1; });
+      } else {
+        const key = String(a);
+        counts[key] = (counts[key] || 0) + 1;
+      }
+    });
+
+    const data = Object.entries(counts).map(([name, value]) => ({ name, value }));
+
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">{question.text}</CardTitle>
+          <p className="text-xs text-muted-foreground">{answers.length} responses</p>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                {data.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Open-ended: just show count
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">{question.text}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-2xl font-bold">{answers.length}</p>
+        <p className="text-xs text-muted-foreground">text responses</p>
+      </CardContent>
+    </Card>
+  );
+}

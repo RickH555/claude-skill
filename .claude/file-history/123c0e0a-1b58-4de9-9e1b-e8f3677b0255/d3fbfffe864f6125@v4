@@ -1,0 +1,509 @@
+import { type FormEvent, useEffect, useState } from 'react'
+import type { ScheduleFrequency } from '../../types/scheduling.ts'
+import type { AdPlatform, BudgetEstimate } from '../../types/retargeting.ts'
+import {
+  getSchedules,
+  createSchedule,
+  toggleSchedule,
+  deleteSchedule,
+  getScanHistory,
+  checkAndRunPendingScans,
+  getFrequencyLabel,
+  getFrequencyColor,
+} from '../../services/scheduling.ts'
+import {
+  getAdConnections,
+  connectAdPlatform,
+  disconnectAdPlatform,
+  generateOpportunities,
+  estimateBudget,
+  exportAudienceCSV,
+  getPlatformLabel,
+  getPlatformColor,
+} from '../../services/retargeting.ts'
+
+interface Citation {
+  id: number
+  model: string
+  query: string
+  cited: boolean
+  date: string
+  url: string
+}
+
+const mockCitations: Citation[] = [
+  { id: 1, model: 'ChatGPT', query: 'Meilleur outil SEO IA', cited: true, date: '2025-01-15', url: 'https://citedby.ai/seo' },
+  { id: 2, model: 'Claude', query: 'Alternatives a Semrush', cited: true, date: '2025-01-14', url: 'https://citedby.ai/compare' },
+  { id: 3, model: 'Perplexity', query: 'Outils de marketing digital', cited: false, date: '2025-01-13', url: 'https://citedby.ai/marketing' },
+  { id: 4, model: 'Gemini', query: 'Suivi de marque en ligne', cited: true, date: '2025-01-12', url: 'https://citedby.ai/monitoring' },
+  { id: 5, model: 'ChatGPT', query: 'Visibilite marque IA', cited: false, date: '2025-01-11', url: 'https://citedby.ai/visibility' },
+]
+
+type ResultTab = 'overview' | 'retargeting'
+
+export default function MonitoringPage() {
+  // Scheduling state
+  const [schedules, setSchedules] = useState(getSchedules)
+  const [scanHistory, setScanHistory] = useState(getScanHistory)
+  const [brandName, setBrandName] = useState('')
+  const [brandUrl, setBrandUrl] = useState('')
+  const [frequency, setFrequency] = useState<ScheduleFrequency>('daily')
+  const [hour, setHour] = useState('09:00')
+  const [dayOfWeek, setDayOfWeek] = useState(1)
+  const [dayOfMonth, setDayOfMonth] = useState(1)
+  const [emailNotification, setEmailNotification] = useState(false)
+
+  // Results tab
+  const [resultTab, setResultTab] = useState<ResultTab>('overview')
+
+  // Retargeting state
+  const [adConnections, setAdConnections] = useState(getAdConnections)
+  const [connectingPlatform, setConnectingPlatform] = useState<AdPlatform | null>(null)
+  const [budgetPlatform, setBudgetPlatform] = useState<AdPlatform>('google_ads')
+  const [dailyBudget, setDailyBudget] = useState(50)
+  const [expandedPixel, setExpandedPixel] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const citedUrls = mockCitations.filter((c) => c.cited).map((c) => c.url)
+  const opportunities = generateOpportunities(citedUrls)
+  const budget: BudgetEstimate = estimateBudget(budgetPlatform, dailyBudget)
+
+  // Run pending scans on mount
+  useEffect(() => {
+    const results = checkAndRunPendingScans()
+    if (results.length > 0) {
+      setSchedules(getSchedules())
+      setScanHistory(getScanHistory())
+    }
+  }, [])
+
+  function handleCreateSchedule(e: FormEvent) {
+    e.preventDefault()
+    if (!brandName.trim() || !brandUrl.trim()) return
+    createSchedule(
+      brandName.trim(),
+      brandUrl.trim(),
+      frequency,
+      hour,
+      emailNotification,
+      frequency === 'weekly' ? dayOfWeek : undefined,
+      frequency === 'monthly' ? dayOfMonth : undefined,
+    )
+    setSchedules(getSchedules())
+    setBrandName('')
+    setBrandUrl('')
+  }
+
+  function handleToggleSchedule(id: string) {
+    toggleSchedule(id)
+    setSchedules(getSchedules())
+  }
+
+  function handleDeleteSchedule(id: string) {
+    deleteSchedule(id)
+    setSchedules(getSchedules())
+  }
+
+  function handleConnectAd(platform: AdPlatform) {
+    setConnectingPlatform(platform)
+    connectAdPlatform(platform).then(() => {
+      setAdConnections(getAdConnections())
+      setConnectingPlatform(null)
+    })
+  }
+
+  function handleDisconnectAd(platform: AdPlatform) {
+    disconnectAdPlatform(platform)
+    setAdConnections(getAdConnections())
+  }
+
+  function copyPixel(code: string, id: string) {
+    navigator.clipboard.writeText(code)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Monitoring</h2>
+
+      {/* Result Tabs */}
+      <div className="flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
+        <button
+          onClick={() => setResultTab('overview')}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            resultTab === 'overview' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Vue d'ensemble
+        </button>
+        <button
+          onClick={() => setResultTab('retargeting')}
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            resultTab === 'retargeting' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Retargeting IA
+        </button>
+      </div>
+
+      {/* Overview Tab */}
+      {resultTab === 'overview' && (
+        <>
+          {/* Citations Table */}
+          <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-gray-200 bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 font-medium text-gray-600">Modele IA</th>
+                  <th className="px-6 py-3 font-medium text-gray-600">Requete</th>
+                  <th className="px-6 py-3 font-medium text-gray-600">Cite</th>
+                  <th className="px-6 py-3 font-medium text-gray-600">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {mockCitations.map((citation) => (
+                  <tr key={citation.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 font-medium text-gray-900">{citation.model}</td>
+                    <td className="px-6 py-4 text-gray-700">{citation.query}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                          citation.cited ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {citation.cited ? 'Oui' : 'Non'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500">{citation.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Scheduling Section */}
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Planification automatique</h3>
+            <form onSubmit={handleCreateSchedule} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Nom de la marque</label>
+                  <input
+                    type="text"
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    placeholder="Ex: CitedBy.ai"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">URL du site</label>
+                  <input
+                    type="url"
+                    value={brandUrl}
+                    onChange={(e) => setBrandUrl(e.target.value)}
+                    placeholder="https://citedby.ai"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Frequence</label>
+                  <select
+                    value={frequency}
+                    onChange={(e) => setFrequency(e.target.value as ScheduleFrequency)}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  >
+                    <option value="daily">Quotidien</option>
+                    <option value="weekly">Hebdomadaire</option>
+                    <option value="monthly">Mensuel</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Heure</label>
+                  <input
+                    type="time"
+                    value={hour}
+                    onChange={(e) => setHour(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  />
+                </div>
+                {frequency === 'weekly' && (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Jour de la semaine</label>
+                    <select
+                      value={dayOfWeek}
+                      onChange={(e) => setDayOfWeek(Number(e.target.value))}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    >
+                      {weekDays.map((day, i) => (
+                        <option key={i} value={i}>{day}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {frequency === 'monthly' && (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Jour du mois</label>
+                    <select
+                      value={dayOfMonth}
+                      onChange={(e) => setDayOfMonth(Number(e.target.value))}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                    >
+                      {Array.from({ length: 28 }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={emailNotification}
+                    onChange={(e) => setEmailNotification(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  Notification email
+                  <span className="text-xs text-gray-400">(Backend a venir)</span>
+                </label>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  Planifier ce scan
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Scheduled Brands Grid */}
+          {schedules.length > 0 && (
+            <div>
+              <h3 className="mb-3 text-lg font-semibold text-gray-900">Marques planifiees</h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {schedules.map((s) => (
+                  <div key={s.id} className="rounded-xl bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-gray-900">{s.brandName}</h4>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getFrequencyColor(s.frequency)}`}>
+                        {getFrequencyLabel(s.frequency)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2 truncate">{s.brandUrl}</p>
+                    <div className="space-y-1 text-xs text-gray-500">
+                      <p>Prochaine execution : {new Date(s.nextRun).toLocaleString('fr-FR')}</p>
+                      {s.lastRun && <p>Derniere execution : {new Date(s.lastRun).toLocaleString('fr-FR')}</p>}
+                    </div>
+                    <div className="mt-3 flex items-center justify-between">
+                      <button
+                        onClick={() => handleToggleSchedule(s.id)}
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                          s.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}
+                      >
+                        {s.active ? 'Actif' : 'En pause'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSchedule(s.id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Scan History */}
+          {scanHistory.length > 0 && (
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">Historique des scans automatiques</h3>
+              <div className="space-y-3">
+                {scanHistory.slice(0, 10).map((scan) => (
+                  <div key={scan.id} className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{scan.brandName}</p>
+                      <p className="text-xs text-gray-500">{new Date(scan.executedAt).toLocaleString('fr-FR')}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-700">{scan.citedCount}/{scan.citationsFound} citations</p>
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        {scan.status === 'completed' ? 'Termine' : 'Erreur'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Retargeting Tab */}
+      {resultTab === 'retargeting' && (
+        <>
+          {/* Ad Platform Connections */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {adConnections.map((conn) => (
+              <div key={conn.platform} className="rounded-xl bg-white p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{getPlatformLabel(conn.platform)}</h4>
+                    {conn.accountName && <p className="text-xs text-gray-500">{conn.accountName}</p>}
+                  </div>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getPlatformColor(conn.platform)}`}>
+                    {conn.status === 'connected' ? 'Connecte' : 'Non connecte'}
+                  </span>
+                </div>
+                <div className="mt-3">
+                  {conn.status === 'disconnected' && (
+                    <button
+                      onClick={() => handleConnectAd(conn.platform)}
+                      disabled={connectingPlatform !== null}
+                      className="w-full rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      Connecter
+                    </button>
+                  )}
+                  {conn.status === 'connecting' && (
+                    <p className="text-center text-xs text-gray-500">Connexion...</p>
+                  )}
+                  {conn.status === 'connected' && (
+                    <button
+                      onClick={() => handleDisconnectAd(conn.platform)}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Deconnecter
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Retargeting Opportunities */}
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Opportunites de retargeting</h3>
+              <button
+                onClick={() => exportAudienceCSV(opportunities)}
+                className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Exporter CSV
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-gray-200 bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 font-medium text-gray-600">URL</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Moteur</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Audience estimee</th>
+                    <th className="px-4 py-3 font-medium text-gray-600">Pixel</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {opportunities.map((op) => (
+                    <tr key={op.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm text-gray-900 max-w-xs truncate">{op.url}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{op.engine}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{op.estimatedAudience.toLocaleString('fr-FR')}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => copyPixel(op.pixelCode, op.id)}
+                            className="text-xs text-blue-600 hover:text-blue-800"
+                          >
+                            {copiedId === op.id ? 'Copie !' : 'Copier'}
+                          </button>
+                          <button
+                            onClick={() => setExpandedPixel(expandedPixel === op.id ? null : op.id)}
+                            className="text-xs text-gray-500 hover:text-gray-700"
+                          >
+                            {expandedPixel === op.id ? 'Masquer' : 'Voir'}
+                          </button>
+                        </div>
+                        {expandedPixel === op.id && (
+                          <pre className="mt-2 overflow-x-auto rounded bg-gray-900 p-2 text-xs text-gray-100">
+                            {op.pixelCode}
+                          </pre>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Budget Estimator */}
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">Estimateur de budget</h3>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Plateforme</label>
+                  <select
+                    value={budgetPlatform}
+                    onChange={(e) => setBudgetPlatform(e.target.value as AdPlatform)}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                  >
+                    <option value="google_ads">Google Ads</option>
+                    <option value="meta_ads">Meta Ads</option>
+                    <option value="linkedin_ads">LinkedIn Ads</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    Budget quotidien : {dailyBudget} EUR
+                  </label>
+                  <input
+                    type="range"
+                    min={10}
+                    max={500}
+                    step={10}
+                    value={dailyBudget}
+                    onChange={(e) => setDailyBudget(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>10 EUR</span>
+                    <span>500 EUR</span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-xs text-gray-500">Portee estimee</p>
+                  <p className="text-lg font-bold text-gray-900">{budget.estimatedReach.toLocaleString('fr-FR')}</p>
+                </div>
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-xs text-gray-500">Clics estimes</p>
+                  <p className="text-lg font-bold text-gray-900">{budget.estimatedClicks.toLocaleString('fr-FR')}</p>
+                </div>
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-xs text-gray-500">CPC estime</p>
+                  <p className="text-lg font-bold text-gray-900">{budget.estimatedCPC.toFixed(2)} EUR</p>
+                </div>
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <p className="text-xs text-gray-500">CPM estime</p>
+                  <p className="text-lg font-bold text-gray-900">{budget.estimatedCPM.toFixed(2)} EUR</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}

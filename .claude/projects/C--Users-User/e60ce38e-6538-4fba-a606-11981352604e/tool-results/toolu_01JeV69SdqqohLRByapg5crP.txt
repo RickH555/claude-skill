@@ -1,0 +1,170 @@
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-40-  ];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-41-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-42-  const filtered = query
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx:43:    ? commands.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-44-    : commands;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-45-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-46-  const grouped = filtered.reduce((acc, cmd) => {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-53-  const highlightMatch = (label: string) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-54-    if (!query) return <span>{label}</span>;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-55-    const lowerLabel = label.toLowerCase();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx:56:    const lowerQuery = query.toLowerCase();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-57-    const idx = lowerLabel.indexOf(lowerQuery);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-58-    if (idx === -1) return <span>{label}</span>;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-59-    return (
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-60-      <span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-61-        {label.slice(0, idx)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx:62:        <span className="text-purple-400 font-semibold">{label.slice(idx, idx + query.length)}</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx:63:        {label.slice(idx + query.length)}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-64-      </span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-65-    );
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\components\CommandPalette.tsx-66-  };
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-79-    const pixelId = `CB-${randomId()}`;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-80-    const url =
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-81-      citation.url ||
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts:82:      `https://www.example.com/${citation.query.toLowerCase().replace(/\s+/g, '-')}`;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-83-    const estimatedAudience = Math.floor(500 + Math.random() * 14500);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-84-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-85-    const pixelCode = `<!-- CitedBy.ai Retargeting Pixel -->
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-88-  s.async=1;s.src='https://t.citedby.ai/pixel.js';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-89-  b.head.appendChild(s)}(window,document);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-90-  cbq('init','${pixelId}');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts:91:  cbq('track','AIVisitor',{source:'${citation.engine}',query:'${citation.query.replace(/'/g, "\\'")}'});
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-92-</script>`;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-93-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-94-    return {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-135-  const rows = opportunities.map((opp) => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-136-    const pixelIdMatch = opp.pixelCode.match(/cbq\('init','(CB-[A-Z0-9]+)'\)/);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-137-    const pixelId = pixelIdMatch ? pixelIdMatch[1] : '';
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts:138:    const escapedQuery = `"${opp.query.replace(/"/g, '""')}"`;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-139-    return `${opp.url},${opp.engine},${escapedQuery},${opp.estimatedAudience},${pixelId}`;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-140-  });
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\retargeting.ts-141-
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx-62-  ];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx-63-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx-64-  const filtered = query
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx:65:    ? commands.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx-66-    : commands;
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx-67-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\App.tsx-68-  const grouped = filtered.reduce((acc, cmd) => {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\lib\constants.ts-673- * Recherche texte dans la taxonomie secteur.
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\lib\constants.ts-674- */
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\lib\constants.ts-675-export const searchSectorOptions = (query: string, limit = 120): SectorTargetOption[] => {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\lib\constants.ts:676:  const normalized = query.trim().toLowerCase();
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\lib\constants.ts-677-  if (!normalized) {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\lib\constants.ts-678-    return SECTOR_OPTIONS.slice(0, limit);
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\src\lib\constants.ts-679-  }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-17-  await new Promise(resolve => setTimeout(resolve, 2500));
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-18-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-19-  const today = new Date().toISOString().split('T')[0];
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:20:  const faqHtml = query.faqItems.map(faq => `
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-21-      <details>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-22-        <summary>${faq.question}</summary>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-23-        <p>${faq.answer}</p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-24-      </details>`).join('\n');
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-25-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:26:  const faqSchema = query.faqItems.map(faq => `{
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-27-          "@type": "Question",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-28-          "name": "${faq.question.replace(/"/g, '\\"')}",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-29-          "acceptedAnswer": {
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-37-<head>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-38-  <meta charset="UTF-8">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-39-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:40:  <title>${query.targetQuestion} — ${config.name}</title>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:41:  <meta name="description" content="${query.answerBox}">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-42-  <meta name="robots" content="index, follow, max-snippet:-1">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:43:  <link rel="canonical" href="${config.url}/ai/query/${query.slug}.html">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-44-  <script type="application/ld+json">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-45-  {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-46-    "@context": "https://schema.org",
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-54-  {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-55-    "@context": "https://schema.org",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-56-    "@type": "WebPage",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:57:    "name": "${query.targetQuestion}",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:58:    "description": "${query.answerBox.replace(/"/g, '\\"')}",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-59-    "publisher": {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-60-      "@type": "${config.entity}",
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-61-      "name": "${config.name}",
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-67-      "itemListElement": [
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-68-        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "${config.url}" },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-69-        { "@type": "ListItem", "position": 2, "name": "AI Hub", "item": "${config.url}/ai/index.html" },
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:70:        { "@type": "ListItem", "position": 3, "name": "${query.targetQuestion}" }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-71-      ]
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-72-    }
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-73-  }
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-97-<body>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-98-  <main class="container">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-99-    <nav class="breadcrumb">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:100:      <a href="${config.url}">Accueil</a> › <a href="/ai/index.html">AI Hub</a> › ${query.targetQuestion}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-101-    </nav>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-102-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:103:    <span class="badge">${query.type}</span>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:104:    <h1>${query.targetQuestion}</h1>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-105-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-106-    <div class="answer-box">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:107:      <p><strong>${query.answerBox}</strong></p>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-108-    </div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-109-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-110-    <div class="keywords">
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:111:      ${query.targetKeywords.map(kw => `<span class="keyword">${kw}</span>`).join('\n      ')}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-112-    </div>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-113-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-114-    <section style="margin-top:2rem">
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-116-      ${faqHtml}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-117-    </section>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-118-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:119:    <a href="${query.cta.url}" class="cta">${query.cta.label}</a>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-120-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-121-    <footer>
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-122-      <p><a href="/ai/index.html">← Retour au AI Hub</a></p>
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-128-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-129-  return {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-130-    html,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:131:    slug: query.slug,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:132:    title: `${query.targetQuestion} — ${config.name}`,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:133:    description: query.answerBox,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-134-    schemaMarkup: 'FAQPage + WebPage + BreadcrumbList (intégré)',
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-135-  };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-136-};
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-158-      required: ["html", "slug", "title", "description", "schemaMarkup"],
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-159-    };
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-160-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:161:    const prompt = `Génère une Query Page /ai/query/${query.slug}.html pour :
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-162-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-163-SITE : ${config.name} (${config.url})
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-164-ENTITÉ : ${config.entity}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-165-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:166:QUESTION CIBLE : ${query.targetQuestion}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:167:TYPE : ${query.type}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:168:MOTS-CLÉS : ${query.targetKeywords.join(', ')}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:169:RÉPONSE DIRECTE : ${query.answerBox}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-170-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-171-FAQ :
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:172:${query.faqItems.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-173-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:174:CTA : "${query.cta.label}" → ${query.cta.url}
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-175-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-176-La page doit :
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-177-1. Commencer par la réponse directe (Answer-First, dans les 100 premiers mots)
+--
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-198-
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-199-    return {
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-200-      html: parsed.html,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts:201:      slug: parsed.slug || query.slug,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-202-      title: parsed.title,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-203-      description: parsed.description,
+C:\Users\User\Downloads\SaaS X-Final-Rick-Dossier Sauvegarde\V2SaaS X-Final-Rick-Test - Test Copie\services\ai-response-layer\query-page-generator.ts-204-      schemaMarkup: parsed.schemaMarkup,

@@ -1,0 +1,37 @@
+import { SITE } from "@/lib/constants";
+
+export default function Footer() {
+  return (
+    <footer className="glass border-t border-white/5 px-6 py-12">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white">
+            C
+          </span>
+          <span className="text-sm font-semibold text-white/80">
+            citedby<span className="text-accent-bright">.ai</span>
+          </span>
+          <span className="ml-2 text-xs text-white/30">
+            by {SITE.company}
+          </span>
+        </div>
+
+        <div className="flex gap-6">
+          {["Privacy", "Terms", "Docs", "Blog"].map((l) => (
+            <a
+              key={l}
+              href="#"
+              className="text-xs text-white/40 transition-colors hover:text-white/70"
+            >
+              {l}
+            </a>
+          ))}
+        </div>
+
+        <p className="text-xs text-white/25">
+          &copy; {new Date().getFullYear()} AOE. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}

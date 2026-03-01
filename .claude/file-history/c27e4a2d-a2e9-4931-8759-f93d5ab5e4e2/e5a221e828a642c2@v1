@@ -1,0 +1,10 @@
+import PageHeader from '@/components/layout/PageHeader';
+
+export default function RewardsPage() {
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Récompenses" description="Gérez les récompenses de vos programmes." />
+      <p className="text-[var(--text-tertiary)]">Bientôt disponible.</p>
+    </div>
+  );
+}

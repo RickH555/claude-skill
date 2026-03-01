@@ -1,0 +1,9 @@
+{
+  "id": "5",
+  "subject": "Écrire le document de design",
+  "description": "Sauvegarder le design validé dans docs/plans/ et commiter",
+  "activeForm": "Rédaction du document de design",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

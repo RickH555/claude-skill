@@ -1,0 +1,456 @@
+import { createClient } from "@/lib/supabase/server"
+
+// ============================================================
+// Types matching Supabase tables
+// ============================================================
+
+export interface Workspace {
+  id: string
+  name: string
+  slug: string
+  logo_url: string | null
+  industry: string | null
+  plan: "starter" | "pro" | "agency"
+  plan_status: "active" | "trialing" | "past_due" | "canceled" | "unpaid"
+  current_period_end: string | null
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  credits_remaining: number
+  created_at: string
+  updated_at: string
+}
+
+export interface WorkspaceUser {
+  id: string
+  workspace_id: string
+  user_id: string
+  role: "owner" | "admin" | "editor" | "viewer"
+  invited_email: string | null
+  joined_at: string
+  created_at: string
+}
+
+export interface DBProject {
+  id: string
+  workspace_id: string
+  name: string
+  domain: string
+  logo_url: string | null
+  brand_name: string | null
+  industry: string | null
+  competitors: string[]
+  keywords: string[]
+  status: "active" | "paused" | "archived"
+  visibility_score: number
+  trend: number
+  last_run_at: string | null
+  next_run_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AnalysisRun {
+  id: string
+  project_id: string
+  triggered_by: string | null
+  status: "pending" | "running" | "completed" | "failed"
+  global_score: number | null
+  total_prompts: number
+  citations_found: number
+  mentions_found: number
+  categories: Record<string, unknown>
+  ai_citation: Record<string, unknown> | null
+  error_message: string | null
+  started_at: string | null
+  completed_at: string | null
+  created_at: string
+}
+
+export interface RunResult {
+  id: string
+  run_id: string
+  project_id: string
+  ai_engine: "ChatGPT" | "Perplexity" | "Claude" | "Gemini" | "Copilot"
+  prompt: string
+  response: string | null
+  score: number
+  result_type: "citation" | "mention" | "none"
+  brand_mentioned: boolean
+  url_mentioned: boolean
+  competitor_mentioned: boolean
+  sentiment: "positive" | "neutral" | "negative" | null
+  sentiment_score: number | null
+  created_at: string
+}
+
+export interface DBRecommendation {
+  id: string
+  run_id: string
+  project_id: string
+  priority: "critical" | "high" | "medium" | "low"
+  title: string
+  description: string
+  action: string
+  effort: "low" | "medium" | "high"
+  impact: "low" | "medium" | "high"
+  category: string
+  status: "open" | "in_progress" | "done" | "dismissed"
+  created_at: string
+}
+
+export interface GeneratedContentRow {
+  id: string
+  project_id: string
+  workspace_id: string
+  created_by: string | null
+  content_type: string
+  title: string
+  content: string
+  meta_description: string | null
+  aeo_score: number | null
+  aeo_tips: string[] | null
+  schema_markup: string | null
+  status: "draft" | "review" | "approved" | "published"
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+// ============================================================
+// Workspace queries
+// ============================================================
+
+export async function getUserWorkspaces(userId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .select("workspace_id, role, workspaces(*)")
+    .eq("user_id", userId)
+
+  if (error) throw error
+  return (data || []) as unknown as Array<{ workspace_id: string; role: string; workspaces: Workspace }>
+}
+
+export async function getWorkspace(workspaceId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("workspaces")
+    .select("*")
+    .eq("id", workspaceId)
+    .single()
+
+  if (error) throw error
+  return data as Workspace
+}
+
+export async function createWorkspace(name: string, userId: string, industry?: string) {
+  const supabase = createClient()
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+
+  const { data: workspace, error: wsError } = await supabase
+    .from("workspaces")
+    .insert({ name, slug, industry })
+    .select()
+    .single()
+
+  if (wsError) throw wsError
+
+  const { error: memberError } = await supabase
+    .from("workspace_users")
+    .insert({ workspace_id: workspace.id, user_id: userId, role: "owner" })
+
+  if (memberError) throw memberError
+
+  return workspace as Workspace
+}
+
+export async function getWorkspaceMembers(workspaceId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+
+  if (error) throw error
+  return data as WorkspaceUser[]
+}
+
+// ============================================================
+// Project queries
+// ============================================================
+
+export async function getProjects(workspaceId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+
+  if (error) throw error
+  return data as DBProject[]
+}
+
+export async function getProject(projectId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", projectId)
+    .single()
+
+  if (error) throw error
+  return data as DBProject
+}
+
+export async function createProject(input: {
+  workspace_id: string
+  name: string
+  domain: string
+  brand_name?: string
+  industry?: string
+  competitors?: string[]
+  keywords?: string[]
+}) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("projects")
+    .insert(input)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as DBProject
+}
+
+export async function updateProject(projectId: string, updates: Partial<DBProject>) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("projects")
+    .update(updates)
+    .eq("id", projectId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as DBProject
+}
+
+export async function deleteProject(projectId: string) {
+  const supabase = createClient()
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", projectId)
+
+  if (error) throw error
+}
+
+// ============================================================
+// Analysis Run queries
+// ============================================================
+
+export async function createAnalysisRun(projectId: string, userId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("analysis_runs")
+    .insert({
+      project_id: projectId,
+      triggered_by: userId,
+      status: "pending",
+    })
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as AnalysisRun
+}
+
+export async function updateAnalysisRun(runId: string, updates: Partial<AnalysisRun>) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("analysis_runs")
+    .update(updates)
+    .eq("id", runId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as AnalysisRun
+}
+
+export async function getProjectRuns(projectId: string, limit = 10) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("analysis_runs")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(limit)
+
+  if (error) throw error
+  return data as AnalysisRun[]
+}
+
+export async function getLatestRun(projectId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("analysis_runs")
+    .select("*")
+    .eq("project_id", projectId)
+    .eq("status", "completed")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error && error.code !== "PGRST116") throw error
+  return data as AnalysisRun | null
+}
+
+// ============================================================
+// Run Results queries
+// ============================================================
+
+export async function insertRunResults(results: Omit<RunResult, "id" | "created_at">[]) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("run_results")
+    .insert(results)
+    .select()
+
+  if (error) throw error
+  return data as RunResult[]
+}
+
+export async function getRunResults(runId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("run_results")
+    .select("*")
+    .eq("run_id", runId)
+    .order("created_at", { ascending: true })
+
+  if (error) throw error
+  return data as RunResult[]
+}
+
+// ============================================================
+// Recommendations queries
+// ============================================================
+
+export async function getProjectRecommendations(projectId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("recommendations")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("priority", { ascending: true })
+
+  if (error) throw error
+  return data as DBRecommendation[]
+}
+
+export async function insertRecommendations(recs: Omit<DBRecommendation, "id" | "created_at" | "status">[]) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("recommendations")
+    .insert(recs)
+    .select()
+
+  if (error) throw error
+  return data as DBRecommendation[]
+}
+
+export async function updateRecommendationStatus(recId: string, status: DBRecommendation["status"]) {
+  const supabase = createClient()
+  const { error } = await supabase
+    .from("recommendations")
+    .update({ status })
+    .eq("id", recId)
+
+  if (error) throw error
+}
+
+// ============================================================
+// Generated Content queries
+// ============================================================
+
+export async function getProjectContents(projectId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("generated_contents")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+
+  if (error) throw error
+  return data as GeneratedContentRow[]
+}
+
+export async function createGeneratedContent(input: {
+  project_id: string
+  workspace_id: string
+  created_by: string
+  content_type: string
+  title: string
+  content: string
+  meta_description?: string
+  aeo_score?: number
+  aeo_tips?: string[]
+  schema_markup?: string
+  metadata?: Record<string, unknown>
+}) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("generated_contents")
+    .insert(input)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as GeneratedContentRow
+}
+
+// ============================================================
+// Dashboard Stats (aggregated queries)
+// ============================================================
+
+export async function getWorkspaceDashboardStats(workspaceId: string) {
+  const supabase = createClient()
+
+  const { data: projects } = await supabase
+    .from("projects")
+    .select("id, visibility_score, status")
+    .eq("workspace_id", workspaceId)
+    .eq("status", "active")
+
+  const activeProjects = projects || []
+  const avgScore = activeProjects.length > 0
+    ? Math.round(activeProjects.reduce((sum, p) => sum + (p.visibility_score || 0), 0) / activeProjects.length)
+    : 0
+
+  const projectIds = activeProjects.map(p => p.id)
+
+  let totalCitations = 0
+  let totalMentions = 0
+
+  if (projectIds.length > 0) {
+    const { data: runs } = await supabase
+      .from("analysis_runs")
+      .select("citations_found, mentions_found")
+      .in("project_id", projectIds)
+      .eq("status", "completed")
+
+    if (runs) {
+      totalCitations = runs.reduce((sum, r) => sum + (r.citations_found || 0), 0)
+      totalMentions = runs.reduce((sum, r) => sum + (r.mentions_found || 0), 0)
+    }
+  }
+
+  return {
+    activeProjectsCount: activeProjects.length,
+    averageScore: avgScore,
+    totalCitations,
+    totalMentions,
+  }
+}

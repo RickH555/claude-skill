@@ -1,0 +1,261 @@
+import React, { useState } from 'react';
+import { generateBlogArchitecture, generateFullArticle } from '../services/generator';
+import { ArrowLeft, PenTool, Link as LinkIcon, Download, Copy, Check, Sparkles, Loader2, FileText, AlignLeft, Bot, ExternalLink, Award } from 'lucide-react';
+import { User } from '../types';
+
+interface Props {
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  onNavigateToPublisher?: (data: { topic: string, url: string, brief: string }) => void;
+}
+
+const BlogOptimizer: React.FC<Props> = ({ onBack, user, onDeductCredits, onNavigateToPublisher }) => {
+  const [topic, setTopic] = useState('');
+  const [url, setUrl] = useState('');
+  const [result, setResult] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isWritingArticle, setIsWritingArticle] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [mode, setMode] = useState<'brief' | 'article'>('brief');
+
+  const BRIEF_COST = 20;
+  const FULL_ARTICLE_COST = 50;
+
+  const handleGenerateBrief = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!topic && !url) {
+      alert("Veuillez saisir au moins un sujet ou une URL.");
+      return;
+    }
+
+    if (onDeductCredits(BRIEF_COST)) {
+      setIsGenerating(true);
+      setMode('brief');
+      try {
+        const output = await generateBlogArchitecture(topic, url);
+        setResult(output);
+      } catch (error) {
+        console.error(error);
+        alert("Erreur lors de la génération.");
+      } finally {
+        setIsGenerating(false);
+      }
+    }
+  };
+
+  const handleWriteForMe = async () => {
+    if (!result) return;
+
+    if (onNavigateToPublisher) {
+        onNavigateToPublisher({
+            topic: topic || "Sujet non spécifié",
+            url: url || "",
+            brief: result
+        });
+    }
+  };
+
+  const handleCopy = () => {
+    if (result) {
+      navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownload = () => {
+    if (result) {
+      const blob = new Blob([result], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${mode === 'article' ? 'Article_AEO' : 'Brief'}_${topic.replace(/\s+/g, '_') || 'Optimized'}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-10 animate-in fade-in duration-500 min-h-screen">
+      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-white mb-6 transition-colors">
+        <ArrowLeft size={18} className="mr-2" /> Retour
+      </button>
+
+      <div className="grid lg:grid-cols-12 gap-8 h-full">
+        {/* Left Panel: Inputs */}
+        <div className="lg:col-span-4 space-y-6">
+          <div>
+            <h1 className="text-3xl font-sans font-bold text-white mb-2 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-pink-500/20 flex items-center justify-center text-pink-400 border border-pink-500/30">
+                <PenTool size={20} />
+              </div>
+              Blog Optimiser
+            </h1>
+            <p className="text-gray-500">Générez des briefs de rédaction structurés pour maximiser vos chances de Citation IA (GEO).</p>
+          </div>
+
+          <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+            <form onSubmit={handleGenerateBrief} className="space-y-6">
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <AlignLeft size={16} className="text-pink-400" /> Sujet / Mot-clé cible
+                </label>
+                <input 
+                  type="text" 
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  placeholder="Ex: Optimisation AEO pour e-commerce"
+                  className="w-full bg-black/40 border border-white/[0.08] rounded-xl p-3 text-white placeholder-gray-600 focus:border-pink-500/50 outline-none transition-colors"
+                />
+              </div>
+
+              <div className="relative flex items-center gap-4">
+                <div className="h-px bg-white/[0.08] flex-1"></div>
+                <span className="text-xs text-gray-500 uppercase font-bold">ET / OU</span>
+                <div className="h-px bg-white/[0.08] flex-1"></div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                  <LinkIcon size={16} className="text-pink-400" /> URL à analyser (Optionnel)
+                </label>
+                <input 
+                  type="url" 
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://votre-site.com/blog/article-existant"
+                  className="w-full bg-black/40 border border-white/[0.08] rounded-xl p-3 text-white placeholder-gray-600 focus:border-pink-500/50 outline-none transition-colors"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-white/[0.06]">
+                <div className="flex justify-between items-center mb-4 text-xs text-gray-500">
+                  <span>Coût Brief</span>
+                  <span className="font-bold text-white">{BRIEF_COST} Crédits</span>
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={isGenerating || isWritingArticle}
+                  className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-pink-500/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <FileText size={20} />}
+                  {isGenerating ? 'Analyse en cours...' : 'Générer le Brief'}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Educational Points */}
+          <div className="ninja-card p-5 rounded-2xl border border-white/[0.08]">
+            <h3 className="font-bold text-white mb-3 text-sm">Pourquoi ce format ?</h3>
+            <ul className="space-y-3 text-xs text-gray-500">
+              <li className="flex gap-2">
+                <Check size={14} className="text-pink-400 shrink-0 mt-0.5" />
+                Structure les Hn pour l'extraction rapide.
+              </li>
+              <li className="flex gap-2">
+                <Check size={14} className="text-pink-400 shrink-0 mt-0.5" />
+                Intègre une FAQ obligatoire pour le Voice Search.
+              </li>
+              <li className="flex gap-2">
+                <Check size={14} className="text-pink-400 shrink-0 mt-0.5" />
+                Prépare les données structurées JSON-LD.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Right Panel: Results & Actions */}
+        <div className="lg:col-span-8 flex flex-col h-full gap-6">
+          
+          {/* Main Content Area (Result) */}
+          <div className="flex-1 flex flex-col h-[calc(100vh-250px)]">
+            {result ? (
+              <div className="flex flex-col h-full bg-[#0f1115] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+                {/* Result Header */}
+                <div className="p-4 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.04] shrink-0">
+                  <div className="flex items-center gap-2 text-sm font-medium text-white">
+                    {mode === 'article' ? <Bot size={16} className="text-purple-300" /> : <FileText size={16} className="text-pink-400" />} 
+                    {mode === 'article' ? 'Article Rédigé par IA' : 'Brief Généré'}
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={handleCopy} className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-purple-500/10 rounded-full text-xs font-medium text-white border border-white/[0.08] transition-colors">
+                      {copied ? <Check size={14} className="text-purple-300" /> : <Copy size={14} />}
+                      {copied ? 'Copié' : 'Copier'}
+                    </button>
+                    <button onClick={handleDownload} className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-600 hover:to-violet-700 rounded-full text-xs font-bold transition-colors">
+                      <Download size={14} /> Télécharger MD
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Markdown Content */}
+                <div className="flex-1 overflow-auto p-8 bg-[#000000] custom-scrollbar">
+                  {isWritingArticle ? (
+                    <div className="h-full flex flex-col items-center justify-center space-y-4">
+                        <Loader2 className="animate-spin text-pink-500" size={48} />
+                        <p className="text-gray-500 animate-pulse">Rédaction de l'article optimisé en cours...</p>
+                    </div>
+                  ) : (
+                    <pre className="whitespace-pre-wrap font-mono text-sm text-gray-300 leading-relaxed selection:bg-pink-500/30">
+                      {result}
+                    </pre>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center ninja-card rounded-2xl border border-white/[0.06] text-gray-500 border-dashed">
+                <div className="w-16 h-16 bg-white/[0.04] rounded-full flex items-center justify-center mb-6">
+                  <FileText size={32} className="opacity-20" />
+                </div>
+                <p className="text-lg font-medium text-gray-500 mb-2">Prêt à rédiger ?</p>
+                <p className="text-sm max-w-sm text-center">
+                  Entrez un sujet ou une URL pour générer une architecture d'article optimisée pour les Answer Engines.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Action Bar / Upsell (Only visible if result exists) */}
+          {result && !isWritingArticle && (
+             <div className="grid md:grid-cols-1 gap-4 animate-in slide-in-from-bottom-4 duration-500">
+                
+                {/* Option 2: Write For Me (New Flow) */}
+                <div className="bg-gradient-to-r from-pink-900/20 to-purple-900/20 p-5 rounded-2xl border border-white/[0.08] flex items-center justify-between group hover:border-white/20 transition-all">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-white/[0.04] rounded-full text-white group-hover:bg-purple-500/10 transition-colors">
+                            <PenTool size={24} />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-white mb-1 flex items-center gap-2">
+                                Write For Me & Publisher
+                            </h4>
+                            <p className="text-xs text-gray-500">
+                                Commandez la rédaction complète et la publication sur un site d'autorité.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        onClick={handleWriteForMe}
+                        className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-full hover:from-purple-600 hover:to-violet-700 transition-colors flex items-center gap-2 shadow-lg"
+                    >
+                        <Sparkles size={16} className="text-pink-600" />
+                        Commander la Rédaction
+                    </button>
+                </div>
+
+             </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BlogOptimizer;

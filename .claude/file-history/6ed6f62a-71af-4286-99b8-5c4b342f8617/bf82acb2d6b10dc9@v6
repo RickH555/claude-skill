@@ -1,0 +1,204 @@
+
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { GeneratedSolution } from '../types';
+import { X, Copy, Check, Sparkles, Loader2, ClipboardList, Briefcase, ArrowRight, UserCheck, Download, FileCode } from 'lucide-react';
+
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  solution: GeneratedSolution | null;
+  isLoading: boolean;
+}
+
+const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading }) => {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleCopy = () => {
+    if (solution?.content) {
+      navigator.clipboard.writeText(solution.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownload = () => {
+    if (solution?.content) {
+        const extension = solution.language === 'html' ? 'html' : solution.language === 'json' ? 'json' : 'txt';
+        const blob = new Blob([solution.content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `solution_aeo.${extension}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleContactExpert = () => {
+    // In a real app, this would open a booking calendar or contact form
+    window.open('mailto:experts@citedby.ai?subject=Demande%20assistance%20Webmaster%20AEO', '_blank');
+  };
+
+  const modalContent = (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      ></div>
+
+      {/* Modal Content */}
+      <div className="relative bg-[#0f1115] border border-white/[0.08] rounded-2xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+
+        {/* Header */}
+        <div className="shrink-0 px-5 py-3 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.04]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-purple-400 border border-white/[0.06] shadow-inner">
+              <Sparkles size={18} />
+            </div>
+            <div>
+              <h3 className="text-base font-sans font-bold text-white leading-tight">
+                {isLoading ? 'Génération de la solution...' : solution?.title}
+              </h3>
+              {!isLoading && <p className="text-[11px] text-gray-500">Optimisation AEO générée par l'IA</p>}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-white/[0.08] rounded-full transition-colors text-gray-500 hover:text-white"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 min-h-0 overflow-hidden bg-[#000000]">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full py-20 text-center space-y-6">
+              <div className="relative">
+                <Loader2 size={64} className="text-purple-400 animate-spin" />
+                <div className="absolute inset-0 blur-xl bg-purple-500/20 rounded-full animate-pulse"></div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-white font-medium text-lg animate-pulse">
+                  Analyse des critères de citation en cours...
+                </p>
+                <p className="text-sm text-gray-500">
+                  Rédaction du code et du guide d'implémentation pour débutant
+                </p>
+              </div>
+            </div>
+          ) : solution ? (
+            <div className="grid lg:grid-cols-12 h-full">
+
+              {/* Left Column: The Code/Content (7 cols) */}
+              <div className="lg:col-span-7 p-4 border-b lg:border-b-0 lg:border-r border-white/[0.08] flex flex-col min-h-0 overflow-y-auto custom-scrollbar">
+                <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl text-sm text-blue-200 mb-4 leading-relaxed shrink-0">
+                  <span className="font-bold text-blue-300 block mb-0.5">Impact AEO :</span>
+                  {solution.explanation}
+                </div>
+
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="flex justify-between items-center mb-2 shrink-0">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                      <FileCode size={14} className="text-gray-500" />
+                      {solution.type === 'code' ? 'Fichiers Sources' : 'Contenu Optimisé'}
+                      <span className="text-[10px] bg-white/[0.08] px-1.5 py-0.5 rounded text-gray-500 font-normal normal-case">{solution.language}</span>
+                    </span>
+                    <div className="flex gap-2">
+                        <button
+                        onClick={handleDownload}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-purple-500/10 rounded-md text-xs font-medium text-white transition-all border border-white/[0.08] group"
+                        title="Télécharger le fichier"
+                        >
+                        <Download size={14} className="group-hover:text-purple-400 transition-colors" />
+                        Télécharger
+                        </button>
+                        <button
+                        onClick={handleCopy}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] hover:bg-purple-500/10 rounded-md text-xs font-medium text-white transition-all border border-white/[0.08] group"
+                        >
+                        {copied ? <Check size={14} className="text-purple-300" /> : <Copy size={14} className="group-hover:text-purple-400 transition-colors" />}
+                        {copied ? 'Copié !' : 'Copier'}
+                        </button>
+                    </div>
+                  </div>
+
+                  <div className="relative flex-1 min-h-[200px] bg-[#111111] rounded-2xl border border-white/[0.08] overflow-hidden shadow-inner group">
+                    <pre className="absolute inset-0 p-5 overflow-auto text-sm font-mono leading-relaxed text-gray-300 custom-scrollbar">
+                      <code>{solution.content}</code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Implementation Plan (5 cols) */}
+              <div className="lg:col-span-5 bg-purple-500/[0.02] flex flex-col min-h-0 border-l border-black">
+                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 pb-2">
+                    <h4 className="text-base font-sans font-bold mb-4 flex items-center gap-2 text-white">
+                    <ClipboardList size={18} className="text-purple-400" />
+                    Guide d'installation (Débutant)
+                    </h4>
+
+                    <div className="space-y-0">
+                    {solution.implementationSteps.map((step, idx) => (
+                        <div key={idx} className="flex gap-3 pb-4 last:pb-0 relative group">
+                            {/* Vertical Line */}
+                            {idx !== solution.implementationSteps.length - 1 && (
+                                <div className="absolute left-[11px] top-8 bottom-0 w-px bg-white/[0.08] group-hover:bg-white/20 transition-colors"></div>
+                            )}
+
+                            <div className="w-6 h-6 rounded-full bg-[#1a1d24] border border-white/20 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 z-10 text-gray-500 group-hover:text-purple-400 group-hover:border-primary/50 transition-colors shadow-lg">
+                                {idx + 1}
+                            </div>
+                            <p className="text-sm text-gray-300 leading-relaxed pt-0.5 group-hover:text-gray-100 transition-colors">{step}</p>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+
+                <div className="shrink-0 px-4 py-3 border-t border-white/[0.08]">
+                   <div className="bg-gradient-to-br from-purple-500/5 to-purple-500/[0.02] p-3.5 rounded-xl border border-white/[0.08] hover:border-primary/30 transition-all group flex items-center gap-3">
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent shrink-0">
+                                <Briefcase size={14} />
+                            </div>
+                            <div className="min-w-0">
+                              <h5 className="font-bold text-white text-xs">Déléguer cette tâche ?</h5>
+                              <p className="text-[11px] text-gray-500 leading-snug truncate">Envoyez ce guide à votre webmaster</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleContactExpert}
+                            className="shrink-0 px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-400 hover:to-violet-500 font-bold rounded-full transition-colors flex items-center gap-1.5 text-[11px] uppercase tracking-wide shadow-lg transform active:scale-95"
+                        >
+                            <UserCheck size={12} />
+                            Webmaster
+                        </button>
+                   </div>
+                </div>
+              </div>
+
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+
+  return createPortal(modalContent, document.body);
+};
+
+export default GenerationModal;

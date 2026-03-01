@@ -1,0 +1,35 @@
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { SurveyBuilder } from '@/components/surveys/survey-builder';
+
+export default async function CreateSurveyPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.organization_id) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-muted-foreground">Please set up your organization first.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Create Survey</h1>
+        <p className="text-muted-foreground">
+          Build a survey to collect customer feedback
+        </p>
+      </div>
+      <SurveyBuilder organizationId={profile.organization_id} />
+    </div>
+  );
+}

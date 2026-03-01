@@ -1,0 +1,43 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import ManualScanner from '@/components/merchant/ManualScanner';
+import { createServerSupabase } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+
+export default async function ScannerPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Look up merchant by user_id
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('id')
+    .eq('user_id', user!.id)
+    .single();
+
+  if (!merchant) redirect('/login');
+
+  const { data: programs } = await supabase
+    .from('loyalty_programs')
+    .select('*')
+    .eq('merchant_id', merchant.id)
+    .eq('is_active', true);
+
+  const programIds = programs?.map(p => p.id) || [];
+
+  const { data: rewards } = programIds.length > 0
+    ? await supabase
+        .from('rewards')
+        .select('id, name, program_id, discount_type, discount_value')
+        .in('program_id', programIds)
+        .eq('is_active', true)
+    : { data: [] };
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Scanner" description="Ajoutez des points ou tampons a vos clients." />
+      <ManualScanner programs={programs || []} merchantId={merchant.id} rewards={rewards || []} />
+    </div>
+  );
+}

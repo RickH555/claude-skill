@@ -1,0 +1,212 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Card, CardContent } from '@/components/ui/card';
+import { Plus, Trash2, GripVertical, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import type { TemplateField } from '@/types';
+import { TEMPLATE_CATEGORIES } from '@/lib/constants';
+
+interface TemplateEditorProps {
+  organizationId: string;
+  initialData?: {
+    name: string;
+    description: string;
+    category: string;
+    fields: TemplateField[];
+  };
+  templateId?: string;
+}
+
+export function TemplateEditor({ organizationId, initialData, templateId }: TemplateEditorProps) {
+  const [name, setName] = useState(initialData?.name || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [category, setCategory] = useState(initialData?.category || 'custom');
+  const [fields, setFields] = useState<TemplateField[]>(initialData?.fields || []);
+  const [saving, setSaving] = useState(false);
+  const router = useRouter();
+
+  const addField = () => {
+    setFields([...fields, { name: '', type: 'text', description: '', required: false }]);
+  };
+
+  const removeField = (index: number) => {
+    setFields(fields.filter((_, i) => i !== index));
+  };
+
+  const updateField = (index: number, updates: Partial<TemplateField>) => {
+    setFields(fields.map((f, i) => (i === index ? { ...f, ...updates } : f)));
+  };
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      toast.error('Template name is required');
+      return;
+    }
+    if (fields.length === 0) {
+      toast.error('Add at least one field');
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const url = templateId ? `/api/documents/templates/${templateId}` : '/api/documents/templates';
+      const method = templateId ? 'PATCH' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          description,
+          category,
+          fields,
+          organization_id: organizationId,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to save template');
+
+      toast.success(templateId ? 'Template updated' : 'Template created');
+      router.push('/dashboard/templates');
+      router.refresh();
+    } catch {
+      toast.error('Failed to save template');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="name">Template Name</Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g., Invoice Template"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TEMPLATE_CATEGORIES.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>
+                  {cat.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Describe what this template extracts..."
+          rows={2}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-base font-semibold">Extraction Fields</Label>
+          <Button variant="outline" size="sm" onClick={addField}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Field
+          </Button>
+        </div>
+
+        {fields.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground border rounded-lg border-dashed">
+            <p className="text-sm">No fields defined yet</p>
+            <p className="text-xs mt-1">Click &ldquo;Add Field&rdquo; to define extraction fields</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {fields.map((field, index) => (
+              <Card key={index}>
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <GripVertical className="h-5 w-5 text-muted-foreground mt-2 shrink-0 cursor-grab" />
+                    <div className="flex-1 grid gap-3 sm:grid-cols-4">
+                      <Input
+                        placeholder="Field name"
+                        value={field.name}
+                        onChange={(e) => updateField(index, { name: e.target.value })}
+                      />
+                      <Select
+                        value={field.type}
+                        onValueChange={(v) => updateField(index, { type: v as TemplateField['type'] })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="text">Text</SelectItem>
+                          <SelectItem value="number">Number</SelectItem>
+                          <SelectItem value="date">Date</SelectItem>
+                          <SelectItem value="currency">Currency</SelectItem>
+                          <SelectItem value="boolean">Boolean</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        placeholder="Description"
+                        value={field.description}
+                        onChange={(e) => updateField(index, { description: e.target.value })}
+                      />
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={field.required || false}
+                            onCheckedChange={(checked) => updateField(index, { required: checked })}
+                          />
+                          <span className="text-xs text-muted-foreground">Required</span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeField(index)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-3 pt-4">
+        <Button onClick={handleSave} disabled={saving}>
+          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {templateId ? 'Update Template' : 'Create Template'}
+        </Button>
+        <Button variant="outline" onClick={() => router.back()}>
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}

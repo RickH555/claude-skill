@@ -1,0 +1,1806 @@
+# CitedBy.ai Launch Campaign — Implementation Plan
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Build all technical assets and content for a 4-week Product Hunt Blitz launch campaign (waitlist page, email funnel, blog posts, social media copy, PH assets).
+
+**Architecture:** Add a `/waitlist` route to the existing Vite SPA with Supabase-backed email capture. Create a `waitlist_subscribers` table in Supabase. Email sequence will use Supabase Edge Functions + Resend (lightweight email API). All content (blog posts, social copy, email templates) is generated as markdown files in `docs/launch/`.
+
+**Tech Stack:** React 18, Tailwind CSS (dark theme), Supabase (PostgreSQL + Edge Functions), Resend (email), Vite, Zod (form validation)
+
+---
+
+## Task 1: Create Supabase waitlist table migration
+
+**Files:**
+- Create: `supabase/migrations/009_waitlist.sql`
+
+**Step 1: Write the migration SQL**
+
+```sql
+-- Waitlist subscribers for launch campaign
+CREATE TABLE IF NOT EXISTS public.waitlist_subscribers (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email text NOT NULL UNIQUE,
+  name text,
+  company text,
+  source text DEFAULT 'direct',         -- 'direct', 'producthunt', 'twitter', 'linkedin', 'hackernews', 'reddit'
+  signup_number integer,                 -- auto-incremented position in waitlist
+  founding_tier text,                    -- 'top100' (30% lifetime), 'top500' (3mo free), null
+  email_1_sent boolean DEFAULT false,
+  email_2_sent boolean DEFAULT false,
+  email_3_sent boolean DEFAULT false,
+  email_4_sent boolean DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Auto-assign signup_number
+CREATE OR REPLACE FUNCTION public.assign_waitlist_number()
+RETURNS trigger AS $$
+BEGIN
+  NEW.signup_number := (SELECT COALESCE(MAX(signup_number), 0) + 1 FROM public.waitlist_subscribers);
+  IF NEW.signup_number <= 100 THEN
+    NEW.founding_tier := 'top100';
+  ELSIF NEW.signup_number <= 500 THEN
+    NEW.founding_tier := 'top500';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_waitlist_number
+  BEFORE INSERT ON public.waitlist_subscribers
+  FOR EACH ROW
+  EXECUTE FUNCTION public.assign_waitlist_number();
+
+-- RPC: get waitlist count (for social proof counter)
+CREATE OR REPLACE FUNCTION public.get_waitlist_count()
+RETURNS integer AS $$
+  SELECT COUNT(*)::integer FROM public.waitlist_subscribers;
+$$ LANGUAGE sql STABLE;
+
+-- RLS: allow anonymous inserts (signup), block reads
+ALTER TABLE public.waitlist_subscribers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can join waitlist"
+  ON public.waitlist_subscribers
+  FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Only service role can read"
+  ON public.waitlist_subscribers
+  FOR SELECT
+  USING (false);
+```
+
+**Step 2: Verify migration file exists and SQL is valid**
+
+Run: `cat supabase/migrations/009_waitlist.sql | head -5`
+Expected: Shows the first 5 lines of the migration
+
+**Step 3: Commit**
+
+```bash
+git add supabase/migrations/009_waitlist.sql
+git commit -m "feat: add waitlist_subscribers table migration"
+```
+
+---
+
+## Task 2: Create waitlist service
+
+**Files:**
+- Create: `services/waitlist.ts`
+- Reference: `services/database.ts` (for localStorage pattern)
+
+**Step 1: Write the waitlist service**
+
+```typescript
+import { z } from 'zod';
+
+// Validation schema
+export const waitlistSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  name: z.string().min(1, 'Name is required').max(100),
+  company: z.string().max(200).optional(),
+  source: z.enum(['direct', 'producthunt', 'twitter', 'linkedin', 'hackernews', 'reddit']).default('direct'),
+});
+
+export type WaitlistFormData = z.infer<typeof waitlistSchema>;
+
+export interface WaitlistResponse {
+  success: boolean;
+  signupNumber?: number;
+  foundingTier?: 'top100' | 'top500' | null;
+  error?: string;
+}
+
+// Local storage fallback key (when Supabase is not configured)
+const WAITLIST_STORAGE_KEY = 'citedby_waitlist';
+
+function getLocalWaitlist(): WaitlistFormData[] {
+  try {
+    return JSON.parse(localStorage.getItem(WAITLIST_STORAGE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Submit a new waitlist signup.
+ * Uses Supabase if configured, falls back to localStorage mock.
+ */
+export async function joinWaitlist(data: WaitlistFormData): Promise<WaitlistResponse> {
+  const parsed = waitlistSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0].message };
+  }
+
+  // Try Supabase first
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/waitlist_subscribers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify({
+          email: parsed.data.email,
+          name: parsed.data.name,
+          company: parsed.data.company || null,
+          source: parsed.data.source,
+        }),
+      });
+
+      if (response.status === 409) {
+        return { success: false, error: 'This email is already on the waitlist!' };
+      }
+
+      if (!response.ok) {
+        throw new Error(`Supabase error: ${response.status}`);
+      }
+
+      const [result] = await response.json();
+      return {
+        success: true,
+        signupNumber: result.signup_number,
+        foundingTier: result.founding_tier,
+      };
+    } catch (err) {
+      console.warn('Supabase waitlist failed, using localStorage fallback:', err);
+    }
+  }
+
+  // localStorage fallback
+  const list = getLocalWaitlist();
+  if (list.some(e => e.email === parsed.data.email)) {
+    return { success: false, error: 'This email is already on the waitlist!' };
+  }
+  list.push(parsed.data);
+  localStorage.setItem(WAITLIST_STORAGE_KEY, JSON.stringify(list));
+  const number = list.length;
+  return {
+    success: true,
+    signupNumber: number,
+    foundingTier: number <= 100 ? 'top100' : number <= 500 ? 'top500' : null,
+  };
+}
+
+/**
+ * Get waitlist count for social proof display.
+ */
+export async function getWaitlistCount(): Promise<number> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/get_waitlist_count`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+      });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch {
+      // fall through to localStorage
+    }
+  }
+
+  return getLocalWaitlist().length;
+}
+```
+
+**Step 2: Verify the file compiles**
+
+Run: `cd /c/Users/User/citedby-ai && npx tsc --noEmit services/waitlist.ts 2>&1 || echo "Check for errors"`
+
+**Step 3: Commit**
+
+```bash
+git add services/waitlist.ts
+git commit -m "feat: add waitlist service with Supabase + localStorage fallback"
+```
+
+---
+
+## Task 3: Create Waitlist page component
+
+**Files:**
+- Create: `pages/Waitlist.tsx`
+- Reference: `pages/Home.tsx` (for design patterns, dark theme)
+- Reference: `components/ScoreRing.tsx` (for visual consistency)
+
+**Step 1: Create the Waitlist page**
+
+```tsx
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Mail, Zap, Shield, BarChart3, Users, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import { joinWaitlist, getWaitlistCount, waitlistSchema, type WaitlistFormData } from '../services/waitlist';
+import { useTranslation } from '../i18n/useTranslation';
+
+interface WaitlistProps {
+  onBack: () => void;
+  onNavigate: (view: string) => void;
+}
+
+export default function Waitlist({ onBack, onNavigate }: WaitlistProps) {
+  const { t } = useTranslation();
+  const [waitlistCount, setWaitlistCount] = useState<number>(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<{ signupNumber?: number; foundingTier?: string | null }>({});
+  const [serverError, setServerError] = useState('');
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<WaitlistFormData>({
+    resolver: zodResolver(waitlistSchema),
+    defaultValues: { source: 'direct' },
+  });
+
+  useEffect(() => {
+    getWaitlistCount().then(setWaitlistCount);
+  }, []);
+
+  const onSubmit = async (data: WaitlistFormData) => {
+    setServerError('');
+    // Detect source from URL params
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get('ref') as WaitlistFormData['source'] || 'direct';
+    const response = await joinWaitlist({ ...data, source });
+
+    if (response.success) {
+      setSubmitted(true);
+      setResult({ signupNumber: response.signupNumber, foundingTier: response.foundingTier });
+      setWaitlistCount(prev => prev + 1);
+    } else {
+      setServerError(response.error || 'Something went wrong. Please try again.');
+    }
+  };
+
+  const valueProps = [
+    { icon: BarChart3, title: 'AI Visibility Score', desc: 'Measure how AI engines see your brand across ChatGPT, Claude, Perplexity & Gemini' },
+    { icon: Shield, title: 'Bot Monitoring', desc: 'Track GPTBot, ClaudeBot and 10+ AI crawlers hitting your site in real-time' },
+    { icon: Zap, title: 'Optimization Tools', desc: '15+ generative tools to make AI recommend your brand over competitors' },
+  ];
+
+  // Success state after signup
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-[#1a1d21] flex items-center justify-center px-4">
+        <div className="max-w-lg w-full text-center">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center">
+            <CheckCircle2 className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-3">You're in! 🎉</h1>
+          <p className="text-white/60 text-lg mb-2">
+            You're <span className="text-purple-400 font-semibold">#{result.signupNumber}</span> on the waitlist
+          </p>
+          {result.foundingTier === 'top100' && (
+            <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 text-amber-400 text-sm font-medium mb-4">
+              ⭐ Founding Member — Lifetime 30% discount unlocked!
+            </div>
+          )}
+          {result.foundingTier === 'top500' && (
+            <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-violet-500/20 border border-purple-500/30 text-purple-400 text-sm font-medium mb-4">
+              🚀 Early Adopter — 3 months free on Pro unlocked!
+            </div>
+          )}
+          <p className="text-white/40 text-sm mt-4">
+            Check your inbox for a welcome email. Follow us on
+            <a href="https://twitter.com/citedbyai" className="text-purple-400 hover:underline ml-1" target="_blank" rel="noopener">Twitter</a> and
+            <a href="https://linkedin.com/company/citedbyai" className="text-purple-400 hover:underline ml-1" target="_blank" rel="noopener">LinkedIn</a> for launch updates.
+          </p>
+          <button
+            onClick={() => onNavigate('home')}
+            className="mt-8 text-white/50 hover:text-white text-sm transition"
+          >
+            ← Back to homepage
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Signup form
+  return (
+    <div className="min-h-screen bg-[#1a1d21]">
+      {/* Hero */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 via-transparent to-transparent" />
+        <div className="max-w-4xl mx-auto px-4 pt-20 pb-12 relative">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium mb-6">
+              <Sparkles className="w-3.5 h-3.5" />
+              Launching soon — Join {waitlistCount > 0 ? `${waitlistCount}+ early adopters` : 'the waitlist'}
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+              Be the first to know when<br />
+              <span className="bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
+                AI recommends your brand
+              </span>
+            </h1>
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">
+              CitedBy.ai launches soon. Join the waitlist for early access + founding member pricing.
+              The first 100 members get a lifetime 30% discount.
+            </p>
+          </div>
+
+          {/* Signup Form */}
+          <div className="max-w-md mx-auto">
+            <form onSubmit={handleSubmit(onSubmit)} className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+              <div className="space-y-4">
+                <div>
+                  <input
+                    {...register('name')}
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 transition"
+                  />
+                  {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>}
+                </div>
+                <div>
+                  <input
+                    {...register('email')}
+                    type="email"
+                    placeholder="you@company.com"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 transition"
+                  />
+                  {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
+                </div>
+                <div>
+                  <input
+                    {...register('company')}
+                    placeholder="Company (optional)"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 transition"
+                  />
+                </div>
+                {serverError && (
+                  <p className="text-red-400 text-sm text-center">{serverError}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      Join the Waitlist
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+              <p className="text-white/30 text-xs text-center mt-3">No spam, ever. Unsubscribe anytime.</p>
+            </form>
+
+            {/* Social proof counter */}
+            {waitlistCount > 0 && (
+              <div className="flex items-center justify-center gap-2 mt-4 text-white/40 text-sm">
+                <Users className="w-4 h-4" />
+                <span>{waitlistCount} people already on the waitlist</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Value Props */}
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <div className="grid md:grid-cols-3 gap-6">
+          {valueProps.map((prop) => (
+            <div key={prop.title} className="bg-white/5 border border-white/5 rounded-2xl p-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-violet-600/20 flex items-center justify-center mb-4">
+                <prop.icon className="w-5 h-5 text-purple-400" />
+              </div>
+              <h3 className="text-white font-semibold mb-2">{prop.title}</h3>
+              <p className="text-white/50 text-sm leading-relaxed">{prop.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Founding Member Tiers */}
+      <div className="max-w-4xl mx-auto px-4 pb-20">
+        <div className="bg-gradient-to-br from-purple-500/5 to-violet-600/5 border border-purple-500/10 rounded-2xl p-8 text-center">
+          <h2 className="text-2xl font-bold text-white mb-6">Founding Member Rewards</h2>
+          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <div className="bg-white/5 border border-amber-500/20 rounded-xl p-5">
+              <div className="text-amber-400 font-bold text-lg mb-1">First 100</div>
+              <div className="text-white/80 text-sm">Lifetime 30% discount on any plan</div>
+              <div className="text-white/30 text-xs mt-2">{Math.max(0, 100 - waitlistCount)} spots remaining</div>
+            </div>
+            <div className="bg-white/5 border border-purple-500/20 rounded-xl p-5">
+              <div className="text-purple-400 font-bold text-lg mb-1">First 500</div>
+              <div className="text-white/80 text-sm">3 months free on Pro plan</div>
+              <div className="text-white/30 text-xs mt-2">{Math.max(0, 500 - waitlistCount)} spots remaining</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+**Step 2: Verify the file exists**
+
+Run: `wc -l pages/Waitlist.tsx`
+Expected: ~175 lines
+
+**Step 3: Commit**
+
+```bash
+git add pages/Waitlist.tsx
+git commit -m "feat: add Waitlist page with signup form and founding member tiers"
+```
+
+---
+
+## Task 4: Wire Waitlist route into App.tsx
+
+**Files:**
+- Modify: `App.tsx` (3 locations: import, page-to-section map, renderPage switch)
+
+**Step 1: Add lazy import at top of App.tsx**
+
+Find the block of lazy imports (around lines 3-43) and add after the last one:
+
+```typescript
+const Waitlist = lazy(() => import('./pages/Waitlist'));
+```
+
+**Step 2: Add to PAGE_TO_SECTION map**
+
+Find the `PAGE_TO_SECTION` object (around line 99-126) and add:
+
+```typescript
+'waitlist': 'compte',
+```
+
+**Step 3: Add case in renderPage()**
+
+Find the switch statement in `renderPage()` (around line 476-575) and add a new case:
+
+```typescript
+case 'waitlist':
+  return <Waitlist onBack={goBack} onNavigate={navigateTo} />;
+```
+
+**Step 4: Add waitlist CTA button to Home.tsx hero section**
+
+In `pages/Home.tsx`, find the hero section CTA button area and add a secondary button:
+
+```tsx
+<button
+  onClick={() => onNavigate('waitlist')}
+  className="px-6 py-3 border border-purple-500/30 text-purple-400 rounded-xl hover:bg-purple-500/10 transition font-medium"
+>
+  Join the Waitlist
+</button>
+```
+
+**Step 5: Test the dev server**
+
+Run: `cd /c/Users/User/citedby-ai && npm run dev`
+Expected: Server starts, navigate to waitlist view works
+
+**Step 6: Commit**
+
+```bash
+git add App.tsx pages/Home.tsx
+git commit -m "feat: wire waitlist route into App.tsx and add CTA to Home"
+```
+
+---
+
+## Task 5: Create email templates (markdown)
+
+**Files:**
+- Create: `docs/launch/emails/01-welcome.md`
+- Create: `docs/launch/emails/02-value-aeo.md`
+- Create: `docs/launch/emails/03-social-proof.md`
+- Create: `docs/launch/emails/04-launch-day.md`
+
+**Step 1: Create directory**
+
+Run: `mkdir -p docs/launch/emails`
+
+**Step 2: Write Email 1 — Welcome**
+
+File: `docs/launch/emails/01-welcome.md`
+
+```markdown
+# Email 1: Welcome to the Waitlist
+
+**Subject:** You're on the list — here's what's coming
+**Trigger:** Immediately after signup
+**From:** Founder Name <hello@citedby.ai>
+
+---
+
+Hi {{name}},
+
+Welcome aboard! You're **#{{signup_number}}** on the CitedBy.ai waitlist.
+
+{{#if founding_tier_top100}}
+🌟 **Founding Member status unlocked!** As one of our first 100 members, you've secured a **lifetime 30% discount** on any plan. This is our way of saying thanks for believing in us early.
+{{/if}}
+
+{{#if founding_tier_top500}}
+🚀 **Early Adopter perk unlocked!** As one of our first 500 members, you've earned **3 months free** on our Pro plan when we launch.
+{{/if}}
+
+### What is CitedBy.ai?
+
+We're building the first platform for **AI Engine Optimization (AEO)** — helping your brand get cited and recommended by ChatGPT, Claude, Perplexity, and Gemini.
+
+Think of it as SEO, but for the AI-powered search era.
+
+### What's next?
+
+- **Week 1-2:** We're finishing final preparations
+- **Week 3:** You'll get a sneak peek of the dashboard
+- **Launch day:** You'll be first in line to try it
+
+Stay connected:
+- [Follow us on Twitter/X](https://twitter.com/citedbyai)
+- [Follow us on LinkedIn](https://linkedin.com/company/citedbyai)
+
+Talk soon,
+{{founder_name}}
+Founder, CitedBy.ai
+```
+
+**Step 3: Write Email 2 — Value (AEO Education)**
+
+File: `docs/launch/emails/02-value-aeo.md`
+
+```markdown
+# Email 2: Is Your Brand Invisible to ChatGPT?
+
+**Subject:** Is your brand invisible to ChatGPT?
+**Trigger:** Day 3 after signup
+**From:** Founder Name <hello@citedby.ai>
+
+---
+
+Hi {{name}},
+
+Quick question: have you ever asked ChatGPT to recommend a product in your industry?
+
+Try it. Ask: *"What are the best {{industry}} tools in 2026?"*
+
+If your brand doesn't appear... you have an AI visibility problem.
+
+### The numbers are stark:
+
+- **68% of ChatGPT responses** don't cite any sources at all
+- The brands that DO get cited follow specific patterns in their content structure
+- Traditional SEO helps with Google — but AI engines use completely different signals
+
+### This is what AEO (AI Engine Optimization) solves.
+
+AEO is the practice of optimizing your online presence so AI engines — ChatGPT, Claude, Perplexity, Gemini — cite and recommend your brand in their responses.
+
+It's not about keywords and backlinks. It's about:
+- **Structured data** (Schema.org, JSON-LD)
+- **E-E-A-T signals** (Expertise, Experience, Authority, Trust)
+- **AI-readable content** (llms.txt, robots.txt for AI bots)
+- **Source of truth** pages that AI can reference
+
+### CitedBy.ai does all of this for you.
+
+We're launching soon. You're already on the waitlist (#{{signup_number}}).
+
+Stay tuned,
+{{founder_name}}
+```
+
+**Step 4: Write Email 3 — Social Proof**
+
+File: `docs/launch/emails/03-social-proof.md`
+
+```markdown
+# Email 3: Momentum Update
+
+**Subject:** {{waitlist_count}} people are already on the waitlist
+**Trigger:** Day 7 after signup
+**From:** Founder Name <hello@citedby.ai>
+
+---
+
+Hi {{name}},
+
+Quick update from CitedBy.ai HQ:
+
+**{{waitlist_count}} people** have joined the waitlist since we announced. The response has been incredible.
+
+### Who's signing up?
+
+- SEO agencies looking to offer AEO as a new service
+- SaaS founders who realized they're invisible to AI search
+- Content publishers who want to be THE source AI engines cite
+
+### What we're building for you:
+
+✅ **AI Visibility Score** — Instant audit across ChatGPT, Claude, Perplexity, Gemini
+✅ **15+ optimization tools** — Schema.org, llms.txt, E-E-A-T builder, content writer
+✅ **Real-time bot monitoring** — See when GPTBot and ClaudeBot crawl your site
+✅ **Reputation tracking** — Know what AI engines say about your brand
+
+### Launch is {{days_until_launch}} days away.
+
+You'll be the first to know. Watch your inbox.
+
+{{founder_name}}
+```
+
+**Step 5: Write Email 4 — Launch Day**
+
+File: `docs/launch/emails/04-launch-day.md`
+
+```markdown
+# Email 4: We're LIVE!
+
+**Subject:** We're LIVE — your founding member access is ready
+**Trigger:** Launch day
+**From:** Founder Name <hello@citedby.ai>
+
+---
+
+Hi {{name}},
+
+The wait is over. **CitedBy.ai is live!** 🚀
+
+[**→ Get your access now**](https://citedby.ai)
+
+{{#if founding_tier_top100}}
+As a Founding Member (#{{signup_number}}), your **lifetime 30% discount** is automatically applied when you choose any plan.
+{{/if}}
+
+{{#if founding_tier_top500}}
+As an Early Adopter (#{{signup_number}}), your **3 months free on Pro** are ready to activate.
+{{/if}}
+
+### We're also live on Product Hunt today!
+
+If you have 10 seconds, an upvote would mean the world to us:
+
+[**→ Upvote on Product Hunt**](https://www.producthunt.com/posts/citedby-ai)
+
+### What you can do right now:
+
+1. **Run your free AI visibility audit** — See your score across 5 AI engines
+2. **Explore the dashboard** — Monitor how AI bots interact with your site
+3. **Generate optimizations** — Use our tools to improve your AI citations
+
+Thank you for being part of this journey from day one.
+
+Let's get you cited by AI. 🎯
+
+{{founder_name}}
+Founder, CitedBy.ai
+```
+
+**Step 6: Commit**
+
+```bash
+git add docs/launch/emails/
+git commit -m "feat: add 4-email waitlist nurture sequence templates"
+```
+
+---
+
+## Task 6: Create blog post drafts
+
+**Files:**
+- Create: `docs/launch/blog/01-what-is-aeo.md`
+- Create: `docs/launch/blog/02-how-chatgpt-recommends.md`
+- Create: `docs/launch/blog/03-five-ways-cited-by-ai.md`
+
+**Step 1: Create directory**
+
+Run: `mkdir -p docs/launch/blog`
+
+**Step 2: Write Blog Post 1 — "What is AEO?"**
+
+File: `docs/launch/blog/01-what-is-aeo.md`
+
+```markdown
+# What is AEO? Why SEO Is No Longer Enough in 2026
+
+**Meta description:** AI Engine Optimization (AEO) is the practice of getting your brand cited by ChatGPT, Claude, and Gemini. Learn why traditional SEO isn't enough and how AEO works.
+**Target keywords:** AEO, AI Engine Optimization, AI SEO, generative engine optimization
+**Word count target:** 1,500-2,000 words
+**CTA:** Free AI visibility audit at citedby.ai
+
+---
+
+## Introduction
+
+For 20 years, SEO meant one thing: rank on Google's first page. But in 2026, a seismic shift is underway. Over 40% of online searches now involve an AI-generated response — from ChatGPT, Google's AI Overviews, Perplexity, or Claude.
+
+The question is no longer "Are you on page 1?" It's: **"Does AI recommend your brand?"**
+
+This is what AEO — AI Engine Optimization — is all about.
+
+## What is AEO?
+
+AEO (AI Engine Optimization), also called GEO (Generative Engine Optimization), is the practice of optimizing your online presence so that AI engines cite, recommend, and reference your brand in their responses.
+
+Unlike traditional SEO, which optimizes for search engine result pages (SERPs), AEO optimizes for **AI-generated answers**.
+
+### SEO vs AEO: Key Differences
+
+| Aspect | SEO | AEO |
+|--------|-----|-----|
+| Target | Google SERPs | AI-generated responses |
+| Signals | Keywords, backlinks, page speed | Structured data, E-E-A-T, source authority |
+| Goal | Rank in top 10 | Be cited in the AI answer |
+| Measurement | Rankings, CTR | Citation frequency, AI visibility score |
+| Content format | Blog posts, landing pages | Structured data, FAQ, expert content |
+
+## Why Traditional SEO Isn't Enough
+
+[EXPAND: 3-4 paragraphs on why AI engines use different signals than Google. Cover: training data, citation patterns, structured data preference, E-E-A-T emphasis]
+
+## The 5 Pillars of AEO
+
+### 1. Structured Data
+Schema.org markup, JSON-LD, and machine-readable content that AI engines can parse.
+
+### 2. E-E-A-T Signals
+Experience, Expertise, Authority, and Trust — the framework AI engines use to evaluate source credibility.
+
+### 3. AI-Readable Directives
+`llms.txt`, `robots.txt` configuration for AI bots (GPTBot, ClaudeBot, PerplexityBot).
+
+### 4. Source of Truth Content
+Comprehensive, authoritative pages that serve as canonical references for AI engines.
+
+### 5. AI Bot Monitoring
+Tracking when and how AI crawlers interact with your content.
+
+## How to Get Started with AEO
+
+[EXPAND: Introduce CitedBy.ai as the solution. Mention free audit. CTA to try it.]
+
+## Conclusion
+
+The shift from SEO to AEO is not optional — it's already happening. Brands that optimize for AI engines now will dominate the next decade of search.
+
+**Ready to check your AI visibility? [Try CitedBy.ai's free audit →](https://citedby.ai)**
+```
+
+**Step 3: Write Blog Post 2 — "How ChatGPT Recommends"**
+
+File: `docs/launch/blog/02-how-chatgpt-recommends.md`
+
+```markdown
+# How ChatGPT Decides Which Brands to Recommend
+
+**Meta description:** Ever wondered why ChatGPT recommends certain products? We break down the signals AI engines use to choose which brands to cite in their responses.
+**Target keywords:** ChatGPT recommendations, AI brand visibility, how AI chooses brands
+**Word count target:** 1,500-2,000 words
+**CTA:** Free AI visibility audit at citedby.ai
+
+---
+
+## Introduction
+
+Ask ChatGPT: "What's the best project management tool?" It will give you an answer. But why does it recommend Notion over your product? Why does it cite HubSpot instead of your CRM?
+
+The answer lies in how large language models process and prioritize information during training and retrieval.
+
+## The 4 Factors AI Engines Use
+
+### 1. Training Data Prevalence
+[EXPAND: How frequently a brand appears in the training corpus. More mentions = higher visibility. Quality of sources matters — Wikipedia, authoritative publications, technical docs.]
+
+### 2. Structured Data & Schema
+[EXPAND: AI engines heavily weight structured content — Schema.org, FAQ pages, comparison tables. Unstructured blog posts are harder for AI to cite.]
+
+### 3. Authority Signals (E-E-A-T)
+[EXPAND: Expert authorship, institutional credibility, citation by other authoritative sources. AI engines mirror academic citation patterns.]
+
+### 4. Retrieval-Augmented Generation (RAG)
+[EXPAND: Modern AI engines like Perplexity use real-time web search. Your content needs to be crawlable by AI bots and structured for extraction.]
+
+## What You Can Do About It
+
+### Audit your current AI visibility
+[Introduce CitedBy.ai free audit]
+
+### Optimize your structured data
+[Brief overview of Schema.org, JSON-LD]
+
+### Make your content AI-bot friendly
+[Brief overview of llms.txt, robots.txt for AI bots]
+
+### Monitor and iterate
+[Brief overview of ongoing monitoring]
+
+## Conclusion
+
+AI doesn't recommend brands at random. It follows patterns you can influence. The brands investing in AEO today will be the ones AI recommends tomorrow.
+
+**Check if AI engines recommend your brand → [Free audit at CitedBy.ai](https://citedby.ai)**
+```
+
+**Step 4: Write Blog Post 3 — "5 Ways to Get Cited"**
+
+File: `docs/launch/blog/03-five-ways-cited-by-ai.md`
+
+```markdown
+# 5 Ways to Get Your Brand Cited by AI in 2026
+
+**Meta description:** Practical guide to getting your brand recommended by ChatGPT, Claude, Perplexity, and Gemini. Five actionable strategies for AI Engine Optimization.
+**Target keywords:** get cited by AI, AI recommendations, brand AI visibility, AEO strategy
+**Word count target:** 1,500-2,000 words
+**CTA:** Free AI visibility audit at citedby.ai
+
+---
+
+## Introduction
+
+If you're not showing up in AI-generated answers, you're invisible to a growing percentage of your audience. Here are 5 concrete strategies to change that.
+
+## 1. Implement Comprehensive Schema.org Markup
+
+[EXPAND: What Schema.org types matter most (Organization, Product, FAQ, HowTo, Article). Show a code example. Explain how AI engines use structured data differently from Google.]
+
+**Tool:** CitedBy.ai's Schema.org Generator automates this for your site.
+
+## 2. Build an llms.txt File
+
+[EXPAND: What llms.txt is — a machine-readable summary of your site for AI engines. Like robots.txt but for content guidance. Show example format.]
+
+**Tool:** CitedBy.ai's Llms.txt Generator creates this instantly.
+
+## 3. Optimize for E-E-A-T Signals
+
+[EXPAND: How to demonstrate Experience, Expertise, Authority, Trust. Author pages, credentials, citations, case studies.]
+
+**Tool:** CitedBy.ai's E-E-A-T Builder audits and improves your trust signals.
+
+## 4. Create "Source of Truth" Content
+
+[EXPAND: Comprehensive, authoritative pages on your core topics. Think Wikipedia-quality depth. Structured with headers, tables, clear claims. Make it easy for AI to extract facts.]
+
+**Tool:** CitedBy.ai's Source of Truth generator helps structure these pages.
+
+## 5. Monitor and Respond to AI Bot Activity
+
+[EXPAND: Configure robots.txt to allow AI bots (GPTBot, ClaudeBot, PerplexityBot). Monitor crawl frequency. Adjust content based on what AI bots prioritize.]
+
+**Tool:** CitedBy.ai's AI Monitoring dashboard shows all bot activity in real-time.
+
+## Conclusion
+
+Getting cited by AI isn't magic — it's a systematic practice. These 5 strategies, applied consistently, will put your brand in front of the fastest-growing search channel in history.
+
+**Start with a free audit → [CitedBy.ai](https://citedby.ai)**
+```
+
+**Step 5: Commit**
+
+```bash
+git add docs/launch/blog/
+git commit -m "feat: add 3 blog post drafts for launch campaign"
+```
+
+---
+
+## Task 7: Create social media content calendar
+
+**Files:**
+- Create: `docs/launch/social/twitter-prelaunch.md`
+- Create: `docs/launch/social/twitter-launch-thread.md`
+- Create: `docs/launch/social/linkedin-prelaunch.md`
+- Create: `docs/launch/social/linkedin-launch-post.md`
+
+**Step 1: Create directory**
+
+Run: `mkdir -p docs/launch/social`
+
+**Step 2: Write Twitter pre-launch calendar**
+
+File: `docs/launch/social/twitter-prelaunch.md`
+
+```markdown
+# Twitter/X Pre-Launch Calendar (14 days)
+
+Post 1 tweet/day. Schedule at 9:00 AM EST (best B2B engagement time).
+
+---
+
+## Day 1 (Monday) — Hot Take
+> SEO got you to page 1 of Google.
+>
+> AEO gets you into ChatGPT's answer.
+>
+> Different game, different rules.
+>
+> (A thread on what's changing 🧵)
+
+## Day 2 (Tuesday) — Data Point
+> We asked ChatGPT, Claude, Perplexity, Gemini and Copilot to recommend a CRM.
+>
+> Only 2 brands appeared in ALL 5 responses.
+>
+> Guess which ones?
+
+## Day 3 (Wednesday) — Problem Awareness
+> I asked ChatGPT to recommend a tool in my industry.
+>
+> My brand didn't appear.
+>
+> My competitor did — 3 times.
+>
+> That's when I knew something had to change.
+
+## Day 4 (Thursday) — Educational
+> What is AEO? (AI Engine Optimization)
+>
+> In 30 seconds:
+> - SEO = ranking on Google
+> - AEO = being cited by AI
+> - SEO uses keywords & backlinks
+> - AEO uses structured data & E-E-A-T
+>
+> The brands doing AEO now will dominate 2027.
+
+## Day 5 (Friday) — Question
+> Quick poll: have you ever checked if ChatGPT recommends your brand?
+>
+> Try it right now. Ask: "What are the best [your industry] tools?"
+>
+> Did you show up? Reply below 👇
+
+## Day 6 (Monday) — Behind the Scenes
+> Building something to solve the AI visibility problem.
+>
+> Sneak peek of what we're working on:
+> [Screenshot of dashboard]
+>
+> More coming soon. 👀
+
+## Day 7 (Tuesday) — Educational Thread (3 tweets)
+> 68% of ChatGPT responses don't cite sources.
+>
+> The 32% that do? They follow 3 patterns: 🧵
+>
+> 1/ Structured data (Schema.org, JSON-LD)
+> 2/ E-E-A-T signals (expertise, authority)
+> 3/ Machine-readable directives (llms.txt)
+>
+> Most brands optimize for none of these.
+
+## Day 8 (Wednesday) — Tease
+> The first platform for AI Engine Optimization is almost ready.
+>
+> Free AI visibility audit included.
+>
+> Waitlist link dropping this week.
+
+## Day 9 (Thursday) — Value Post
+> 5 things you can do TODAY to get cited by AI:
+>
+> 1. Add Schema.org markup
+> 2. Create an llms.txt file
+> 3. Allow GPTBot in robots.txt
+> 4. Build author/expert pages (E-E-A-T)
+> 5. Create FAQ-structured content
+>
+> Or... we're building a tool that does all 5. Stay tuned.
+
+## Day 10 (Friday) — Waitlist Announcement
+> 🚀 The waitlist for CitedBy.ai is officially open.
+>
+> First 100 members get a lifetime 30% discount.
+>
+> [Link to waitlist]
+>
+> What it does: audit, monitor, and optimize your brand's visibility in ChatGPT, Claude, Perplexity & Gemini.
+
+## Day 11 (Monday) — Social Proof
+> 48 hours since we opened the waitlist.
+>
+> {{count}} people have signed up.
+>
+> SEO professionals, SaaS founders, and agencies are all asking the same question: "Am I visible to AI?"
+>
+> [Waitlist link]
+
+## Day 12 (Tuesday) — Feature Highlight
+> One of my favorite features we built:
+>
+> Real-time AI bot monitoring.
+>
+> See exactly when GPTBot, ClaudeBot, and PerplexityBot crawl your site. Track what pages they visit. Get alerts when patterns change.
+>
+> [Screenshot]
+
+## Day 13 (Wednesday) — Countdown
+> 🔥 Launch day is [DAY]. We're going live on Product Hunt.
+>
+> If you're on the waitlist, you'll get first access.
+>
+> If you're not... there's still time: [waitlist link]
+
+## Day 14 (Thursday) — Final Tease
+> Tomorrow we launch.
+>
+> 15+ tools to optimize your AI visibility.
+> Free audit included.
+> Founding member pricing for early adopters.
+>
+> See you on Product Hunt at midnight PT. 🎯
+```
+
+**Step 3: Write Twitter launch day thread**
+
+File: `docs/launch/social/twitter-launch-thread.md`
+
+```markdown
+# Twitter/X Launch Day Thread (7 Tweets)
+
+---
+
+## Tweet 1 — Hook
+> 40% of online searches now get an AI-generated response.
+>
+> If your brand isn't in those responses, you're invisible to a growing chunk of your audience.
+>
+> Today we're launching the fix. 🧵
+
+## Tweet 2 — Problem
+> The problem: AI engines like ChatGPT, Claude, and Perplexity decide which brands to recommend.
+>
+> Most businesses have zero visibility into this process.
+>
+> They don't know IF they're cited, WHERE they appear, or WHY competitors show up instead.
+
+## Tweet 3 — Solution
+> Introducing CitedBy.ai — the first platform for AI Engine Optimization (AEO).
+>
+> Audit. Monitor. Optimize.
+>
+> Know exactly how AI engines see your brand, and make them recommend you.
+
+## Tweet 4 — How It Works
+> How it works:
+>
+> 1️⃣ Run a free audit — get your AI visibility score across 5 engines
+> 2️⃣ Monitor AI bots — see when GPTBot & ClaudeBot crawl your site
+> 3️⃣ Optimize — use 15+ tools (Schema.org, llms.txt, E-E-A-T builder, content writer)
+
+## Tweet 5 — Features
+> What's inside:
+>
+> ✅ AI Visibility Score (50+ criteria)
+> ✅ Real-time bot monitoring (10+ AI crawlers)
+> ✅ Schema.org generator
+> ✅ llms.txt generator
+> ✅ E-E-A-T builder
+> ✅ AI citation simulator
+> ✅ Content writer & blog optimizer
+>
+> All in one dashboard.
+
+## Tweet 6 — Social Proof
+> {{waitlist_count}} people joined the waitlist.
+>
+> SEO agencies, SaaS founders, and publishers all see the same shift: AI is the new search.
+>
+> The brands that optimize now win for the next decade.
+
+## Tweet 7 — CTA
+> 🚀 We're live on Product Hunt today!
+>
+> → Upvote: [PH link]
+> → Try the free audit: https://citedby.ai
+>
+> First 100 users: lifetime 30% discount.
+>
+> Let's make sure AI recommends YOUR brand. 🎯
+```
+
+**Step 4: Write LinkedIn pre-launch posts**
+
+File: `docs/launch/social/linkedin-prelaunch.md`
+
+```markdown
+# LinkedIn Pre-Launch Posts (6 posts over 2 weeks)
+
+---
+
+## Post 1 (Week 2, Monday) — Thought Leadership
+
+**The biggest shift in search since Google**
+
+For 20 years, "being found online" meant ranking on Google.
+
+That era is ending.
+
+Over 40% of searches now include an AI-generated response. ChatGPT, Claude, Perplexity, Gemini — they don't show 10 blue links. They give ONE answer.
+
+And your brand is either in that answer... or it doesn't exist.
+
+This is why I've been building something new. A platform for AI Engine Optimization (AEO) — the practice of getting your brand cited and recommended by AI.
+
+More details coming soon.
+
+If this resonates, follow along. The future of visibility is changing faster than most realize.
+
+#AEO #AISearch #MarketingStrategy #SEO
+
+---
+
+## Post 2 (Week 2, Wednesday) — Personal Story
+
+**I asked ChatGPT to recommend tools in my industry. My brand was nowhere.**
+
+That was my wake-up call.
+
+My competitor appeared in 4 out of 5 AI engines. I appeared in zero.
+
+We had better reviews, more content, higher domain authority. None of it mattered.
+
+Because AI engines use completely different signals than Google:
+- Structured data (Schema.org, JSON-LD)
+- E-E-A-T signals (Expertise, Authority, Trust)
+- Machine-readable directives (llms.txt)
+- Source quality over keyword density
+
+That's when I decided to build a tool to solve this — for my brand, and for everyone else.
+
+Launching soon. Watch this space.
+
+#StartupJourney #AEO #AIVisibility
+
+---
+
+## Post 3 (Week 2, Friday) — Data/Insight
+
+**We audited 50 brands' AI visibility. Here's what we found:**
+
+📊 Only 12% had Schema.org markup optimized for AI
+📊 Only 3% had an llms.txt file
+📊 68% were completely absent from ChatGPT recommendations
+📊 The top-cited brands all shared 3 patterns
+
+The gap between AI-optimized brands and everyone else is enormous.
+
+And most companies don't even know they have a problem.
+
+We're building a tool to close this gap. Details dropping next week.
+
+#DataDriven #AEO #BrandVisibility
+
+---
+
+## Post 4 (Week 3, Monday) — Waitlist Announcement
+
+**🚀 The waitlist for CitedBy.ai is officially open.**
+
+We're building the first platform for AI Engine Optimization:
+
+→ Audit your AI visibility score across ChatGPT, Claude, Perplexity & Gemini
+→ Monitor AI bot activity on your site in real-time
+→ 15+ tools to optimize your content for AI citation
+
+**Founding member pricing:**
+- First 100: Lifetime 30% discount
+- First 500: 3 months free on Pro
+
+No credit card needed. Join here: [waitlist link]
+
+The shift from SEO to AEO is happening now. Don't be the last to notice.
+
+#SaaS #LaunchingSoon #AEO #ProductLaunch
+
+---
+
+## Post 5 (Week 3, Wednesday) — Feature Showcase
+
+**One feature I'm particularly proud of:**
+
+Real-time AI Bot Monitoring.
+
+You can see exactly when GPTBot, ClaudeBot, PerplexityBot, and 7 other AI crawlers visit your site. Which pages they hit. How often they come back.
+
+[Screenshot]
+
+This is data most companies have never seen — and it directly impacts whether AI engines recommend your brand.
+
+Launching this week on Product Hunt. Link in waitlist confirmation email.
+
+#BuildInPublic #SaaS #AEO
+
+---
+
+## Post 6 (Week 3, Friday) — Launch Eve
+
+**Tomorrow, we launch CitedBy.ai on Product Hunt.**
+
+Quick story: 6 months ago, I realized the future of "being found online" was shifting from Google to AI engines.
+
+Not someday. Now.
+
+So I built a platform to help brands navigate this shift. Audit your AI visibility. Monitor AI bots. Optimize your content so ChatGPT, Claude, Perplexity, and Gemini recommend YOU.
+
+Tomorrow at midnight PT, we go live.
+
+If you believe the future of search is AI — I'd love your support on Product Hunt.
+
+Link tomorrow morning. Stay tuned. 🎯
+
+#ProductHunt #LaunchDay #AEO #Startup
+```
+
+**Step 5: Write LinkedIn launch day post**
+
+File: `docs/launch/social/linkedin-launch-post.md`
+
+```markdown
+# LinkedIn Launch Day Post
+
+---
+
+**We just launched CitedBy.ai on Product Hunt. Here's why it matters.**
+
+6 months ago, I had a realization that changed everything for me.
+
+I asked ChatGPT: "What are the best tools for [my industry]?"
+
+My brand didn't appear. My competitor did — in all 5 AI engines I tested.
+
+We had more content. Better reviews. Higher domain authority. None of it mattered.
+
+Because AI engines don't rank websites. They RECOMMEND brands. And they use completely different signals than Google.
+
+---
+
+**The shift is massive.**
+
+→ 40%+ of searches now include AI-generated responses
+→ Google's AI Overviews are replacing traditional results
+→ ChatGPT, Claude, and Perplexity are becoming how people discover products
+→ Most brands have ZERO visibility into this process
+
+SEO optimized you for Google's algorithm. But AI engines? That's a new game entirely.
+
+---
+
+**That's why I built CitedBy.ai.**
+
+The first platform for AI Engine Optimization (AEO).
+
+What it does:
+✅ Audits your AI visibility score across ChatGPT, Claude, Perplexity, Gemini & AI Overviews
+✅ Monitors 10+ AI bots crawling your site in real-time
+✅ Provides 15+ optimization tools (Schema.org, llms.txt, E-E-A-T builder, content writer)
+✅ Tracks your brand reputation across AI engines
+
+Think of it as "Google Search Console" — but for AI.
+
+---
+
+**Today's the day.**
+
+🚀 We're live on Product Hunt: [LINK]
+🎯 Free audit included — no credit card needed
+⭐ First 100 users get a lifetime 30% discount
+
+If you believe AI is the future of how people find products and services, I'd love your support.
+
+Try it. Upvote it. Share it with someone who needs it.
+
+The brands that optimize for AI now will own the next decade of discovery.
+
+Let's go. 🔥
+
+[PRODUCT HUNT LINK]
+
+#ProductHunt #AEO #AISearch #SaaS #Launch #CitedByAI
+```
+
+**Step 6: Commit**
+
+```bash
+git add docs/launch/social/
+git commit -m "feat: add social media content calendar (Twitter + LinkedIn)"
+```
+
+---
+
+## Task 8: Create Product Hunt assets & copy
+
+**Files:**
+- Create: `docs/launch/producthunt/listing.md`
+- Create: `docs/launch/producthunt/maker-comment.md`
+- Create: `docs/launch/producthunt/gallery-plan.md`
+
+**Step 1: Create directory**
+
+Run: `mkdir -p docs/launch/producthunt`
+
+**Step 2: Write PH listing copy**
+
+File: `docs/launch/producthunt/listing.md`
+
+```markdown
+# Product Hunt Listing
+
+## Tagline (60 chars max)
+Get your brand cited by ChatGPT, Claude & Gemini
+
+## Short Description
+CitedBy.ai is the first platform for AI Engine Optimization (AEO). Audit your AI visibility score, monitor how AI bots crawl your site, and use 15+ tools to optimize your content so ChatGPT, Claude, Perplexity, and Gemini recommend your brand. Free audit included.
+
+## Topics
+- Artificial Intelligence
+- SEO
+- Marketing
+- SaaS
+
+## Pricing
+Freemium — Free audit + paid plans starting at €29/month
+
+## Links
+- Website: https://citedby.ai
+- Twitter: https://twitter.com/citedbyai
+```
+
+**Step 3: Write Maker Comment**
+
+File: `docs/launch/producthunt/maker-comment.md`
+
+```markdown
+# Maker Comment (Post as first comment immediately at launch)
+
+---
+
+Hey Product Hunt! 👋
+
+I'm [Name], the founder of CitedBy.ai.
+
+**The backstory:** 6 months ago, I asked ChatGPT to recommend tools in my industry. My brand was nowhere. My competitor appeared in every AI engine.
+
+I had better content, more backlinks, higher domain authority — but none of that mattered. AI engines use completely different signals than Google.
+
+That was my "aha moment." SEO helps you rank on Google. But who helps you get RECOMMENDED by ChatGPT, Claude, Perplexity, and Gemini?
+
+Nobody. Until now.
+
+**What CitedBy.ai does:**
+
+🔍 **Audit** — Get your AI visibility score across 5 AI engines (50+ criteria)
+📊 **Monitor** — See when GPTBot, ClaudeBot, and 10+ AI bots crawl your site
+🛠️ **Optimize** — 15+ tools: Schema.org generator, llms.txt, E-E-A-T builder, content writer, AI citation simulator, and more
+
+**The free audit is real** — Enter your URL and get an instant AI visibility score. No signup required.
+
+I believe AEO (AI Engine Optimization) will be as important as SEO was in 2005. The brands that start now will dominate the AI-driven search era.
+
+💬 **Reply with your website URL and I'll personally run a full AI visibility audit for you** — no strings attached.
+
+Would love your feedback, questions, and upvotes! 🙏
+```
+
+**Step 4: Write Gallery Plan**
+
+File: `docs/launch/producthunt/gallery-plan.md`
+
+```markdown
+# Product Hunt Gallery Plan (5 images)
+
+All images: 1270x760px, dark theme matching app design.
+
+---
+
+## Image 1: Hero — AI Visibility Dashboard
+**Screenshot of:** Dashboard page with AI Visibility Score ring, KPI cards, monitoring overview
+**Overlay text:** "Know your AI Visibility Score"
+**Captures:** The main dashboard with score ring, stats overview, and quick actions
+
+## Image 2: AI Bot Monitoring
+**Screenshot of:** AiMonitoring page with bot tracking table
+**Overlay text:** "Track 10+ AI bots in real-time"
+**Captures:** Bot list (GPTBot, ClaudeBot, PerplexityBot, etc.) with crawl stats
+
+## Image 3: Generative Tools Suite
+**Screenshot of:** GenerativeTools page showing all 15+ tools
+**Overlay text:** "15+ optimization tools in one dashboard"
+**Captures:** Tool grid showing Schema.org, llms.txt, E-E-A-T, content writer, etc.
+
+## Image 4: Before/After Comparison
+**Design:** Split screen showing:
+- Left: "Before AEO" — brand absent from ChatGPT response
+- Right: "After AEO" — brand cited and recommended
+**Overlay text:** "From invisible to recommended"
+
+## Image 5: Demo GIF (15 seconds)
+**Flow:** Homepage → Enter URL → Loading animation → Results page with score → Key recommendations
+**Captures:** The free audit flow from start to finish
+**Format:** GIF, 15 sec loop, 1270x760px
+
+---
+
+## Thumbnail (240x240px)
+- CitedBy.ai logo on dark gradient background
+- Purple/violet gradient matching brand colors
+- Clean, no text (logo only)
+```
+
+**Step 5: Commit**
+
+```bash
+git add docs/launch/producthunt/
+git commit -m "feat: add Product Hunt listing copy, maker comment, and gallery plan"
+```
+
+---
+
+## Task 9: Create community posting templates
+
+**Files:**
+- Create: `docs/launch/community/reddit-posts.md`
+- Create: `docs/launch/community/hackernews-post.md`
+- Create: `docs/launch/community/indiehackers-post.md`
+
+**Step 1: Create directory**
+
+Run: `mkdir -p docs/launch/community`
+
+**Step 2: Write Reddit post templates**
+
+File: `docs/launch/community/reddit-posts.md`
+
+```markdown
+# Reddit Post Templates
+
+## r/SEO — Value-first post (Week 2)
+
+**Title:** I audited 50 brands' AI visibility — here's what separates the cited from the invisible
+
+**Body:**
+
+I've been researching how AI engines (ChatGPT, Claude, Perplexity, Gemini) decide which brands to recommend. Here's what I found:
+
+**The 3 patterns that cited brands share:**
+
+1. **Comprehensive Schema.org markup** — Not just basic Organization schema, but FAQ, HowTo, Product, and Review schemas. AI engines parse structured data far more than traditional Google does.
+
+2. **llms.txt files** — This is new. Like robots.txt but specifically for AI crawlers. It tells AI engines what your site is about and what content to prioritize. Only 3% of sites have this.
+
+3. **E-E-A-T-heavy content** — Expert authorship pages, credentials, clear citation of sources. AI engines mirror academic citation patterns — they trust content that looks like a reliable source.
+
+**What doesn't matter as much as you'd think:**
+- Domain authority (less important than content structure)
+- Keyword density (AI engines understand semantics, not keywords)
+- Backlink count (matters for Google, less for AI recommendations)
+
+I'm building a tool to help with this (launching soon), but these insights are freely actionable regardless.
+
+**Quick test:** Ask ChatGPT "What are the best [your industry] tools?" and see if you appear. If you don't, you have an AI visibility problem.
+
+Happy to answer questions about AEO in the comments.
+
+---
+
+## r/SaaS — Launch announcement (Launch day)
+
+**Title:** After 6 months of building, I launched CitedBy.ai — the first AEO (AI Engine Optimization) platform
+
+**Body:**
+
+Hey r/SaaS!
+
+Just launched on [Product Hunt](link) today.
+
+**The problem:** AI engines (ChatGPT, Claude, Perplexity, Gemini) are becoming how people discover products. But most brands have zero visibility into whether AI recommends them or not.
+
+**What I built:** CitedBy.ai — audit, monitor, and optimize your brand's visibility in AI-generated responses.
+
+- Free AI visibility audit (no signup)
+- Real-time monitoring of 10+ AI bots
+- 15+ optimization tools
+
+**Revenue model:** Freemium. Free audit + plans at €29/89/299 per month.
+
+**Stack:** React, Supabase, Stripe, Google Gemini API
+
+Would love feedback from the community. Ask me anything!
+```
+
+**Step 3: Write Hacker News post**
+
+File: `docs/launch/community/hackernews-post.md`
+
+```markdown
+# Hacker News — Show HN Post
+
+**Title:** Show HN: CitedBy.ai – Audit and optimize your brand's visibility in AI-generated responses
+
+**Body:**
+
+Hi HN,
+
+I built CitedBy.ai to solve a problem I experienced firsthand: my brand was invisible to AI engines while competitors appeared in every ChatGPT, Claude, and Perplexity response.
+
+The tool audits your AI visibility score across 5 engines (50+ criteria), monitors AI bot crawl activity (GPTBot, ClaudeBot, PerplexityBot), and provides optimization tools (Schema.org, llms.txt, E-E-A-T, content structuring).
+
+Stack: React SPA (Vite), Supabase (Postgres + Edge Functions), Stripe, Google Gemini API for analysis.
+
+Free audit at https://citedby.ai — enter any URL and get an instant AI visibility score. No signup required.
+
+I'd love feedback on the approach and the product. AEO (AI Engine Optimization) is a new discipline and I'm curious what HN thinks about it.
+```
+
+**Step 4: Write Indie Hackers post**
+
+File: `docs/launch/community/indiehackers-post.md`
+
+```markdown
+# Indie Hackers — Launch Post
+
+**Title:** 🚀 I just launched CitedBy.ai — helping brands get recommended by ChatGPT & friends
+
+**Body:**
+
+Hey IH!
+
+Today I launched CitedBy.ai on Product Hunt and I'd love to share the journey.
+
+**The idea:** 6 months ago I realized AI engines are replacing traditional search for product recommendations. But unlike SEO (where tools like Ahrefs and Semrush help), there was NO tool for optimizing your brand's visibility in AI-generated responses.
+
+**What I built:**
+- AI Visibility Score audit (free, no signup)
+- Real-time AI bot monitoring (GPTBot, ClaudeBot, etc.)
+- 15+ optimization tools (Schema.org, llms.txt, E-E-A-T, content writer)
+
+**Business model:**
+- Freemium: free audit + paid plans (€29/89/299 per month)
+- Credit system (GTO Gas) for generative tools
+- Target: SaaS companies, SEO agencies, publishers
+
+**Current traction:**
+- {{waitlist_count}} waitlist signups pre-launch
+- Launching on PH today: [link]
+
+**Revenue target:** €5K MRR in 6 months
+
+Would love your feedback, upvote on PH, and any questions about building in the AEO space!
+
+[Product Hunt link]
+```
+
+**Step 5: Commit**
+
+```bash
+git add docs/launch/community/
+git commit -m "feat: add community posting templates (Reddit, HN, Indie Hackers)"
+```
+
+---
+
+## Task 10: Create launch checklist and tracker
+
+**Files:**
+- Create: `docs/launch/CHECKLIST.md`
+
+**Step 1: Write the master checklist**
+
+File: `docs/launch/CHECKLIST.md`
+
+```markdown
+# CitedBy.ai Launch Campaign — Master Checklist
+
+**Campaign:** "Be Cited by AI" Product Hunt Blitz
+**Duration:** 4 weeks
+**Launch day target:** Tuesday (TBD), 12:01 AM PT
+
+---
+
+## Week 1: Asset Creation
+
+### Technical
+- [ ] Deploy waitlist page to production (citedby.ai/waitlist)
+- [ ] Run Supabase migration (009_waitlist.sql)
+- [ ] Test waitlist signup flow end-to-end
+- [ ] Set up email provider (Resend) and verify domain
+- [ ] Implement email 1 (welcome) as Edge Function
+- [ ] Test email delivery
+
+### Content
+- [ ] Finalize blog post 1: "What is AEO?"
+- [ ] Finalize blog post 2: "How ChatGPT Recommends"
+- [ ] Finalize blog post 3: "5 Ways to Get Cited"
+- [ ] Publish blog posts on citedby.ai/blog (or Medium/Substack)
+
+### Visual Assets
+- [ ] Take 5 product screenshots for PH gallery
+- [ ] Record 60-90 sec demo video
+- [ ] Create 15-sec demo GIF for PH
+- [ ] Design PH thumbnail (240x240px)
+- [ ] Create LinkedIn carousel images (4-6 slides)
+
+---
+
+## Week 2: Content & Community
+
+### Product Hunt
+- [ ] Create PH "Coming Soon" page
+- [ ] Write PH description and tagline
+- [ ] Upload gallery images
+- [ ] Prepare maker comment
+
+### Social Media
+- [ ] Schedule Twitter pre-launch posts (Day 1-7)
+- [ ] Publish LinkedIn posts 1-3
+- [ ] Post in r/SEO (value-first post)
+
+### Community
+- [ ] Join 3-5 SEO Slack/Discord groups
+- [ ] Provide value in communities (answer questions, share insights)
+- [ ] Start building relationships with active PH users
+
+### Email
+- [ ] Implement email 2 (value/AEO education)
+- [ ] Implement email 3 (social proof)
+- [ ] Test nurture sequence
+
+---
+
+## Week 3: Warm-Up
+
+### Social Media
+- [ ] Schedule Twitter pre-launch posts (Day 8-14)
+- [ ] Publish LinkedIn posts 4-6
+- [ ] Share waitlist link in communities
+
+### Product Hunt
+- [ ] Reach out to PH supporters (goal: 200+ Coming Soon followers)
+- [ ] DM 50+ active PH users for launch day support
+- [ ] Find a PH hunter (optional but helpful)
+
+### Email
+- [ ] Send pre-launch email to waitlist
+- [ ] Implement email 4 (launch day)
+
+### Prep
+- [ ] Write HN "Show HN" post
+- [ ] Write Indie Hackers launch post
+- [ ] Write Reddit r/SaaS launch post
+- [ ] Prepare all launch day posts (ready to copy-paste)
+- [ ] Do a dry run of launch day playbook
+
+---
+
+## Week 4: Launch Week
+
+### Launch Day (Tuesday)
+- [ ] 00:01 PT: Product Hunt goes live
+- [ ] 00:05 PT: Post maker comment
+- [ ] 06:00 ET: LinkedIn launch post
+- [ ] 06:00 ET: Twitter launch thread
+- [ ] 08:00 ET: Send launch day email to waitlist
+- [ ] 09:00 ET: Post on r/SaaS
+- [ ] 10:00 ET: Post "Show HN" on Hacker News
+- [ ] 10:00 ET: Post on Indie Hackers
+- [ ] ALL DAY: Reply to every PH comment within 30 min
+- [ ] ALL DAY: Engage on social media, share updates
+- [ ] EVENING: Twitter update with PH stats
+
+### Post-Launch (Wed-Fri)
+- [ ] Share PH results as social proof
+- [ ] Write "launch recap" LinkedIn post
+- [ ] Thank supporters individually
+- [ ] Analyze metrics vs KPIs
+- [ ] Begin converting waitlist to paid users
+
+---
+
+## KPI Targets
+
+| Metric | Target | Actual |
+|--------|--------|--------|
+| Waitlist signups | 500+ | |
+| PH upvotes | 200+ | |
+| PH Coming Soon followers | 200+ | |
+| Launch day visits | 2,000+ | |
+| Email open rate | 40%+ | |
+| Waitlist → signup conversion | 15-20% | |
+```
+
+**Step 2: Commit**
+
+```bash
+git add docs/launch/CHECKLIST.md
+git commit -m "feat: add master launch checklist with weekly breakdown"
+```
+
+---
+
+## Task 11: Build and verify
+
+**Step 1: Verify the Vite build passes with new files**
+
+Run: `cd /c/Users/User/citedby-ai && npm run build`
+Expected: Build succeeds with 0 errors
+
+**Step 2: Start dev server and test waitlist page**
+
+Run: `cd /c/Users/User/citedby-ai && npm run dev`
+Navigate to the waitlist view, test:
+- Form validation (empty fields, invalid email)
+- Successful submission (localStorage fallback)
+- Success screen with signup number and founding tier badge
+- Waitlist counter updates
+- "Back to homepage" link works
+
+**Step 3: Fix any build or runtime errors**
+
+Address any TypeScript, import, or styling issues discovered during testing.
+
+**Step 4: Final commit**
+
+```bash
+git add -A
+git commit -m "fix: resolve any build issues with waitlist integration"
+```
+
+---
+
+## Summary
+
+| Task | What it delivers |
+|------|-----------------|
+| 1 | Supabase waitlist table + auto-numbering + founding tiers |
+| 2 | Waitlist service (Supabase + localStorage fallback) |
+| 3 | Waitlist page component (form + success state + value props) |
+| 4 | Route wiring in App.tsx + CTA on Home page |
+| 5 | 4 email nurture sequence templates |
+| 6 | 3 blog post drafts (AEO education) |
+| 7 | Twitter + LinkedIn content calendars (14 days + launch day) |
+| 8 | Product Hunt listing, maker comment, gallery plan |
+| 9 | Reddit, HN, Indie Hackers post templates |
+| 10 | Master launch checklist with weekly breakdown |
+| 11 | Build verification + manual testing |
+
+**Total deliverables:** 1 Supabase migration, 1 service, 1 page component, 1 route update, 4 email templates, 3 blog posts, 4 social media calendars, 3 PH assets, 3 community posts, 1 master checklist.

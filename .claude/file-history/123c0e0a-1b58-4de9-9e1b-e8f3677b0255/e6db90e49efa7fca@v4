@@ -1,0 +1,256 @@
+import { useState } from 'react'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import type { IntegrationPeriod, IntegrationProvider } from '../../types/integrations.ts'
+import {
+  getIntegrationState,
+  hasAnyConnection,
+  connectProvider,
+  disconnectProvider,
+  setPeriod,
+  getKPIs,
+  getTrafficData,
+  getAttributionData,
+  getAIQueries,
+  getProviderLabel,
+} from '../../services/integrations.ts'
+
+export default function Integrations() {
+  // State: integration state from localStorage
+  const [state, setState] = useState(getIntegrationState)
+  const [connecting, setConnecting] = useState<IntegrationProvider | null>(null)
+  const connected = hasAnyConnection(state)
+
+  // Derived data (only computed if connected)
+  const kpis = connected ? getKPIs(state.period) : null
+  const trafficData = connected ? getTrafficData(state.period) : null
+  const attributionData = connected ? getAttributionData() : null
+  const aiQueries = connected ? getAIQueries() : null
+
+  function handleConnect(provider: IntegrationProvider) {
+    setConnecting(provider)
+    connectProvider(provider).then(() => {
+      setState(getIntegrationState())
+      setConnecting(null)
+    })
+  }
+
+  function handleDisconnect(provider: IntegrationProvider) {
+    disconnectProvider(provider)
+    setState(getIntegrationState())
+  }
+
+  function handlePeriodChange(period: IntegrationPeriod) {
+    setPeriod(period)
+    setState(getIntegrationState())
+  }
+
+  const periods: { value: IntegrationPeriod; label: string }[] = [
+    { value: '7d', label: '7 jours' },
+    { value: '30d', label: '30 jours' },
+    { value: '90d', label: '90 jours' },
+  ]
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Integrations</h2>
+        {connected && (
+          <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+            {periods.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => handlePeriodChange(p.value)}
+                className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
+                  state.period === p.value ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Connection Cards */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {state.connections.map((conn) => (
+          <div key={conn.provider} className="rounded-xl bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-lg">
+                  {conn.provider === 'ga4' ? '📊' : '🔍'}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{getProviderLabel(conn.provider)}</h3>
+                  {conn.status === 'connected' && conn.accountName && (
+                    <p className="text-sm text-gray-500">{conn.accountName}</p>
+                  )}
+                </div>
+              </div>
+              <div>
+                {conn.status === 'disconnected' && (
+                  <button
+                    onClick={() => handleConnect(conn.provider)}
+                    disabled={connecting !== null}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Connecter
+                  </button>
+                )}
+                {conn.status === 'connecting' && (
+                  <span className="text-sm text-gray-500">Connexion en cours...</span>
+                )}
+                {conn.status === 'connected' && (
+                  <button
+                    onClick={() => handleDisconnect(conn.provider)}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Deconnecter
+                  </button>
+                )}
+              </div>
+            </div>
+            {conn.status === 'connected' && conn.connectedAt && (
+              <p className="mt-3 text-xs text-gray-400">
+                Connecte le {new Date(conn.connectedAt).toLocaleDateString('fr-FR')}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Dashboard - only visible if connected */}
+      {!connected && (
+        <div className="rounded-xl bg-gray-50 p-12 text-center">
+          <p className="text-lg font-medium text-gray-600">Connectez au moins un service pour voir le dashboard</p>
+          <p className="mt-2 text-sm text-gray-400">Google Analytics 4 ou Search Console</p>
+        </div>
+      )}
+
+      {connected && kpis && (
+        <>
+          {/* KPIs */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Visites IA</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{kpis.aiVisits.toLocaleString('fr-FR')}</p>
+            </div>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Conversions IA</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{kpis.aiConversions.toLocaleString('fr-FR')}</p>
+            </div>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Part trafic IA</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{kpis.aiTrafficShare.toFixed(1)}%</p>
+            </div>
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">CTR moyen IA</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{kpis.avgAiCTR.toFixed(1)}%</p>
+            </div>
+          </div>
+
+          {/* Traffic Chart */}
+          {trafficData && (
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">Trafic par source IA</h3>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={trafficData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Area type="monotone" dataKey="chatgpt" name="ChatGPT" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="perplexity" name="Perplexity" stackId="1" stroke="#6366f1" fill="#6366f1" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="claude" name="Claude" stackId="1" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="gemini" name="Gemini" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="copilot" name="Copilot" stackId="1" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+
+          {/* Attribution Table */}
+          {attributionData && (
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">Attribution par source</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-gray-200 bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 font-medium text-gray-600">Source</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Visites</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Pages vues</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Duree moy.</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Taux rebond</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Conversions</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Tendance</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {attributionData.map((row) => (
+                      <tr key={row.source} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-900">{row.source}</td>
+                        <td className="px-4 py-3 text-gray-700">{row.visits.toLocaleString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-gray-700">{row.pageViews.toLocaleString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-gray-700">{row.avgDuration}</td>
+                        <td className="px-4 py-3 text-gray-700">{row.bounceRate}%</td>
+                        <td className="px-4 py-3 text-gray-700">{row.conversions}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-sm ${row.trend === 'up' ? 'text-green-600' : row.trend === 'down' ? 'text-red-600' : 'text-gray-500'}`}>
+                            {row.trend === 'up' ? '↑' : row.trend === 'down' ? '↓' : '→'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* AI Queries */}
+          {aiQueries && (
+            <div className="rounded-xl bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900">Top requetes IA (Search Console)</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-gray-200 bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 font-medium text-gray-600">Requete</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Impressions</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Clics</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">CTR</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Position</th>
+                      <th className="px-4 py-3 font-medium text-gray-600">Source</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {aiQueries.map((row) => (
+                      <tr key={row.query} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 font-medium text-gray-900">{row.query}</td>
+                        <td className="px-4 py-3 text-gray-700">{row.impressions.toLocaleString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-gray-700">{row.clicks.toLocaleString('fr-FR')}</td>
+                        <td className="px-4 py-3 text-gray-700">{row.ctr}%</td>
+                        <td className="px-4 py-3 text-gray-700">{row.position.toFixed(1)}</td>
+                        <td className="px-4 py-3">
+                          {row.isAIReferral ? (
+                            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">IA</span>
+                          ) : (
+                            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">Organique</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}

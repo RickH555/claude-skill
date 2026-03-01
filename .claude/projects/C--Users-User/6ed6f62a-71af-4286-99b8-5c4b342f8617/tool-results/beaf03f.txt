@@ -1,0 +1,2256 @@
+warning: in the working copy of 'components/GenerationModal.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/OnboardingModal.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/ShortcutsModal.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/Account.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/ActionPlan.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/Clients.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/Directory.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/MissionOrders.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/Plan.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/robots_service.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'services/schema_service.ts', LF will be replaced by CRLF the next time Git touches it
+diff --git a/components/GenerationModal.tsx b/components/GenerationModal.tsx
+index 6cbcc05..778a1bb 100644
+--- a/components/GenerationModal.tsx
++++ b/components/GenerationModal.tsx
+@@ -1,5 +1,6 @@
+ 
+-import React, { useState } from 'react';
++import React, { useState, useEffect } from 'react';
++import { createPortal } from 'react-dom';
+ import { GeneratedSolution } from '../types';
+ import { X, Copy, Check, Sparkles, Loader2, ClipboardList, Briefcase, ArrowRight, UserCheck, Download, FileCode } from 'lucide-react';
+ 
+@@ -13,6 +14,13 @@ interface Props {
+ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading }) => {
+   const [copied, setCopied] = useState(false);
+ 
++  useEffect(() => {
++    if (isOpen) {
++      document.body.style.overflow = 'hidden';
++    }
++    return () => { document.body.style.overflow = ''; };
++  }, [isOpen]);
++
+   if (!isOpen) return null;
+ 
+   const handleCopy = () => {
+@@ -43,19 +51,19 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+     window.open('mailto:experts@citedby.ai?subject=Demande%20assistance%20Webmaster%20AEO', '_blank');
+   };
+ 
+-  return (
++  const modalContent = (
+     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+       {/* Backdrop */}
+-      <div 
++      <div
+         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+         onClick={onClose}
+       ></div>
+ 
+       {/* Modal Content */}
+-      <div className="relative bg-[#0f1115] border border-white/[0.08] rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+-        
++      <div className="relative bg-[#0f1115] border border-white/[0.08] rounded-2xl w-full max-w-5xl h-[80vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
++
+         {/* Header */}
+-        <div className="p-6 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.04]">
++        <div className="shrink-0 px-6 py-4 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.04]">
+           <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-purple-400 border border-white/[0.06] shadow-inner">
+               <Sparkles size={20} />
+@@ -67,7 +75,7 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+               {!isLoading && <p className="text-xs text-gray-500">Optimisation AEO générée par l'IA</p>}
+             </div>
+           </div>
+-          <button 
++          <button
+             onClick={onClose}
+             className="p-2 hover:bg-white/[0.08] rounded-full transition-colors text-gray-500 hover:text-white"
+           >
+@@ -76,9 +84,9 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+         </div>
+ 
+         {/* Body */}
+-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#000000]">
++        <div className="flex-1 min-h-0 overflow-hidden bg-[#000000]">
+           {isLoading ? (
+-            <div className="flex flex-col items-center justify-center h-full py-24 text-center space-y-6">
++            <div className="flex flex-col items-center justify-center h-full py-20 text-center space-y-6">
+               <div className="relative">
+                 <Loader2 size={64} className="text-purple-400 animate-spin" />
+                 <div className="absolute inset-0 blur-xl bg-purple-500/20 rounded-full animate-pulse"></div>
+@@ -93,17 +101,17 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+               </div>
+             </div>
+           ) : solution ? (
+-            <div className="grid lg:grid-cols-12 h-full min-h-[500px]">
+-              
++            <div className="grid lg:grid-cols-12 h-full">
++
+               {/* Left Column: The Code/Content (7 cols) */}
+-              <div className="lg:col-span-7 p-6 border-b lg:border-b-0 lg:border-r border-white/[0.08] flex flex-col">
+-                <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl text-sm text-blue-200 mb-6 leading-relaxed">
++              <div className="lg:col-span-7 p-6 border-b lg:border-b-0 lg:border-r border-white/[0.08] flex flex-col min-h-0 overflow-y-auto custom-scrollbar">
++                <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl text-sm text-blue-200 mb-6 leading-relaxed shrink-0">
+                   <span className="font-bold text-blue-300 block mb-1">Impact AEO :</span>
+                   {solution.explanation}
+                 </div>
+ 
+-                <div className="flex-1 flex flex-col">
+-                  <div className="flex justify-between items-center mb-3">
++                <div className="flex-1 flex flex-col min-h-0">
++                  <div className="flex justify-between items-center mb-3 shrink-0">
+                     <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                       <FileCode size={14} className="text-gray-500" />
+                       {solution.type === 'code' ? 'Fichiers Sources' : 'Contenu Optimisé'}
+@@ -127,8 +135,8 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+                         </button>
+                     </div>
+                   </div>
+-                  
+-                  <div className="relative flex-1 min-h-[300px] bg-[#111111] rounded-2xl border border-white/[0.08] overflow-hidden shadow-inner group">
++
++                  <div className="relative flex-1 min-h-[200px] bg-[#111111] rounded-2xl border border-white/[0.08] overflow-hidden shadow-inner group">
+                     <pre className="absolute inset-0 p-5 overflow-auto text-sm font-mono leading-relaxed text-gray-300 custom-scrollbar">
+                       <code>{solution.content}</code>
+                     </pre>
+@@ -137,13 +145,13 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+               </div>
+ 
+               {/* Right Column: Implementation Plan (5 cols) */}
+-              <div className="lg:col-span-5 p-6 bg-purple-500/[0.02] flex flex-col h-full border-l border-black">
+-                <div className="mb-8">
++              <div className="lg:col-span-5 bg-purple-500/[0.02] flex flex-col min-h-0 border-l border-black">
++                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 pb-2">
+                     <h4 className="text-lg font-sans font-bold mb-6 flex items-center gap-2 text-white">
+                     <ClipboardList size={20} className="text-purple-400" />
+                     Guide d'installation (Débutant)
+                     </h4>
+-                    
++
+                     <div className="space-y-0">
+                     {solution.implementationSteps.map((step, idx) => (
+                         <div key={idx} className="flex gap-4 pb-6 last:pb-0 relative group">
+@@ -151,7 +159,7 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+                             {idx !== solution.implementationSteps.length - 1 && (
+                                 <div className="absolute left-[11px] top-8 bottom-0 w-px bg-white/[0.08] group-hover:bg-white/20 transition-colors"></div>
+                             )}
+-                            
++
+                             <div className="w-6 h-6 rounded-full bg-[#1a1d24] border border-white/20 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 z-10 text-gray-500 group-hover:text-purple-400 group-hover:border-primary/50 transition-colors shadow-lg">
+                                 {idx + 1}
+                             </div>
+@@ -161,7 +169,7 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+                     </div>
+                 </div>
+ 
+-                <div className="mt-auto pt-6 border-t border-white/[0.08]">
++                <div className="shrink-0 px-6 py-4 border-t border-white/[0.08]">
+                    <div className="bg-gradient-to-br from-purple-500/5 to-purple-500/[0.02] p-5 rounded-2xl border border-white/[0.08] hover:border-primary/30 transition-all group">
+                         <div className="flex items-center gap-3 mb-3">
+                             <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent">
+@@ -172,7 +180,7 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+                         <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                             Envoyez ce guide et les fichiers à votre webmaster ou demandez l'assistance d'un expert certifié AEO.
+                         </p>
+-                        <button 
++                        <button
+                             onClick={handleContactExpert}
+                             className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-400 hover:to-violet-500 font-bold rounded-full transition-colors flex items-center justify-center gap-2 text-xs uppercase tracking-wide shadow-lg transform active:scale-95"
+                         >
+@@ -189,6 +197,8 @@ const GenerationModal: React.FC<Props> = ({ isOpen, onClose, solution, isLoading
+       </div>
+     </div>
+   );
++
++  return createPortal(modalContent, document.body);
+ };
+ 
+ export default GenerationModal;
+diff --git a/components/OnboardingModal.tsx b/components/OnboardingModal.tsx
+index c44fe81..d836f51 100644
+--- a/components/OnboardingModal.tsx
++++ b/components/OnboardingModal.tsx
+@@ -13,7 +13,7 @@ const OnboardingModal: React.FC<{ show: boolean; onClose: () => void; onNavigate
+ 
+   return (
+     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+-      <div className="relative w-full max-w-[480px] mx-4 bg-[#13131d] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/60 overflow-hidden">
++      <div className="relative w-full max-w-[480px] mx-4 bg-[#13131d] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/60 overflow-hidden max-h-[90vh] overflow-y-auto">
+         {/* Skip button */}
+         <button
+           onClick={handleSkip}
+diff --git a/components/ShortcutsModal.tsx b/components/ShortcutsModal.tsx
+index 350cec1..24896f5 100644
+--- a/components/ShortcutsModal.tsx
++++ b/components/ShortcutsModal.tsx
+@@ -5,9 +5,9 @@ const ShortcutsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ is
+   if (!isOpen) return null;
+ 
+   return (
+-    <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={onClose}>
++    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
+       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+-      <div className="relative w-full max-w-[400px] bg-[#13131d] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
++      <div className="relative w-full max-w-[400px] max-h-[90vh] overflow-y-auto bg-[#13131d] border border-white/[0.1] rounded-2xl shadow-2xl" onClick={e => e.stopPropagation()}>
+         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08]">
+           <h3 className="text-sm font-semibold text-white">Raccourcis clavier</h3>
+           <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors"><X size={14} /></button>
+diff --git a/n8n/workflows/btp-boamp.json b/n8n/workflows/btp-boamp.json
+deleted file mode 100644
+index 271c666..0000000
+--- a/n8n/workflows/btp-boamp.json
++++ /dev/null
+@@ -1,115 +0,0 @@
+-{
+-  "name": "LeadRadar - BTP - BOAMP Quotidien",
+-  "nodes": [
+-    {
+-      "parameters": {
+-        "rule": {
+-          "interval": [
+-            {
+-              "field": "days",
+-              "daysInterval": 1
+-            }
+-          ]
+-        }
+-      },
+-      "id": "1",
+-      "name": "Cron Quotidien",
+-      "type": "n8n-nodes-base.cron",
+-      "typeVersion": 2,
+-      "position": [180, 280]
+-    },
+-    {
+-      "parameters": {
+-        "method": "GET",
+-        "url": "={{$env.BOAMP_API_URL}}",
+-        "sendQuery": true,
+-        "queryParameters": {
+-          "parameters": [
+-            { "name": "secteur", "value": "btp" },
+-            { "name": "max_amount", "value": "500000" },
+-            { "name": "region", "value": "={{$env.LEADRADAR_DEFAULT_REGION}}" }
+-          ]
+-        },
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "2",
+-      "name": "HTTP BOAMP",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [410, 280]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "const rows = $json.data ?? $json.results ?? [];\nconst normalized = rows.map((row) => ({\n  name: row.buyer_name ?? row.title ?? 'Marche public BTP',\n  location: row.city ?? row.region ?? '',\n  date: row.publication_date ?? new Date().toISOString(),\n  signal_type: 'marche_public',\n  amount: Number(row.amount ?? 0),\n  category: row.category ?? '',\n  source_url: row.url ?? null,\n  details: row\n})).filter((row) => row.amount <= 500000);\nreturn normalized.map((item) => ({ json: item }));"
+-      },
+-      "id": "3",
+-      "name": "Parser Appels Offres",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [630, 280]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "return [{ json: { sector: 'btp', source: 'BOAMP', data: items.map((i) => i.json) } }];"
+-      },
+-      "id": "4",
+-      "name": "Build Ingest Payload",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [850, 280]
+-    },
+-    {
+-      "parameters": {
+-        "method": "POST",
+-        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ingest",
+-        "sendHeaders": true,
+-        "headerParameters": {
+-          "parameters": [
+-            { "name": "Authorization", "value": "Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+-            { "name": "apikey", "value": "{{$env.SUPABASE_SERVICE_ROLE_KEY}}" }
+-          ]
+-        },
+-        "sendBody": true,
+-        "contentType": "json",
+-        "specifyBody": "json",
+-        "jsonBody": "={{$json}}",
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "5",
+-      "name": "POST Ingest",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [1070, 280]
+-    }
+-  ],
+-  "connections": {
+-    "Cron Quotidien": {
+-      "main": [[{ "node": "HTTP BOAMP", "type": "main", "index": 0 }]]
+-    },
+-    "HTTP BOAMP": {
+-      "main": [[{ "node": "Parser Appels Offres", "type": "main", "index": 0 }]]
+-    },
+-    "Parser Appels Offres": {
+-      "main": [[{ "node": "Build Ingest Payload", "type": "main", "index": 0 }]]
+-    },
+-    "Build Ingest Payload": {
+-      "main": [[{ "node": "POST Ingest", "type": "main", "index": 0 }]]
+-    }
+-  },
+-  "active": false,
+-  "settings": {},
+-  "pinData": {},
+-  "versionId": "leadradar-btp-boamp-v1"
+-}
+diff --git a/n8n/workflows/btp-sitadel2.json b/n8n/workflows/btp-sitadel2.json
+deleted file mode 100644
+index 3c4b490..0000000
+--- a/n8n/workflows/btp-sitadel2.json
++++ /dev/null
+@@ -1,114 +0,0 @@
+-{
+-  "name": "LeadRadar - BTP - Sitadel2 Hebdo",
+-  "nodes": [
+-    {
+-      "parameters": {
+-        "rule": {
+-          "interval": [
+-            {
+-              "field": "weeks",
+-              "weeksInterval": 1
+-            }
+-          ]
+-        }
+-      },
+-      "id": "1",
+-      "name": "Cron Hebdomadaire",
+-      "type": "n8n-nodes-base.cron",
+-      "typeVersion": 2,
+-      "position": [180, 220]
+-    },
+-    {
+-      "parameters": {
+-        "method": "GET",
+-        "url": "={{$env.SITADEL2_API_URL}}",
+-        "sendQuery": true,
+-        "queryParameters": {
+-          "parameters": [
+-            { "name": "zone", "value": "={{$env.LEADRADAR_DEFAULT_REGION}}" },
+-            { "name": "type", "value": "permis_construire" }
+-          ]
+-        },
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "2",
+-      "name": "HTTP Sitadel2",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [410, 220]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "const rows = $json.data ?? $json.results ?? [];\nconst normalized = rows.map((row) => ({\n  name: row.petitionnaire ?? 'Projet BTP',\n  location: row.adresse ?? row.commune ?? '',\n  date: row.date_accord ?? new Date().toISOString(),\n  signal_type: 'permis_construire',\n  permit_number: row.numero_permis ?? null,\n  surface: Number(row.surface ?? 0),\n  terrain: Number(row.surface_terrain ?? 0),\n  architect: row.architecte ?? null,\n  details: row\n}));\nreturn normalized.map((item) => ({ json: item }));"
+-      },
+-      "id": "3",
+-      "name": "Parser Permis",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [630, 220]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "return [{ json: { sector: 'btp', source: 'Sit@del2 data.gouv.fr', data: items.map((i) => i.json) } }];"
+-      },
+-      "id": "4",
+-      "name": "Build Ingest Payload",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [850, 220]
+-    },
+-    {
+-      "parameters": {
+-        "method": "POST",
+-        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ingest",
+-        "sendHeaders": true,
+-        "headerParameters": {
+-          "parameters": [
+-            { "name": "Authorization", "value": "Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+-            { "name": "apikey", "value": "{{$env.SUPABASE_SERVICE_ROLE_KEY}}" }
+-          ]
+-        },
+-        "sendBody": true,
+-        "contentType": "json",
+-        "specifyBody": "json",
+-        "jsonBody": "={{$json}}",
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "5",
+-      "name": "POST Ingest",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [1070, 220]
+-    }
+-  ],
+-  "connections": {
+-    "Cron Hebdomadaire": {
+-      "main": [[{ "node": "HTTP Sitadel2", "type": "main", "index": 0 }]]
+-    },
+-    "HTTP Sitadel2": {
+-      "main": [[{ "node": "Parser Permis", "type": "main", "index": 0 }]]
+-    },
+-    "Parser Permis": {
+-      "main": [[{ "node": "Build Ingest Payload", "type": "main", "index": 0 }]]
+-    },
+-    "Build Ingest Payload": {
+-      "main": [[{ "node": "POST Ingest", "type": "main", "index": 0 }]]
+-    }
+-  },
+-  "active": false,
+-  "settings": {},
+-  "pinData": {},
+-  "versionId": "leadradar-btp-sitadel2-v1"
+-}
+diff --git a/n8n/workflows/coaching-linkedin.json b/n8n/workflows/coaching-linkedin.json
+deleted file mode 100644
+index 5386eae..0000000
+--- a/n8n/workflows/coaching-linkedin.json
++++ /dev/null
+@@ -1,120 +0,0 @@
+-{
+-  "name": "LeadRadar - Coaching - LinkedIn Daily",
+-  "nodes": [
+-    {
+-      "parameters": {
+-        "rule": {
+-          "interval": [
+-            {
+-              "field": "days",
+-              "daysInterval": 1
+-            }
+-          ]
+-        }
+-      },
+-      "id": "1",
+-      "name": "Cron Quotidien",
+-      "type": "n8n-nodes-base.cron",
+-      "typeVersion": 2,
+-      "position": [200, 220]
+-    },
+-    {
+-      "parameters": {
+-        "method": "GET",
+-        "url": "={{$env.LINKEDIN_SIGNAL_API_URL}}",
+-        "sendHeaders": true,
+-        "headerParameters": {
+-          "parameters": [
+-            { "name": "Authorization", "value": "Bearer {{$env.LINKEDIN_API_TOKEN}}" }
+-          ]
+-        },
+-        "sendQuery": true,
+-        "queryParameters": {
+-          "parameters": [
+-            { "name": "q", "value": "nomme OR promoted OR \"new role\"" },
+-            { "name": "location", "value": "={{$env.LEADRADAR_DEFAULT_CITY}}" }
+-          ]
+-        },
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "2",
+-      "name": "HTTP LinkedIn",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [430, 220]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "const rows = $json.items ?? $json.results ?? [];\nconst normalized = rows.map((row) => ({\n  name: row.full_name ?? row.name ?? 'Profil LinkedIn',\n  location: row.location ?? '',\n  date: row.posted_at ?? row.date ?? new Date().toISOString(),\n  signal_type: 'transition_poste',\n  role: row.new_role ?? row.title ?? '',\n  company: row.company ?? '',\n  previous_role: row.previous_role ?? null,\n  team_size: row.team_size ?? null,\n  source_url: row.url ?? null,\n  details: row\n}));\nreturn normalized.map((item) => ({ json: item }));"
+-      },
+-      "id": "3",
+-      "name": "Parser Profils",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [650, 220]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "return [{ json: { sector: 'coaching', source: 'LinkedIn', data: items.map((i) => i.json) } }];"
+-      },
+-      "id": "4",
+-      "name": "Build Ingest Payload",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [870, 220]
+-    },
+-    {
+-      "parameters": {
+-        "method": "POST",
+-        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ingest",
+-        "sendHeaders": true,
+-        "headerParameters": {
+-          "parameters": [
+-            { "name": "Authorization", "value": "Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+-            { "name": "apikey", "value": "{{$env.SUPABASE_SERVICE_ROLE_KEY}}" }
+-          ]
+-        },
+-        "sendBody": true,
+-        "contentType": "json",
+-        "specifyBody": "json",
+-        "jsonBody": "={{$json}}",
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "5",
+-      "name": "POST Ingest",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [1090, 220]
+-    }
+-  ],
+-  "connections": {
+-    "Cron Quotidien": {
+-      "main": [[{ "node": "HTTP LinkedIn", "type": "main", "index": 0 }]]
+-    },
+-    "HTTP LinkedIn": {
+-      "main": [[{ "node": "Parser Profils", "type": "main", "index": 0 }]]
+-    },
+-    "Parser Profils": {
+-      "main": [[{ "node": "Build Ingest Payload", "type": "main", "index": 0 }]]
+-    },
+-    "Build Ingest Payload": {
+-      "main": [[{ "node": "POST Ingest", "type": "main", "index": 0 }]]
+-    }
+-  },
+-  "active": false,
+-  "settings": {},
+-  "pinData": {},
+-  "versionId": "leadradar-coaching-linkedin-v1"
+-}
+diff --git a/n8n/workflows/immobilier-dvf.json b/n8n/workflows/immobilier-dvf.json
+deleted file mode 100644
+index 60bbf85..0000000
+--- a/n8n/workflows/immobilier-dvf.json
++++ /dev/null
+@@ -1,114 +0,0 @@
+-{
+-  "name": "LeadRadar - Immobilier - DVF Mensuel",
+-  "nodes": [
+-    {
+-      "parameters": {
+-        "rule": {
+-          "interval": [
+-            {
+-              "field": "months",
+-              "monthsInterval": 1
+-            }
+-          ]
+-        }
+-      },
+-      "id": "1",
+-      "name": "Cron Mensuel",
+-      "type": "n8n-nodes-base.cron",
+-      "typeVersion": 2,
+-      "position": [200, 260]
+-    },
+-    {
+-      "parameters": {
+-        "method": "GET",
+-        "url": "={{$env.DVF_API_URL}}",
+-        "sendQuery": true,
+-        "queryParameters": {
+-          "parameters": [
+-            { "name": "code_postal", "value": "={{$env.LEADRADAR_DEFAULT_ZIP}}" },
+-            { "name": "limit", "value": "200" }
+-          ]
+-        },
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "2",
+-      "name": "HTTP DVF API",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [420, 260]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "const rows = $json.data ?? $json.results ?? [];\nconst mapped = rows.map((row) => ({\n  name: `${row.type_local ?? 'Bien'} ${row.commune ?? ''}`.trim(),\n  title: row.type_local ?? 'Transaction immobiliere',\n  location: row.commune ?? row.code_postal ?? '',\n  date: row.date_mutation ?? new Date().toISOString(),\n  signal_type: 'transaction_dvf',\n  transaction_value: Number(row.valeur_fonciere ?? 0),\n  surface: Number(row.surface_reelle_bati ?? 0),\n  details: row\n}));\nreturn mapped.map((item) => ({ json: item }));"
+-      },
+-      "id": "3",
+-      "name": "Parser DVF",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [640, 260]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "return [{ json: { sector: 'immobilier', source: 'DVF data.gouv.fr', data: items.map((i) => i.json) } }];"
+-      },
+-      "id": "4",
+-      "name": "Build Ingest Payload",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [860, 260]
+-    },
+-    {
+-      "parameters": {
+-        "method": "POST",
+-        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ingest",
+-        "sendHeaders": true,
+-        "headerParameters": {
+-          "parameters": [
+-            { "name": "Authorization", "value": "Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+-            { "name": "apikey", "value": "{{$env.SUPABASE_SERVICE_ROLE_KEY}}" }
+-          ]
+-        },
+-        "sendBody": true,
+-        "contentType": "json",
+-        "specifyBody": "json",
+-        "jsonBody": "={{$json}}",
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "5",
+-      "name": "POST Ingest",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [1080, 260]
+-    }
+-  ],
+-  "connections": {
+-    "Cron Mensuel": {
+-      "main": [[{ "node": "HTTP DVF API", "type": "main", "index": 0 }]]
+-    },
+-    "HTTP DVF API": {
+-      "main": [[{ "node": "Parser DVF", "type": "main", "index": 0 }]]
+-    },
+-    "Parser DVF": {
+-      "main": [[{ "node": "Build Ingest Payload", "type": "main", "index": 0 }]]
+-    },
+-    "Build Ingest Payload": {
+-      "main": [[{ "node": "POST Ingest", "type": "main", "index": 0 }]]
+-    }
+-  },
+-  "active": false,
+-  "settings": {},
+-  "pinData": {},
+-  "versionId": "leadradar-immobilier-dvf-v1"
+-}
+diff --git a/n8n/workflows/immobilier-pap-leboncoin.json b/n8n/workflows/immobilier-pap-leboncoin.json
+deleted file mode 100644
+index da82735..0000000
+--- a/n8n/workflows/immobilier-pap-leboncoin.json
++++ /dev/null
+@@ -1,163 +0,0 @@
+-{
+-  "name": "LeadRadar - Immobilier - PAP LeBonCoin",
+-  "nodes": [
+-    {
+-      "parameters": {
+-        "rule": {
+-          "interval": [
+-            {
+-              "field": "hours",
+-              "hoursInterval": 6
+-            }
+-          ]
+-        }
+-      },
+-      "id": "1",
+-      "name": "Cron Trigger 6h",
+-      "type": "n8n-nodes-base.cron",
+-      "typeVersion": 2,
+-      "position": [200, 320]
+-    },
+-    {
+-      "parameters": {
+-        "method": "GET",
+-        "url": "={{$env.PAP_API_URL}}",
+-        "sendQuery": true,
+-        "queryParameters": {
+-          "parameters": [
+-            { "name": "city", "value": "={{$env.LEADRADAR_DEFAULT_CITY}}" },
+-            { "name": "type", "value": "particulier" }
+-          ]
+-        },
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "2",
+-      "name": "HTTP PAP LeBonCoin",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [420, 320]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "const rows = $json.items ?? $json.results ?? [];\nconst normalized = rows.map((row) => {\n  const daysOnline = Number(row.days_online ?? row.daysOnline ?? 0);\n  const hasPriceDrop = Boolean(row.price_drop ?? row.hasPriceDrop ?? false);\n  return {\n    title: row.title ?? row.name ?? 'Annonce immobiliere',\n    name: row.title ?? row.name ?? 'Annonce immobiliere',\n    location: row.city ?? row.location ?? '',\n    date: row.updated_at ?? row.date ?? new Date().toISOString(),\n    price: Number(row.price ?? 0),\n    surface: Number(row.surface ?? 0),\n    days_online: daysOnline,\n    price_drop: hasPriceDrop,\n    signal_type: 'annonce_particulier',\n    source_url: row.url ?? null,\n    details: row\n  };\n});\nreturn normalized.map((entry) => ({ json: entry }));"
+-      },
+-      "id": "3",
+-      "name": "Parser Annonces",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [640, 320]
+-    },
+-    {
+-      "parameters": {
+-        "conditions": {
+-          "combinator": "or",
+-          "conditions": [
+-            {
+-              "leftValue": "={{$json.days_online}}",
+-              "operator": {
+-                "operation": "largerEqual"
+-              },
+-              "rightValue": 30
+-            },
+-            {
+-              "leftValue": "={{$json.price_drop}}",
+-              "operator": {
+-                "operation": "equal"
+-              },
+-              "rightValue": true
+-            }
+-          ]
+-        }
+-      },
+-      "id": "4",
+-      "name": "Filtre Signal Fort",
+-      "type": "n8n-nodes-base.if",
+-      "typeVersion": 2.2,
+-      "position": [860, 320]
+-    },
+-    {
+-      "parameters": {
+-        "jsCode": "const data = items.map((item) => item.json);\nreturn [{\n  json: {\n    sector: 'immobilier',\n    source: 'LeBonCoin / PAP',\n    data\n  }\n}];"
+-      },
+-      "id": "5",
+-      "name": "Build Ingest Payload",
+-      "type": "n8n-nodes-base.code",
+-      "typeVersion": 2,
+-      "position": [1080, 260]
+-    },
+-    {
+-      "parameters": {
+-        "method": "POST",
+-        "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ingest",
+-        "sendHeaders": true,
+-        "headerParameters": {
+-          "parameters": [
+-            { "name": "Authorization", "value": "Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" },
+-            { "name": "apikey", "value": "{{$env.SUPABASE_SERVICE_ROLE_KEY}}" }
+-          ]
+-        },
+-        "sendBody": true,
+-        "contentType": "json",
+-        "specifyBody": "json",
+-        "jsonBody": "={{$json}}",
+-        "options": {
+-          "timeout": 30000,
+-          "retry": {
+-            "maxTries": 3,
+-            "waitBetweenTries": 2000
+-          }
+-        }
+-      },
+-      "id": "6",
+-      "name": "POST Ingest",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [1290, 260]
+-    },
+-    {
+-      "parameters": {
+-        "method": "POST",
+-        "url": "={{$env.N8N_LOG_WEBHOOK_URL}}",
+-        "sendBody": true,
+-        "contentType": "json",
+-        "specifyBody": "json",
+-        "jsonBody": "={\"workflow\":\"immobilier-pap-leboncoin\",\"status\":\"error\",\"timestamp\":\"{{$now}}\"}"
+-      },
+-      "id": "7",
+-      "name": "Log Erreur",
+-      "type": "n8n-nodes-base.httpRequest",
+-      "typeVersion": 4.2,
+-      "position": [1080, 420]
+-    }
+-  ],
+-  "connections": {
+-    "Cron Trigger 6h": {
+-      "main": [[{ "node": "HTTP PAP LeBonCoin", "type": "main", "index": 0 }]]
+-    },
+-    "HTTP PAP LeBonCoin": {
+-      "main": [[{ "node": "Parser Annonces", "type": "main", "index": 0 }]]
+-    },
+-    "Parser Annonces": {
+-      "main": [[{ "node": "Filtre Signal Fort", "type": "main", "index": 0 }]]
+-    },
+-    "Filtre Signal Fort": {
+-      "main": [
+-        [{ "node": "Build Ingest Payload", "type": "main", "index": 0 }],
+-        [{ "node": "Log Erreur", "type": "main", "index": 0 }]
+-      ]
+-    },
+-    "Build Ingest Payload": {
+-      "main": [[{ "node": "POST Ingest", "type": "main", "index": 0 }]]
+-    }
+-  },
+-  "active": false,
+-  "settings": {},
+-  "pinData": {},
+-  "versionId": "leadradar-immobilier-pap-v1"
+-}
+diff --git a/package-lock.json b/package-lock.json
+index a79b85b..c026375 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -185,29 +185,6 @@
+         "url": "https://opencollective.com/babel"
+       }
+     },
+-    "node_modules/@babel/core/node_modules/json5": {
+-      "version": "2.2.3",
+-      "resolved": "https://registry.npmjs.org/json5/-/json5-2.2.3.tgz",
+-      "integrity": "sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==",
+-      "dev": true,
+-      "license": "MIT",
+-      "bin": {
+-        "json5": "lib/cli.js"
+-      },
+-      "engines": {
+-        "node": ">=6"
+-      }
+-    },
+-    "node_modules/@babel/core/node_modules/semver": {
+-      "version": "6.3.1",
+-      "resolved": "https://registry.npmjs.org/semver/-/semver-6.3.1.tgz",
+-      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+-      "dev": true,
+-      "license": "ISC",
+-      "bin": {
+-        "semver": "bin/semver.js"
+-      }
+-    },
+     "node_modules/@babel/generator": {
+       "version": "7.29.1",
+       "resolved": "https://registry.npmjs.org/@babel/generator/-/generator-7.29.1.tgz",
+@@ -242,26 +219,6 @@
+         "node": ">=6.9.0"
+       }
+     },
+-    "node_modules/@babel/helper-compilation-targets/node_modules/lru-cache": {
+-      "version": "5.1.1",
+-      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-5.1.1.tgz",
+-      "integrity": "sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==",
+-      "dev": true,
+-      "license": "ISC",
+-      "dependencies": {
+-        "yallist": "^3.0.2"
+-      }
+-    },
+-    "node_modules/@babel/helper-compilation-targets/node_modules/semver": {
+-      "version": "6.3.1",
+-      "resolved": "https://registry.npmjs.org/semver/-/semver-6.3.1.tgz",
+-      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+-      "dev": true,
+-      "license": "ISC",
+-      "bin": {
+-        "semver": "bin/semver.js"
+-      }
+-    },
+     "node_modules/@babel/helper-globals": {
+       "version": "7.28.0",
+       "resolved": "https://registry.npmjs.org/@babel/helper-globals/-/helper-globals-7.28.0.tgz",
+@@ -463,6 +420,19 @@
+         "node": ">=6.9.0"
+       }
+     },
++    "node_modules/@bramus/specificity": {
++      "version": "2.4.2",
++      "resolved": "https://registry.npmjs.org/@bramus/specificity/-/specificity-2.4.2.tgz",
++      "integrity": "sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "css-tree": "^3.0.0"
++      },
++      "bin": {
++        "specificity": "bin/cli.js"
++      }
++    },
+     "node_modules/@csstools/color-helpers": {
+       "version": "6.0.1",
+       "resolved": "https://registry.npmjs.org/@csstools/color-helpers/-/color-helpers-6.0.1.tgz",
+@@ -1931,9 +1901,9 @@
+       "license": "MIT"
+     },
+     "node_modules/@supabase/auth-js": {
+-      "version": "2.95.3",
+-      "resolved": "https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.95.3.tgz",
+-      "integrity": "sha512-vD2YoS8E2iKIX0F7EwXTmqhUpaNsmbU6X2R0/NdFcs02oEfnHyNP/3M716f3wVJ2E5XHGiTFXki6lRckhJ0Thg==",
++      "version": "2.96.0",
++      "resolved": "https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.96.0.tgz",
++      "integrity": "sha512-nk0BQgsACgI5tiJsFCjDtZJOdWHeKplbXIV4TBvAS/i7H3k+vG3zyW8XgqNB5GEY8oHzMfMAGdNsB4RU60GWfA==",
+       "license": "MIT",
+       "dependencies": {
+         "tslib": "2.8.1"
+@@ -1943,9 +1913,9 @@
+       }
+     },
+     "node_modules/@supabase/functions-js": {
+-      "version": "2.95.3",
+-      "resolved": "https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.95.3.tgz",
+-      "integrity": "sha512-uTuOAKzs9R/IovW1krO0ZbUHSJnsnyJElTXIRhjJTqymIVGcHzkAYnBCJqd7468Fs/Foz1BQ7Dv6DCl05lr7ig==",
++      "version": "2.96.0",
++      "resolved": "https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.96.0.tgz",
++      "integrity": "sha512-FG+zOrdbrVKjMlvbHa91mj8+mBS3/V2n2MM+r4kwqoxQYWQGcEhirR2udqwGqPG2tiqgfHnm1RsOWFvcubdjqQ==",
+       "license": "MIT",
+       "dependencies": {
+         "tslib": "2.8.1"
+@@ -1955,9 +1925,9 @@
+       }
+     },
+     "node_modules/@supabase/postgrest-js": {
+-      "version": "2.95.3",
+-      "resolved": "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.95.3.tgz",
+-      "integrity": "sha512-LTrRBqU1gOovxRm1vRXPItSMPBmEFqrfTqdPTRtzOILV4jPSueFz6pES5hpb4LRlkFwCPRmv3nQJ5N625V2Xrg==",
++      "version": "2.96.0",
++      "resolved": "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.96.0.tgz",
++      "integrity": "sha512-OSQAza492P2NyS4MgDcMyvvRJvjuoFNxgGBS8erBZ5H16Zk4cSwYq47bV/L4ybxQiviC50z8AyXeEL4frL++yA==",
+       "license": "MIT",
+       "dependencies": {
+         "tslib": "2.8.1"
+@@ -1967,9 +1937,9 @@
+       }
+     },
+     "node_modules/@supabase/realtime-js": {
+-      "version": "2.95.3",
+-      "resolved": "https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.95.3.tgz",
+-      "integrity": "sha512-D7EAtfU3w6BEUxDACjowWNJo/ZRo7sDIuhuOGKHIm9FHieGeoJV5R6GKTLtga/5l/6fDr2u+WcW/m8I9SYmaIw==",
++      "version": "2.96.0",
++      "resolved": "https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.96.0.tgz",
++      "integrity": "sha512-m4ETI6KxiGfD50h5rDkuR2zIQEc0RlfiPV8Bhs2p/NPAmctweA8yb33slsMRLaJafoytadJyo4nP9gvig93wfA==",
+       "license": "MIT",
+       "dependencies": {
+         "@types/phoenix": "^1.6.6",
+@@ -1995,9 +1965,9 @@
+       }
+     },
+     "node_modules/@supabase/storage-js": {
+-      "version": "2.95.3",
+-      "resolved": "https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.95.3.tgz",
+-      "integrity": "sha512-4GxkJiXI3HHWjxpC3sDx1BVrV87O0hfX+wvJdqGv67KeCu+g44SPnII8y0LL/Wr677jB7tpjAxKdtVWf+xhc9A==",
++      "version": "2.96.0",
++      "resolved": "https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.96.0.tgz",
++      "integrity": "sha512-7dgEM77GWw9phzLHi+M2vPqOqP99MAbdk/vorpebo/t50JWWS4ckxacHHjmaeLctT4ipVcbfB8rpdbLr95fTcw==",
+       "license": "MIT",
+       "dependencies": {
+         "iceberg-js": "^0.8.1",
+@@ -2008,16 +1978,16 @@
+       }
+     },
+     "node_modules/@supabase/supabase-js": {
+-      "version": "2.95.3",
+-      "resolved": "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.95.3.tgz",
+-      "integrity": "sha512-Fukw1cUTQ6xdLiHDJhKKPu6svEPaCEDvThqCne3OaQyZvuq2qjhJAd91kJu3PXLG18aooCgYBaB6qQz35hhABg==",
++      "version": "2.96.0",
++      "resolved": "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.96.0.tgz",
++      "integrity": "sha512-KaIHsO6LU1cuqpYMsprQhfedRJFuTAf4dr8/k4/4Po6urRVXIWzmdY/lHPnf8Mzw2Fh0ueQVQYdaXzOvCBGnGQ==",
+       "license": "MIT",
+       "dependencies": {
+-        "@supabase/auth-js": "2.95.3",
+-        "@supabase/functions-js": "2.95.3",
+-        "@supabase/postgrest-js": "2.95.3",
+-        "@supabase/realtime-js": "2.95.3",
+-        "@supabase/storage-js": "2.95.3"
++        "@supabase/auth-js": "2.96.0",
++        "@supabase/functions-js": "2.96.0",
++        "@supabase/postgrest-js": "2.96.0",
++        "@supabase/realtime-js": "2.96.0",
++        "@supabase/storage-js": "2.96.0"
+       },
+       "engines": {
+         "node": ">=20.0.0"
+@@ -2060,17 +2030,6 @@
+         "node": ">=18"
+       }
+     },
+-    "node_modules/@testing-library/dom/node_modules/aria-query": {
+-      "version": "5.3.0",
+-      "resolved": "https://registry.npmjs.org/aria-query/-/aria-query-5.3.0.tgz",
+-      "integrity": "sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A==",
+-      "dev": true,
+-      "license": "Apache-2.0",
+-      "peer": true,
+-      "dependencies": {
+-        "dequal": "^2.0.3"
+-      }
+-    },
+     "node_modules/@testing-library/jest-dom": {
+       "version": "6.9.1",
+       "resolved": "https://registry.npmjs.org/@testing-library/jest-dom/-/jest-dom-6.9.1.tgz",
+@@ -2487,6 +2446,19 @@
+         "url": "https://github.com/sponsors/isaacs"
+       }
+     },
++    "node_modules/@typescript-eslint/typescript-estree/node_modules/semver": {
++      "version": "7.7.4",
++      "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
++      "integrity": "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==",
++      "dev": true,
++      "license": "ISC",
++      "bin": {
++        "semver": "bin/semver.js"
++      },
++      "engines": {
++        "node": ">=10"
++      }
++    },
+     "node_modules/@typescript-eslint/visitor-keys": {
+       "version": "7.2.0",
+       "resolved": "https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-7.2.0.tgz",
+@@ -3024,13 +2996,13 @@
+       "license": "Python-2.0"
+     },
+     "node_modules/aria-query": {
+-      "version": "5.3.2",
+-      "resolved": "https://registry.npmjs.org/aria-query/-/aria-query-5.3.2.tgz",
+-      "integrity": "sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==",
++      "version": "5.3.0",
++      "resolved": "https://registry.npmjs.org/aria-query/-/aria-query-5.3.0.tgz",
++      "integrity": "sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A==",
+       "dev": true,
+       "license": "Apache-2.0",
+-      "engines": {
+-        "node": ">= 0.4"
++      "dependencies": {
++        "dequal": "^2.0.3"
+       }
+     },
+     "node_modules/array-buffer-byte-length": {
+@@ -3525,9 +3497,9 @@
+       }
+     },
+     "node_modules/caniuse-lite": {
+-      "version": "1.0.30001769",
+-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001769.tgz",
+-      "integrity": "sha512-BCfFL1sHijQlBGWBMuJyhZUhzo7wer5sVj9hqekB/7xn0Ypy+pER/edCYQm4exbXj4WiySGp40P8UuTh6w1srg==",
++      "version": "1.0.30001770",
++      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001770.tgz",
++      "integrity": "sha512-x/2CLQ1jHENRbHg5PSId2sXq1CIO1CISvwWAj027ltMVG2UNgW+w9oH2+HzgEIRFembL8bUlXtfbBHR1fCg2xw==",
+       "funding": [
+         {
+           "type": "opencollective",
+@@ -3768,16 +3740,16 @@
+       }
+     },
+     "node_modules/cssstyle": {
+-      "version": "5.3.7",
+-      "resolved": "https://registry.npmjs.org/cssstyle/-/cssstyle-5.3.7.tgz",
+-      "integrity": "sha512-7D2EPVltRrsTkhpQmksIu+LxeWAIEk6wRDMJ1qljlv+CKHJM+cJLlfhWIzNA44eAsHXSNe3+vO6DW1yCYx8SuQ==",
++      "version": "6.0.1",
++      "resolved": "https://registry.npmjs.org/cssstyle/-/cssstyle-6.0.1.tgz",
++      "integrity": "sha512-IoJs7La+oFp/AB033wBStxNOJt4+9hHMxsXUPANcoXL2b3W4DZKghlJ2cI/eyeRZIQ9ysvYEorVhjrcYctWbog==",
+       "dev": true,
+       "license": "MIT",
+       "dependencies": {
+-        "@asamuzakjp/css-color": "^4.1.1",
+-        "@csstools/css-syntax-patches-for-csstree": "^1.0.21",
++        "@asamuzakjp/css-color": "^4.1.2",
++        "@csstools/css-syntax-patches-for-csstree": "^1.0.26",
+         "css-tree": "^3.1.0",
+-        "lru-cache": "^11.2.4"
++        "lru-cache": "^11.2.5"
+       },
+       "engines": {
+         "node": ">=20"
+@@ -3941,44 +3913,6 @@
+         "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+       }
+     },
+-    "node_modules/data-urls/node_modules/tr46": {
+-      "version": "6.0.0",
+-      "resolved": "https://registry.npmjs.org/tr46/-/tr46-6.0.0.tgz",
+-      "integrity": "sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "punycode": "^2.3.1"
+-      },
+-      "engines": {
+-        "node": ">=20"
+-      }
+-    },
+-    "node_modules/data-urls/node_modules/webidl-conversions": {
+-      "version": "8.0.1",
+-      "resolved": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-8.0.1.tgz",
+-      "integrity": "sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==",
+-      "dev": true,
+-      "license": "BSD-2-Clause",
+-      "engines": {
+-        "node": ">=20"
+-      }
+-    },
+-    "node_modules/data-urls/node_modules/whatwg-url": {
+-      "version": "16.0.0",
+-      "resolved": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-16.0.0.tgz",
+-      "integrity": "sha512-9CcxtEKsf53UFwkSUZjG+9vydAsFO4lFHBpJUtjBcoJOCJpKnSJNwCw813zrYJHpCJ7sgfbtOe0V5Ku7Pa1XMQ==",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "@exodus/bytes": "^1.11.0",
+-        "tr46": "^6.0.0",
+-        "webidl-conversions": "^8.0.1"
+-      },
+-      "engines": {
+-        "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+-      }
+-    },
+     "node_modules/data-view-buffer": {
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/data-view-buffer/-/data-view-buffer-1.0.2.tgz",
+@@ -4122,7 +4056,6 @@
+       "integrity": "sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "engines": {
+         "node": ">=6"
+       }
+@@ -4724,16 +4657,6 @@
+         "node": ">=0.10.0"
+       }
+     },
+-    "node_modules/eslint-plugin-import/node_modules/semver": {
+-      "version": "6.3.1",
+-      "resolved": "https://registry.npmjs.org/semver/-/semver-6.3.1.tgz",
+-      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+-      "dev": true,
+-      "license": "ISC",
+-      "bin": {
+-        "semver": "bin/semver.js"
+-      }
+-    },
+     "node_modules/eslint-plugin-jsx-a11y": {
+       "version": "6.10.2",
+       "resolved": "https://registry.npmjs.org/eslint-plugin-jsx-a11y/-/eslint-plugin-jsx-a11y-6.10.2.tgz",
+@@ -4764,6 +4687,16 @@
+         "eslint": "^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9"
+       }
+     },
++    "node_modules/eslint-plugin-jsx-a11y/node_modules/aria-query": {
++      "version": "5.3.2",
++      "resolved": "https://registry.npmjs.org/aria-query/-/aria-query-5.3.2.tgz",
++      "integrity": "sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==",
++      "dev": true,
++      "license": "Apache-2.0",
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/eslint-plugin-react": {
+       "version": "7.37.5",
+       "resolved": "https://registry.npmjs.org/eslint-plugin-react/-/eslint-plugin-react-7.37.5.tgz",
+@@ -4824,33 +4757,29 @@
+       }
+     },
+     "node_modules/eslint-plugin-react/node_modules/resolve": {
+-      "version": "2.0.0-next.5",
+-      "resolved": "https://registry.npmjs.org/resolve/-/resolve-2.0.0-next.5.tgz",
+-      "integrity": "sha512-U7WjGVG9sH8tvjW5SmGbQuui75FiyjAX72HX15DwBBwF9dNiQZRQAg9nnPhYy+TUnE0+VcrttuvNI8oSxZcocA==",
++      "version": "2.0.0-next.6",
++      "resolved": "https://registry.npmjs.org/resolve/-/resolve-2.0.0-next.6.tgz",
++      "integrity": "sha512-3JmVl5hMGtJ3kMmB3zi3DL25KfkCEyy3Tw7Gmw7z5w8M9WlwoPFnIvwChzu1+cF3iaK3sp18hhPz8ANeimdJfA==",
+       "dev": true,
+       "license": "MIT",
+       "dependencies": {
+-        "is-core-module": "^2.13.0",
++        "es-errors": "^1.3.0",
++        "is-core-module": "^2.16.1",
++        "node-exports-info": "^1.6.0",
++        "object-keys": "^1.1.1",
+         "path-parse": "^1.0.7",
+         "supports-preserve-symlinks-flag": "^1.0.0"
+       },
+       "bin": {
+         "resolve": "bin/resolve"
+       },
++      "engines": {
++        "node": ">= 0.4"
++      },
+       "funding": {
+         "url": "https://github.com/sponsors/ljharb"
+       }
+     },
+-    "node_modules/eslint-plugin-react/node_modules/semver": {
+-      "version": "6.3.1",
+-      "resolved": "https://registry.npmjs.org/semver/-/semver-6.3.1.tgz",
+-      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+-      "dev": true,
+-      "license": "ISC",
+-      "bin": {
+-        "semver": "bin/semver.js"
+-      }
+-    },
+     "node_modules/eslint-scope": {
+       "version": "7.2.2",
+       "resolved": "https://registry.npmjs.org/eslint-scope/-/eslint-scope-7.2.2.tgz",
+@@ -5881,6 +5810,19 @@
+         "semver": "^7.7.1"
+       }
+     },
++    "node_modules/is-bun-module/node_modules/semver": {
++      "version": "7.7.4",
++      "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
++      "integrity": "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==",
++      "dev": true,
++      "license": "ISC",
++      "bin": {
++        "semver": "bin/semver.js"
++      },
++      "engines": {
++        "node": ">=10"
++      }
++    },
+     "node_modules/is-callable": {
+       "version": "1.2.7",
+       "resolved": "https://registry.npmjs.org/is-callable/-/is-callable-1.2.7.tgz",
+@@ -6322,16 +6264,17 @@
+       }
+     },
+     "node_modules/jsdom": {
+-      "version": "28.0.0",
+-      "resolved": "https://registry.npmjs.org/jsdom/-/jsdom-28.0.0.tgz",
+-      "integrity": "sha512-KDYJgZ6T2TKdU8yBfYueq5EPG/EylMsBvCaenWMJb2OXmjgczzwveRCoJ+Hgj1lXPDyasvrgneSn4GBuR1hYyA==",
++      "version": "28.1.0",
++      "resolved": "https://registry.npmjs.org/jsdom/-/jsdom-28.1.0.tgz",
++      "integrity": "sha512-0+MoQNYyr2rBHqO1xilltfDjV9G7ymYGlAUazgcDLQaUf8JDHbuGwsxN6U9qWaElZ4w1B2r7yEGIL3GdeW3Rug==",
+       "dev": true,
+       "license": "MIT",
+       "dependencies": {
+         "@acemir/cssom": "^0.9.31",
+-        "@asamuzakjp/dom-selector": "^6.7.6",
++        "@asamuzakjp/dom-selector": "^6.8.1",
++        "@bramus/specificity": "^2.4.2",
+         "@exodus/bytes": "^1.11.0",
+-        "cssstyle": "^5.3.7",
++        "cssstyle": "^6.0.1",
+         "data-urls": "^7.0.0",
+         "decimal.js": "^10.6.0",
+         "html-encoding-sniffer": "^6.0.0",
+@@ -6342,7 +6285,7 @@
+         "saxes": "^6.0.0",
+         "symbol-tree": "^3.2.4",
+         "tough-cookie": "^6.0.0",
+-        "undici": "^7.20.0",
++        "undici": "^7.21.0",
+         "w3c-xmlserializer": "^5.0.0",
+         "webidl-conversions": "^8.0.1",
+         "whatwg-mimetype": "^5.0.0",
+@@ -6361,44 +6304,6 @@
+         }
+       }
+     },
+-    "node_modules/jsdom/node_modules/tr46": {
+-      "version": "6.0.0",
+-      "resolved": "https://registry.npmjs.org/tr46/-/tr46-6.0.0.tgz",
+-      "integrity": "sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "punycode": "^2.3.1"
+-      },
+-      "engines": {
+-        "node": ">=20"
+-      }
+-    },
+-    "node_modules/jsdom/node_modules/webidl-conversions": {
+-      "version": "8.0.1",
+-      "resolved": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-8.0.1.tgz",
+-      "integrity": "sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==",
+-      "dev": true,
+-      "license": "BSD-2-Clause",
+-      "engines": {
+-        "node": ">=20"
+-      }
+-    },
+-    "node_modules/jsdom/node_modules/whatwg-url": {
+-      "version": "16.0.0",
+-      "resolved": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-16.0.0.tgz",
+-      "integrity": "sha512-9CcxtEKsf53UFwkSUZjG+9vydAsFO4lFHBpJUtjBcoJOCJpKnSJNwCw813zrYJHpCJ7sgfbtOe0V5Ku7Pa1XMQ==",
+-      "dev": true,
+-      "license": "MIT",
+-      "dependencies": {
+-        "@exodus/bytes": "^1.11.0",
+-        "tr46": "^6.0.0",
+-        "webidl-conversions": "^8.0.1"
+-      },
+-      "engines": {
+-        "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+-      }
+-    },
+     "node_modules/jsesc": {
+       "version": "3.1.0",
+       "resolved": "https://registry.npmjs.org/jsesc/-/jsesc-3.1.0.tgz",
+@@ -6443,16 +6348,16 @@
+       "license": "MIT"
+     },
+     "node_modules/json5": {
+-      "version": "1.0.2",
+-      "resolved": "https://registry.npmjs.org/json5/-/json5-1.0.2.tgz",
+-      "integrity": "sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==",
++      "version": "2.2.3",
++      "resolved": "https://registry.npmjs.org/json5/-/json5-2.2.3.tgz",
++      "integrity": "sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==",
+       "dev": true,
+       "license": "MIT",
+-      "dependencies": {
+-        "minimist": "^1.2.0"
+-      },
+       "bin": {
+         "json5": "lib/cli.js"
++      },
++      "engines": {
++        "node": ">=6"
+       }
+     },
+     "node_modules/jspdf": {
+@@ -6615,11 +6520,14 @@
+       }
+     },
+     "node_modules/lru-cache": {
+-      "version": "10.4.3",
+-      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-10.4.3.tgz",
+-      "integrity": "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==",
++      "version": "5.1.1",
++      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-5.1.1.tgz",
++      "integrity": "sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==",
+       "dev": true,
+-      "license": "ISC"
++      "license": "ISC",
++      "dependencies": {
++        "yallist": "^3.0.2"
++      }
+     },
+     "node_modules/lucide-react": {
+       "version": "0.378.0",
+@@ -6871,6 +6779,25 @@
+         "node": "^10 || ^12 || >=14"
+       }
+     },
++    "node_modules/node-exports-info": {
++      "version": "1.6.0",
++      "resolved": "https://registry.npmjs.org/node-exports-info/-/node-exports-info-1.6.0.tgz",
++      "integrity": "sha512-pyFS63ptit/P5WqUkt+UUfe+4oevH+bFeIiPPdfb0pFeYEu/1ELnJu5l+5EcTKYL5M7zaAa7S8ddywgXypqKCw==",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "array.prototype.flatmap": "^1.3.3",
++        "es-errors": "^1.3.0",
++        "object.entries": "^1.1.9",
++        "semver": "^6.3.1"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/ljharb"
++      }
++    },
+     "node_modules/node-fetch": {
+       "version": "2.7.0",
+       "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz",
+@@ -6891,6 +6818,28 @@
+         }
+       }
+     },
++    "node_modules/node-fetch/node_modules/tr46": {
++      "version": "0.0.3",
++      "resolved": "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz",
++      "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==",
++      "license": "MIT"
++    },
++    "node_modules/node-fetch/node_modules/webidl-conversions": {
++      "version": "3.0.1",
++      "resolved": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz",
++      "integrity": "sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==",
++      "license": "BSD-2-Clause"
++    },
++    "node_modules/node-fetch/node_modules/whatwg-url": {
++      "version": "5.0.0",
++      "resolved": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz",
++      "integrity": "sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==",
++      "license": "MIT",
++      "dependencies": {
++        "tr46": "~0.0.3",
++        "webidl-conversions": "^3.0.0"
++      }
++    },
+     "node_modules/node-releases": {
+       "version": "2.0.27",
+       "resolved": "https://registry.npmjs.org/node-releases/-/node-releases-2.0.27.tgz",
+@@ -7214,6 +7163,13 @@
+         "url": "https://github.com/sponsors/isaacs"
+       }
+     },
++    "node_modules/path-scurry/node_modules/lru-cache": {
++      "version": "10.4.3",
++      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-10.4.3.tgz",
++      "integrity": "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==",
++      "dev": true,
++      "license": "ISC"
++    },
+     "node_modules/path-type": {
+       "version": "4.0.0",
+       "resolved": "https://registry.npmjs.org/path-type/-/path-type-4.0.0.tgz",
+@@ -7490,14 +7446,6 @@
+         "url": "https://github.com/chalk/ansi-styles?sponsor=1"
+       }
+     },
+-    "node_modules/pretty-format/node_modules/react-is": {
+-      "version": "17.0.2",
+-      "resolved": "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz",
+-      "integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==",
+-      "dev": true,
+-      "license": "MIT",
+-      "peer": true
+-    },
+     "node_modules/prop-types": {
+       "version": "15.8.1",
+       "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz",
+@@ -7509,6 +7457,12 @@
+         "react-is": "^16.13.1"
+       }
+     },
++    "node_modules/prop-types/node_modules/react-is": {
++      "version": "16.13.1",
++      "resolved": "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz",
++      "integrity": "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==",
++      "license": "MIT"
++    },
+     "node_modules/punycode": {
+       "version": "2.3.1",
+       "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz",
+@@ -7617,10 +7571,12 @@
+       }
+     },
+     "node_modules/react-is": {
+-      "version": "16.13.1",
+-      "resolved": "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz",
+-      "integrity": "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==",
+-      "license": "MIT"
++      "version": "17.0.2",
++      "resolved": "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz",
++      "integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==",
++      "dev": true,
++      "license": "MIT",
++      "peer": true
+     },
+     "node_modules/react-refresh": {
+       "version": "0.18.0",
+@@ -8099,16 +8055,13 @@
+       }
+     },
+     "node_modules/semver": {
+-      "version": "7.7.4",
+-      "resolved": "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz",
+-      "integrity": "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==",
++      "version": "6.3.1",
++      "resolved": "https://registry.npmjs.org/semver/-/semver-6.3.1.tgz",
++      "integrity": "sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==",
+       "dev": true,
+       "license": "ISC",
+       "bin": {
+         "semver": "bin/semver.js"
+-      },
+-      "engines": {
+-        "node": ">=10"
+       }
+     },
+     "node_modules/set-function-length": {
+@@ -8920,10 +8873,17 @@
+       }
+     },
+     "node_modules/tr46": {
+-      "version": "0.0.3",
+-      "resolved": "https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz",
+-      "integrity": "sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==",
+-      "license": "MIT"
++      "version": "6.0.0",
++      "resolved": "https://registry.npmjs.org/tr46/-/tr46-6.0.0.tgz",
++      "integrity": "sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "punycode": "^2.3.1"
++      },
++      "engines": {
++        "node": ">=20"
++      }
+     },
+     "node_modules/ts-api-utils": {
+       "version": "1.4.3",
+@@ -8958,6 +8918,19 @@
+         "strip-bom": "^3.0.0"
+       }
+     },
++    "node_modules/tsconfig-paths/node_modules/json5": {
++      "version": "1.0.2",
++      "resolved": "https://registry.npmjs.org/json5/-/json5-1.0.2.tgz",
++      "integrity": "sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==",
++      "dev": true,
++      "license": "MIT",
++      "dependencies": {
++        "minimist": "^1.2.0"
++      },
++      "bin": {
++        "json5": "lib/cli.js"
++      }
++    },
+     "node_modules/tslib": {
+       "version": "2.8.1",
+       "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
+@@ -9455,10 +9428,14 @@
+       }
+     },
+     "node_modules/webidl-conversions": {
+-      "version": "3.0.1",
+-      "resolved": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz",
+-      "integrity": "sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==",
+-      "license": "BSD-2-Clause"
++      "version": "8.0.1",
++      "resolved": "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-8.0.1.tgz",
++      "integrity": "sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==",
++      "dev": true,
++      "license": "BSD-2-Clause",
++      "engines": {
++        "node": ">=20"
++      }
+     },
+     "node_modules/whatwg-mimetype": {
+       "version": "5.0.0",
+@@ -9471,13 +9448,18 @@
+       }
+     },
+     "node_modules/whatwg-url": {
+-      "version": "5.0.0",
+-      "resolved": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz",
+-      "integrity": "sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==",
++      "version": "16.0.0",
++      "resolved": "https://registry.npmjs.org/whatwg-url/-/whatwg-url-16.0.0.tgz",
++      "integrity": "sha512-9CcxtEKsf53UFwkSUZjG+9vydAsFO4lFHBpJUtjBcoJOCJpKnSJNwCw813zrYJHpCJ7sgfbtOe0V5Ku7Pa1XMQ==",
++      "dev": true,
+       "license": "MIT",
+       "dependencies": {
+-        "tr46": "~0.0.3",
+-        "webidl-conversions": "^3.0.0"
++        "@exodus/bytes": "^1.11.0",
++        "tr46": "^6.0.0",
++        "webidl-conversions": "^8.0.1"
++      },
++      "engines": {
++        "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+       }
+     },
+     "node_modules/which": {
+diff --git a/pages/Account.tsx b/pages/Account.tsx
+index 7151b3e..7eff4a3 100644
+--- a/pages/Account.tsx
++++ b/pages/Account.tsx
+@@ -904,7 +904,7 @@ const Account: React.FC<AccountProps> = ({ user, onLogout, onNavigate, onUpgrade
+       {upgradeModal && paymentStep === 'success' && (
+         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ left: 0, top: 0, width: '100vw', height: '100vh' }}>
+           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => !isProcessing && handleCloseUpgradeModal()} />
+-          <div className="relative z-10 bg-[#111111] border border-purple-500/20 rounded-2xl w-full max-w-lg shadow-2xl shadow-purple-500/10 mx-auto">
++          <div className="relative z-10 bg-[#111111] border border-purple-500/20 rounded-2xl w-full max-w-lg shadow-2xl shadow-purple-500/10 mx-auto max-h-[90vh] overflow-y-auto">
+             {paymentStep === 'success' && (
+               <div className="p-8 text-center space-y-5">
+                 <div className="w-20 h-20 mx-auto rounded-full bg-green-500/10 border-2 border-green-500/20 flex items-center justify-center">
+diff --git a/pages/ActionPlan.tsx b/pages/ActionPlan.tsx
+index 6a348ca..770b263 100644
+--- a/pages/ActionPlan.tsx
++++ b/pages/ActionPlan.tsx
+@@ -47,7 +47,7 @@ const ActionPlan: React.FC<Props> = ({ data, user, onDeductCredits, onSaveSoluti
+     // La logique de vérification de solde et de redirection est déléguée à onDeductCredits
+     const success = onDeductCredits(cost);
+     if (!success) {
+-      return; 
++      return;
+     }
+ 
+     setIsModalOpen(true);
+@@ -58,8 +58,8 @@ const ActionPlan: React.FC<Props> = ({ data, user, onDeductCredits, onSaveSoluti
+       const solution = await generateSolution(rec, data.url);
+       setGeneratedSolution(solution);
+       // PASSAGE DE L'ID D'ANALYSE (data.timestamp) OBLIGATOIRE
+-      onSaveSolution(data.timestamp, rec.id, solution); 
+-      
++      onSaveSolution(data.timestamp, rec.id, solution);
++
+     } catch (error) {
+       console.error("Error generating solution", error);
+       setGeneratedSolution({
+diff --git a/pages/AiResponseLayer.tsx b/pages/AiResponseLayer.tsx
+index 877ea1d..3e7e443 100644
+--- a/pages/AiResponseLayer.tsx
++++ b/pages/AiResponseLayer.tsx
+@@ -660,7 +660,7 @@ const AiResponseLayer: React.FC<Props> = ({ onBack, user, onDeductCredits }) =>
+       {/* Preview Modal */}
+       {showPreview && (
+         <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+-          <div className="bg-[#13131d] border border-white/[0.08] rounded-2xl w-full max-w-5xl h-[80vh] flex flex-col overflow-hidden">
++          <div className="bg-[#13131d] border border-white/[0.08] rounded-2xl w-full max-w-5xl max-h-[80vh] flex flex-col overflow-hidden">
+             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+               <span className="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                 <Eye size={14} className="text-purple-400" /> Aperçu de la page
+diff --git a/pages/Clients.tsx b/pages/Clients.tsx
+index f1d901a..739fe03 100644
+--- a/pages/Clients.tsx
++++ b/pages/Clients.tsx
+@@ -988,7 +988,7 @@ const Clients: React.FC<ClientsProps> = ({ onBack, onNavigate, user, directClien
+       {showLimitAlert && (
+         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLimitAlert(false)} />
+-          <div className="relative bg-[#111111] border border-red-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-red-500/5 overflow-hidden">
++          <div className="relative bg-[#111111] border border-red-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-red-500/5 overflow-hidden max-h-[90vh] overflow-y-auto">
+             <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-b border-white/[0.06] p-6 text-center">
+               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                 <AlertCircle size={32} className="text-red-400" />
+diff --git a/pages/Directory.tsx b/pages/Directory.tsx
+index 578be1f..b67007f 100644
+--- a/pages/Directory.tsx
++++ b/pages/Directory.tsx
+@@ -668,7 +668,7 @@ const Directory: React.FC<DirectoryProps> = ({ onBack, onViewEntity, onNavigateT
+       {showLimitAlert && (
+         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLimitAlert(false)} />
+-          <div className="relative bg-[#111111] border border-red-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-red-500/5 overflow-hidden">
++          <div className="relative bg-[#111111] border border-red-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-red-500/5 overflow-hidden max-h-[90vh] overflow-y-auto">
+             <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-b border-white/[0.06] p-6 text-center">
+               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                 <AlertCircle size={32} className="text-red-400" />
+@@ -699,7 +699,7 @@ const Directory: React.FC<DirectoryProps> = ({ onBack, onViewEntity, onNavigateT
+       {showActionPlanAlert && (
+         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowActionPlanAlert(false)} />
+-          <div className="relative bg-[#111111] border border-amber-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-amber-500/5 overflow-hidden">
++          <div className="relative bg-[#111111] border border-amber-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-amber-500/5 overflow-hidden max-h-[90vh] overflow-y-auto">
+             <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-white/[0.06] p-6 text-center">
+               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                 <ClipboardList size={32} className="text-amber-400" />
+diff --git a/pages/MissionOrders.tsx b/pages/MissionOrders.tsx
+index 0e75db1..3f46976 100644
+--- a/pages/MissionOrders.tsx
++++ b/pages/MissionOrders.tsx
+@@ -823,7 +823,7 @@ const MissionOrders: React.FC<MissionOrdersProps> = ({ onBack, user, onNavigate
+       {proofModal && (
+         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setProofModal(null)} />
+-          <div className="relative bg-[#111111] border border-white/[0.08] rounded-2xl w-full max-w-md shadow-2xl">
++          <div className="relative bg-[#111111] border border-white/[0.08] rounded-2xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+             <div className="p-5 border-b border-white/[0.06]">
+               <h2 className="text-lg font-bold text-white flex items-center gap-2"><Upload size={18} className="text-purple-400" /> Preuve de livraison</h2>
+               <p className="text-xs text-gray-500 mt-1">Fournissez la preuve que cette tâche est réalisée.</p>
+diff --git a/pages/Plan.tsx b/pages/Plan.tsx
+index b839d0c..0e8ef3a 100644
+--- a/pages/Plan.tsx
++++ b/pages/Plan.tsx
+@@ -445,7 +445,7 @@ const Plan: React.FC<PlanProps> = ({ onBack, user, onUpgrade, initialTab = 'my-p
+       {upgradeModal && paymentStep === 'success' && (
+         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" style={{ left: 0, top: 0, width: '100vw', height: '100vh' }}>
+           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => !isProcessing && handleCloseUpgradeModal()} />
+-          <div className="relative z-10 bg-[#111111] border border-purple-500/20 rounded-2xl w-full max-w-lg shadow-2xl shadow-purple-500/10 mx-auto">
++          <div className="relative z-10 bg-[#111111] border border-purple-500/20 rounded-2xl w-full max-w-lg shadow-2xl shadow-purple-500/10 mx-auto max-h-[90vh] overflow-y-auto">
+             {paymentStep === 'success' && (
+               <div className="p-8 text-center space-y-5">
+                 <div className="w-20 h-20 mx-auto rounded-full bg-green-500/10 border-2 border-green-500/20 flex items-center justify-center">
+diff --git a/services/robots_service.ts b/services/robots_service.ts
+index 777887f..3b04cb1 100644
+--- a/services/robots_service.ts
++++ b/services/robots_service.ts
+@@ -1,3 +1,17 @@
++import { GoogleGenAI, Type, Schema } from "@google/genai";
++
++// Helper to safely get env var
++const getApiKey = () => {
++  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
++    return process.env.API_KEY;
++  }
++  return null;
++};
++
++// ================================================================
++// TYPES
++// ================================================================
++
+ export interface RobotRule {
+   agent: string;
+   allow: boolean;
+@@ -11,6 +25,79 @@ interface PlatformConfig {
+   sitemaps: string[];
+ }
+ 
++export interface RobotsResult {
++  content: string;          // The full robots.txt content
++  platformDetected: string; // Detected platform name
++  aiBotsCount: number;      // Number of AI bots whitelisted
++  rulesCount: number;       // Total number of rules
++}
++
++// ================================================================
++// SYSTEM PROMPT — Expert AEO / Robots.txt Engineering
++// ================================================================
++
++const ROBOTS_SYSTEM_PROMPT = `
++# ROLE
++Tu es un Expert Senior en AEO (Answer Engine Optimization), Crawl Budget Management et Technical SEO chez CitedBy.ai.
++Tu maitrises les mecanismes de crawl des moteurs de recherche (Googlebot, Bingbot) ET des bots IA (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot) ainsi que leurs interactions avec le fichier robots.txt.
++
++# MISSION
++Genere un fichier robots.txt optimise selon la strategie "Open-AI, Closed-Admin" :
++- OUVRIR les portes aux bots IA pour maximiser la citation et la visibilite dans les reponses generees
++- FERMER les routes sensibles (admin, API, donnees privees) pour la securite et l'optimisation du crawl budget
++
++# EXPERTISE ROBOTS.TXT POUR L'AEO
++
++Les bots IA utilisent le robots.txt differemment des crawlers SEO classiques :
++
++## Bots IA critiques a autoriser (whitelist explicite)
++- **GPTBot** : Bot principal d'OpenAI pour alimenter ChatGPT — ESSENTIEL pour la citation
++- **ChatGPT-User** : Bot de navigation live de ChatGPT (Browse with Bing mode)
++- **Google-Extended** : Controle l'entrainement de Gemini/Vertex AI (separe de Googlebot)
++- **CCBot** : Common Crawl — dataset fondation de la majorite des LLMs (GPT, Claude, Llama)
++- **ClaudeBot** : Bot d'Anthropic pour Claude — crawl de verification factuelle
++- **anthropic-ai** : Nouvel agent Anthropic pour l'indexation proactive
++- **Applebot** : Apple Intelligence / Siri — reponses vocales et Apple Search
++- **PerplexityBot** : Perplexity AI — moteur de reponse avec citations en temps reel
++- **Amazonbot** : Amazon Alexa / Amazon Q — reponses e-commerce et entreprise
++- **FacebookBot** : Meta AI (Llama training) — alimentation du modele Meta
++- **Bytespider** : ByteDance/TikTok AI — en expansion rapide
++- **Cohere-ai** : Cohere — modeles de recherche semantique entreprise
++- **YouBot** : You.com AI — moteur de recherche IA
++
++## Pourquoi la whitelist explicite est cruciale
++- Certains WAF (Cloudflare, Sucuri) bloquent par defaut les bots non reconnus
++- Sans whitelist explicite, GPTBot et ClaudeBot sont souvent bloques silencieusement
++- Chaque bot autorise = un canal supplementaire de citation IA
++
++## Regles de securite par plateforme
++Adapter les Disallow en fonction de l'architecture detectee :
++- WordPress : /wp-admin/, /wp-includes/, /xmlrpc.php, /?s=
++- Shopify : /cart, /orders, /checkouts, /account
++- SaaS/Web App : /api/, /dashboard/, /settings/, /auth/
++- General : /admin/, /login/, /tmp/, /private/, /search
++
++## Bonnes pratiques
++- Declarer TOUS les Sitemaps (index + specifiques)
++- Ajouter un commentaire d'en-tete avec la date et la plateforme
++- Grouper les regles par categorie (IA, SEO, Securite)
++- Ajouter un Crawl-delay raisonnable pour les bots non-essentiels si necessaire
++- Pointer vers le llms.txt et llm.json si disponibles
++
++# REGLES DE FORMAT
++- Format robots.txt standard (pas de JSON)
++- Commentaires avec # pour documenter chaque section
++- User-agent en premiere ligne de chaque bloc
++- Allow/Disallow avec chemins absolus depuis la racine
++- Sitemap avec URLs completes (protocol + domaine)
++- Bien structure, lisible, avec sections clairement separees
++- Reponds UNIQUEMENT avec le contenu brut du robots.txt (pas de Markdown fences)
++`;
++
++// ================================================================
++// STATIC DATA — AI Bots List
++// ================================================================
++
+ const AI_BOTS: RobotRule[] = [
+   { agent: 'GPTBot', allow: true, comment: 'OpenAI (ChatGPT) - Essential for citation', category: 'ai' },
+   { agent: 'ChatGPT-User', allow: true, comment: 'OpenAI (Live Browsing)', category: 'ai' },
+@@ -24,10 +111,13 @@ const AI_BOTS: RobotRule[] = [
+   { agent: 'FacebookBot', allow: true, comment: 'Meta AI (Llama training)', category: 'ai' }
+ ];
+ 
+-// Heuristics to detect platform based on URL pattern (Simulation)
++// ================================================================
++// PLATFORM DETECTION
++// ================================================================
++
+ const detectPlatform = (url: string): PlatformConfig => {
+   const lowerUrl = url.toLowerCase();
+-  
++
+   if (lowerUrl.includes('shopify') || lowerUrl.includes('store') || lowerUrl.includes('shop')) {
+     return {
+       name: 'Shopify / E-commerce',
+@@ -35,7 +125,7 @@ const detectPlatform = (url: string): PlatformConfig => {
+       sitemaps: ['/sitemap.xml', '/sitemap_products_1.xml']
+     };
+   }
+-  
++
+   if (lowerUrl.includes('wordpress') || lowerUrl.includes('blog') || lowerUrl.includes('wp-')) {
+     return {
+       name: 'WordPress',
+@@ -60,10 +150,14 @@ const detectPlatform = (url: string): PlatformConfig => {
+   };
+ };
+ 
+-export const generateOptimizedRobotsTxt = (urlStr: string): string => {
++// ================================================================
++// FALLBACK — Local generation (existing logic preserved)
++// ================================================================
++
++const fallbackGeneration = (urlStr: string): RobotsResult => {
+   let hostname = urlStr;
+   let protocol = 'https';
+-  
++
+   try {
+     const urlObj = new URL(urlStr.startsWith('http') ? urlStr : `https://${urlStr}`);
+     hostname = urlObj.hostname;
+@@ -83,7 +177,7 @@ export const generateOptimizedRobotsTxt = (urlStr: string): string => {
+ # ==========================================
+ # PART 1: AI & LLM AGENTS (ALLOW LIST)
+ # ==========================================
+-# We explicitly allow these bots to ensure your content feeds 
++# We explicitly allow these bots to ensure your content feeds
+ # the knowledge graphs of ChatGPT, Gemini, Claude, and Perplexity.
+ `;
+ 
+@@ -121,15 +215,29 @@ Allow: /
+ # End of file
+ `;
+ 
+-  return content;
++  const rulesCount = AI_BOTS.length + platform.disallow.length + 1; // +1 for Allow: /
++
++  return {
++    content,
++    platformDetected: platform.name,
++    aiBotsCount: AI_BOTS.length,
++    rulesCount,
++  };
++};
++
++// ================================================================
++// LEGACY EXPORTS — Synchronous local generation (kept for compatibility)
++// ================================================================
++
++export const generateOptimizedRobotsTxt = (urlStr: string): string => {
++  return fallbackGeneration(urlStr).content;
+ };
+ 
+ export const parseCurrentRobotsTxt = (url: string): string => {
+-  // We simulate what a "standard" unoptimized file looks like based on platform
+   const platform = detectPlatform(url);
+-  
++
+   let content = `User-agent: *\n`;
+-  
++
+   if (platform.name === 'WordPress') {
+     content += `Disallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n`;
+   } else if (platform.name.includes('Shopify')) {
+@@ -139,10 +247,116 @@ export const parseCurrentRobotsTxt = (url: string): string => {
+   }
+ 
+   content += `\nSitemap: ${url}/sitemap.xml`;
+-  
++
+   return content;
+ };
+ 
+ export const getDetectedPlatformName = (url: string): string => {
+-    return detectPlatform(url).name;
+-};
+\ No newline at end of file
++  return detectPlatform(url).name;
++};
++
++// ================================================================
++// MAIN EXPORT — GEMINI-POWERED GENERATION
++// ================================================================
++
++export const generateRobotsWithAI = async (urlStr: string): Promise<RobotsResult> => {
++  const apiKey = getApiKey();
++
++  if (!apiKey) {
++    console.warn("API_KEY not found, using local robots.txt generation.");
++    return fallbackGeneration(urlStr);
++  }
++
++  let hostname = urlStr;
++  let protocol = 'https';
++
++  try {
++    const urlObj = new URL(urlStr.startsWith('http') ? urlStr : `https://${urlStr}`);
++    hostname = urlObj.hostname;
++    protocol = urlObj.protocol.replace(':', '');
++  } catch (e) {
++    // Fallback
++  }
++
++  const platform = detectPlatform(urlStr);
++
++  try {
++    const ai = new GoogleGenAI({ apiKey });
++
++    const schema: Schema = {
++      type: Type.OBJECT,
++      properties: {
++        robotsTxt: { type: Type.STRING, description: "The complete robots.txt file content optimized for AEO" },
++        platformDetected: { type: Type.STRING, description: "The detected platform/CMS name" },
++        aiBotsCount: { type: Type.NUMBER, description: "Number of AI bots explicitly whitelisted" },
++        rulesCount: { type: Type.NUMBER, description: "Total number of Allow/Disallow rules" },
++      },
++      required: ["robotsTxt", "platformDetected", "aiBotsCount", "rulesCount"],
++    };
++
++    const prompt = `
++      INFORMATIONS DU SITE :
++      - URL complete : ${urlStr}
++      - Hostname : ${hostname}
++      - Protocol : ${protocol}
++      - Architecture detectee : ${platform.name}
++      - Routes sensibles identifiees : ${platform.disallow.join(', ')}
++      - Sitemaps connus : ${platform.sitemaps.map(s => `${protocol}://${hostname}${s}`).join(', ')}
++
++      BOTS IA A AUTORISER (whitelist explicite obligatoire) :
++      ${AI_BOTS.map(bot => `- ${bot.agent} : ${bot.comment}`).join('\n')}
++
++      Bots supplementaires a considerer :
++      - Bytespider : ByteDance/TikTok AI
++      - Cohere-ai : Cohere (recherche semantique)
++      - YouBot : You.com AI search engine
++      - AI2Bot : Allen Institute for AI
++      - Diffbot : Knowledge Graph builder
++
++      MISSION :
++      Genere un fichier robots.txt complet optimise pour maximiser la citabilite de ce site par les moteurs de reponse IA, tout en protegeant les routes sensibles.
++
++      Exigences :
++      1. En-tete avec date de generation, domaine et architecture detectee
++      2. PARTIE 1 : Whitelist explicite de TOUS les bots IA avec Allow: / et commentaire explicatif
++      3. PARTIE 2 : Regles generales (User-agent: * avec Allow: /)
++      4. PARTIE 3 : Protection des routes sensibles adaptees a ${platform.name}
++      5. PARTIE 4 : Declaration de tous les Sitemaps
++      6. PARTIE 5 : References aux fichiers AEO (llms.txt, llm.json) si applicable
++      7. Commentaires clairs et pedagogiques dans chaque section
++      8. Format robots.txt standard uniquement (pas de JSON, pas de Markdown)
++
++      Le champ "robotsTxt" doit contenir le contenu brut du fichier robots.txt.
++      Calcule aiBotsCount (bots IA autorises) et rulesCount (total des regles Allow/Disallow).
++    `;
++
++    const response = await ai.models.generateContent({
++      model: 'gemini-2.5-flash',
++      contents: prompt,
++      config: {
++        systemInstruction: ROBOTS_SYSTEM_PROMPT,
++        responseMimeType: 'application/json',
++        responseSchema: schema,
++        temperature: 0.2,
++      },
++    });
++
++    let output = response.text;
++    if (!output) {
++      throw new Error("Empty response from AI");
++    }
++
++    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
++    const parsed = JSON.parse(output);
++
++    return {
++      content: parsed.robotsTxt,
++      platformDetected: parsed.platformDetected,
++      aiBotsCount: parsed.aiBotsCount,
++      rulesCount: parsed.rulesCount,
++    };
++  } catch (error) {
++    console.error("Robots.txt AI generation failed:", error);
++    return fallbackGeneration(urlStr);
++  }
++};
+diff --git a/services/schema_service.ts b/services/schema_service.ts
+index d0ab225..c717c94 100644
+--- a/services/schema_service.ts
++++ b/services/schema_service.ts
+@@ -1,3 +1,17 @@
++import { GoogleGenAI, Type, Schema } from "@google/genai";
++
++// Helper to safely get env var
++const getApiKey = () => {
++  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
++    return process.env.API_KEY;
++  }
++  return null;
++};
++
++// ================================================================
++// TYPES
++// ================================================================
++
+ export interface SchemaInput {
+   name: string;
+   url: string;
+@@ -9,7 +23,83 @@ export interface SchemaInput {
+   alternateName: string;
+ }
+ 
+-export const generateJsonLd = (data: SchemaInput): string => {
++export interface SchemaResult {
++  content: string;       // Stringified JSON-LD
++  typesCount: number;    // Number of @type entries in the @graph
++  byteSize: number;      // Approximate byte size
++}
++
++// ================================================================
++// SYSTEM PROMPT — Expert AEO / Schema.org Engineering
++// ================================================================
++
++const SCHEMA_SYSTEM_PROMPT = `
++# ROLE
++Tu es un Expert Senior en Schema.org, Knowledge Graph Optimization et AEO (Answer Engine Optimization) chez CitedBy.ai.
++Tu maitrises les donnees structurees JSON-LD, les Knowledge Graphs de Google, Bing, Apple et les mecanismes d'enrichissement des reponses IA (ChatGPT, Claude, Gemini, Perplexity, AI Overviews).
++
++# MISSION
++Genere un balisage JSON-LD Schema.org complet et optimise pour maximiser :
++1. La presence dans le Knowledge Panel Google
++2. La desambiguation de l'entite pour les LLMs
++3. Les rich results (resultats enrichis) dans les SERPs
++4. La citabilite par les moteurs de reponse IA (Answer Engines)
++
++# EXPERTISE SCHEMA.ORG POUR L'AEO
++
++Les LLMs et moteurs de reponse IA exploitent activement le Schema.org pour :
++- **Identifier l'entite** : @type Organization/LocalBusiness + @id canonique = ancrage d'identite
++- **Desambiguer** : sameAs (liens reseaux sociaux, Wikidata, CrunchBase) = signaux de confirmation
++- **Verifier les faits** : contactPoint, address, foundingDate = donnees verifiables
++- **Construire le Knowledge Graph** : Les relations @id entre entites creent un graphe exploitable
++- **Generer des rich results** : SearchAction, FAQPage, BreadcrumbList = visibilite SERP
++
++# STRUCTURE DU JSON-LD
++
++Le balisage doit utiliser un @graph contenant au minimum :
++
++1. **Organization** (ou sous-type pertinent) :
++   - @id canonique (url/#organization)
++   - name, alternateName, url, description
++   - logo (ImageObject avec url, width, height)
++   - sameAs (TOUS les profils sociaux = signaux de desambiguation critiques)
++   - contactPoint (telephone, email, contactType)
++   - address (si disponible)
++   - foundingDate, numberOfEmployees (si disponible)
++
++2. **WebSite** :
++   - @id canonique (url/#website)
++   - name, url, publisher (reference @id Organization)
++   - potentialAction SearchAction (pour le sitelinks searchbox Google)
++   - inLanguage (langue du site)
++
++3. **WebPage** (page d'accueil) :
++   - @id canonique (url/#webpage)
++   - name, description, url
++   - isPartOf (reference @id WebSite)
++   - about (reference @id Organization)
++   - primaryImageOfPage (logo)
++
++4. **BreadcrumbList** (optionnel mais recommande) :
++   - Navigation structuree pour Google
++
++# REGLES
++- JSON-LD valide avec @context "https://schema.org"
++- Utiliser un @graph array pour regrouper les entites
++- Chaque entite doit avoir un @id unique et canonique
++- Les references entre entites utilisent {"@id": "..."}
++- Pas de champs vides : omets les proprietes non renseignees
++- Les URLs doivent etre absolus
++- Les descriptions doivent etre factuelles, jamais promotionnelles
++- sameAs est CRITIQUE pour l'AEO : chaque profil social = un signal de desambiguation
++- Reponds en JSON pur sans Markdown fences
++`;
++
++// ================================================================
++// FALLBACK — Local generation (existing logic preserved)
++// ================================================================
++
++const fallbackGeneration = (data: SchemaInput): SchemaResult => {
+   const schema = {
+     "@context": "https://schema.org",
+     "@graph": [
+@@ -52,5 +142,116 @@ export const generateJsonLd = (data: SchemaInput): string => {
+     ]
+   };
+ 
+-  return JSON.stringify(schema, null, 2);
+-};
+\ No newline at end of file
++  const content = JSON.stringify(schema, null, 2);
++  return {
++    content,
++    typesCount: schema["@graph"].length,
++    byteSize: new TextEncoder().encode(content).length,
++  };
++};
++
++// ================================================================
++// LEGACY EXPORT — Synchronous local generation (kept for compatibility)
++// ================================================================
++
++export const generateJsonLd = (data: SchemaInput): string => {
++  return fallbackGeneration(data).content;
++};
++
++// ================================================================
++// MAIN EXPORT — GEMINI-POWERED GENERATION
++// ================================================================
++
++export const generateSchemaWithAI = async (data: SchemaInput): Promise<SchemaResult> => {
++  const apiKey = getApiKey();
++
++  if (!apiKey) {
++    console.warn("API_KEY not found, using local Schema.org generation.");
++    return fallbackGeneration(data);
++  }
++
++  try {
++    const ai = new GoogleGenAI({ apiKey });
++
++    const schema: Schema = {
++      type: Type.OBJECT,
++      properties: {
++        jsonLd: { type: Type.STRING, description: "The complete JSON-LD Schema.org markup as a stringified JSON object" },
++        typesCount: { type: Type.NUMBER, description: "Number of @type entries in the @graph array" },
++        byteSize: { type: Type.NUMBER, description: "Approximate byte size of the JSON-LD content" },
++      },
++      required: ["jsonLd", "typesCount", "byteSize"],
++    };
++
++    const socialProfilesDesc = data.socialProfiles
++      .filter(url => url.length > 0)
++      .map(url => `- ${url}`)
++      .join('\n');
++
++    const prompt = `
++      INFORMATIONS DE L'ENTITE :
++      - Nom : ${data.name}
++      ${data.alternateName ? `- Nom alternatif : ${data.alternateName}` : ''}
++      - URL : ${data.url}
++      - Description : ${data.description}
++      - Logo URL : ${data.logoUrl}
++
++      CONTACT :
++      ${data.contactEmail ? `- Email : ${data.contactEmail}` : ''}
++      ${data.contactPhone ? `- Telephone : ${data.contactPhone}` : ''}
++
++      ${socialProfilesDesc ? `PROFILS SOCIAUX (sameAs — critiques pour la desambiguation) :\n${socialProfilesDesc}` : 'PROFILS SOCIAUX : Aucun renseigne'}
++
++      MISSION :
++      Genere un balisage JSON-LD Schema.org complet et optimise pour maximiser la visibilite dans le Knowledge Graph de Google et la citabilite par les moteurs de reponse IA.
++
++      Le balisage doit inclure au minimum :
++      - Organization avec @id, name, url, logo (ImageObject), description, sameAs, contactPoint
++      - WebSite avec @id, name, url, publisher (reference Organization), potentialAction (SearchAction)
++      - WebPage pour la page d'accueil avec @id, name, url, isPartOf (WebSite), about (Organization)
++
++      Enrichis le balisage avec toutes les proprietes Schema.org pertinentes basees sur les informations fournies.
++      Assure-toi que chaque entite a un @id canonique unique et que les references entre entites sont correctes.
++
++      Le champ "jsonLd" de ta reponse doit contenir le JSON-LD complet stringify.
++      Calcule typesCount (nombre d'entites dans @graph) et byteSize (taille approximative en octets).
++    `;
++
++    const response = await ai.models.generateContent({
++      model: 'gemini-2.5-flash',
++      contents: prompt,
++      config: {
++        systemInstruction: SCHEMA_SYSTEM_PROMPT,
++        responseMimeType: 'application/json',
++        responseSchema: schema,
++        temperature: 0.2,
++      },
++    });
++
++    let output = response.text;
++    if (!output) {
++      throw new Error("Empty response from AI");
++    }
++
++    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
++    const parsed = JSON.parse(output);
++
++    // Try to pretty-print the inner JSON if it was stringified
++    let content = parsed.jsonLd;
++    try {
++      const innerJson = JSON.parse(content);
++      content = JSON.stringify(innerJson, null, 2);
++    } catch {
++      // Already a string or not valid JSON, keep as-is
++    }
++
++    return {
++      content,
++      typesCount: parsed.typesCount,
++      byteSize: parsed.byteSize,
++    };
++  } catch (error) {
++    console.error("Schema.org AI generation failed:", error);
++    return fallbackGeneration(data);
++  }
++};

@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Phase 1: Create services/content_writer.ts",
+  "description": "Create the AI Content Writer B2B service with 8 content type prompts, 9 vertical contexts, generateContent function with GoogleGenAI + fallback pattern.",
+  "activeForm": "Creating content writer service",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

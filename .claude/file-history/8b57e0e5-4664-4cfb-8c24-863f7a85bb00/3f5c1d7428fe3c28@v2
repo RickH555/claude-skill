@@ -1,0 +1,102 @@
+export interface SchemaInput {
+  name: string;
+  url: string;
+  logoUrl: string;
+  description: string;
+  socialProfiles: string[];
+  contactPhone: string;
+  contactEmail: string;
+  alternateName: string;
+}
+
+export const generateJsonLd = (data: SchemaInput): string => {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${data.url}/#organization`,
+        "name": data.name,
+        "url": data.url,
+        "logo": {
+          "@type": "ImageObject",
+          "url": data.logoUrl
+        },
+        "description": data.description,
+        "alternateName": data.alternateName || undefined,
+        "sameAs": data.socialProfiles.filter(url => url.length > 0),
+        "contactPoint": (data.contactPhone || data.contactEmail) ? {
+          "@type": "ContactPoint",
+          "telephone": data.contactPhone || undefined,
+          "email": data.contactEmail || undefined,
+          "contactType": "customer service"
+        } : undefined
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${data.url}/#website`,
+        "url": data.url,
+        "name": data.name,
+        "publisher": {
+          "@id": `${data.url}/#organization`
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": `${data.url}/search?q={search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  };
+
+  return JSON.stringify(schema, null, 2);
+};
+
+export async function generateSchemaWithAI(
+  data: SchemaInput
+): Promise<{ content: string }> {
+  const apiKey = typeof process !== 'undefined' && process.env?.GEMINI_API_KEY
+    ? process.env.GEMINI_API_KEY
+    : (typeof window !== 'undefined' && ((window as unknown as Record<string, Record<string, string>>).__ENV__?.GEMINI_API_KEY)) || null;
+
+  if (!apiKey) {
+    return { content: generateJsonLd(data) };
+  }
+
+  try {
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey });
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: `Tu es un expert en Schema.org et SEO structuré. Génère un JSON-LD complet et optimisé pour l'organisation suivante :
+
+- Nom : ${data.name}
+- URL : ${data.url}
+- Logo : ${data.logoUrl}
+- Description : ${data.description}
+- Nom alternatif : ${data.alternateName || 'N/A'}
+- Profils sociaux : ${data.socialProfiles.filter(u => u).join(', ') || 'Aucun'}
+- Téléphone : ${data.contactPhone || 'N/A'}
+- Email : ${data.contactEmail || 'N/A'}
+
+Inclus un @graph avec :
+1. Organization (avec logo, sameAs, contactPoint)
+2. WebSite (avec SearchAction)
+3. BreadcrumbList basique
+
+Le JSON-LD doit être valide, prêt à copier dans une balise <script type="application/ld+json">.
+Réponds UNIQUEMENT avec le JSON, sans backticks ni explication.`,
+    });
+
+    const text = response.text || '';
+    const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    JSON.parse(clean); // validate
+    return { content: clean };
+  } catch {
+    return { content: generateJsonLd(data) };
+  }
+}

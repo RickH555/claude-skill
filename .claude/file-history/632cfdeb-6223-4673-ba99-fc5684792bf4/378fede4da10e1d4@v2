@@ -1,0 +1,79 @@
+/**
+ * Google Search Console Integration Service
+ *
+ * Provides the scaffold for GSC data fetching.
+ * In production, this would use Google OAuth2 + Search Console API.
+ * Currently returns mock data to demonstrate the integration UX.
+ */
+
+export interface GSCMetric {
+  query: string
+  clicks: number
+  impressions: number
+  ctr: number
+  position: number
+}
+
+export interface GSCPageMetric {
+  page: string
+  clicks: number
+  impressions: number
+  ctr: number
+  position: number
+}
+
+export interface GSCCorrelation {
+  query: string
+  gscPosition: number
+  aeoScore: number
+  aiCitations: number
+  correlation: "strong" | "moderate" | "weak"
+}
+
+export interface GSCOverview {
+  totalClicks: number
+  totalImpressions: number
+  averageCTR: number
+  averagePosition: number
+  topQueries: GSCMetric[]
+  topPages: GSCPageMetric[]
+  aeoCorrelations: GSCCorrelation[]
+}
+
+// Mock data simulating GSC API responses
+export async function fetchGSCOverview(domain: string): Promise<GSCOverview> {
+  // Simulate API call delay
+  await new Promise((r) => setTimeout(r, 500))
+
+  return {
+    totalClicks: 12450,
+    totalImpressions: 345000,
+    averageCTR: 3.6,
+    averagePosition: 8.2,
+    topQueries: [
+      { query: "meilleur outil AEO", clicks: 890, impressions: 12000, ctr: 7.4, position: 3.2 },
+      { query: "answer engine optimization", clicks: 650, impressions: 18000, ctr: 3.6, position: 5.1 },
+      { query: "optimiser visibilite ChatGPT", clicks: 420, impressions: 8500, ctr: 4.9, position: 4.7 },
+      { query: "etre cite par les IA", clicks: 380, impressions: 6200, ctr: 6.1, position: 2.8 },
+      { query: "monitoring reputation IA", clicks: 290, impressions: 5100, ctr: 5.7, position: 6.3 },
+      { query: "AEO vs SEO", clicks: 245, impressions: 9800, ctr: 2.5, position: 7.1 },
+      { query: "schema.org pour IA", clicks: 210, impressions: 4300, ctr: 4.9, position: 5.5 },
+      { query: "comment etre reference par Perplexity", clicks: 185, impressions: 3800, ctr: 4.9, position: 4.2 },
+    ],
+    topPages: [
+      { page: "/blog/guide-aeo-complet", clicks: 3200, impressions: 85000, ctr: 3.8, position: 6.1 },
+      { page: "/", clicks: 2800, impressions: 45000, ctr: 6.2, position: 3.4 },
+      { page: "/features/monitoring", clicks: 1900, impressions: 32000, ctr: 5.9, position: 4.8 },
+      { page: "/blog/chatgpt-citations", clicks: 1500, impressions: 28000, ctr: 5.4, position: 5.2 },
+      { page: "/pricing", clicks: 1200, impressions: 22000, ctr: 5.5, position: 7.3 },
+    ],
+    aeoCorrelations: [
+      { query: "meilleur outil AEO", gscPosition: 3.2, aeoScore: 87, aiCitations: 8, correlation: "strong" },
+      { query: "answer engine optimization", gscPosition: 5.1, aeoScore: 72, aiCitations: 5, correlation: "strong" },
+      { query: "optimiser visibilite ChatGPT", gscPosition: 4.7, aeoScore: 68, aiCitations: 4, correlation: "moderate" },
+      { query: "etre cite par les IA", gscPosition: 2.8, aeoScore: 91, aiCitations: 12, correlation: "strong" },
+      { query: "monitoring reputation IA", gscPosition: 6.3, aeoScore: 55, aiCitations: 2, correlation: "moderate" },
+      { query: "AEO vs SEO", gscPosition: 7.1, aeoScore: 45, aiCitations: 1, correlation: "weak" },
+    ],
+  }
+}

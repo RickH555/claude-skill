@@ -1,0 +1,203 @@
+import { createClient } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ResponseChart } from '@/components/surveys/response-chart';
+import { ClipboardList, ExternalLink, MessageSquare, Copy } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
+import type { Survey, SurveyResponse } from '@/types';
+
+export default async function SurveyDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: survey } = await supabase
+    .from('surveys')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (!survey) notFound();
+
+  const typedSurvey = survey as Survey;
+
+  const { data: responses } = await supabase
+    .from('survey_responses')
+    .select('*')
+    .eq('survey_id', id)
+    .order('created_at', { ascending: false });
+
+  const typedResponses = (responses || []) as SurveyResponse[];
+  const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/s/${id}`;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-4">
+          <div className="rounded-lg bg-purple-50 dark:bg-purple-950 p-3">
+            <ClipboardList className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">{typedSurvey.title}</h1>
+            <p className="text-sm text-muted-foreground">
+              {typedSurvey.questions.length} questions · {typedSurvey.response_count} responses
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant={typedSurvey.status === 'active' ? 'default' : 'secondary'}>
+            {typedSurvey.status}
+          </Badge>
+          {typedSurvey.status === 'active' && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={publicUrl} target="_blank">
+                <ExternalLink className="h-4 w-4 mr-1" />
+                Preview
+              </Link>
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Share URL */}
+      {typedSurvey.status === 'active' && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 bg-muted rounded-md px-3 py-2 text-sm font-mono truncate">
+                {publicUrl}
+              </div>
+              <Button variant="outline" size="sm">
+                <Copy className="h-4 w-4 mr-1" />
+                Copy
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Tabs defaultValue="responses">
+        <TabsList>
+          <TabsTrigger value="responses">
+            <MessageSquare className="h-4 w-4 mr-1" />
+            Responses ({typedResponses.length})
+          </TabsTrigger>
+          <TabsTrigger value="charts">Charts</TabsTrigger>
+          <TabsTrigger value="analysis">AI Analysis</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="responses" className="space-y-4 mt-4">
+          {typedResponses.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <MessageSquare className="mx-auto h-8 w-8 mb-2 opacity-50" />
+              <p className="text-sm">No responses yet</p>
+              <p className="text-xs mt-1">Share the survey link to start collecting responses</p>
+            </div>
+          ) : (
+            typedResponses.map((response) => (
+              <Card key={response.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(response.created_at), { addSuffix: true })}
+                    </p>
+                    {response.respondent_email && (
+                      <p className="text-xs text-muted-foreground">{response.respondent_email}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {typedSurvey.questions.map((q) => (
+                      <div key={q.id} className="text-sm">
+                        <p className="font-medium">{q.text}</p>
+                        <p className="text-muted-foreground">
+                          {response.answers[q.id] !== undefined
+                            ? Array.isArray(response.answers[q.id])
+                              ? (response.answers[q.id] as string[]).join(', ')
+                              : String(response.answers[q.id])
+                            : 'No answer'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="charts" className="mt-4">
+          {typedResponses.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-sm">Collect responses to see charts</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {typedSurvey.questions.map((q) => (
+                <ResponseChart
+                  key={q.id}
+                  question={q}
+                  answers={typedResponses
+                    .map((r) => r.answers[q.id])
+                    .filter((a) => a !== undefined && a !== null)}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="analysis" className="mt-4">
+          <AnalysisTab surveyId={id} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// Client component for analysis tab
+async function AnalysisTab({ surveyId }: { surveyId: string }) {
+  const supabase = await createClient();
+  
+  const { data: analysis } = await supabase
+    .from('analyses')
+    .select('*')
+    .eq('survey_id', surveyId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!analysis) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground mb-4">No analysis yet</p>
+        <AnalyzeButton surveyId={surveyId} />
+      </div>
+    );
+  }
+
+  // Import and use AnalysisReport dynamically to use the component
+  const { AnalysisReport } = await import('@/components/surveys/analysis-report');
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <AnalyzeButton surveyId={surveyId} label="Re-analyze" />
+      </div>
+      <AnalysisReport results={analysis.results} />
+    </div>
+  );
+}
+
+// Simple client button for triggering analysis
+function AnalyzeButton({ surveyId, label = 'Run AI Analysis' }: { surveyId: string; label?: string }) {
+  return (
+    <form action={`/api/surveys/${surveyId}/analyze`} method="POST">
+      <Button type="submit">{label}</Button>
+    </form>
+  );
+}

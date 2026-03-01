@@ -1,0 +1,68 @@
+// components/layout/AppShell.tsx
+// Layout 2 niveaux — TopNav (7 sections) + Sidebar contextuelle + Contenu
+
+import React from 'react';
+import TopNav from './TopNav';
+import Sidebar from './Sidebar';
+
+interface AppShellProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+  activePage: string;
+  onPageChange: (page: string) => void;
+  credits: number;
+  plan: string;
+  user: { name: string; email: string } | null;
+  onOpenCommandPalette?: () => void;
+  onLogoClick?: () => void;
+  children: React.ReactNode;
+}
+
+export default function AppShell({
+  activeSection,
+  onSectionChange,
+  activePage,
+  onPageChange,
+  credits,
+  plan,
+  user,
+  onOpenCommandPalette,
+  onLogoClick,
+  children,
+}: AppShellProps) {
+  // La sidebar est visible pour TOUTES les sections SAUF dashboard
+  const hasSidebar = activeSection !== 'dashboard';
+
+  return (
+    <div className="min-h-screen bg-[var(--bg-base)]">
+
+      {/* BARRE HORIZONTALE — toujours visible, toujours en haut */}
+      <TopNav
+        activeSection={activeSection}
+        onSectionChange={onSectionChange}
+        credits={credits}
+        user={user}
+        onOpenCommandPalette={onOpenCommandPalette}
+        onLogoClick={onLogoClick}
+      />
+
+      {/* SIDEBAR — visible sauf sur Dashboard (mobile: overlay hamburger) */}
+      <Sidebar
+        section={activeSection}
+        activePage={activePage}
+        onPageChange={onPageChange}
+        onSectionChange={onSectionChange}
+        credits={credits}
+        plan={plan}
+        onLogoClick={onLogoClick}
+      />
+
+      {/* CONTENU PRINCIPAL */}
+      <main className={`pt-0 md:pt-14 ${hasSidebar ? 'md:pl-60' : ''} min-h-screen transition-[padding] duration-200`}>
+        <div className="p-6 md:p-8 h-screen md:h-[calc(100vh-56px)] overflow-y-auto">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}

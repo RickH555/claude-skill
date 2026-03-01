@@ -1,0 +1,584 @@
+import React, { useState } from 'react';
+import { 
+  ArrowLeft, Share2, DollarSign, Users, TrendingUp, 
+  Copy, Check, Download, CreditCard, ChevronRight, 
+  ExternalLink, Wallet, BarChart3, PieChart, ArrowUpRight,
+  Mail, Linkedin, Twitter, Image as ImageIcon, X
+} from 'lucide-react';
+import { User } from '../types';
+
+interface AffiliationProps {
+  onBack: () => void;
+  user: User | null;
+}
+
+// Mock Data pour les statistiques
+const AFFILIATE_STATS = {
+  totalEarned: 1450.50,
+  pendingCommission: 320.00,
+  clicks: 1240,
+  conversions: 18,
+  conversionRate: 1.45,
+  nextPayoutDate: '01/05/2024'
+};
+
+// Mock Data pour la base de données des filleuls (Clients affiliés)
+const REFERRALS = [
+  { id: 'REF-001', name: 'StartUp Alpha', plan: 'Agency', commission: 59.80, status: 'active', date: '12/03/2024', history: '3 paiements' },
+  { id: 'REF-002', name: 'Jean Michel SEO', plan: 'Pro', commission: 17.80, status: 'active', date: '15/03/2024', history: '2 paiements' },
+  { id: 'REF-003', name: 'E-com Growth', plan: 'Starter', commission: 0, status: 'trial', date: '02/04/2024', history: 'En essai' },
+  { id: 'REF-004', name: 'Agency One', plan: 'Agency', commission: 59.80, status: 'active', date: '20/02/2024', history: '4 paiements' },
+  { id: 'REF-005', name: 'Freelance WP', plan: 'Pro', commission: 17.80, status: 'churned', date: '10/01/2024', history: 'Arrêté' },
+];
+
+// Mock Data pour l'historique des paiements
+const PAYOUTS = [
+  { id: 'PAY-892', date: '01/04/2024', amount: 450.00, status: 'paid', method: 'PayPal' },
+  { id: 'PAY-756', date: '01/03/2024', amount: 380.50, status: 'paid', method: 'PayPal' },
+  { id: 'PAY-621', date: '01/02/2024', amount: 620.00, status: 'paid', method: 'Virement' },
+];
+
+const Affiliation: React.FC<AffiliationProps> = ({ onBack, user }) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'referrals' | 'payouts'>('overview');
+  const [copied, setCopied] = useState(false);
+  const [isRequestingPayout, setIsRequestingPayout] = useState(false);
+  
+  // Marketing Modal State
+  const [showMarketingModal, setShowMarketingModal] = useState(false);
+  const [marketingTab, setMarketingTab] = useState<'email' | 'social' | 'banners'>('email');
+  const [copiedResource, setCopiedResource] = useState<string | null>(null);
+
+  const affiliateLink = `https://citedby.ai?ref=${user?.name.replace(/\s+/g, '').toLowerCase() || 'partner'}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(affiliateLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyResource = (content: string, id: string) => {
+    const textToCopy = content.replace('[LIEN_AFFILIE]', affiliateLink);
+    navigator.clipboard.writeText(textToCopy);
+    setCopiedResource(id);
+    setTimeout(() => setCopiedResource(null), 2000);
+  };
+
+  const handleRequestPayout = () => {
+    setIsRequestingPayout(true);
+    // Simulation
+    setTimeout(() => {
+        setIsRequestingPayout(false);
+        alert("Demande de paiement envoyée avec succès !");
+    }, 1500);
+  };
+
+  // Contenu Marketing
+  const MARKETING_ASSETS = {
+    emails: [
+        {
+            id: 'email_1',
+            title: "Approche Stratégique (Décideurs)",
+            subject: "Optimisation AEO : Votre visibilité sur ChatGPT et Gemini",
+            body: `Bonjour,\n\nL'écosystème de la recherche en ligne évolue. Avec l'adoption massive d'outils comme ChatGPT ou Perplexity, une part croissante du trafic ne provient plus de listes de résultats, mais de réponses générées directement par l'IA.\n\nC'est l'ère de l'AEO (Answer Engine Optimization).\n\nPour une entreprise, l'enjeu est désormais d'être citée comme la source de référence par ces modèles.\n\nJe vous recommande d'analyser votre \"visibilité générative\" via la plateforme CitedBy.ai. Elle permet de :\n1. Comprendre comment les algorithmes perçoivent votre marque.\n2. Structurer vos données pour influencer les réponses (Knowledge Graph).\n3. Sécuriser votre autorité digitale face aux hallucinations.\n\nVous pouvez réaliser un audit préliminaire via ce lien : [LIEN_AFFILIE]\n\nCordialement,`
+        },
+        {
+            id: 'email_2',
+            title: "Approche Technique / Agence",
+            subject: "Nouveau levier de croissance : L'optimisation pour les Moteurs de Réponse",
+            body: `Bonjour,\n\nLes comportements de recherche changent. Vos clients ne cherchent plus seulement des liens bleus, ils attendent des réponses immédiates et synthétisées fournies par des IA.\n\nL'AEO (Answer Engine Optimization) devient le complément indispensable du SEO technique. Il ne s'agit plus de positionner des mots-clés, mais de valider des entités et des faits auprès des Large Language Models (LLMs).\n\nCitedBy.ai est la première solution dédiée à cette problématique. Elle offre les outils nécessaires pour auditer et corriger la \"perte de signal\" sémantique entre un site web et les IA génératives.\n\nJe vous invite à découvrir cette approche méthodologique et à tester la solution ici : [LIEN_AFFILIE]\n\nBien à vous,`
+        }
+    ],
+    social: [
+        {
+            id: 'linkedin_1',
+            platform: 'LinkedIn',
+            content: `🤖 Google n'est plus le seul shérif en ville.\n\nAvec la montée de ChatGPT Search et Perplexity, l'objectif n'est plus d'être en 1ère position, mais d'être la RÉPONSE UNIQUE.\n\nJ'ai audité mon site avec CitedBy.ai pour voir si mon entité était bien reconnue par les LLMs. Résultat surprenant ! 😅\n\nL'AEO (Answer Engine Optimization) est le nouveau SEO.\n\nTestez votre score de visibilité gratuitement 👉 [LIEN_AFFILIE]\n\n#AEO #SEO #MarketingDigital #AI #ChatGPT`
+        },
+        {
+            id: 'twitter_1',
+            platform: 'Twitter / X',
+            content: `Le SEO en 2024, ce n'est plus des mots-clés, c'est des entités et du contexte. 🧠\n\nSi ChatGPT ne sait pas qui vous êtes, vous n'existez pas dans le futur du search.\n\nAnalysez votre visibilité IA avec CitedBy : [LIEN_AFFILIE] \n\n#AEO #Tech #Marketing`
+        }
+    ],
+    banners: [
+        { id: 'ban_1', size: '1080x1080', name: 'Instagram/LinkedIn Carré', color: 'bg-primary' },
+        { id: 'ban_2', size: '1200x628', name: 'Facebook/Twitter Link', color: 'bg-[#111111]' },
+        { id: 'ban_3', size: '300x600', name: 'Sidebar Blog', color: 'bg-white' }
+    ]
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8 animate-in fade-in duration-500 min-h-screen relative">
+      
+      {/* MARKETING RESOURCES MODAL */}
+      {showMarketingModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowMarketingModal(false)}></div>
+            <div className="relative bg-[#111111] border border-white/10 rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="p-6 border-b border-white/10 flex items-center justify-between bg-purple-500/5">
+                    <h3 className="text-xl font-sans font-bold text-white flex items-center gap-2">
+                        <Share2 size={24} className="text-primary" /> Kit Média & Ressources
+                    </h3>
+                    <button onClick={() => setShowMarketingModal(false)} className="p-2 hover:bg-purple-500/10 rounded-lg text-gray-400 hover:text-white transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
+                
+                <div className="flex border-b border-white/10 bg-black/20 px-6">
+                    <button onClick={() => setMarketingTab('email')} className={`py-4 px-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${marketingTab === 'email' ? 'border-primary text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>
+                        <Mail size={16} /> Emailing
+                    </button>
+                    <button onClick={() => setMarketingTab('social')} className={`py-4 px-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${marketingTab === 'social' ? 'border-primary text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>
+                        <Linkedin size={16} /> Réseaux Sociaux
+                    </button>
+                    <button onClick={() => setMarketingTab('banners')} className={`py-4 px-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${marketingTab === 'banners' ? 'border-primary text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}>
+                        <ImageIcon size={16} /> Bannières
+                    </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-8 bg-black custom-scrollbar">
+                    {marketingTab === 'email' && (
+                        <div className="space-y-8">
+                            {MARKETING_ASSETS.emails.map((email) => (
+                                <div key={email.id} className="ninja-card p-6 rounded-xl border border-white/10">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <span className="text-xs font-bold text-primary uppercase tracking-wider mb-1 block">{email.title}</span>
+                                            <h4 className="font-bold text-white text-lg">Objet : {email.subject}</h4>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleCopyResource(`Objet: ${email.subject}\n\n${email.body}`, email.id)}
+                                            className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/5 hover:bg-purple-500/10 border border-white/10 rounded-lg text-xs font-bold text-white transition-colors"
+                                        >
+                                            {copiedResource === email.id ? <Check size={14} className="text-purple-300" /> : <Copy size={14} />}
+                                            {copiedResource === email.id ? 'Copié' : 'Copier tout'}
+                                        </button>
+                                    </div>
+                                    <div className="bg-black/40 p-4 rounded-lg border border-white/5 font-mono text-sm text-gray-300 whitespace-pre-wrap">
+                                        {email.body}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {marketingTab === 'social' && (
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {MARKETING_ASSETS.social.map((post) => (
+                                <div key={post.id} className="ninja-card p-6 rounded-xl border border-white/10 h-full flex flex-col">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div className="flex items-center gap-2">
+                                            {post.platform.includes('LinkedIn') ? <Linkedin size={18} className="text-blue-400"/> : <Twitter size={18} className="text-white"/>}
+                                            <span className="font-bold text-white text-sm">{post.platform}</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleCopyResource(post.content, post.id)}
+                                            className="text-xs bg-purple-500/5 hover:bg-purple-500/10 px-2 py-1 rounded text-gray-300 transition-colors border border-white/10"
+                                        >
+                                            {copiedResource === post.id ? 'Copié !' : 'Copier'}
+                                        </button>
+                                    </div>
+                                    <div className="bg-white p-4 rounded-lg text-black text-sm flex-1 whitespace-pre-wrap font-sans border border-gray-200">
+                                        {post.content}
+                                        <div className="mt-4 h-32 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">
+                                            [Image ou Lien Preview]
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {marketingTab === 'banners' && (
+                        <div className="space-y-6">
+                            <p className="text-sm text-gray-400">Cliquez pour télécharger les visuels haute définition.</p>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {MARKETING_ASSETS.banners.map((ban) => (
+                                    <div key={ban.id} className="group cursor-pointer">
+                                        <div className={`aspect-video rounded-xl border border-white/10 flex flex-col items-center justify-center relative overflow-hidden transition-all group-hover:border-primary/50 ${ban.color}`}>
+                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
+                                            <div className="relative z-10 text-center">
+                                                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-black font-sans font-bold text-2xl mx-auto mb-2 shadow-lg">C</div>
+                                                <span className="text-white font-bold text-xl drop-shadow-md">CitedBy.ai</span>
+                                            </div>
+                                            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="bg-black/80 p-2 rounded-full text-white">
+                                                    <Download size={16} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="mt-2 flex justify-between items-center px-1">
+                                            <span className="text-sm font-bold text-white">{ban.name}</span>
+                                            <span className="text-xs text-gray-500">{ban.size} px</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* HEADER */}
+      <button onClick={onBack} className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors group">
+        <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" /> 
+        Retour au Dashboard
+      </button>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+        <div>
+          <h1 className="text-3xl font-sans font-bold text-white mb-2 flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-pink-400 border border-pink-500/30">
+              <Share2 size={22} />
+            </div>
+            Programme Partenaire
+          </h1>
+          <p className="text-gray-400">Recommandez CitedBy.ai et gagnez 20% de commission récurrente à vie.</p>
+        </div>
+        
+        {/* Affiliate Link Card */}
+        <div className="ninja-card p-1.5 rounded-xl flex items-center gap-2 w-full md:w-auto shadow-lg">
+            <div className="px-3 py-2 text-sm text-gray-300 font-mono truncate max-w-[200px] md:max-w-xs">
+                {affiliateLink}
+            </div>
+            <button 
+                onClick={handleCopy}
+                className="btn-gradient px-4 py-2 text-sm transition-colors flex items-center gap-2"
+            >
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? 'Copié' : 'Copier'}
+            </button>
+        </div>
+      </div>
+
+      {/* KPI CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="ninja-card p-6 rounded-xl border border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Wallet size={64} />
+            </div>
+            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">Commissions Totales</p>
+            <h3 className="text-3xl font-bold text-white">{AFFILIATE_STATS.totalEarned.toFixed(2)} €</h3>
+            <p className="text-xs text-purple-300 mt-2 flex items-center gap-1">
+                <ArrowUpRight size={12} /> +12% ce mois-ci
+            </p>
+        </div>
+
+        <div className="ninja-card p-6 rounded-xl border border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <DollarSign size={64} />
+            </div>
+            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">En attente</p>
+            <h3 className="text-3xl font-bold text-white">{AFFILIATE_STATS.pendingCommission.toFixed(2)} €</h3>
+            <p className="text-xs text-gray-500 mt-2">
+                Prochain virement le {AFFILIATE_STATS.nextPayoutDate}
+            </p>
+        </div>
+
+        <div className="ninja-card p-6 rounded-xl border border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Users size={64} />
+            </div>
+            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">Filleuls Actifs</p>
+            <h3 className="text-3xl font-bold text-white">{AFFILIATE_STATS.conversions}</h3>
+            <p className="text-xs text-gray-500 mt-2">
+                Sur {AFFILIATE_STATS.clicks} clics uniques
+            </p>
+        </div>
+
+        <div className="ninja-card p-6 rounded-xl border border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <PieChart size={64} />
+            </div>
+            <p className="text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">Taux de Conversion</p>
+            <h3 className="text-3xl font-bold text-white">{AFFILIATE_STATS.conversionRate}%</h3>
+            <p className="text-xs text-purple-300 mt-2 flex items-center gap-1">
+                Excellent (Moyenne 1.1%)
+            </p>
+        </div>
+      </div>
+
+      {/* TABS NAVIGATION */}
+      <div className="flex items-center gap-6 mb-8 border-b border-white/10">
+        <button 
+            onClick={() => setActiveTab('overview')}
+            className={`pb-4 px-2 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'overview' ? 'border-primary text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+        >
+            <BarChart3 size={16} /> Vue d'ensemble
+        </button>
+        <button 
+            onClick={() => setActiveTab('referrals')}
+            className={`pb-4 px-2 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'referrals' ? 'border-primary text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+        >
+            <Users size={16} /> Mes Filleuls
+        </button>
+        <button 
+            onClick={() => setActiveTab('payouts')}
+            className={`pb-4 px-2 text-sm font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'payouts' ? 'border-primary text-white' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+        >
+            <CreditCard size={16} /> Paiements
+        </button>
+      </div>
+
+      {/* TAB CONTENTS */}
+      
+      {/* 1. OVERVIEW */}
+      {activeTab === 'overview' && (
+        <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4">
+            <div className="lg:col-span-2">
+                <div className="ninja-card p-6 rounded-xl border border-white/10 mb-8">
+                    <h3 className="font-bold text-white mb-6">Performance (30 jours)</h3>
+                    {/* Fake Chart Bars */}
+                    <div className="h-64 flex items-end justify-between gap-2">
+                        {[35, 45, 30, 60, 75, 50, 45, 65, 80, 70, 90, 85].map((h, i) => (
+                            <div key={i} className="w-full bg-purple-500/5 rounded-t-lg relative group">
+                                <div 
+                                    className="absolute bottom-0 left-0 right-0 bg-primary/20 group-hover:bg-primary/40 transition-colors rounded-t-lg"
+                                    style={{ height: `${h}%` }}
+                                ></div>
+                                <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded border border-white/10 whitespace-nowrap transition-opacity">
+                                    {h} clics
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-4 px-2">
+                        <span>01 Avr</span>
+                        <span>15 Avr</span>
+                        <span>30 Avr</span>
+                    </div>
+                </div>
+
+                <div className="ninja-card p-6 rounded-xl border border-white/10">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-bold text-white">Dernières conversions</h3>
+                        <button onClick={() => setActiveTab('referrals')} className="text-xs text-primary hover:underline">Tout voir</button>
+                    </div>
+                    <div className="space-y-4">
+                        {REFERRALS.slice(0, 3).map((ref) => (
+                            <div key={ref.id} className="flex items-center justify-between p-3 bg-purple-500/5 rounded-lg border border-white/5">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-black flex items-center justify-center font-bold text-xs text-white">
+                                        {ref.name.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-sm text-white">{ref.name}</p>
+                                        <p className="text-xs text-gray-500">Plan {ref.plan}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-bold text-purple-300">+{ref.commission} €</p>
+                                    <p className="text-[10px] text-gray-500">{ref.date}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-6">
+                <div className="bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-xl border border-primary/20">
+                    <h3 className="font-bold text-white mb-2">Ressources Marketing</h3>
+                    <p className="text-sm text-gray-400 mb-6">Utilisez nos bannières et kits emails pour maximiser vos conversions.</p>
+                    <button 
+                        onClick={() => setShowMarketingModal(true)}
+                        className="w-full py-3 bg-purple-500/10 hover:bg-purple-500/20 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-sm border border-white/10"
+                    >
+                        <Download size={16} /> Ouvrir le Kit Média
+                    </button>
+                </div>
+
+                <div className="ninja-card p-6 rounded-xl border border-white/10">
+                    <h3 className="font-bold text-white mb-4">Niveaux de commission</h3>
+                    <div className="space-y-4 relative">
+                        <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-white/10"></div>
+                        
+                        <div className="relative pl-8">
+                            <div className="absolute left-0 top-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-black z-10">
+                                <Check size={12} />
+                            </div>
+                            <p className="text-sm font-bold text-white">Bronze (20%)</p>
+                            <p className="text-xs text-gray-500">Actuel • Jusqu'à 50 filleuls</p>
+                        </div>
+
+                        <div className="relative pl-8 opacity-50">
+                            <div className="absolute left-0 top-1 w-6 h-6 bg-black rounded-full flex items-center justify-center text-gray-500 text-xs font-bold border-2 border-white/10 z-10">
+                                2
+                            </div>
+                            <p className="text-sm font-bold text-white">Silver (25%)</p>
+                            <p className="text-xs text-gray-500">À partir de 51 filleuls</p>
+                        </div>
+
+                        <div className="relative pl-8 opacity-50">
+                            <div className="absolute left-0 top-1 w-6 h-6 bg-black rounded-full flex items-center justify-center text-gray-500 text-xs font-bold border-2 border-white/10 z-10">
+                                3
+                            </div>
+                            <p className="text-sm font-bold text-white">Gold (30%)</p>
+                            <p className="text-xs text-gray-500">À partir de 150 filleuls</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* 2. REFERRALS (CLIENT DATABASE) */}
+      {activeTab === 'referrals' && (
+        <div className="animate-in fade-in slide-in-from-right-4">
+            <div className="ninja-card rounded-xl border border-white/10 overflow-hidden">
+                <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                    <h3 className="font-bold text-white">Base de données filleuls</h3>
+                    <button className="text-xs bg-purple-500/5 hover:bg-purple-500/10 px-3 py-1.5 rounded-lg text-gray-300 transition-colors border border-white/10 flex items-center gap-2">
+                        <Download size={14} /> Exporter CSV
+                    </button>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-[#111111] text-xs text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-4 font-medium">Filleul</th>
+                                <th className="px-6 py-4 font-medium">Plan</th>
+                                <th className="px-6 py-4 font-medium">Date Inscription</th>
+                                <th className="px-6 py-4 font-medium">Statut</th>
+                                <th className="px-6 py-4 font-medium">Historique</th>
+                                <th className="px-6 py-4 font-medium text-right">Commission (Mois)</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {REFERRALS.map((ref) => (
+                                <tr key={ref.id} className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-purple-500/5 flex items-center justify-center font-bold text-xs text-gray-300">
+                                                {ref.name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-white">{ref.name}</p>
+                                                <p className="text-xs text-gray-500">{ref.id}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`text-xs px-2 py-1 rounded border ${
+                                            ref.plan === 'Agency' ? 'bg-purple-500/10 border-purple-500/20 text-purple-400' :
+                                            ref.plan === 'Pro' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
+                                            'bg-gray-500/10 border-gray-500/20 text-gray-400'
+                                        }`}>
+                                            {ref.plan}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-400">{ref.date}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${
+                                                ref.status === 'active' ? 'bg-purple-400' :
+                                                ref.status === 'trial' ? 'bg-purple-500' : 'bg-red-500'
+                                            }`}></div>
+                                            <span className="text-sm text-gray-300 capitalize">{ref.status === 'trial' ? 'Essai' : ref.status}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-400">{ref.history}</td>
+                                    <td className="px-6 py-4 text-right font-bold text-purple-300">
+                                        {ref.commission > 0 ? `+${ref.commission.toFixed(2)} €` : '-'}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+      )}
+
+      {/* 3. PAYOUTS */}
+      {activeTab === 'payouts' && (
+        <div className="grid md:grid-cols-12 gap-8 animate-in fade-in slide-in-from-right-4">
+            <div className="md:col-span-4 space-y-6">
+                <div className="ninja-card p-6 rounded-xl border border-white/10 bg-gradient-to-b from-primary/5 to-transparent">
+                    <h3 className="font-bold text-white mb-2">Solde disponible</h3>
+                    <div className="text-4xl font-sans font-bold text-white mb-6">{AFFILIATE_STATS.pendingCommission.toFixed(2)} €</div>
+                    
+                    <button 
+                        onClick={handleRequestPayout}
+                        disabled={AFFILIATE_STATS.pendingCommission < 50 || isRequestingPayout}
+                        className="w-full btn-gradient py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isRequestingPayout ? 'Traitement...' : 'Demander le virement'}
+                    </button>
+                    <p className="text-xs text-gray-500 mt-3 text-center">
+                        Minimum de retrait : 50.00 €
+                    </p>
+                </div>
+
+                <div className="ninja-card p-6 rounded-xl border border-white/10">
+                    <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                        <CreditCard size={18} className="text-gray-400" /> Mode de paiement
+                    </h3>
+                    <div className="flex items-center justify-between p-3 bg-purple-500/5 rounded-lg border border-white/10 mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-6 bg-white rounded flex items-center justify-center">
+                                <span className="text-[10px] font-bold text-blue-800">PayPal</span>
+                            </div>
+                            <span className="text-sm text-gray-300">user@email.com</span>
+                        </div>
+                        <button className="text-xs text-primary hover:underline">Modifier</button>
+                    </div>
+                    <button className="w-full py-2 bg-purple-500/5 hover:bg-purple-500/10 text-gray-300 text-sm font-medium rounded-lg transition-colors border border-white/10">
+                        Ajouter un compte bancaire (IBAN)
+                    </button>
+                </div>
+            </div>
+
+            <div className="md:col-span-8">
+                <div className="ninja-card rounded-xl border border-white/10 overflow-hidden">
+                    <div className="p-6 border-b border-white/10">
+                        <h3 className="font-bold text-white">Historique des versements</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-[#111111] text-xs text-gray-500 uppercase tracking-wider">
+                                    <th className="px-6 py-4 font-medium">Référence</th>
+                                    <th className="px-6 py-4 font-medium">Date</th>
+                                    <th className="px-6 py-4 font-medium">Méthode</th>
+                                    <th className="px-6 py-4 font-medium">Statut</th>
+                                    <th className="px-6 py-4 font-medium text-right">Montant</th>
+                                    <th className="px-6 py-4 font-medium text-right">Reçu</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {PAYOUTS.map((pay) => (
+                                    <tr key={pay.id} className="hover:bg-white/[0.02] transition-colors">
+                                        <td className="px-6 py-4 text-sm text-gray-300 font-mono">{pay.id}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-400">{pay.date}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-300">{pay.method}</td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-400/10 text-purple-300 border border-purple-400/20">
+                                                <Check size={10} /> Payé
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right text-sm font-bold text-white">
+                                            {pay.amount.toFixed(2)} €
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button className="p-1.5 hover:bg-purple-500/10 rounded text-gray-500 hover:text-white transition-colors">
+                                                <ExternalLink size={14} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default Affiliation;

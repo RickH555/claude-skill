@@ -1,0 +1,99 @@
+import { describe, it, expect } from "vitest"
+import { calculateAiVisibilityScore } from "@/lib/scoring"
+
+describe("calculateAiVisibilityScore", () => {
+  const baseContext = {
+    answer: "",
+    brandName: "CitedBy",
+    domain: "citedby.ai",
+    services: ["monitoring AEO", "content optimization"],
+    competitors: ["Semrush", "Ahrefs"],
+  }
+
+  it("returns score 0 and type none for empty answer", () => {
+    const result = calculateAiVisibilityScore({ ...baseContext, answer: "" })
+    expect(result.score).toBe(0)
+    expect(result.resultType).toBe("none")
+    expect(result.details.brandMention).toBe(false)
+    expect(result.details.urlMention).toBe(false)
+  })
+
+  it("detects brand mention and adds 20 points", () => {
+    const result = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "CitedBy est un outil utile pour le monitoring.",
+    })
+    expect(result.details.brandMention).toBe(true)
+    expect(result.resultType).toBe("mention")
+    expect(result.score).toBeGreaterThanOrEqual(20)
+  })
+
+  it("detects URL citation and adds 30+10 points", () => {
+    const result = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "Visitez citedby.ai pour plus d'informations sur le monitoring AEO.",
+    })
+    expect(result.details.urlMention).toBe(true)
+    expect(result.resultType).toBe("citation")
+    expect(result.score).toBeGreaterThanOrEqual(40)
+  })
+
+  it("detects service mentions and adds 15 points", () => {
+    const result = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "Les outils de monitoring AEO sont essentiels pour le SEO moderne.",
+    })
+    expect(result.details.serviceMention).toBe(true)
+  })
+
+  it("applies competitor penalty", () => {
+    const withCompetitor = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "Semrush est un bon outil de SEO qui propose de nombreuses fonctionnalites.",
+    })
+    const withoutCompetitor = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "Cet outil de SEO propose de nombreuses fonctionnalites.",
+    })
+    expect(withCompetitor.details.competitorMention).toBe(true)
+    expect(withCompetitor.score).toBeLessThan(withoutCompetitor.score + 10)
+  })
+
+  it("scores higher with brand + URL + services combined", () => {
+    const fullCitation = calculateAiVisibilityScore({
+      ...baseContext,
+      answer:
+        "CitedBy (citedby.ai) est la reference en monitoring AEO. " +
+        "Leur plateforme de content optimization permet de suivre la visibilite.",
+    })
+    const partialMention = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "CitedBy est un outil utile.",
+    })
+    expect(fullCitation.score).toBeGreaterThan(partialMention.score)
+    expect(fullCitation.resultType).toBe("citation")
+  })
+
+  it("clamps score between 0 and 100", () => {
+    const result = calculateAiVisibilityScore({
+      ...baseContext,
+      answer:
+        "CitedBy citedby.ai monitoring AEO content optimization " +
+        "a".repeat(5000),
+    })
+    expect(result.score).toBeLessThanOrEqual(100)
+    expect(result.score).toBeGreaterThanOrEqual(0)
+  })
+
+  it("is case insensitive", () => {
+    const lower = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "citedby est un outil citedby.ai",
+    })
+    const upper = calculateAiVisibilityScore({
+      ...baseContext,
+      answer: "CITEDBY est un outil CITEDBY.AI",
+    })
+    expect(lower.score).toBe(upper.score)
+  })
+})

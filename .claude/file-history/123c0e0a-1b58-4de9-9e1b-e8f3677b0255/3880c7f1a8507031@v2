@@ -1,0 +1,157 @@
+import React from 'react';
+import {
+  Home as HomeIcon, Search, LayoutDashboard, Activity, Sparkles,
+  BookOpen, Fuel, Share2, Users, FileText, Bell, UserCircle, BarChart3,
+  Link2, Code2
+} from 'lucide-react';
+import { useTranslation } from '../i18n';
+
+interface SidebarProps {
+  currentView: string;
+  navigateTo: (view: string) => void;
+  isSidebarCollapsed: boolean;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (v: boolean) => void;
+}
+
+const NavItem = ({ view, label, icon: Icon, onClick, active, collapsed, currentView, navigateTo }: {
+  view?: string;
+  label: string;
+  icon: React.ElementType;
+  onClick?: () => void;
+  active?: boolean;
+  collapsed?: boolean;
+  currentView: string;
+  navigateTo: (view: string) => void;
+}) => {
+  const handleClick = onClick ? onClick : () => view && navigateTo(view);
+  const isActive = active !== undefined ? active : (view && currentView === view);
+
+  if (collapsed) {
+    return (
+      <div className="relative group">
+        <button
+          onClick={handleClick}
+          className={`w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-200 ${
+            isActive
+              ? 'bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-900/30'
+              : 'text-gray-400 hover:text-white hover:bg-white/[0.06]'
+          }`}
+        >
+          <Icon size={18} className={isActive ? "text-white" : "text-gray-500 group-hover:text-gray-300"} />
+        </button>
+        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-[#1a1d21] border border-white/[0.1] rounded-lg shadow-xl text-xs font-medium text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50">
+          {label}
+          <div className="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[5px] border-r-[#1a1d21]" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`relative w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13.5px] transition-all duration-200 group font-sans overflow-hidden ${
+        isActive
+          ? 'bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold shadow-lg shadow-purple-900/30'
+          : 'text-gray-400 hover:text-white hover:bg-white/[0.06] font-medium'
+      }`}
+    >
+      {/* Animated active indicator bar */}
+      <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full bg-white transition-all duration-300 ${isActive ? 'h-5 opacity-100' : 'h-0 opacity-0'}`} />
+      <Icon size={17} className={`shrink-0 ${isActive ? "text-white" : "text-gray-500 group-hover:text-gray-300"}`} />
+      <span className="truncate transition-opacity duration-200">{label}</span>
+    </button>
+  );
+};
+
+const Sidebar: React.FC<SidebarProps> = ({
+  currentView,
+  navigateTo,
+  isSidebarCollapsed,
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
+}) => {
+  const { t } = useTranslation();
+
+  const navItemProps = { currentView, navigateTo };
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      <div
+        className={`md:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      {/* Mobile sidebar */}
+      <aside
+        id="mobile-sidebar-menu"
+        className={`md:hidden fixed top-0 left-0 bottom-0 z-50 w-[84%] max-w-[320px] bg-[#0e0e18] border-r border-white/[0.08] shadow-2xl shadow-black/50 transform transition-transform duration-300 ease-out ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="h-full flex flex-col pt-20 pb-6 px-4 overflow-y-auto">
+          <div className="bg-[#13131d]/80 border border-white/[0.06] rounded-2xl p-3 space-y-1">
+            <NavItem label={t.nav.home} icon={HomeIcon} view="home" {...navItemProps} />
+            <NavItem label={t.nav.newAudit} icon={Search} view="analyze" {...navItemProps} />
+            <NavItem label={t.nav.dashboard} icon={LayoutDashboard} view="dashboard" {...navItemProps} />
+            <NavItem label={t.nav.monitoringAEO} icon={Activity} view="projects" active={['projects', 'results'].includes(currentView)} {...navItemProps} />
+            <NavItem label={t.nav.generativeTools} icon={Sparkles} view="generative-tools" active={['generative-tools', 'smc-studio', 'source-of-truth', 'schema-org', 'robots-txt', 'content-writer', 'reputation', 'bot-tracking', 'blog-optimizer', 'ai-response-layer', 'llms-txt', 'answer-first-audit', 'ai-citation-simulator', 'eeat-builder'].includes(currentView)} {...navItemProps} />
+            <NavItem label={t.nav.indexedDirectory} icon={BookOpen} view="directory" active={['directory', 'directory-entity'].includes(currentView)} {...navItemProps} />
+            <NavItem label="API Developer" icon={Code2} view="api-developer" {...navItemProps} />
+            <NavItem label="Intégrations" icon={Link2} view="integrations" {...navItemProps} />
+            <NavItem label={t.nav.gtoGas} icon={Fuel} view="recharge" {...navItemProps} />
+            <NavItem label={t.nav.affiliation} icon={Share2} view="affiliation" {...navItemProps} />
+            <NavItem label={t.nav.baseClients} icon={Users} view="clients" {...navItemProps} />
+            <NavItem label={t.nav.missionOrders} icon={FileText} view="mission-orders" {...navItemProps} />
+            <NavItem label={t.nav.alertsAEO} icon={Bell} view="alerts" {...navItemProps} />
+
+            <div className="my-4 border-t border-white/[0.08] mx-4"></div>
+
+            <NavItem label={t.nav.accountPlan} icon={UserCircle} view="account" {...navItemProps} />
+          </div>
+        </div>
+      </aside>
+
+      {/* Desktop sidebar */}
+      <aside className={`hidden md:flex flex-col py-4 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto shrink-0 transition-[width,padding] duration-300 ease-in-out ${
+        isSidebarCollapsed ? 'w-[68px] px-2' : 'w-64 px-3'
+      }`}>
+        <div className={`bg-[#13131d]/80 border border-white/[0.06] rounded-2xl shadow-lg overflow-y-auto custom-scrollbar ${
+          isSidebarCollapsed ? 'p-1.5 space-y-0.5' : 'p-3 space-y-1'
+        }`}>
+           {/* PRINCIPAL */}
+           {!isSidebarCollapsed && <div className="px-4 pt-2 pb-1.5"><span className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Principal</span></div>}
+           {isSidebarCollapsed && <div className="my-1" />}
+           <NavItem label={t.nav.home} icon={HomeIcon} view="home" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.newAudit} icon={Search} view="analyze" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.dashboard} icon={LayoutDashboard} view="dashboard" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label="Monitoring IA" icon={BarChart3} view="ai-monitoring" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.monitoringAEO} icon={Activity} view="projects" active={['projects', 'results'].includes(currentView)} collapsed={isSidebarCollapsed} {...navItemProps} />
+
+           {/* OUTILS */}
+           {!isSidebarCollapsed && <div className="px-4 pt-5 pb-1.5"><span className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Outils</span></div>}
+           {isSidebarCollapsed && <div className="my-2 mx-3 border-t border-white/[0.06]" />}
+           <NavItem label={t.nav.generativeTools} icon={Sparkles} view="generative-tools" active={['generative-tools', 'smc-studio', 'source-of-truth', 'schema-org', 'robots-txt', 'content-writer', 'reputation', 'bot-tracking', 'blog-optimizer', 'ai-response-layer', 'llms-txt', 'answer-first-audit', 'ai-citation-simulator', 'eeat-builder'].includes(currentView)} collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.indexedDirectory} icon={BookOpen} view="directory" active={['directory', 'directory-entity'].includes(currentView)} collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label="API Developer" icon={Code2} view="api-developer" collapsed={isSidebarCollapsed} {...navItemProps} />
+
+           {/* GESTION */}
+           {!isSidebarCollapsed && <div className="px-4 pt-5 pb-1.5"><span className="text-[10px] font-bold text-gray-600 uppercase tracking-wider">Gestion</span></div>}
+           {isSidebarCollapsed && <div className="my-2 mx-3 border-t border-white/[0.06]" />}
+           <NavItem label="Intégrations" icon={Link2} view="integrations" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.gtoGas} icon={Fuel} view="recharge" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.affiliation} icon={Share2} view="affiliation" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.baseClients} icon={Users} view="clients" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.missionOrders} icon={FileText} view="mission-orders" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.alertsAEO} icon={Bell} view="alerts" collapsed={isSidebarCollapsed} {...navItemProps} />
+           <NavItem label={t.nav.accountPlan} icon={UserCircle} view="account" collapsed={isSidebarCollapsed} {...navItemProps} />
+        </div>
+      </aside>
+    </>
+  );
+};
+
+export default Sidebar;

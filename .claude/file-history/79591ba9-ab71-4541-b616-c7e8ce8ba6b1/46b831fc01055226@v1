@@ -1,0 +1,37 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+
+function LoginPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-gray-900">CitedBy.ai</h1>
+        <p className="mt-2 text-gray-600">Connexion</p>
+      </div>
+    </div>
+  )
+}
+
+function AppPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-gray-900">CitedBy.ai</h1>
+        <p className="mt-2 text-gray-600">Tableau de bord</p>
+      </div>
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/app" element={<AppPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App

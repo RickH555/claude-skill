@@ -1,0 +1,9 @@
+{
+  "id": "22",
+  "subject": "Verify dev server starts and commit",
+  "description": "Run pnpm dev to verify everything compiles without errors, then commit all changes with a descriptive message",
+  "activeForm": "Verifying dev server and committing",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

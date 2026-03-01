@@ -1,0 +1,99 @@
+import { useState } from 'react';
+import { CREDIT_PACKS } from '../../lib/constants';
+import { isSupabaseConfigured, supabase } from '../../lib/supabase';
+import { formatCurrency } from '../../utils/format';
+
+interface CreditPacksProps {
+  userId: string;
+}
+
+/**
+ * Vente de packs de credits en paiement one-shot.
+ */
+export const CreditPacks = ({ userId }: CreditPacksProps): JSX.Element => {
+  const [loadingPackId, setLoadingPackId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Lance un checkout Stripe pour un pack de credits.
+   */
+  const buyPack = async (packId: string): Promise<void> => {
+    if (!isSupabaseConfigured) {
+      setError('Mode demo: achat de credits indisponible sans configuration Supabase.');
+      return;
+    }
+    try {
+      setLoadingPackId(packId);
+      setError(null);
+      const { data, error: invokeError } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          user_id: userId,
+          pack_id: packId,
+        },
+      });
+      if (invokeError) {
+        throw invokeError;
+      }
+      const checkoutUrl = String((data as { url?: string } | null)?.url ?? '');
+      if (!checkoutUrl) {
+        throw new Error('URL checkout manquante');
+      }
+      if (!checkoutUrl.startsWith('https://checkout.stripe.com/')) {
+        throw new Error('URL de checkout invalide');
+      }
+      window.location.href = checkoutUrl;
+    } catch (caughtError) {
+      const message = caughtError instanceof Error ? caughtError.message : 'Achat credits impossible';
+      setError(message);
+    } finally {
+      setLoadingPackId(null);
+    }
+  };
+
+  return (
+    <section className="space-y-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {CREDIT_PACKS.map((pack) => {
+          const totalCredits = pack.credits + pack.bonusCredits;
+          return (
+            <article
+              key={pack.id}
+              className={`rounded-xl border p-4 ${
+                pack.highlight ? 'border-emerald-500/50 bg-emerald-500/8' : 'border-leadradar-border bg-[#0F172A]'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <h4 className="font-outfit text-lg font-semibold">{pack.label}</h4>
+                {pack.bonusCredits > 0 ? (
+                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] text-emerald-300">
+                    +{pack.bonusCredits} bonus
+                  </span>
+                ) : null}
+              </div>
+              <p className="mt-1 text-sm text-slate-300">{formatCurrency(pack.priceEur)}</p>
+              <p className="mt-2 text-2xl font-bold text-emerald-300">{totalCredits} credits</p>
+              <p className="text-xs text-slate-400">
+                Base: {pack.credits}
+                {pack.bonusCredits > 0 ? ` + Bonus: ${pack.bonusCredits}` : ''}
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                Cout par credit: {formatCurrency(pack.priceEur / totalCredits)}
+              </p>
+              <button
+                type="button"
+                disabled={loadingPackId !== null}
+                onClick={() => {
+                  void buyPack(pack.id);
+                }}
+                className="mt-4 w-full rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-emerald-950 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loadingPackId === pack.id ? 'Chargement...' : 'Acheter ce pack'}
+              </button>
+            </article>
+          );
+        })}
+      </div>
+      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+    </section>
+  );
+};

@@ -1,0 +1,36 @@
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { ThemeProvider } from '@/lib/theme-context';
+import { Toaster } from 'sonner';
+import './globals.css';
+
+const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
+
+export const metadata: Metadata = {
+  title: 'RoyallAzz — Plateforme de fidélité digitale',
+  description: 'Créez et gérez vos programmes de fidélité avec QR codes, points et récompenses.',
+  manifest: '/manifest.json',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="fr" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider>
+          {children}
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+                color: 'var(--text-primary)',
+              },
+            }}
+          />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

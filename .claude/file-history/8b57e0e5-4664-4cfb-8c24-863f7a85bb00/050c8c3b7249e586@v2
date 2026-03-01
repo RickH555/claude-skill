@@ -1,0 +1,134 @@
+// Client-side wrappers for AI API routes
+// Pages import from @/lib/api-client instead of @/services/* for AI generation calls
+
+async function post(endpoint: string, body: Record<string, any>) {
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(err.error || `API error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.result;
+}
+
+// Generator
+export const apiGenerateSolution = (recommendation: any, url: string) =>
+  post('/api/ai/generate', { action: 'solution', recommendation, url });
+
+export const apiGenerateBlogArchitecture = (topic: string, url: string) =>
+  post('/api/ai/generate', { action: 'blogArchitecture', topic, url });
+
+export const apiGenerateFullArticle = (briefContent: string, topic: string) =>
+  post('/api/ai/generate', { action: 'fullArticle', briefContent, topic });
+
+// Mega generator
+export const apiMegaGenerate = (url: string) =>
+  post('/api/ai/mega-generate', { url });
+
+// Solution mega generator
+export const apiGenerateAllSolutions = (url: string, pageTitle: string, pageContent: string, failedCriteria: any[], detectedProducts: any[], detectedBrand: string, language: string) =>
+  post('/api/ai/solution-mega', { url, pageTitle, pageContent, failedCriteria, detectedProducts, detectedBrand, language });
+
+// SMC
+export const apiSmcGenerateFiche = (productName: string, features: string) =>
+  post('/api/ai/smc', { action: 'fiche', productName, features });
+
+export const apiSmcGenerateFAQ = (topic: string, context: string) =>
+  post('/api/ai/smc', { action: 'faq', topic, context });
+
+export const apiSmcGenerateBrief = (topic: string, url: string) =>
+  post('/api/ai/smc', { action: 'brief', topic, url });
+
+export const apiSmcGenerateFullArticle = (briefContent: string, topic: string) =>
+  post('/api/ai/smc', { action: 'fullArticle', briefContent, topic });
+
+// Content Writer
+export const apiGenerateContent = (input: any) =>
+  post('/api/ai/content-writer', { input });
+
+// Schema.org
+export const apiGenerateJsonLd = (data: any) =>
+  post('/api/ai/schema-org', { action: 'generate', data });
+
+export const apiGenerateSchemaWithAI = (data: any) =>
+  post('/api/ai/schema-org', { action: 'generateWithAI', data });
+
+// Robots.txt
+export const apiGenerateRobotsTxt = (url: string) =>
+  post('/api/ai/robots-txt', { action: 'generate', url });
+
+export const apiGenerateRobotsWithAI = (url: string) =>
+  post('/api/ai/robots-txt', { action: 'generateWithAI', url });
+
+// llms.txt
+export const apiGenerateLlmsTxt = (config: any) =>
+  post('/api/ai/llms-txt', { config });
+
+// llm.json
+export const apiGenerateLlmJson = (config: any) =>
+  post('/api/ai/llm-json', { config });
+
+// Reputation
+export const apiScanReputation = (input: any, locale?: string) =>
+  post('/api/ai/reputation', { action: 'scan', input, locale });
+
+export const apiGenerateReputationResponse = (alert: any, brandName: string, locale?: string) =>
+  post('/api/ai/reputation', { action: 'generateResponse', alert, brandName, locale });
+
+// Citation Simulator
+export const apiSimulateCitation = (query: string, brandName: string, brandUrl: string, industry: string) =>
+  post('/api/ai/citation-simulator', { query, brandName, brandUrl, industry });
+
+// Answer First Audit
+export const apiAuditAnswerFirst = (url: string, brandName?: string) =>
+  post('/api/ai/answer-first', { url, brandName });
+
+// AI Monitoring
+export const apiRunMonitoringScan = (brandName: string, url: string, period?: string) =>
+  post('/api/ai/monitoring', { brandName, url, period });
+
+// E-E-A-T
+export const apiEeatGenerateAuthorBio = (params: any) =>
+  post('/api/ai/eeat', { action: 'authorBio', ...params });
+
+export const apiEeatGenerateAboutPage = (params: any) =>
+  post('/api/ai/eeat', { action: 'aboutPage', ...params });
+
+export const apiEeatGenerateTrustSignals = (params: any) =>
+  post('/api/ai/eeat', { action: 'trustSignals', ...params });
+
+export const apiEeatGenerateCredentials = (params: any) =>
+  post('/api/ai/eeat', { action: 'credentials', ...params });
+
+export const apiEeatGenerateCitationBlock = (params: any) =>
+  post('/api/ai/eeat', { action: 'citationBlock', ...params });
+
+export const apiEeatAudit = (url: string, brandName?: string) =>
+  post('/api/ai/eeat', { action: 'audit', url, brandName });
+
+// AI Response Layer
+export const apiGenerateHub = (params: any) =>
+  post('/api/ai/response-layer', { action: 'hub', ...params });
+
+export const apiGenerateQueryPage = (params: any) =>
+  post('/api/ai/response-layer', { action: 'queryPage', ...params });
+
+export const apiGenerateRecommendJson = (params: any) =>
+  post('/api/ai/response-layer', { action: 'recommendJson', ...params });
+
+export const apiGenerateSitemapAi = (params: any) =>
+  post('/api/ai/response-layer', { action: 'sitemapAi', ...params });
+
+// V3 Citations
+export const apiRunCitationChecks = (queries: any[], config: any) =>
+  post('/api/ai/v3/citation', { action: 'check', queries, config });
+
+export const apiAggregateCitationRates = (checks: any[]) =>
+  post('/api/ai/v3/citation', { action: 'aggregate', checks });
+
+export const apiGenerateTrackedQueries = (niche: string, country: string, brandName: string, language: string) =>
+  post('/api/ai/v3/query-gen', { niche, country, brandName, language });

@@ -1,0 +1,210 @@
+// ================================================================
+// AI RESPONSE LAYER — Query Page Generator (/ai/query/[slug].html)
+// ================================================================
+
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { SiteConfig, QueryPageConfig, QueryPageOutput } from '../../types/ai-response-layer';
+import { QUERY_PAGE_SYSTEM_PROMPT } from './prompts';
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackQuerySimulation = async (config: SiteConfig, query: QueryPageConfig): Promise<QueryPageOutput> => {
+  await new Promise(resolve => setTimeout(resolve, 2500));
+
+  const today = new Date().toISOString().split('T')[0];
+  const faqHtml = query.faqItems.map(faq => `
+      <details>
+        <summary>${faq.question}</summary>
+        <p>${faq.answer}</p>
+      </details>`).join('\n');
+
+  const faqSchema = query.faqItems.map(faq => `{
+          "@type": "Question",
+          "name": "${faq.question.replace(/"/g, '\\"')}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "${faq.answer.replace(/"/g, '\\"')}"
+          }
+        }`).join(',\n        ');
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${query.targetQuestion} — ${config.name}</title>
+  <meta name="description" content="${query.answerBox}">
+  <meta name="robots" content="index, follow, max-snippet:-1">
+  <link rel="canonical" href="${config.url}/ai/query/${query.slug}.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        ${faqSchema}
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "${query.targetQuestion}",
+    "description": "${query.answerBox.replace(/"/g, '\\"')}",
+    "publisher": {
+      "@type": "${config.entity}",
+      "name": "${config.name}",
+      "url": "${config.url}"
+    },
+    "datePublished": "${today}",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "${config.url}" },
+        { "@type": "ListItem", "position": 2, "name": "AI Hub", "item": "${config.url}/ai/index.html" },
+        { "@type": "ListItem", "position": 3, "name": "${query.targetQuestion}" }
+      ]
+    }
+  }
+  </script>
+  <style>
+    :root { --bg: #0e0e18; --card: #13131d; --border: rgba(255,255,255,0.06); --purple: #a855f7; --text: #e5e7eb; --muted: #9ca3af; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; line-height: 1.7; }
+    .container { max-width: 800px; margin: 0 auto; padding: 3rem 1.5rem; }
+    .breadcrumb { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .breadcrumb a { color: var(--purple); text-decoration: none; }
+    h1 { font-size: 2rem; color: white; margin-bottom: 1rem; }
+    .answer-box { background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(124,58,237,0.05)); border: 1px solid rgba(168,85,247,0.2); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; font-size: 1.05rem; line-height: 1.8; }
+    .badge { display: inline-block; background: rgba(168,85,247,0.15); color: var(--purple); font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 999px; font-weight: 700; text-transform: uppercase; margin-bottom: 1rem; }
+    .keywords { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+    .keyword { background: var(--card); border: 1px solid var(--border); padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.8rem; color: var(--muted); }
+    details { background: var(--card); border: 1px solid var(--border); border-radius: 0.75rem; margin-bottom: 0.75rem; }
+    summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; color: white; }
+    summary:hover { color: var(--purple); }
+    details p { padding: 0 1.25rem 1rem; color: var(--muted); }
+    .cta { display: inline-block; background: linear-gradient(135deg, #a855f7, #7c3aed); color: white; padding: 0.75rem 2rem; border-radius: 0.75rem; text-decoration: none; font-weight: 600; margin-top: 1.5rem; transition: transform 0.2s; }
+    .cta:hover { transform: translateY(-2px); text-decoration: none; }
+    footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; }
+    a { color: var(--purple); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <nav class="breadcrumb">
+      <a href="${config.url}">Accueil</a> › <a href="/ai/index.html">AI Hub</a> › ${query.targetQuestion}
+    </nav>
+
+    <span class="badge">${query.type}</span>
+    <h1>${query.targetQuestion}</h1>
+
+    <div class="answer-box">
+      <p><strong>${query.answerBox}</strong></p>
+    </div>
+
+    <div class="keywords">
+      ${query.targetKeywords.map(kw => `<span class="keyword">${kw}</span>`).join('\n      ')}
+    </div>
+
+    <section style="margin-top:2rem">
+      <h2 style="color:white; margin-bottom:1rem;">Questions Complémentaires</h2>
+      ${faqHtml}
+    </section>
+
+    <a href="${query.cta.url}" class="cta">${query.cta.label}</a>
+
+    <footer>
+      <p><a href="/ai/index.html">← Retour au AI Hub</a></p>
+      <p style="margin-top:0.5rem">Généré par <a href="https://citedby.ai">CitedBy.ai</a></p>
+    </footer>
+  </main>
+</body>
+</html>`;
+
+  return {
+    html,
+    slug: query.slug,
+    title: `${query.targetQuestion} — ${config.name}`,
+    description: query.answerBox,
+    schemaMarkup: 'FAQPage + WebPage + BreadcrumbList (intégré)',
+  };
+};
+
+export const generateQueryPage = async (config: SiteConfig, query: QueryPageConfig): Promise<QueryPageOutput> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn("API_KEY not found, using query page simulation.");
+    return fallbackQuerySimulation(config, query);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        html: { type: Type.STRING, description: "Le HTML complet de la query page" },
+        slug: { type: Type.STRING, description: "Le slug URL" },
+        title: { type: Type.STRING, description: "Le titre de la page" },
+        description: { type: Type.STRING, description: "La meta description" },
+        schemaMarkup: { type: Type.STRING, description: "Description des Schema.org utilisés" },
+      },
+      required: ["html", "slug", "title", "description", "schemaMarkup"],
+    };
+
+    const prompt = `Génère une Query Page /ai/query/${query.slug}.html pour :
+
+SITE : ${config.name} (${config.url})
+ENTITÉ : ${config.entity}
+
+QUESTION CIBLE : ${query.targetQuestion}
+TYPE : ${query.type}
+MOTS-CLÉS : ${query.targetKeywords.join(', ')}
+RÉPONSE DIRECTE : ${query.answerBox}
+
+FAQ :
+${query.faqItems.map(f => `Q: ${f.question}\nR: ${f.answer}`).join('\n\n')}
+
+CTA : "${query.cta.label}" → ${query.cta.url}
+
+La page doit :
+1. Commencer par la réponse directe (Answer-First, dans les 100 premiers mots)
+2. Inclure la FAQ en <details>/<summary>
+3. Schema.org : FAQPage + WebPage + BreadcrumbList
+4. Fil d'Ariane : Accueil > AI Hub > [Question]
+5. Design dark theme professionnel autonome`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: QUERY_PAGE_SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.3,
+      }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response from AI");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    return {
+      html: parsed.html,
+      slug: parsed.slug || query.slug,
+      title: parsed.title,
+      description: parsed.description,
+      schemaMarkup: parsed.schemaMarkup,
+    };
+  } catch (error) {
+    console.error("Query page generation failed:", error);
+    return fallbackQuerySimulation(config, query);
+  }
+};

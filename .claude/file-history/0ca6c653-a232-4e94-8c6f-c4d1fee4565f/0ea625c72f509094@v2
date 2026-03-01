@@ -1,0 +1,112 @@
+import { z } from 'zod';
+
+export const waitlistSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  name: z.string().min(1, 'Name is required').max(100),
+  company: z.string().max(200).optional(),
+  source: z.enum(['direct', 'producthunt', 'twitter', 'linkedin', 'hackernews', 'reddit']).default('direct'),
+});
+
+export type WaitlistFormData = z.infer<typeof waitlistSchema>;
+
+export interface WaitlistResponse {
+  success: boolean;
+  signupNumber?: number;
+  foundingTier?: 'top100' | 'top500' | null;
+  error?: string;
+}
+
+const WAITLIST_STORAGE_KEY = 'citedby_waitlist';
+
+function getLocalWaitlist(): WaitlistFormData[] {
+  try {
+    return JSON.parse(localStorage.getItem(WAITLIST_STORAGE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export async function joinWaitlist(data: WaitlistFormData): Promise<WaitlistResponse> {
+  const parsed = waitlistSchema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.errors[0].message };
+  }
+
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/waitlist_subscribers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify({
+          email: parsed.data.email,
+          name: parsed.data.name,
+          company: parsed.data.company || null,
+          source: parsed.data.source,
+        }),
+      });
+
+      if (response.status === 409) {
+        return { success: false, error: 'This email is already on the waitlist!' };
+      }
+
+      if (!response.ok) {
+        throw new Error(`Supabase error: ${response.status}`);
+      }
+
+      const [result] = await response.json();
+      return {
+        success: true,
+        signupNumber: result.signup_number,
+        foundingTier: result.founding_tier,
+      };
+    } catch (err) {
+      console.warn('Supabase waitlist failed, using localStorage fallback:', err);
+    }
+  }
+
+  const list = getLocalWaitlist();
+  if (list.some(e => e.email === parsed.data.email)) {
+    return { success: false, error: 'This email is already on the waitlist!' };
+  }
+  list.push(parsed.data);
+  localStorage.setItem(WAITLIST_STORAGE_KEY, JSON.stringify(list));
+  const number = list.length;
+  return {
+    success: true,
+    signupNumber: number,
+    foundingTier: number <= 100 ? 'top100' : number <= 500 ? 'top500' : null,
+  };
+}
+
+export async function getWaitlistCount(): Promise<number> {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/get_waitlist_count`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+      });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch {
+      // fall through to localStorage
+    }
+  }
+
+  return getLocalWaitlist().length;
+}

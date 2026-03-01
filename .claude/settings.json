@@ -1,0 +1,407 @@
+{
+  "cleanupPeriodDays": 30,
+  "env": {
+    "BASH_DEFAULT_TIMEOUT_MS": "60000",
+    "BASH_MAX_OUTPUT_LENGTH": "20000",
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
+    "NODE_ENV": "development"
+  },
+  "includeCoAuthoredBy": true,
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(echo:*)",
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(cd:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(findstr:*)",
+      "Bash(sort:*)",
+      "Bash(wc:*)",
+      "Bash(cp:*)",
+      "Bash(tee:*)",
+      "Bash(test:*)",
+      "Bash(timeout:*)",
+      "Bash(start:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm:*)",
+      "Bash(pip install:*)",
+      "Bash(python3:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(claude:*)",
+      "Bash(powershell:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(robocopy:*)",
+      "Bash(xcopy:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(wmic:*)",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot",
+      "mcp__puppeteer__puppeteer_evaluate",
+      "mcp__puppeteer__puppeteer_click",
+      "mcp__puppeteer__puppeteer_fill",
+      "mcp__puppeteer__puppeteer_select",
+      "mcp__puppeteer__puppeteer_hover",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__list_directory_with_sizes",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__read_text_file",
+      "mcp__filesystem__read_multiple_files",
+      "mcp__filesystem__read_media_file",
+      "mcp__filesystem__write_file",
+      "mcp__filesystem__create_directory",
+      "mcp__filesystem__search_files",
+      "mcp__filesystem__list_allowed_directories",
+      "mcp__memory__create_entities",
+      "mcp__memory__search_nodes",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(npx vite build)",
+      "Bash(npx claude-code-templates@latest:*)",
+      "Bash(gh auth status:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(start http://localhost:3000)",
+      "Bash(node -e:*)",
+      "Bash(npx --yes playwright install:*)",
+      "Bash(npx --yes playwright screenshot:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next start:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nRestore Vite SPA architecture after broken Next.js migration\n\n- Rename _legacy_pages/ back to pages/ \\(24 .tsx files restored\\)\n- Fix package.json scripts to use vite instead of next\n- Install vite and @vitejs/plugin-react as devDependencies\n- Remove tsconfig.json exclusions blocking SPA files\n- Fix JSX syntax error in Results.tsx \\(missing closing div\\)\n- Fix JSX syntax error in SchemaOrg.tsx \\(literal script tag\\)\n- Install missing jspdf and html2canvas dependencies\n- Rewrite CLAUDE.md to reflect actual Vite SPA architecture\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)",
+      "WebFetch(domain:ninjapromo.io)",
+      "Bash(fi)",
+      "Bash(for file in pages/Recharge.tsx pages/Account.tsx pages/Affiliation.tsx pages/GenerativeTools.tsx pages/SMCStudio.tsx pages/SchemaOrg.tsx pages/RobotsTxt.tsx pages/SourceOfTruth.tsx pages/ContentWriter.tsx pages/Reputation.tsx pages/BotTracking.tsx pages/ActionPlan.tsx pages/Projects.tsx pages/Directory.tsx)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(if grep -q \"ninja-card\\\\|btn-gradient\\\\|gradient-text\" \"$file\")",
+      "Bash(then echo \"UPDATED\")",
+      "Bash(else echo \"NEEDS UPDATE\")",
+      "Bash(done)",
+      "Bash(for file in components/CategoryCard.tsx components/ScoreRing.tsx)",
+      "Bash(cmd /c \"robocopy \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS X-Final-Rick-Test\"\" \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS-Backup-NinjaPromo-2026-02-12\"\" /E /XD node_modules .git dist /XF nul /NFL /NDL\")",
+      "Bash(npm view:*)",
+      "Bash(npx next build)",
+      "Bash(curl:*)",
+      "Bash(npx vitest run)",
+      "Bash(powershell.exe -NoProfile -Command \"Get-ChildItem ''C:\\\\Users\\\\User\\\\Downloads'' -Filter ''*frontend*'' | ForEach-Object { Copy-Item -LiteralPath $_FullName -Destination ''C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png'' }\")",
+      "Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*frontend*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png\"\" }')",
+      "Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*bandeau*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\bandeau-copy.png\"\" }')",
+      "Bash(wmic process where ProcessId=49720 get CommandLine,ExecutablePath:*)",
+      "Bash(wmic process:*)",
+      "Bash(npm i:*)",
+      "Bash(ngrok:*)",
+      "Bash(npm audit:*)",
+      "Bash(git checkout:*)",
+      "Bash(cd \"C:/Users/User/citedby-ai\" && rm -rf .next && npm run build 2>&1)",
+      "Bash(cd \"C:/Users/User/citedby-ai\" && git restore . 2>&1)",
+      "Bash(cd \"C:/Users/User/citedby-ai\" && rm -rf \\\\\n  \"app/\\(app\\)/analyze\" \\\\\n  \"app/\\(app\\)/citations\" \\\\\n  \"app/\\(app\\)/dashboard\" \\\\\n  \"app/\\(app\\)/history\" \\\\\n  \"app/\\(app\\)/layout.tsx\" \\\\\n  \"app/\\(app\\)/marketplace\" \\\\\n  \"app/\\(app\\)/monitoring\" \\\\\n  \"app/\\(app\\)/projects\" \\\\\n  \"app/\\(app\\)/results\" \\\\\n  \"app/\\(app\\)/settings\" \\\\\n  \"app/\\(app\\)/tools\" \\\\\n  \"app/\\(public\\)/login\" \\\\\n  \"app/api/ai\" \\\\\n  \"lib/api-client.ts\" \\\\\n  \"lib/app-context.tsx\" \\\\\n  \"lib/route-map.ts\" \\\\\n  \"lib/toast-context.tsx\" \\\\\n  \"views/\" \\\\\n  \"src/views-lr/\" \\\\\n  \"tsconfig.tsbuildinfo\" \\\\\n  \".next\" \\\\\n  2>&1)",
+      "Bash(echo done:*)",
+      "Bash(uipro:*)",
+      "Bash(cd \"C:/Users/User/citedby-ai\" && python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"SaaS AEO SEO analytics dark mode professional\" --design-system -p \"CitedBy.ai\" 2>&1 || python .claude/skills/ui-ux-pro-max/scripts/search.py \"SaaS AEO SEO analytics dark mode professional\" --design-system -p \"CitedBy.ai\" 2>&1)",
+      "Bash(cd \"C:/Users/User/citedby-ai\" && python .claude/skills/ui-ux-pro-max/scripts/search.py \"landing hero social-proof pricing\" --domain landing 2>&1)",
+      "Bash(cd /c/Users/User && python .claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism\" --domain style 2>&1)",
+      "Bash(cd /c/Users/User/citedby-ai && python .claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism\" --domain style 2>&1)",
+      "Bash(python3 skills/ui-ux-pro-max/scripts/search.py \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1 || python skills/ui-ux-pro-max/scripts/search.py \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1)",
+      "Bash(python3 \"$HOME/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1 || python \"$HOME/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1)",
+      "Bash(uipro --version 2>/dev/null || uipro-cli --version 2>/dev/null || npx uipro-cli --version 2>/dev/null)",
+      "Bash(gsd --help 2>&1 || gsd -h 2>&1 || gsd 2>&1)",
+      "Bash(gsd hello world:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm uninstall:*)",
+      "Bash(git clone:*)",
+      "Bash(npx get-shit-done-cc@latest:*)",
+      "Bash(xargs basename:*)",
+      "Bash(cd /c/Users/User && npx create-next-app@latest personal-site --typescript --tailwind --eslint --app --src-dir --no-import-alias --use-npm 2>&1)",
+      "Bash(cd /c/Users/User/personal-site && npm run lint 2>&1)",
+      "Bash(cd \"C:/Users/User/citedby-ai\" && supabase functions deploy ai-proxy --no-verify-jwt 2>&1)",
+      "Bash(cd \"C:/Users/User/citedby-ai\" && npx supabase --version 2>&1)",
+      "WebFetch(domain:next.frase.io)",
+      "WebFetch(domain:searchendurance.com)",
+      "WebFetch(domain:www.frase.io)",
+      "WebFetch(domain:selfmademillennials.com)",
+      "WebFetch(domain:www.demandsage.com)",
+      "WebFetch(domain:juliety.com)",
+      "WebFetch(domain:www.g2.com)",
+      "WebFetch(domain:help.frase.io)",
+      "Bash(npx playwright:*)",
+      "WebFetch(domain:www.stan.store)",
+      "WebFetch(domain:www.hopp.co)",
+      "WebFetch(domain:help.stan.store)",
+      "WebFetch(domain:whop.com)",
+      "Bash(cd \"C:/Users/User/stan-io\" && ./node_modules/.bin/tsc --noEmit --pretty -- pages/Dashboard.tsx pages/AllProducts.tsx pages/DigitalProducts.tsx pages/Courses.tsx pages/MyStore.tsx 2>&1)",
+      "Bash(echo CCPM_LIST_NOT_AVAILABLE:*)",
+      "Bash(npx supabase --version 2>&1 || supabase --version 2>&1)",
+      "Bash(npx supabase:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=sbp_8d1963f9205da08d0a34d689ecff258c387f93c9 npx supabase:*)",
+      "Bash(cd /c/Users/User/nexus-ai && VERCEL_TOKEN=vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB npx vercel whoami --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && npx vercel --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB --yes 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && npx vercel --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production --value \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvYXhjeGxubmtyZXp3d2tmcGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODcyNzQsImV4cCI6MjA4NzM2MzI3NH0.nFsrjQFumprdTe8bIqNrJSeXBNYj8dGin4uXslEGON8\" --yes --scope \"$SCOPE\" 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add SUPABASE_SERVICE_ROLE_KEY production --value \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvYXhjeGxubmtyZXp3d2tmcGhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTc4NzI3NCwiZXhwIjoyMDg3MzYzMjc0fQ.qWVAYZ7xfCzqFQAkRgCArO0gq0wiWYlcVuigCCc-1jI\" --yes --scope \"$SCOPE\" 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add STRIPE_SECRET_KEY production --value \"sk_test_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add STRIPE_WEBHOOK_SECRET production --value \"whsec_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY production --value \"pk_test_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add OPENAI_API_KEY production --value \"sk-placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_APP_URL production --value \"https://nexus-ai-silk-six.vercel.app\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_APP_NAME production --value \"NexusAI\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add RESEND_API_KEY production --value \"re_placeholder\" --yes --scope \"$SCOPE\" 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add STRIPE_WEBHOOK_SECRET production --value \"whsec_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY production --value \"pk_test_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add OPENAI_API_KEY production --value \"sk-placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_APP_URL production --value \"https://nexus-ai-silk-six.vercel.app\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_APP_NAME production --value \"NexusAI\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add RESEND_API_KEY production --value \"re_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env ls --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel --prod --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "WebFetch(domain:nexus-ai-silk-six.vercel.app)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env rm OPENAI_API_KEY production --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add OPENAI_API_KEY production --value \"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\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)",
+      "Bash(echo === SURVEY ===:*)",
+      "Bash(echo === Anon SELECT active surveys ===:*)",
+      "Bash(grep Type error\\\\|error TS:*)",
+      "Bash(mkdir -p /c/Users/User/nexus-ai/test-docs/scan && cd /c/Users/User/nexus-ai && node test-docs/scan-clicks.mjs 2>&1)",
+      "Bash(pnpm --version 2>/dev/null && node --version 2>/dev/null && npm --version 2>/dev/null)",
+      "Bash(cd /c/Users/User/loyalty-app/apps && npx create-expo-app@latest mobile --template tabs 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo install expo-camera expo-location expo-localization expo-notifications expo-secure-store react-native-url-polyfill 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest init -d 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest add button card input label table dialog tabs badge select textarea toast 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest add button card input label table dialog tabs badge select textarea sonner 2>&1)",
+      "Bash(echo FOUND: $f:*)",
+      "Bash(cd \"C:/Users/User/loyalty-app/apps/mobile\" && npx expo install react-native-nfc-manager 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web --offline 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo install react-native-url-polyfill 2>&1)",
+      "Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web --offline --port 8082 2>&1)",
+      "Bash(npx ecc-agentshield:*)",
+      "Bash(mkdir)",
+      "Bash(ccpm:*)"
+    ],
+    "deny": [
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)",
+      "Bash(ssh:*)"
+    ],
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '\"\\(.tool_input.command) - \\(.tool_input.description // \"No description\")\"' >> ~/.claude/bash-command-log.txt"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"); CONTENT=$(echo $STDIN_JSON | jq -r '.tool_input.content // \"\"); if [[ \"$FILE\" =~ \\.(js|jsx|ts|tsx)$ ]] && echo \"$CONTENT\" | grep -q 'console\\.log'; then echo 'Warning: console.log statements should be removed before committing' >&2; exit 2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" == \"package.json\" ]]; then echo 'Checking for vulnerable dependencies...'; npm audit --audit-level=moderate; fi",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.(js|jsx|ts|tsx)$ ]]; then npx prettier --write \"$FILE\"; fi",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.(ts|tsx)$ ]]; then RESULT=$(npx tsc --noEmit 2>&1); if [ $? -ne 0 ]; then echo \"TypeScript errors found: $RESULT\" >&2; exit 2; fi; fi",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.(js|jsx|ts|tsx)$ ]] && grep -q 'import \\* from' \"$FILE\"; then echo 'Warning: Avoid wildcard imports for better tree-shaking' >&2; exit 2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.(js|jsx|ts|tsx)$ && \"$FILE\" != *\".test.\"* && \"$FILE\" != *\".spec.\"* ]]; then DIR=$(dirname \"$FILE\"); BASENAME=$(basename \"$FILE\" | sed -E 's/\\.(js|jsx|ts|tsx)$//'); for TEST_FILE in \"$DIR/$BASENAME.test.\"* \"$DIR/$BASENAME.spec.\"*; do if [ -f \"$TEST_FILE\" ]; then echo \"Running tests for $TEST_FILE...\"; if command -v jest >/dev/null 2>&1; then npx jest \"$TEST_FILE\" --passWithNoTests; elif command -v vitest >/dev/null 2>&1; then npx vitest run \"$TEST_FILE\"; fi; break; fi; done; fi",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Claude Code notification: $(date)\" >> ~/.claude/notifications.log"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ -f package.json && $(git status --porcelain | grep -E '\\.js$|\\.jsx$|\\.ts$|\\.tsx$') ]]; then echo 'Running linter on changed files...'; npx eslint $(git diff --name-only --diff-filter=ACMR | grep -E '\\.js$|\\.jsx$|\\.ts$|\\.tsx$'); fi",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ -f package.json && $(git status --porcelain | grep -E '\\.js$|\\.jsx$|\\.ts$|\\.tsx$') ]]; then echo 'Analyzing bundle size impact...'; if command -v bundlesize >/dev/null 2>&1; then npx bundlesize; elif npm list webpack-bundle-analyzer >/dev/null 2>&1; then echo 'Use: npx webpack-bundle-analyzer build/static/js/*.js'; else echo 'No bundle analysis tool found'; fi; fi",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:/Users/User/.claude/hooks/gsd-check-update.js\""
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node \"C:/Users/User/.claude/hooks/gsd-statusline.js\""
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "supabase@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "agent-sdk-dev@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "stripe@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "accessibility-compliance@claude-code-workflows": true,
+    "agent-orchestration@claude-code-workflows": true,
+    "agent-teams@claude-code-workflows": true,
+    "api-scaffolding@claude-code-workflows": true,
+    "api-testing-observability@claude-code-workflows": true,
+    "application-performance@claude-code-workflows": true,
+    "arm-cortex-microcontrollers@claude-code-workflows": true,
+    "backend-api-security@claude-code-workflows": true,
+    "backend-development@claude-code-workflows": true,
+    "blockchain-web3@claude-code-workflows": true,
+    "business-analytics@claude-code-workflows": true,
+    "c4-architecture@claude-code-workflows": true,
+    "cicd-automation@claude-code-workflows": true,
+    "cloud-infrastructure@claude-code-workflows": true,
+    "code-documentation@claude-code-workflows": true,
+    "code-refactoring@claude-code-workflows": true,
+    "codebase-cleanup@claude-code-workflows": true,
+    "comprehensive-review@claude-code-workflows": true,
+    "conductor@claude-code-workflows": true,
+    "content-marketing@claude-code-workflows": true,
+    "context-management@claude-code-workflows": true,
+    "customer-sales-automation@claude-code-workflows": true,
+    "data-engineering@claude-code-workflows": true,
+    "data-validation-suite@claude-code-workflows": true,
+    "database-cloud-optimization@claude-code-workflows": true,
+    "database-design@claude-code-workflows": true,
+    "database-migrations@claude-code-workflows": true,
+    "debugging-toolkit@claude-code-workflows": true,
+    "dependency-management@claude-code-workflows": true,
+    "deployment-strategies@claude-code-workflows": true,
+    "deployment-validation@claude-code-workflows": true,
+    "developer-essentials@claude-code-workflows": true,
+    "distributed-debugging@claude-code-workflows": true,
+    "documentation-generation@claude-code-workflows": true,
+    "dotnet-contribution@claude-code-workflows": true,
+    "error-debugging@claude-code-workflows": true,
+    "error-diagnostics@claude-code-workflows": true,
+    "framework-migration@claude-code-workflows": true,
+    "frontend-mobile-development@claude-code-workflows": true,
+    "frontend-mobile-security@claude-code-workflows": true,
+    "full-stack-orchestration@claude-code-workflows": true,
+    "functional-programming@claude-code-workflows": true,
+    "game-development@claude-code-workflows": true,
+    "git-pr-workflows@claude-code-workflows": true,
+    "hr-legal-compliance@claude-code-workflows": true,
+    "incident-response@claude-code-workflows": true,
+    "javascript-typescript@claude-code-workflows": true,
+    "julia-development@claude-code-workflows": true,
+    "jvm-languages@claude-code-workflows": true,
+    "kubernetes-operations@claude-code-workflows": true,
+    "llm-application-dev@claude-code-workflows": true,
+    "machine-learning-ops@claude-code-workflows": true,
+    "multi-platform-apps@claude-code-workflows": true,
+    "observability-monitoring@claude-code-workflows": true,
+    "payment-processing@claude-code-workflows": true,
+    "performance-testing-review@claude-code-workflows": true,
+    "python-development@claude-code-workflows": true,
+    "quantitative-trading@claude-code-workflows": true,
+    "reverse-engineering@claude-code-workflows": true,
+    "security-compliance@claude-code-workflows": true,
+    "security-scanning@claude-code-workflows": true,
+    "seo-analysis-monitoring@claude-code-workflows": true,
+    "seo-content-creation@claude-code-workflows": true,
+    "seo-technical-optimization@claude-code-workflows": true,
+    "shell-scripting@claude-code-workflows": true,
+    "startup-business-analyst@claude-code-workflows": true,
+    "systems-programming@claude-code-workflows": true,
+    "tdd-workflows@claude-code-workflows": true,
+    "team-collaboration@claude-code-workflows": true,
+    "ui-design@claude-code-workflows": true,
+    "unit-testing@claude-code-workflows": true,
+    "web-scripting@claude-code-workflows": true
+  },
+  "language": "french"
+}

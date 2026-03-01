@@ -1,0 +1,48 @@
+2026-02-07T20:59:59.569Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:00:07.616Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:00:17.302Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:00:45.335Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:00:45.336Z [DEBUG] [Query.streamInput] Processing message 1: user
+2026-02-07T21:06:01.009Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:06:12.370Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:06:29.156Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:06:36.114Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:06:41.369Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:06:41.381Z [DEBUG] [Query.streamInput] Processing message 1: user
+2026-02-07T21:06:46.820Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:06:56.369Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:11:41.237Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:12:03.761Z [DEBUG] [Query.streamInput] Processing message 1: user
+2026-02-07T21:14:27.863Z [DEBUG] [Query.streamInput] Processing message 2: user
+2026-02-07T21:15:44.285Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:15:50.815Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:18:39.459Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:18:51.131Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:18:58.707Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:19:17.925Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T21:21:18.781Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T22:42:19.520Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T22:43:19.917Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T22:43:19.918Z [DEBUG] [Query.streamInput] Processing message 1: user
+2026-02-07T22:58:56.769Z [DEBUG] [Query.streamInput] Processing message 2: user
+2026-02-07T23:04:33.677Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-07T23:04:33.677Z [DEBUG] [Query.streamInput] Processing message 1: user
+2026-02-07T23:13:39.426Z [DEBUG] [Query.streamInput] Processing message 2: user
+2026-02-07T23:21:43.906Z [DEBUG] [Query.streamInput] Processing message 3: user
+2026-02-08T06:48:19.309Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-08T06:50:30.569Z [DEBUG] [Query.streamInput] Finished processing 0 messages from input stream
+2026-02-08T06:50:30.569Z [DEBUG] [Query] Calling transport.endInput() to close stdin to CLI process
+2026-02-08T06:50:35.734Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-08T06:50:38.273Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-08T07:06:47.276Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-08T07:06:47.277Z [DEBUG] [Query.streamInput] Processing message 1: user
+2026-02-08T07:21:12.416Z [DEBUG] [Query.streamInput] Processing message 2: user
+2026-02-08T08:27:53.966Z [DEBUG] [Query.streamInput] Processing message 3: user
+2026-02-08T09:18:25.228Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-08T09:25:04.321Z [DEBUG] [Query.streamInput] Processing message 1: user
+2026-02-08T09:28:12.528Z [DEBUG] [Query.streamInput] Processing message 2: user
+2026-02-08T09:33:08.562Z [DEBUG] [Query.streamInput] Processing message 3: user
+2026-02-08T09:36:09.784Z [DEBUG] [Query.streamInput] Processing message 4: user
+2026-02-08T09:39:39.105Z [DEBUG] [Query.streamInput] Processing message 5: user
+2026-02-08T11:07:53.725Z [DEBUG] [Query.streamInput] Starting to process input stream
+2026-02-08T11:48:58.699Z [DEBUG] [Query.streamInput] Starting to process input stream

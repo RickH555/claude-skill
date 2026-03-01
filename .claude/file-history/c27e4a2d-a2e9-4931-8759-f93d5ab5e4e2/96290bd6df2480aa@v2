@@ -1,0 +1,23 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import MerchantSettings from '@/components/merchant/MerchantSettings';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function SettingsPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('*')
+    .eq('id', user!.id)
+    .single();
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Paramètres" description="Configurez votre compte et vos préférences." />
+      <MerchantSettings merchant={merchant} />
+    </div>
+  );
+}

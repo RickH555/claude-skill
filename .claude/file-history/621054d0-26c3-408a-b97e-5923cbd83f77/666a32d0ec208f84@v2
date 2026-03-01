@@ -1,0 +1,223 @@
+# Digital Loyalty Card App — Design Document
+
+**Date:** 2026-02-25
+**Status:** Approved
+**Approach:** React Native (Expo) + Supabase + Next.js
+
+---
+
+## 1. Product Vision
+
+A B2B2C digital loyalty platform enabling any type of merchant to create and manage digital loyalty programs (stamp cards and points systems), launch targeted marketing campaigns, and engage customers through push notifications — all from a web dashboard. Consumers use a mobile app to collect stamps/points, receive offers, and redeem rewards.
+
+**Target market:** Worldwide, multilingual
+**Business model:** Freemium + Premium (subscriptions for merchants)
+
+---
+
+## 2. Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                   USERS                          │
+├──────────────────────┬──────────────────────────┤
+│   Mobile App (Client)│  Web Dashboard (Merchant) │
+│   React Native (Expo)│  Next.js + Tailwind       │
+├──────────────────────┴──────────────────────────┤
+│                 API Layer                         │
+│        Supabase (Auth + REST + Realtime)          │
+│        + Edge Functions (business logic)           │
+├─────────────────────────────────────────────────┤
+│              Database                             │
+│           PostgreSQL (Supabase)                    │
+├─────────────────────────────────────────────────┤
+│            External Services                      │
+│  Push: Expo Notifications + OneSignal             │
+│  Payments: Stripe (merchant subscriptions)        │
+│  Storage: Supabase Storage (logos, images)         │
+│  Analytics: PostHog                               │
+└─────────────────────────────────────────────────┘
+```
+
+**3 layers:**
+1. **Mobile app** (React Native/Expo) — consumer scans, collects stamps/points, receives notifications
+2. **Web dashboard** (Next.js) — merchant creates cards, launches campaigns, tracks analytics
+3. **Backend** (Supabase) — auth, database, push, file storage, serverless functions
+
+---
+
+## 3. Data Model
+
+### Merchants
+- id, name, logo, address, category, plan (free/pro/business)
+- subscription_status, stripe_customer_id
+
+### Loyalty Programs
+- id, merchant_id, type (stamp | points), name
+- stamp_goal, points_per_euro, reward_description
+- expiration_days, is_active
+
+### Rewards
+- id, program_id, name, description
+- points_cost | stamps_required
+- discount_type (percentage | fixed | freebie), discount_value
+
+### Campaigns
+- id, merchant_id, title, body, image_url
+- type (push | in_app | targeted_ad)
+- target_segment (all | new | inactive | vip | custom)
+- scheduled_at, sent_at, status
+- analytics (opens, clicks, conversions)
+
+### QR Codes / NFC Tags
+- id, merchant_id, location, type (stamp | redeem)
+- secret_key (secure validation)
+
+### Customers
+- id, email, name, phone, push_token
+- preferred_language, location
+
+### Customer Cards
+- id, customer_id, program_id
+- current_stamps | current_points
+- tier (bronze | silver | gold | vip)
+- created_at, last_activity
+
+### Transactions
+- id, card_id, type (stamp_add | points_add | reward_redeem)
+- value, validated_by (qr | nfc | manual)
+- created_at
+
+### Referrals
+- id, referrer_id, referred_id, merchant_id
+- reward_given, status, created_at
+
+### Notifications
+- id, customer_id, campaign_id, title, body
+- type (campaign | reward_available | expiration_warning | proximity)
+- read_at, sent_at, deep_link
+
+---
+
+## 4. Features — Mobile App (Consumer)
+
+| Screen | Features |
+|--------|----------|
+| **Onboarding** | Sign up email/Google/Apple, language, geolocation |
+| **Home** | Active cards, stamp/point balances, current offers |
+| **Scanner** | Scan merchant QR OR show own QR to be scanned |
+| **Card detail** | Stamp progress (visual), history, available rewards |
+| **Stores** | Nearby stores map/list, search, category filters |
+| **Notifications** | Notification center (offers, news, expiration alerts) |
+| **Rewards** | Reward catalog, exchange points/stamps for discounts |
+| **Profile** | Personal info, notification prefs, language, referral, history |
+| **Referral** | Unique code/link, tracking, earned rewards |
+
+---
+
+## 5. Features — Web Dashboard (Merchant)
+
+| Section | Features |
+|---------|----------|
+| **Dashboard** | KPIs (active clients, return rate, top rewards, campaign revenue) |
+| **Programs** | Create/edit stamp or point cards, define rewards, expiration |
+| **Clients** | Client list, segments, filters, CSV export |
+| **Campaigns** | Create push/notification, target segment, schedule, A/B test |
+| **Analytics** | Campaign performance, client behavior, cohorts, retention |
+| **Scanner** | Cashier mode: scan client card or generate ephemeral QR |
+| **QR/NFC** | Generate and download QR codes, manage NFC tags |
+| **Subscription** | Current plan, upgrade, Stripe billing |
+| **Settings** | Logo, store info, hours, multi-location |
+
+---
+
+## 6. Push Notifications
+
+| Type | Trigger |
+|------|---------|
+| Campaign offer | Merchant launches manually |
+| Inactivity reminder | Auto after X days without visit |
+| Reward available | Auto when threshold reached |
+| Expiration warning | Auto X days before points/stamps expire |
+| Proximity | Auto when client near partner store |
+| Welcome | Auto on registration |
+| Referral | Auto when referral signs up |
+
+---
+
+## 7. Business Model
+
+| Plan | Price | Includes |
+|------|-------|----------|
+| **Free** | 0 EUR | 1 program, 100 clients, 2 push/month, basic analytics |
+| **Pro** | 29 EUR/month | 3 programs, unlimited clients, unlimited push, analytics, segments |
+| **Business** | 79 EUR/month | Unlimited programs, advanced campaigns, A/B test, multi-location, API, priority support |
+
+---
+
+## 8. Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Mobile app | React Native + Expo SDK 52+ |
+| Navigation | Expo Router (file-based) |
+| UI Kit | React Native Paper or Tamagui |
+| State management | Zustand |
+| Web dashboard | Next.js 15 + Tailwind CSS + shadcn/ui |
+| Backend/DB | Supabase (PostgreSQL + Auth + Edge Functions + Realtime) |
+| Push notifications | Expo Notifications + Supabase Edge Functions |
+| Payments | Stripe (Subscriptions API) |
+| Analytics | PostHog |
+| NFC | react-native-nfc-manager |
+| QR | expo-camera (scan) + react-native-qrcode-svg (generation) |
+| Geolocation | expo-location + Supabase PostGIS |
+| i18n | expo-localization + i18next |
+| CI/CD | EAS Build + EAS Submit (Expo) |
+| Web hosting | Vercel (Next.js dashboard) |
+
+---
+
+## 9. Delivery Phases
+
+### Phase 1 — MVP Core (Weeks 1-4)
+- Auth (email + Google + Apple)
+- Stamp card + point card
+- QR code scan (add stamps/points + redeem rewards)
+- Basic merchant dashboard (create program, view clients)
+- Basic push notifications (manual campaign + welcome)
+- Free plan only
+
+### Phase 2 — Marketing & Monetization (Weeks 5-8)
+- Segmented campaigns (target by profile)
+- Analytics dashboard (KPIs, retention, cohorts)
+- Stripe integration (Pro + Business plans)
+- Referral system
+- Auto notifications (inactivity, expiration, reward available)
+- Multi-language (i18n)
+
+### Phase 3 — Advanced (Weeks 9-12)
+- NFC support
+- Geolocation + proximity notifications
+- A/B testing for campaigns
+- Multi-location support
+- Public API for integrations
+- VIP/Gold/Silver tiers
+
+---
+
+## 10. Validation Method
+
+- QR code: Merchant displays QR at checkout, client scans in-app (or client shows their QR, merchant scans via dashboard/cashier mode)
+- NFC: Client taps phone on NFC tag at merchant location (Phase 3)
+- Each scan is cryptographically validated via secret key to prevent fraud
+
+---
+
+## 11. Security Considerations
+
+- Row Level Security (RLS) on all Supabase tables
+- Merchant can only access their own data
+- QR codes use HMAC-signed tokens with short expiration
+- Stripe webhooks for subscription state management
+- Rate limiting on Edge Functions
+- GDPR compliance: data export, deletion, consent management

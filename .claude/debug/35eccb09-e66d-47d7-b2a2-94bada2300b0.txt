@@ -1,0 +1,81 @@
+2026-02-20T06:00:50.734Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-20T06:00:50.739Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-20T06:00:50.739Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-20T06:00:50.740Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-20T06:00:50.802Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-20T06:00:50.852Z [DEBUG] Applying permission update: Adding 80 allow rule(s) to destination 'localSettings': ["Bash(npx vite build)","Bash(npx claude-code-templates@latest:*)","WebSearch","Bash(echo:*)","Bash(gh auth status:*)","Bash(ls:*)","Bash(npm run build:*)","Bash(npm run dev:*)","Bash(start http://localhost:3000)","Bash(node -e:*)","Bash(npx --yes playwright install:*)","Bash(npx --yes playwright screenshot:*)","Bash(dir:*)","Bash(npm install:*)","Bash(node:*)","Bash(npx next start:*)","Bash(taskkill:*)","Bash(npx tsc:*)","mcp__puppeteer__puppeteer_navigate","mcp__puppeteer__puppeteer_screenshot","mcp__puppeteer__puppeteer_evaluate","mcp__puppeteer__puppeteer_click","mcp__puppeteer__puppeteer_fill","Bash(npx vite:*)","Bash(git init:*)","Bash(git add:*)","Bash(git commit -m \"$\\(cat <<''EOF''\nRestore Vite SPA architecture after broken Next.js migration\n\n- Rename _legacy_pages/ back to pages/ \\(24 .tsx files restored\\)\n- Fix package.json scripts to use vite instead of next\n- Install vite and @vitejs/plugin-react as devDependencies\n- Remove tsconfig.json exclusions blocking SPA files\n- Fix JSX syntax error in Results.tsx \\(missing closing div\\)\n- Fix JSX syntax error in SchemaOrg.tsx \\(literal script tag\\)\n- Install missing jspdf and html2canvas dependencies\n- Rewrite CLAUDE.md to reflect actual Vite SPA architecture\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")","Bash(git commit:*)","Bash(timeout:*)","mcp__filesystem__list_directory","mcp__filesystem__directory_tree","mcp__filesystem__read_text_file","Bash(robocopy:*)","Bash(powershell:*)","WebFetch(domain:ninjapromo.io)","Bash(fi)","mcp__filesystem__read_multiple_files","Bash(for file in pages/Recharge.tsx pages/Account.tsx pages/Affiliation.tsx pages/GenerativeTools.tsx pages/SMCStudio.tsx pages/SchemaOrg.tsx pages/RobotsTxt.tsx pages/SourceOfTruth.tsx pages/ContentWriter.tsx pages/Reputation.tsx pages/BotTracking.tsx pages/ActionPlan.tsx pages/Projects.tsx pages/Directory.tsx)","Bash(do echo \"=== $file ===\")","Bash(if grep -q \"ninja-card\\\\|btn-gradient\\\\|gradient-text\" \"$file\")","Bash(then echo \"UPDATED\")","Bash(else echo \"NEEDS UPDATE\")","Bash(done)","Bash(for file in components/CategoryCard.tsx components/ScoreRing.tsx)","Bash(start:*)","Bash(xcopy:*)","Bash(cmd /c \"robocopy \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS X-Final-Rick-Test\"\" \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS-Backup-NinjaPromo-2026-02-12\"\" /E /XD node_modules .git dist /XF nul /NFL /NDL\")","Bash(cd:*)","mcp__filesystem__list_allowed_directories","Bash(findstr:*)","mcp__filesystem__search_files","Bash(npm view:*)","Bash(npx next build)","Bash(curl:*)","Bash(npx vitest run)","mcp__puppeteer__puppeteer_select","mcp__filesystem__write_file","mcp__sequential-thinking__sequentialthinking","Bash(find:*)","mcp__filesystem__read_media_file","Bash(powershell.exe -NoProfile -Command \"Get-ChildItem ''C:\\\\Users\\\\User\\\\Downloads'' -Filter ''*frontend*'' | ForEach-Object { Copy-Item -LiteralPath $_FullName -Destination ''C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png'' }\")","Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*frontend*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png\"\" }')","Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*bandeau*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\bandeau-copy.png\"\" }')","Bash(netstat:*)","Bash(wmic process where ProcessId=49720 get CommandLine,ExecutablePath:*)","Bash(tasklist:*)","Bash(grep:*)","Bash(wc:*)","mcp__puppeteer__puppeteer_hover","mcp__filesystem__create_directory","Bash(cat:*)","mcp__filesystem__list_directory_with_sizes","Bash(wmic process:*)","mcp__memory__create_entities","Bash(npm i:*)","Bash(ngrok:*)","Bash(npm audit:*)","Bash(git checkout:*)","Bash(tee:*)","Bash(test:*)"]
+2026-02-20T06:00:50.876Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-20T06:00:50.897Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-20T06:00:50.899Z [DEBUG] [STARTUP] Running setup()...
+2026-02-20T06:00:50.934Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-20T06:00:50.958Z [DEBUG] Error log sink initialized
+2026-02-20T06:00:51.201Z [DEBUG] [STARTUP] setup() completed in 302ms
+2026-02-20T06:00:51.201Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-20T06:00:51.210Z [DEBUG] Git remote URL: null
+2026-02-20T06:00:51.210Z [DEBUG] No git remote URL found
+2026-02-20T06:00:52.476Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1
+2026-02-20T06:00:52.531Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-02-20T06:00:52.541Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=C:\Users\User\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\vendor\ripgrep\x64-win32\rg.exe)
+2026-02-20T06:00:52.593Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-20T06:00:52.613Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-20T06:00:52.613Z [DEBUG] Total plugin skills loaded: 0
+2026-02-20T06:00:52.613Z [DEBUG] Total plugin commands loaded: 0
+2026-02-20T06:00:52.613Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-20T06:00:52.613Z [DEBUG] Total plugin agents loaded: 0
+2026-02-20T06:00:52.666Z [DEBUG] Loaded 8 unique skills (8 unconditional, 0 conditional, managed: 0, user: 1, project: 0, additional: 0, legacy commands: 7)
+2026-02-20T06:00:52.666Z [DEBUG] getSkills returning: 8 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-02-20T06:00:52.674Z [DEBUG] [STARTUP] Commands and agents loaded in 1473ms
+2026-02-20T06:00:52.694Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-02-20T06:00:52.724Z [DEBUG] [keybindings] KeybindingSetup initialized with 103 bindings, 0 warnings
+2026-02-20T06:00:52.942Z [DEBUG] [keybindings] Watching for changes to C:\Users\User\.claude\keybindings.json
+2026-02-20T06:00:53.074Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29088.1771567253073
+2026-02-20T06:00:53.074Z [DEBUG] Preserving file permissions: 100666
+2026-02-20T06:00:53.075Z [DEBUG] Temp file written successfully, size: 11897 bytes
+2026-02-20T06:00:53.076Z [DEBUG] Applied original permissions to temp file
+2026-02-20T06:00:53.076Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29088.1771567253073 to C:\Users\User\.claude.json
+2026-02-20T06:00:53.077Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-20T06:00:53.783Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29088.1771567253783
+2026-02-20T06:00:53.783Z [DEBUG] Preserving file permissions: 100666
+2026-02-20T06:00:53.784Z [DEBUG] Temp file written successfully, size: 11897 bytes
+2026-02-20T06:00:53.784Z [DEBUG] Applied original permissions to temp file
+2026-02-20T06:00:53.784Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29088.1771567253783 to C:\Users\User\.claude.json
+2026-02-20T06:00:53.785Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-20T06:00:54.298Z [ERROR] AxiosError: AxiosError: Request failed with status code 401
+    at Ex (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:90:1138)
+    at IncomingMessage.<anonymous> (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:91:9827)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+    at TE6.request (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:93:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async FU9 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:1646:366)
+    at async Y (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:110:19570)
+    at async QU9 (file:///C:/Users/User/AppData/Roaming/npm/node_modules/@anthropic-ai/claude-code/cli.js:1646:509)
+2026-02-20T06:00:54.597Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.local.json.tmp.29088.1771567254597
+2026-02-20T06:00:54.597Z [DEBUG] Preserving file permissions: 100666
+2026-02-20T06:00:54.598Z [DEBUG] Temp file written successfully, size: 4784 bytes
+2026-02-20T06:00:54.598Z [DEBUG] Applied original permissions to temp file
+2026-02-20T06:00:54.598Z [DEBUG] Renaming C:\Users\User\.claude\settings.local.json.tmp.29088.1771567254597 to C:\Users\User\.claude\settings.local.json
+2026-02-20T06:00:54.600Z [DEBUG] File C:\Users\User\.claude\settings.local.json written atomically
+2026-02-20T06:00:54.721Z [DEBUG] Grove: Cache stale, returning cached data and refreshing in background
+2026-02-20T06:00:54.727Z [DEBUG] Not in a GitHub repository, skipping path mapping update
+2026-02-20T06:00:54.868Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-20T06:00:54.868Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-02-20T06:00:55.109Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.29088.1771567255109
+2026-02-20T06:00:55.109Z [DEBUG] Preserving file permissions: 100666
+2026-02-20T06:00:55.110Z [DEBUG] Temp file written successfully, size: 11897 bytes
+2026-02-20T06:00:55.110Z [DEBUG] Applied original permissions to temp file
+2026-02-20T06:00:55.110Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.29088.1771567255109 to C:\Users\User\.claude.json
+2026-02-20T06:00:55.112Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-20T06:00:55.136Z [DEBUG] [STARTUP] showSetupScreens() completed in 2442ms
+2026-02-20T06:00:55.137Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-20T06:00:55.137Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-20T06:00:55.137Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-20T06:00:55.187Z [DEBUG] Total LSP servers loaded: 0
+2026-02-20T06:00:55.187Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-20T06:00:55.187Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-20T06:00:55.187Z [DEBUG] LSP server manager initialized successfully
+2026-02-20T06:00:55.188Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-20T06:01:09.686Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-02-20T06:01:09.686Z [DEBUG] Found 0 hook matchers in settings
+2026-02-20T06:01:09.686Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)

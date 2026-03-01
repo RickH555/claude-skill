@@ -1,0 +1,376 @@
+// services/solution-mega-generator.ts
+//
+// MÉGA-GÉNÉRATEUR DE SOLUTIONS : Un appel API = toutes les solutions pré-générées
+//
+// ⚠️ Ce fichier ne remplace PAS services/generator.ts ni services/mega-generator.ts
+// Il les complète avec une fonction qui génère TOUTES les solutions du plan d'action
+// en un seul appel Gemini, au lieu d'un appel par recommandation.
+//
+// Les fonctions existantes de generator.ts restent intactes
+// et peuvent toujours être appelées individuellement si besoin.
+
+import { GoogleGenAI } from '@google/genai';
+
+// ═══════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════
+
+export interface PreGeneratedSolution {
+  id: string;
+  category: 'faq' | 'schema' | 'meta' | 'content' | 'structure' | 'technical' | 'authority' | 'geo';
+  title: string;
+  description: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  estimatedImpact: number;
+  fixesCriteria: string[];
+  mostImpactedEngines: string[];
+
+  // Le contenu généré (ce qui est verrouillé)
+  generatedContent: {
+    code: string;
+    language: 'html' | 'json' | 'json-ld' | 'text' | 'css' | 'markdown';
+    explanation: string;
+    implementationSteps: string[];
+  };
+}
+
+export interface SolutionMegaGenerationResult {
+  // Métadonnées
+  generatedAt: string;
+  url: string;
+  apiModel: string;
+  tokenCount: number;
+
+  // Solutions pré-générées (toutes verrouillées par défaut)
+  solutions: PreGeneratedSolution[];
+
+  // Contenus complets pré-générés
+  fullFAQ: {
+    html: string;
+    schemaJsonLd: string;
+    questionsCount: number;
+  };
+
+  fullSchemaOrg: {
+    jsonLd: string;
+    types: string[];
+  };
+
+  fullMetaTags: {
+    title: string;
+    description: string;
+    openGraph: string;
+    canonical: string;
+  };
+
+  fullIntroduction: {
+    html: string;
+    wordCount: number;
+  };
+
+  fullComparativeTable: {
+    html: string;
+    columnsCount: number;
+    rowsCount: number;
+  };
+
+  fullArticleOutline: {
+    markdown: string;
+    sections: string[];
+    estimatedWordCount: number;
+  };
+
+  // Score de complétion
+  solutionsCount: number;
+  totalEstimatedImpact: number;
+}
+
+// ═══════════════════════════════════════════════
+// LE MÉGA-PROMPT
+// ═══════════════════════════════════════════════
+
+const MEGA_SYSTEM_PROMPT = `Tu es un expert en AEO (Answer Engine Optimization) et en optimisation de contenu pour les moteurs de réponse IA (ChatGPT, Perplexity, Gemini).
+
+Tu reçois les résultats d'un audit AEO d'une page web. Pour chaque critère ÉCHOUÉ, tu dois générer une solution COMPLÈTE et IMMÉDIATEMENT IMPLÉMENTABLE.
+
+RÈGLES ABSOLUES :
+- Chaque solution doit contenir du CODE RÉEL prêt à copier-coller, PAS des placeholders
+- Le code HTML doit être valide et complet
+- Le JSON-LD doit être valide (vérifie les guillemets, virgules, accolades)
+- Les textes doivent être rédigés en français, naturels, pas de "Lorem ipsum"
+- Adapte CHAQUE solution au contexte RÉEL de la page analysée (URL, titre, contenu détecté)
+- Priorise par impact sur la citabilité IA
+
+RÉPONDS UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans texte avant ou après.`;
+
+function buildMegaPrompt(
+  url: string,
+  pageTitle: string,
+  pageContent: string,
+  failedCriteria: Array<{ id: string; name: string; category: string; maxPoints: number }>,
+  detectedProducts: string[],
+  detectedBrand: string,
+  language: string = 'fr'
+): string {
+  return `AUDIT AEO — Génération complète de solutions
+
+URL : ${url}
+Titre détecté : ${pageTitle}
+Marque détectée : ${detectedBrand}
+Produits/services détectés : ${detectedProducts.join(', ') || 'Non détectés'}
+Langue : ${language}
+
+CONTENU EXTRAIT (résumé) :
+${pageContent.slice(0, 3000)}
+
+CRITÈRES ÉCHOUÉS À CORRIGER (${failedCriteria.length} critères) :
+${failedCriteria.map((c, i) => `${i + 1}. [${c.id}] ${c.name} (catégorie: ${c.category}, impact: ${c.maxPoints} pts)`).join('\n')}
+
+GÉNÈRE UN JSON avec cette structure EXACTE :
+{
+  "solutions": [
+    {
+      "id": "sol_001",
+      "category": "faq|schema|meta|content|structure|technical|authority|geo",
+      "title": "Titre court de la solution",
+      "description": "Description en 1-2 phrases de ce que fait cette solution",
+      "priority": "critical|high|medium|low",
+      "estimatedImpact": 12,
+      "fixesCriteria": ["criterion_id_1", "criterion_id_2"],
+      "mostImpactedEngines": ["perplexity", "chatgpt"],
+      "generatedContent": {
+        "code": "Le code HTML/JSON-LD/CSS complet prêt à copier",
+        "language": "html|json|json-ld|text|css|markdown",
+        "explanation": "Explication de pourquoi cette solution améliore la citabilité IA",
+        "implementationSteps": [
+          "Étape 1 : ...",
+          "Étape 2 : ...",
+          "Étape 3 : ..."
+        ]
+      }
+    }
+  ],
+  "fullFAQ": {
+    "html": "Section FAQ HTML complète avec 6-8 questions/réponses pertinentes",
+    "schemaJsonLd": "Le script JSON-LD FAQPage complet correspondant",
+    "questionsCount": 6
+  },
+  "fullSchemaOrg": {
+    "jsonLd": "Le script JSON-LD complet (WebPage + Article/Product + Organization + BreadcrumbList)",
+    "types": ["WebPage", "FAQPage", "Organization"]
+  },
+  "fullMetaTags": {
+    "title": "Title tag optimisé (<60 chars)",
+    "description": "Meta description optimisée (<155 chars)",
+    "openGraph": "Balises Open Graph complètes (og:title, og:description, og:image, og:type, og:locale)",
+    "canonical": "URL canonique"
+  },
+  "fullIntroduction": {
+    "html": "Paragraphe d'introduction TL;DR answer-first (3-5 phrases, répond directement à l'intention)",
+    "wordCount": 80
+  },
+  "fullComparativeTable": {
+    "html": "Tableau HTML comparatif complet avec données réelles (ex: produits, prix, specs)",
+    "columnsCount": 4,
+    "rowsCount": 5
+  },
+  "fullArticleOutline": {
+    "markdown": "Plan d'article AEO complet en markdown avec titres H2/H3 sous forme de questions",
+    "sections": ["Section 1", "Section 2"],
+    "estimatedWordCount": 1500
+  }
+}
+
+IMPORTANT :
+- Génère UNE solution par critère échoué (ou combine les critères liés dans une même solution)
+- Les solutions "critical" sont celles qui impactent les critères avec coefficient ≥ 1.5 chez au moins 2 moteurs
+- Le fullFAQ doit contenir des VRAIES questions que les utilisateurs posent sur ce sujet
+- Le fullSchemaOrg doit être adapté au TYPE de page (produit, article, catégorie, etc.)
+- Le fullComparativeTable doit utiliser les VRAIS produits/données détectés sur la page
+- Le fullIntroduction doit commencer par la réponse directe (inverted pyramid)
+- Trie les solutions par estimatedImpact décroissant`;
+}
+
+// ═══════════════════════════════════════════════
+// FONCTION PRINCIPALE
+// ═══════════════════════════════════════════════
+
+const getApiKey = (): string | null => {
+  // Check VITE_GEMINI_API_KEY first (Vite frontend env), then API_KEY
+  const viteKey = import.meta.env.VITE_GEMINI_API_KEY;
+  if (viteKey) return viteKey;
+
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+/**
+ * Génère TOUTES les solutions en UN SEUL appel API.
+ *
+ * @param url - URL analysée
+ * @param pageTitle - Titre de la page détecté par l'analyseur
+ * @param pageContent - Contenu textuel extrait (sera tronqué à 3000 chars)
+ * @param failedCriteria - Liste des critères échoués issus de l'audit
+ * @param detectedProducts - Produits/services détectés sur la page
+ * @param detectedBrand - Nom de marque détecté
+ * @returns Toutes les solutions pré-générées
+ */
+export async function generateAllSolutions(
+  url: string,
+  pageTitle: string,
+  pageContent: string,
+  failedCriteria: Array<{ id: string; name: string; category: string; maxPoints: number }>,
+  detectedProducts: string[] = [],
+  detectedBrand: string = '',
+  language: string = 'fr'
+): Promise<SolutionMegaGenerationResult> {
+
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn('[SolutionMegaGenerator] No API key found, using fallback simulation.');
+    return generateFallbackResult(url, failedCriteria);
+  }
+
+  const prompt = buildMegaPrompt(
+    url, pageTitle, pageContent,
+    failedCriteria, detectedProducts, detectedBrand, language
+  );
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: MEGA_SYSTEM_PROMPT,
+        maxOutputTokens: 16000, // On veut une réponse longue et complète
+        temperature: 0.3,
+        // Basse température = plus factuel et structuré
+      },
+    });
+
+    const text = response.text || '';
+
+    // Nettoyer le JSON (supprimer backticks markdown si présents)
+    const cleanJson = text
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    const parsed = JSON.parse(cleanJson);
+
+    // Valider et enrichir le résultat
+    const result: SolutionMegaGenerationResult = {
+      generatedAt: new Date().toISOString(),
+      url,
+      apiModel: 'gemini-2.0-flash',
+      tokenCount: text.length, // approximation
+
+      solutions: (parsed.solutions || []).map((sol: Record<string, unknown>, index: number) => ({
+        id: (sol.id as string) || `sol_${String(index + 1).padStart(3, '0')}`,
+        category: (sol.category as string) || 'content',
+        title: (sol.title as string) || `Solution ${index + 1}`,
+        description: (sol.description as string) || '',
+        priority: (sol.priority as string) || 'medium',
+        estimatedImpact: (sol.estimatedImpact as number) || 2,
+        fixesCriteria: (sol.fixesCriteria as string[]) || [],
+        mostImpactedEngines: (sol.mostImpactedEngines as string[]) || [],
+        generatedContent: {
+          code: (sol.generatedContent as Record<string, unknown>)?.code as string || '',
+          language: (sol.generatedContent as Record<string, unknown>)?.language as string || 'html',
+          explanation: (sol.generatedContent as Record<string, unknown>)?.explanation as string || '',
+          implementationSteps: (sol.generatedContent as Record<string, unknown>)?.implementationSteps as string[] || [],
+        },
+      })),
+
+      fullFAQ: parsed.fullFAQ || { html: '', schemaJsonLd: '', questionsCount: 0 },
+      fullSchemaOrg: parsed.fullSchemaOrg || { jsonLd: '', types: [] },
+      fullMetaTags: parsed.fullMetaTags || { title: '', description: '', openGraph: '', canonical: '' },
+      fullIntroduction: parsed.fullIntroduction || { html: '', wordCount: 0 },
+      fullComparativeTable: parsed.fullComparativeTable || { html: '', columnsCount: 0, rowsCount: 0 },
+      fullArticleOutline: parsed.fullArticleOutline || { markdown: '', sections: [], estimatedWordCount: 0 },
+
+      solutionsCount: (parsed.solutions || []).length,
+      totalEstimatedImpact: (parsed.solutions || []).reduce(
+        (sum: number, s: Record<string, unknown>) => sum + ((s.estimatedImpact as number) || 0), 0
+      ),
+    };
+
+    return result;
+
+  } catch (error) {
+    console.error('Erreur méga-génération solutions:', error);
+    // Fallback : retourner un résultat simulé mais valide
+    return generateFallbackResult(url, failedCriteria);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// FALLBACK (si pas d'API key ou erreur)
+// ═══════════════════════════════════════════════
+
+function generateFallbackResult(
+  url: string,
+  failedCriteria: Array<{ id: string; name: string; category: string; maxPoints: number }>
+): SolutionMegaGenerationResult {
+
+  let hostname = url;
+  try { hostname = new URL(url).hostname; } catch { /* keep raw */ }
+
+  const solutions: PreGeneratedSolution[] = failedCriteria.map((c, i) => ({
+    id: `sol_${String(i + 1).padStart(3, '0')}`,
+    category: mapCriteriaCategory(c.category),
+    title: `Corriger : ${c.name}`,
+    description: `Solution pour le critère "${c.name}". Connectez votre clé API Gemini pour obtenir du code réel.`,
+    priority: c.maxPoints >= 4 ? 'critical' : c.maxPoints >= 3 ? 'high' : 'medium',
+    estimatedImpact: c.maxPoints,
+    fixesCriteria: [c.id],
+    mostImpactedEngines: ['perplexity', 'chatgpt'],
+    generatedContent: {
+      code: `<!-- Solution pour "${c.name}" —\n     Site : ${hostname}\n     Impact : +${c.maxPoints} pts —>\n\n<!-- Connectez votre clé API Gemini pour obtenir\n     le code réel prêt à copier-coller. -->\n\n<section class="aeo-fix" data-criterion="${c.id}">\n  <h2>Optimisation: ${c.name}</h2>\n  <p>Contenu simulé — lancez un audit avec Gemini connecté.</p>\n</section>`,
+      language: 'html' as const,
+      explanation: `Ce critère impacte votre score de ${c.maxPoints} points. La correction améliore votre visibilité sur ChatGPT et Perplexity.`,
+      implementationSteps: [
+        'Connectez votre clé API Gemini dans .env.local (VITE_GEMINI_API_KEY)',
+        'Relancez l\'audit pour obtenir les solutions réelles',
+        'Copiez-collez le code généré dans votre site',
+      ],
+    },
+  }));
+
+  return {
+    generatedAt: new Date().toISOString(),
+    url,
+    apiModel: 'fallback-simulation',
+    tokenCount: 0,
+    solutions,
+    fullFAQ: {
+      html: `<section class="faq-section">\n  <h2>Questions fréquentes sur ${hostname}</h2>\n  <div class="faq-item">\n    <h3>Qu'est-ce que ${hostname} propose ?</h3>\n    <p>Contenu simulé — connectez Gemini pour du contenu réel.</p>\n  </div>\n  <div class="faq-item">\n    <h3>Comment contacter ${hostname} ?</h3>\n    <p>Contenu simulé — connectez Gemini pour du contenu réel.</p>\n  </div>\n</section>`,
+      schemaJsonLd: `{\n  "@context": "https://schema.org",\n  "@type": "FAQPage",\n  "mainEntity": []\n}`,
+      questionsCount: 2,
+    },
+    fullSchemaOrg: { jsonLd: `{\n  "@context": "https://schema.org",\n  "@type": "WebPage"\n}`, types: ['WebPage'] },
+    fullMetaTags: { title: `${hostname} — Titre optimisé`, description: `Découvrez ${hostname}, votre référence...`, openGraph: '', canonical: url },
+    fullIntroduction: { html: `<p class="intro-answer-first">Contenu simulé — connectez Gemini pour une introduction answer-first optimisée pour ${hostname}.</p>`, wordCount: 15 },
+    fullComparativeTable: { html: '<!-- Tableau comparatif simulé -->', columnsCount: 0, rowsCount: 0 },
+    fullArticleOutline: { markdown: `# Guide complet : ${hostname}\n\n## Qu'est-ce que ${hostname} ?\n\n## Pourquoi choisir ${hostname} ?`, sections: ['Introduction', 'Avantages'], estimatedWordCount: 200 },
+    solutionsCount: solutions.length,
+    totalEstimatedImpact: solutions.reduce((s, sol) => s + sol.estimatedImpact, 0),
+  };
+}
+
+function mapCriteriaCategory(cat: string): PreGeneratedSolution['category'] {
+  const mapping: Record<string, PreGeneratedSolution['category']> = {
+    'structure': 'structure',
+    'structured_data': 'schema',
+    'authority': 'authority',
+    'clarity': 'content',
+    'technical': 'technical',
+    'geo': 'geo',
+  };
+  return mapping[cat.toLowerCase()] || 'content';
+}

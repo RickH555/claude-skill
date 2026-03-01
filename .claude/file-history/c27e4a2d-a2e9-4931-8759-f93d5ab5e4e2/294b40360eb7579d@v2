@@ -1,0 +1,87 @@
+import { createServerSupabase } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  const supabase = await createServerSupabase();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { card_id, reward_id } = body;
+
+  if (!card_id || !reward_id) {
+    return NextResponse.json({ error: 'card_id et reward_id requis' }, { status: 400 });
+  }
+
+  // Fetch the reward
+  const { data: reward } = await supabase
+    .from('rewards')
+    .select('*, loyalty_programs(merchant_id, type, target)')
+    .eq('id', reward_id)
+    .eq('is_active', true)
+    .single();
+
+  if (!reward) {
+    return NextResponse.json({ error: 'Recompense non trouvee ou inactive' }, { status: 404 });
+  }
+
+  // Verify merchant owns this program
+  if (reward.loyalty_programs.merchant_id !== user.id) {
+    return NextResponse.json({ error: 'Acces refuse' }, { status: 403 });
+  }
+
+  // Fetch the customer card
+  const { data: card } = await supabase
+    .from('customer_cards')
+    .select('*')
+    .eq('id', card_id)
+    .eq('program_id', reward.program_id)
+    .single();
+
+  if (!card) {
+    return NextResponse.json({ error: 'Carte non trouvee pour ce programme' }, { status: 404 });
+  }
+
+  // Check if customer has enough balance (target = cost to redeem)
+  const cost = reward.loyalty_programs.target;
+
+  if (card.balance < cost) {
+    return NextResponse.json({
+      error: `Solde insuffisant. Requis: ${cost}, Actuel: ${card.balance}`,
+    }, { status: 400 });
+  }
+
+  // Deduct balance
+  const newBalance = card.balance - cost;
+  const { error: updateError } = await supabase
+    .from('customer_cards')
+    .update({ balance: newBalance })
+    .eq('id', card_id);
+
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
+
+  // Log redeem transaction
+  const { error: txnError } = await supabase.from('transactions').insert({
+    card_id,
+    merchant_id: user.id,
+    type: 'redeem',
+    amount: cost,
+    source: 'manual',
+  });
+
+  if (txnError) {
+    return NextResponse.json({ error: txnError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    success: true,
+    reward_name: reward.name,
+    cost,
+    new_balance: newBalance,
+  });
+}

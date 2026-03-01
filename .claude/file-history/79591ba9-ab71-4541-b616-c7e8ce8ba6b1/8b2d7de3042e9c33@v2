@@ -1,0 +1,50 @@
+import Card from '../../components/ui/Card.tsx'
+
+interface Metric {
+  label: string
+  value: string
+  description: string
+}
+
+const metrics: Metric[] = [
+  {
+    label: 'Citations totales',
+    value: '1 284',
+    description: 'Nombre total de citations détectées',
+  },
+  {
+    label: 'Modèles IA',
+    value: '4',
+    description: 'ChatGPT, Claude, Perplexity, Gemini',
+  },
+  {
+    label: 'Score de visibilité',
+    value: '72 %',
+    description: 'Taux de présence dans les réponses IA',
+  },
+  {
+    label: 'Tendance',
+    value: '+12 %',
+    description: 'Évolution sur les 30 derniers jours',
+  },
+]
+
+export default function DashboardPage() {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Tableau de bord</h2>
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {metrics.map((metric) => (
+          <Card key={metric.label}>
+            <p className="text-sm text-gray-500">{metric.label}</p>
+            <p className="mt-1 text-3xl font-bold text-gray-900">
+              {metric.value}
+            </p>
+            <p className="mt-1 text-xs text-gray-400">{metric.description}</p>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}

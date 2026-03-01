@@ -1,0 +1,24 @@
+import React from 'react';
+
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: 'default' | 'success' | 'warning' | 'error' | 'blue' | 'accent';
+  className?: string;
+}
+
+const VARIANT_STYLES = {
+  default: 'bg-[var(--glass-active)] text-[var(--text-secondary)] border border-[var(--border-default)]',
+  success: 'bg-[var(--success-subtle)] text-[var(--success)] border border-[var(--success)]/20',
+  warning: 'bg-[var(--warning-subtle)] text-[var(--warning)] border border-[var(--warning)]/20',
+  error: 'bg-[var(--error-subtle)] text-[var(--error)] border border-[var(--error)]/20',
+  blue: 'bg-blue-500/10 text-blue-500 dark:text-blue-400 border border-blue-500/20',
+  accent: 'bg-[var(--accent-subtle)] text-[var(--accent-text)] border border-[var(--accent)]/20',
+};
+
+export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
+  return (
+    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-md inline-flex items-center ${VARIANT_STYLES[variant]} ${className}`}>
+      {children}
+    </span>
+  );
+}

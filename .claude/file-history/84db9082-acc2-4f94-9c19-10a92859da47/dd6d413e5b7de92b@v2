@@ -1,0 +1,162 @@
+import { chromium } from 'playwright';
+
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+
+  // Login
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+  console.log('Logged in.\n');
+
+  // Collect all links from all pages first
+  const pagesToScan = [
+    '/',
+    '/pricing',
+    '/dashboard',
+    '/dashboard/documents',
+    '/dashboard/documents/upload',
+    '/dashboard/surveys',
+    '/dashboard/surveys/create',
+    '/dashboard/templates',
+    '/dashboard/templates/new',
+    '/dashboard/settings',
+    '/dashboard/settings/team',
+    '/dashboard/settings/billing',
+    '/dashboard/settings/api-keys',
+  ];
+
+  // Also check common pages that navbar/footer might link to
+  const extraRoutes = [
+    '/features',
+    '/docs',
+    '/about',
+    '/contact',
+    '/blog',
+    '/terms',
+    '/privacy',
+    '/changelog',
+    '/help',
+    '/support',
+  ];
+
+  const allLinks = new Set([...pagesToScan, ...extraRoutes]);
+
+  // Scan links from each page
+  for (const scanPage of pagesToScan) {
+    await page.goto(`${APP}${scanPage}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => null);
+    await page.waitForTimeout(500);
+
+    const links = await page.evaluate(() => {
+      return [...document.querySelectorAll('a[href]')].map(a => {
+        const href = a.getAttribute('href');
+        const text = a.textContent?.trim();
+        return { href, text };
+      }).filter(l => l.href && l.href.startsWith('/') && !l.href.startsWith('/_next') && !l.href.startsWith('/#'));
+    });
+
+    links.forEach(l => allLinks.add(l.href.split('?')[0].split('#')[0]));
+  }
+
+  console.log(`Total unique routes to check: ${allLinks.size}\n`);
+
+  // Check each route
+  const ok = [];
+  const broken = [];
+
+  for (const route of [...allLinks].sort()) {
+    const resp = await page.goto(`${APP}${route}`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null);
+    const httpStatus = resp?.status() || 0;
+
+    // Check for Next.js 404 page: look for the specific "404" heading
+    const is404byHttp = httpStatus === 404;
+    const is404byContent = await page.evaluate(() => {
+      // Next.js default 404 has an h1 or specific element with "404"
+      const h1 = document.querySelector('h1');
+      const h2 = document.querySelector('h2');
+      const title = document.title;
+      // Check for Next.js built-in 404 page pattern
+      const nextError = document.querySelector('#__next-build-error, [class*="next-error"]');
+      const bodyText = document.body?.innerText || '';
+
+      // Very specific: Next.js 404 page usually shows "404" as a big number + "This page could not be found"
+      if (h1?.textContent?.trim() === '404') return true;
+      if (bodyText.includes('This page could not be found')) return true;
+      if (title.includes('404')) return true;
+      // Also check for "not-found" in Next.js app router
+      if (bodyText.match(/^404\s*This page could not be found/)) return true;
+      return false;
+    });
+
+    const isBroken = is404byHttp || is404byContent;
+    const finalUrl = page.url().replace(APP, '');
+
+    if (isBroken) {
+      broken.push(route);
+      console.log(`  [404] ${route} (HTTP ${httpStatus})`);
+    } else {
+      ok.push(route);
+      const redirected = finalUrl !== route ? ` -> redirected to ${finalUrl}` : '';
+      console.log(`  [ OK] ${route} (HTTP ${httpStatus})${redirected}`);
+    }
+  }
+
+  console.log('\n========================================');
+  console.log('RESULTS');
+  console.log('========================================');
+  console.log(`\nWorking pages: ${ok.length}`);
+  ok.forEach(r => console.log(`  OK: ${r}`));
+  console.log(`\nBroken (404) pages: ${broken.length}`);
+  broken.forEach(r => console.log(`  404: ${r}`));
+
+  // Now check which broken pages are actually LINKED from the app
+  console.log('\n========================================');
+  console.log('BROKEN PAGES THAT ARE LINKED FROM THE APP');
+  console.log('========================================\n');
+
+  for (const scanPage of pagesToScan) {
+    await page.goto(`${APP}${scanPage}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => null);
+    await page.waitForTimeout(500);
+
+    const pageLinks = await page.evaluate(() => {
+      return [...document.querySelectorAll('a[href]')].map(a => ({
+        href: a.getAttribute('href')?.split('?')[0]?.split('#')[0],
+        text: a.textContent?.trim(),
+        visible: a.offsetParent !== null
+      })).filter(l => l.href && l.href.startsWith('/') && !l.href.startsWith('/_next') && l.visible);
+    });
+
+    const brokenLinks = pageLinks.filter(l => broken.includes(l.href));
+    if (brokenLinks.length > 0) {
+      console.log(`On page ${scanPage}:`);
+      brokenLinks.forEach(l => console.log(`  -> "${l.text}" links to ${l.href} (404)`));
+      console.log('');
+    }
+  }
+
+  // Also check buttons that might navigate
+  console.log('\n========================================');
+  console.log('CHECKING BUTTON CLICKS ON DASHBOARD');
+  console.log('========================================\n');
+
+  await page.goto(`${APP}/dashboard`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1000);
+
+  const buttons = await page.evaluate(() => {
+    return [...document.querySelectorAll('button, [role="button"]')].map(b => ({
+      text: b.textContent?.trim(),
+      visible: b.offsetParent !== null
+    })).filter(b => b.visible && b.text);
+  });
+
+  console.log(`Dashboard buttons: ${buttons.length}`);
+  buttons.forEach(b => console.log(`  - "${b.text}"`));
+
+  await browser.close();
+})();

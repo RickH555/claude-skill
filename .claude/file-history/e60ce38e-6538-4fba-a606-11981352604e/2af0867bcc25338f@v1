@@ -1,0 +1,47 @@
+import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, logAutomationEvent } from '../_shared/common.ts';
+
+/**
+ * Tache de maintenance credits (legacy endpoint).
+ * Corrige les soldes negatifs eventuels et journalise l'operation.
+ */
+Deno.serve(async (request: Request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+  try {
+    enforceRateLimit(`reset-quotas:${ip}`, 100);
+    if (request.method !== 'POST' && request.method !== 'GET') {
+      return jsonResponse({ error: 'Method not allowed' }, 405);
+    }
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from('profiles')
+      .update({
+        credits_balance: 0,
+        updated_at: new Date().toISOString(),
+      })
+      .lt('credits_balance', 0)
+      .select('id');
+
+    if (error) {
+      throw error;
+    }
+
+    await logAutomationEvent('scan_completed', {
+      stage: 'reset_quotas',
+      corrected_profiles: (data ?? []).length,
+    });
+
+    return jsonResponse({
+      success: true,
+      corrected_profiles: (data ?? []).length,
+    });
+  } catch (error) {
+    await logAutomationEvent('error', {
+      stage: 'reset_quotas',
+      reason: error instanceof Error ? error.message : 'unknown',
+    });
+    return jsonResponse({ error: error instanceof Error ? error.message : 'Erreur reset quotas' }, 500);
+  }
+});

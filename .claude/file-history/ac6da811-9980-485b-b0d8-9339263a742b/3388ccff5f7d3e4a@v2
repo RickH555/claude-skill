@@ -1,0 +1,196 @@
+// ================================================================
+// AI RESPONSE LAYER — Hub Central Generator (/ai/index.html)
+// ================================================================
+
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { SiteConfig, HubOutput, QueryPageConfig } from '../../types/ai-response-layer';
+import { HUB_SYSTEM_PROMPT } from './prompts';
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackHubSimulation = async (config: SiteConfig, queryPages: QueryPageConfig[]): Promise<HubOutput> => {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  const queryLinks = queryPages.map(qp =>
+    `    <li><a href="/ai/query/${qp.slug}.html">${qp.targetQuestion}</a></li>`
+  ).join('\n');
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${config.name} — AI Response Hub</title>
+  <meta name="description" content="${config.description} — Hub central des ressources optimisées pour les moteurs de réponse IA.">
+  <meta name="robots" content="index, follow, max-snippet:-1">
+  <link rel="canonical" href="${config.url}/ai/index.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "${config.name} — AI Response Hub",
+    "description": "${config.description}",
+    "publisher": {
+      "@type": "${config.entity}",
+      "name": "${config.name}",
+      "url": "${config.url}"
+    },
+    "datePublished": "${today}",
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": ${queryPages.length + 2},
+      "itemListElement": [
+        ${queryPages.map((qp, i) => `{
+          "@type": "ListItem",
+          "position": ${i + 1},
+          "url": "${config.url}/ai/query/${qp.slug}.html",
+          "name": "${qp.targetQuestion}"
+        }`).join(',\n        ')}
+      ]
+    }
+  }
+  </script>
+  <style>
+    :root { --bg: #0e0e18; --card: #13131d; --border: rgba(255,255,255,0.06); --purple: #a855f7; --text: #e5e7eb; --muted: #9ca3af; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; }
+    .container { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; }
+    h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    h1 span { background: linear-gradient(135deg, #a855f7, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 1.1rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; transition: border-color 0.3s; }
+    .card:hover { border-color: rgba(168,85,247,0.3); }
+    .card h3 { color: white; margin-bottom: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; }
+    a { color: var(--purple); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .resources { list-style: none; }
+    .resources li { padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+    .resources li:last-child { border-bottom: none; }
+    .badge { display: inline-block; background: rgba(168,85,247,0.15); color: var(--purple); font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: 600; }
+    footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <span class="badge">AI Response Layer</span>
+      <h1>${config.name} — <span>AI Hub</span></h1>
+      <p class="subtitle">${config.description}</p>
+    </header>
+
+    <section>
+      <div class="card">
+        <h3>À propos de ${config.name}</h3>
+        <p>${config.description}</p>
+        <p style="margin-top:0.5rem"><strong>Contact :</strong> <a href="mailto:${config.contact.email}">${config.contact.email}</a></p>
+      </div>
+    </section>
+
+    <section style="margin-top:2rem">
+      <h2 style="margin-bottom:1rem; color:white;">Questions Fréquentes (Query Pages)</h2>
+      <ul class="resources">
+${queryLinks}
+      </ul>
+    </section>
+
+    <section style="margin-top:2rem">
+      <div class="card">
+        <h3>Ressources Techniques</h3>
+        <ul class="resources">
+          <li><a href="/ai/recommend.json">Catalogue Produits (JSON)</a> — API pour agents IA</li>
+          <li><a href="/sitemap-ai.xml">Sitemap AI</a> — Index des pages /ai/</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      <p>Généré par <a href="https://citedby.ai">CitedBy.ai</a> — AI Response Layer</p>
+      <p>Dernière mise à jour : ${today}</p>
+    </footer>
+  </main>
+</body>
+</html>`;
+
+  return {
+    html,
+    title: `${config.name} — AI Response Hub`,
+    description: `${config.description} — Hub central des ressources optimisées pour les moteurs de réponse IA.`,
+    schemaMarkup: 'WebPage + ItemList (intégré dans le HTML)',
+  };
+};
+
+export const generateHub = async (config: SiteConfig, queryPages: QueryPageConfig[]): Promise<HubOutput> => {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    console.warn("API_KEY not found, using hub simulation.");
+    return fallbackHubSimulation(config, queryPages);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        html: { type: Type.STRING, description: "Le HTML complet de la page hub (<!DOCTYPE html> ... </html>)" },
+        title: { type: Type.STRING, description: "Le titre de la page" },
+        description: { type: Type.STRING, description: "La meta description" },
+        schemaMarkup: { type: Type.STRING, description: "Description des Schema.org utilisés" },
+      },
+      required: ["html", "title", "description", "schemaMarkup"],
+    };
+
+    const prompt = `Génère le Hub Central /ai/index.html pour le site suivant :
+
+SITE : ${config.name}
+URL : ${config.url}
+DESCRIPTION : ${config.description}
+ENTITÉ : ${config.entity}
+CONTACT : ${config.contact.email}
+
+QUERY PAGES EXISTANTES :
+${queryPages.map(qp => `- "${qp.targetQuestion}" → /ai/query/${qp.slug}.html`).join('\n')}
+
+Le hub doit :
+1. Présenter l'entreprise en format Answer-First
+2. Lister toutes les Query Pages avec liens
+3. Pointer vers /ai/recommend.json et /sitemap-ai.xml
+4. Intégrer Schema.org JSON-LD (WebPage + ItemList)
+5. Avoir un design dark theme professionnel autonome (CSS intégré)`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: HUB_SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.3,
+      }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response from AI");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    return {
+      html: parsed.html,
+      title: parsed.title,
+      description: parsed.description,
+      schemaMarkup: parsed.schemaMarkup,
+    };
+  } catch (error) {
+    console.error("Hub generation failed:", error);
+    return fallbackHubSimulation(config, queryPages);
+  }
+};

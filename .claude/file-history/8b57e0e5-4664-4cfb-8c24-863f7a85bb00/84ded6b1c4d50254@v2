@@ -1,0 +1,19 @@
+'use client';
+import dynamicImport from 'next/dynamic';
+import { useAppContext } from '@/lib/app-context';
+
+const MonthlyReportPage = dynamicImport(
+  () => import('@/views/v3/MonthlyReportPage'),
+  { ssr: false }
+);
+
+export default function MonthlyReportPageWrapper() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return (
+    <MonthlyReportPage
+      onBack={goBack}
+      user={user}
+      onNavigate={navigateTo}
+    />
+  );
+}

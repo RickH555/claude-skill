@@ -1,0 +1,345 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { ReputationScanInput, ReputationReport, AIMention } from '../types';
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+// ================================================================
+// PROMPTS
+// ================================================================
+
+export const REPUTATION_SCAN_PROMPT = `
+# ROLE
+Tu es un Analyste de Reputation Digitale & Expert en Visibilite IA chez CitedBy.ai.
+
+# MISSION
+Simule une analyse de reputation d'une marque telle qu'elle apparaitrait dans les reponses des moteurs de reponse IA.
+
+DISCLAIMER IMPORTANT : Cette analyse est une SIMULATION HEURISTIQUE basee sur des patterns connus de citation IA.
+Ce n'est PAS un scraping en temps reel des IA. C'est un INDICE DE VISIBILITE estime.
+
+# CE QUE TU DOIS FAIRE
+
+1. **Analyse de la marque** : Identifie ce que les IA diraient probablement sur cette marque base sur :
+   - Sa presence web connue
+   - Son secteur d'activite
+   - Sa notoriete estimee
+   - La qualite de son contenu (si URL fournie)
+
+2. **Simulation de mentions** : Genere des exemples realistes de comment les IA pourraient mentionner cette marque dans :
+   - Des comparaisons de produits/services
+   - Des recommandations a des utilisateurs
+   - Des reponses a des questions sectorielles
+   - Des listes de "meilleurs" ou "top"
+
+3. **Analyse de sentiment** : Pour chaque mention simulee, evalue :
+   - Le sentiment global (-100 a +100)
+   - Le type de mention (directe, indirecte, comparaison, absente)
+   - Les themes associes
+
+4. **Detection de risques** : Identifie :
+   - Les questions ou la marque est ABSENTE des reponses IA (risque majeur)
+   - Les questions ou les concurrents sont cites mais PAS la marque
+   - Les associations negatives potentielles
+
+5. **Recommandations** : Genere des actions concretes pour :
+   - Ameliorer la visibilite IA
+   - Corriger les associations negatives
+   - Combler les lacunes de contenu
+
+# REGLES
+- Reste REALISTE dans les simulations (pas de scores parfaits)
+- Mentionne TOUJOURS que c'est un indice de visibilite, pas une mesure exacte
+- Inclus au moins 5-8 mentions simulees
+- Score de sentiment global rarement > 70 ou < -70
+- Les recommandations doivent etre ACTIONNABLES
+`;
+
+export const RESPONSE_GENERATOR_PROMPT = `
+# ROLE
+Tu es un Expert en Gestion de Crise & Communication Digitale, specialise dans la reputation algorithmique.
+
+# MISSION
+Genere une strategie de reponse pour ameliorer le sentiment d'une mention IA negative ou absente.
+
+# FORMAT
+Pour chaque alerte/probleme :
+1. **Diagnostic** : Pourquoi l'IA dit ca / ne cite pas la marque
+2. **Contenu a creer** : Quel contenu publier pour corriger la situation
+3. **Actions techniques** : Schema.org, llm.txt, backlinks a obtenir
+4. **Timeline** : Estimation du temps pour voir un changement
+5. **KPI de suivi** : Comment mesurer l'amelioration
+
+# REGLES
+- Chaque action doit etre realisable par un non-technique
+- Inclure des exemples concrets de contenu a publier
+- Pas de promesses de resultats garantis
+- Mentionner que les changements prennent du temps (semaines/mois)
+`;
+
+// ================================================================
+// FALLBACK SIMULATION
+// ================================================================
+
+const fallbackReport = async (input: ReputationScanInput): Promise<ReputationReport> => {
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  return {
+    brandName: input.brandName,
+    overallSentiment: 35,
+    visibilityScore: 42,
+    totalMentions: 7,
+    sentimentBreakdown: { positive: 2, neutral: 3, negative: 1 },
+    topThemes: [
+      { theme: `${input.industry} solutions`, count: 3, sentiment: 'positive' },
+      { theme: 'pricing', count: 2, sentiment: 'neutral' },
+      { theme: 'support client', count: 1, sentiment: 'negative' }
+    ],
+    competitorComparison: (input.competitors || []).map(c => ({
+      name: c, mentions: Math.floor(Math.random() * 10), sentiment: Math.floor(Math.random() * 80) - 20
+    })),
+    alerts: [
+      { severity: 'critical', message: `${input.brandName} absent des reponses IA sur "${input.industry} recommandations"`, action: "Creer du contenu Answer-First sur ce sujet" },
+      { severity: 'warning', message: "Sentiment neutre dominant — manque de differenciation", action: "Publier des etudes de cas chiffrees" },
+      { severity: 'info', message: "Concurrents mieux positionnes sur les comparaisons", action: "Creer une page de comparaison detaillee" }
+    ],
+    recommendations: [
+      "Creer un fichier llm.txt avec vos donnees de reference",
+      "Publier 3 articles Answer-First sur vos sujets cles",
+      "Ajouter Schema.org Organization + Product sur votre site",
+      "Obtenir des mentions dans des articles de presse/blogs autoritaires",
+      "Monitorer mensuellement l'evolution du score de visibilite"
+    ],
+    mentions: [
+      {
+        id: '1', aiEngine: 'ChatGPT',
+        prompt: `Quels sont les meilleurs outils de ${input.industry} ?`,
+        mentionType: 'absent', sentiment: 'negative', sentimentScore: -30,
+        excerpt: `Les principaux outils recommandes sont [concurrent1], [concurrent2]...`,
+        context: `${input.brandName} n'est pas mentionne dans cette reponse.`,
+        date: new Date().toISOString()
+      },
+      {
+        id: '2', aiEngine: 'Perplexity',
+        prompt: `Avis sur ${input.brandName}`,
+        mentionType: 'direct', sentiment: 'neutral', sentimentScore: 15,
+        excerpt: `${input.brandName} est une solution dans le domaine de ${input.industry}...`,
+        context: `Mention factuelle sans recommandation active.`,
+        date: new Date().toISOString()
+      },
+      {
+        id: '3', aiEngine: 'Claude',
+        prompt: `Comparaison des solutions ${input.industry}`,
+        mentionType: 'comparison', sentiment: 'neutral', sentimentScore: 5,
+        excerpt: `Parmi les solutions disponibles, on trouve ${input.brandName} ainsi que d'autres acteurs...`,
+        context: `Mentionne mais sans mise en avant particuliere.`,
+        date: new Date().toISOString()
+      },
+      {
+        id: '4', aiEngine: 'Gemini',
+        prompt: `Quel est le meilleur outil pour ${input.industry} ?`,
+        mentionType: 'absent', sentiment: 'negative', sentimentScore: -40,
+        excerpt: `Je recommande principalement [concurrent1] pour sa robustesse et [concurrent2] pour son rapport qualite-prix.`,
+        context: `${input.brandName} completement absent de la recommandation.`,
+        date: new Date().toISOString()
+      },
+      {
+        id: '5', aiEngine: 'ChatGPT',
+        prompt: `${input.brandName} est-il fiable ?`,
+        mentionType: 'direct', sentiment: 'positive', sentimentScore: 45,
+        excerpt: `${input.brandName} semble etre une solution fiable dans son domaine avec des avis globalement positifs.`,
+        context: `Reponse positive mais manque de donnees concretes.`,
+        date: new Date().toISOString()
+      },
+      {
+        id: '6', aiEngine: 'Copilot',
+        prompt: `Top 10 des outils ${input.industry} 2026`,
+        mentionType: 'indirect', sentiment: 'positive', sentimentScore: 25,
+        excerpt: `...parmi les acteurs emergents, ${input.brandName} se distingue par son approche innovante...`,
+        context: `Mentionne en fin de liste, pas dans le top 5.`,
+        date: new Date().toISOString()
+      },
+      {
+        id: '7', aiEngine: 'AI Overviews',
+        prompt: `${input.brandName} ${input.industry}`,
+        mentionType: 'direct', sentiment: 'neutral', sentimentScore: 30,
+        excerpt: `${input.brandName} est une solution specialisee dans le domaine ${input.industry}, proposant des services via son site web.`,
+        context: `Encart factuel Google AI Overviews avec lien source vers le site.`,
+        date: new Date().toISOString()
+      }
+    ],
+    generatedAt: new Date().toISOString()
+  };
+};
+
+// ================================================================
+// SCAN REPUTATION
+// ================================================================
+
+export const scanReputation = async (input: ReputationScanInput, locale: 'fr' | 'en' | 'es' = 'fr'): Promise<ReputationReport> => {
+  const apiKey = getApiKey();
+  if (!apiKey) return fallbackReport(input);
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        overallSentiment: { type: Type.NUMBER },
+        visibilityScore: { type: Type.NUMBER },
+        totalMentions: { type: Type.NUMBER },
+        sentimentBreakdown: {
+          type: Type.OBJECT,
+          properties: {
+            positive: { type: Type.NUMBER },
+            neutral: { type: Type.NUMBER },
+            negative: { type: Type.NUMBER }
+          },
+          required: ["positive", "neutral", "negative"]
+        },
+        topThemes: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              theme: { type: Type.STRING },
+              count: { type: Type.NUMBER },
+              sentiment: { type: Type.STRING }
+            },
+            required: ["theme", "count", "sentiment"]
+          }
+        },
+        alerts: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              severity: { type: Type.STRING },
+              message: { type: Type.STRING },
+              action: { type: Type.STRING }
+            },
+            required: ["severity", "message", "action"]
+          }
+        },
+        competitorComparison: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              mentions: { type: Type.NUMBER },
+              sentiment: { type: Type.NUMBER }
+            },
+            required: ["name", "mentions", "sentiment"]
+          }
+        },
+        recommendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+        mentions: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              aiEngine: { type: Type.STRING },
+              prompt: { type: Type.STRING },
+              mentionType: { type: Type.STRING },
+              sentiment: { type: Type.STRING },
+              sentimentScore: { type: Type.NUMBER },
+              excerpt: { type: Type.STRING },
+              context: { type: Type.STRING }
+            },
+            required: ["aiEngine", "prompt", "mentionType", "sentiment", "sentimentScore", "excerpt", "context"]
+          }
+        }
+      },
+      required: ["overallSentiment", "visibilityScore", "totalMentions", "sentimentBreakdown", "topThemes", "competitorComparison", "alerts", "recommendations", "mentions"]
+    };
+
+    const langInstruction = locale === 'en' ? 'Respond ENTIRELY in English.' : locale === 'es' ? 'Responde INTEGRAMENTE en espanol.' : 'Reponds INTEGRALEMENT en francais.';
+
+    const userPrompt = `
+      ${langInstruction}
+
+      Analyse la reputation IA de cette marque :
+
+      MARQUE : ${input.brandName}
+      URL : ${input.brandUrl || 'Non fournie'}
+      SECTEUR : ${input.industry}
+      CONCURRENTS : ${(input.competitors || []).join(', ') || 'Non specifies'}
+      MOTS-CLES SURVEILLES : ${(input.keywords || []).join(', ') || 'Non specifies'}
+
+      Genere un rapport complet de reputation IA avec au minimum 6 mentions simulees.
+      IMPORTANT : Tout le contenu du rapport (themes, messages, recommandations, excerpts) doit etre dans la langue specifiee ci-dessus.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: REPUTATION_SCAN_PROMPT,
+        responseMimeType: 'application/json',
+        responseSchema: schema,
+        temperature: 0.5,
+      }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(output);
+
+    return {
+      brandName: input.brandName,
+      overallSentiment: parsed.overallSentiment,
+      visibilityScore: parsed.visibilityScore,
+      totalMentions: parsed.totalMentions,
+      sentimentBreakdown: parsed.sentimentBreakdown,
+      topThemes: parsed.topThemes,
+      competitorComparison: parsed.competitorComparison || (input.competitors || []).map(c => ({
+        name: c, mentions: 0, sentiment: 0
+      })),
+      alerts: parsed.alerts,
+      recommendations: parsed.recommendations,
+      mentions: parsed.mentions.map((m: any, i: number) => ({
+        ...m,
+        id: String(i + 1),
+        date: new Date().toISOString()
+      })),
+      generatedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error("Reputation scan failed:", error); // TODO: Replace with proper error reporting (Sentry)
+    return fallbackReport(input);
+  }
+};
+
+// ================================================================
+// GENERATE RESPONSE PLAN
+// ================================================================
+
+export const generateReputationResponse = async (alert: { message: string; action: string }, brandName: string, locale: 'fr' | 'en' | 'es' = 'fr'): Promise<string> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    await new Promise(r => setTimeout(r, 1500));
+    return `# Plan d'Action [SIMULATION]\n\n## Probleme\n${alert.message}\n\n## Actions Recommandees\n1. ${alert.action}\n2. Publier du contenu Answer-First\n3. Renforcer le Schema.org\n\n*Configurez votre cle API pour un plan d'action detaille.*`;
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `${locale === 'en' ? 'Respond ENTIRELY in English.' : locale === 'es' ? 'Responde INTEGRAMENTE en espanol.' : 'Reponds INTEGRALEMENT en francais.'}\n\nMarque: ${brandName}\nProbleme detecte: ${alert.message}\nAction suggeree: ${alert.action}\n\nGenere un plan d'action detaille pour corriger cette situation.`,
+      config: {
+        systemInstruction: RESPONSE_GENERATOR_PROMPT,
+        temperature: 0.4,
+      }
+    });
+    return response.text || "Erreur de generation.";
+  } catch (e) {
+    console.error(e); // TODO: Replace with proper error reporting (Sentry)
+    return "Erreur lors de la generation du plan d'action.";
+  }
+};

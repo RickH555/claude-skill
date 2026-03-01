@@ -1,0 +1,118 @@
+ CLAUDE CODE — AI Response Layer (Version Condensée)
+
+## OBJECTIF
+Créer 4 outils génératifs pour CitedBy.ai permettant aux utilisateurs de générer une "AI Response Layer" sur leur site.
+
+## FICHIERS À GÉNÉRER
+
+### 1. `/ai/index.html` — Hub Central
+Page listant toutes les ressources AI-optimized du site.
+
+**Structure :**
+- Meta tags AI (`ai-content-declaration`, `ai-hub-version`)
+- Schema.org WebPage + ItemList
+- Liste des pages `/ai/query/*`
+- Liens vers llms.txt, recommend.json, sitemap-ai.xml
+
+### 2. `/ai/query/[keyword].html` — Pages Query
+Pages ciblant des requêtes spécifiques (ex: "meilleures sandales orthopédiques").
+
+**Types :** comparison, definition, howto, faq, product, listicle
+
+**Structure :**
+- Answer Box (3 phrases : réponse directe + donnée + contexte)
+- Contenu détaillé (800-1200 mots)
+- Tableau comparatif (si comparison)
+- FAQ (5 questions)
+- Sources
+- CTA vers site principal
+
+### 3. `/ai/recommend.json` — API Catalogue
+JSON structuré du catalogue produits pour plugins/agents IA.
+
+**Structure :**
+```json
+{
+  "provider": { "name", "url", "trustSignals" },
+  "catalog": { "products": [...] },
+  "recommendations": { "byCondition", "byBudget" },
+  "aiInstructions": { "preferredCitationFormat" }
+}
+```
+
+### 4. `/sitemap-ai.xml` — Sitemap IA
+Sitemap XML listant uniquement les pages `/ai/*`.
+
+---
+
+## ARCHITECTURE
+
+```
+src/
+├── types/ai-response-layer.ts
+├── services/ai-response-layer/
+│   ├── prompts.ts
+│   ├── hub-generator.ts
+│   ├── query-page-generator.ts
+│   ├── recommend-json-generator.ts
+│   └── sitemap-ai-generator.ts
+├── components/generators/
+│   ├── AiHubGenerator.tsx
+│   ├── AiQueryPageGenerator.tsx
+│   ├── AiRecommendJsonGenerator.tsx
+│   └── AiSitemapGenerator.tsx
+└── app/(dashboard)/outils/ai-response-layer/page.tsx
+```
+
+---
+
+## TYPES PRINCIPAUX
+
+```typescript
+interface SiteConfig {
+  name: string;
+  url: string;
+  description: string;
+  entity: { type: string; name: string; description: string };
+  contact: { email: string };
+}
+
+interface QueryPageConfig {
+  type: 'comparison' | 'definition' | 'howto' | 'faq' | 'product' | 'listicle';
+  targetQuestion: string;
+  targetKeywords: string[];
+  slug: string;
+  answerBox: { sentence1: string; sentence2: string; sentence3: string };
+  faqItems: Array;
+  cta: { text: string; url: string };
+}
+
+interface ProductConfig {
+  id: string;
+  name: string;
+  shortDescription: string;
+  pricing: { price: number; currency: string };
+  idealFor: Array;
+  links: { productPage: string; buyNow: string };
+}
+```
+
+---
+
+## PROMPTS GEMINI (Résumés)
+
+**Hub Generator :** Enrichir description entité + suggérer nouvelles questions
+
+**Query Page Generator :** Générer Answer Box (3 phrases) + contenu détaillé + FAQ + sources
+
+**Recommend JSON Enricher :** Pour chaque produit → shortDescription optimisée + idealFor + notRecommendedFor + comparisons
+
+---
+
+## COÛTS CRÉDITS
+
+| Outil | Crédits |
+|-------|---------|
+| Hub | 5 |
+| Query Page | 8 |
+|

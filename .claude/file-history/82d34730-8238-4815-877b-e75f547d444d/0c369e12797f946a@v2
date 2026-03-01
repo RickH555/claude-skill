@@ -1,0 +1,21 @@
+$src = "C:\Users\User\Downloads\SaaS X-Final-Rick-Test"
+$dst = "C:\Users\User\Downloads\SaaS-Backup-NinjaPromo-2026-02-12"
+
+if (Test-Path $dst) { Remove-Item $dst -Recurse -Force }
+
+$files = Get-ChildItem -Path $src -Recurse -File | Where-Object {
+    $_.FullName -notmatch '\\node_modules\\' -and
+    $_.FullName -notmatch '\\\.git\\' -and
+    $_.FullName -notmatch '\\dist\\' -and
+    $_.Name -ne 'nul'
+}
+
+foreach ($f in $files) {
+    $rel = $f.FullName.Substring($src.Length)
+    $destFile = Join-Path $dst $rel
+    $destDir = Split-Path $destFile
+    if (!(Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
+    Copy-Item $f.FullName -Destination $destFile -Force
+}
+
+Write-Host "BACKUP COMPLETE - $($files.Count) files copied to $dst"

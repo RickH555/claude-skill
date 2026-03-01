@@ -1,0 +1,104 @@
+"use client"
+
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+interface TabsProps {
+  value: string
+  onValueChange: (value: string) => void
+  children: React.ReactNode
+  className?: string
+}
+
+function Tabs({ value, onValueChange, children, className }: TabsProps) {
+  return (
+    <div className={cn("", className)} data-active-tab={value}>
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child as React.ReactElement<any>, {
+            activeTab: value,
+            onTabChange: onValueChange,
+          })
+        }
+        return child
+      })}
+    </div>
+  )
+}
+
+interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
+  activeTab?: string
+  onTabChange?: (value: string) => void
+}
+
+function TabsList({ className, children, activeTab, onTabChange, ...props }: TabsListProps) {
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-1 rounded-xl bg-white/5 p-1",
+        className
+      )}
+      role="tablist"
+      {...props}
+    >
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child as React.ReactElement<any>, {
+            activeTab,
+            onTabChange,
+          })
+        }
+        return child
+      })}
+    </div>
+  )
+}
+
+interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  value: string
+  activeTab?: string
+  onTabChange?: (value: string) => void
+}
+
+function TabsTrigger({ className, value, activeTab, onTabChange, children, ...props }: TabsTriggerProps) {
+  const isActive = activeTab === value
+
+  return (
+    <button
+      role="tab"
+      aria-selected={isActive}
+      className={cn(
+        "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
+        isActive
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "text-white/50 hover:text-white/80 hover:bg-white/5",
+        className
+      )}
+      onClick={() => onTabChange?.(value)}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+
+interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  value: string
+  activeTab?: string
+}
+
+function TabsContent({ className, value, activeTab, children, ...props }: TabsContentProps) {
+  if (activeTab !== value) return null
+
+  return (
+    <div
+      role="tabpanel"
+      className={cn("mt-4", className)}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+}
+
+export { Tabs, TabsList, TabsTrigger, TabsContent }

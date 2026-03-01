@@ -1,0 +1,103 @@
+export const dynamic = 'force-dynamic';
+
+import PageHeader from '@/components/layout/PageHeader';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export default async function AnalyticsPage() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Get merchant record via user_id
+  const { data: merchant } = await supabase
+    .from('merchants')
+    .select('id')
+    .eq('user_id', user!.id)
+    .single();
+
+  // Fetch aggregated stats
+  const [txnsTotalRes, txnsWeekRes, earnRes, redeemRes] = await Promise.all([
+    supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('validated_by', merchant!.id),
+    supabase.from('transactions').select('*', { count: 'exact', head: true })
+      .eq('validated_by', merchant!.id)
+      .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
+    supabase.from('transactions').select('value').eq('validated_by', merchant!.id).eq('type', 'earn'),
+    supabase.from('transactions').select('value').eq('validated_by', merchant!.id).eq('type', 'redeem'),
+  ]);
+
+  const totalEarned = earnRes.data?.reduce((sum, t) => sum + t.value, 0) || 0;
+  const totalRedeemed = redeemRes.data?.reduce((sum, t) => sum + t.value, 0) || 0;
+
+  const stats = [
+    { label: 'Total transactions', value: txnsTotalRes.count || 0 },
+    { label: 'Cette semaine', value: txnsWeekRes.count || 0 },
+    { label: 'Points distribués', value: totalEarned },
+    { label: 'Points utilisés', value: totalRedeemed },
+  ];
+
+  // Recent transactions
+  const { data: recentTxns } = await supabase
+    .from('transactions')
+    .select('*, customer_cards(customers(email, name), loyalty_programs(name))')
+    .eq('validated_by', merchant!.id)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Analytiques" description="Suivez les performances de vos programmes." />
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((stat, i) => (
+          <Card key={stat.label} className={`stagger-enter stagger-${i + 1}`}>
+            <p className="text-[12px] font-medium text-[var(--text-tertiary)] uppercase tracking-wider mb-1">{stat.label}</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)]">{stat.value.toLocaleString()}</p>
+          </Card>
+        ))}
+      </div>
+
+      {/* Transactions table */}
+      <div>
+        <h2 className="text-[15px] font-semibold text-[var(--text-primary)] mb-4">Transactions récentes</h2>
+        {recentTxns && recentTxns.length > 0 ? (
+          <Card padding="none">
+            <div className="hidden md:grid grid-cols-5 gap-4 px-5 py-3 border-b border-[var(--border-default)] text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+              <span>Client</span>
+              <span>Programme</span>
+              <span>Type</span>
+              <span>Montant</span>
+              <span>Date</span>
+            </div>
+            <div className="divide-y divide-[var(--border-subtle)]">
+              {recentTxns.map((txn: any) => (
+                <div key={txn.id} className="grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-4 px-5 py-3 items-center">
+                  <p className="text-[13px] text-[var(--text-primary)]">
+                    {txn.customer_cards?.customers?.name || txn.customer_cards?.customers?.email || '—'}
+                  </p>
+                  <p className="text-[13px] text-[var(--text-secondary)]">
+                    {txn.customer_cards?.loyalty_programs?.name || '—'}
+                  </p>
+                  <Badge variant={txn.type === 'earn' ? 'success' : 'warning'}>
+                    {txn.type === 'earn' ? 'Gain' : 'Utilisation'}
+                  </Badge>
+                  <p className="text-[13px] font-medium text-[var(--text-primary)]">
+                    {txn.type === 'earn' ? '+' : '-'}{txn.value}
+                  </p>
+                  <p className="text-[12px] text-[var(--text-tertiary)]">
+                    {new Date(txn.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        ) : (
+          <Card className="text-center py-8">
+            <p className="text-[var(--text-tertiary)] text-[13px]">Aucune transaction enregistrée.</p>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

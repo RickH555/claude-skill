@@ -1,0 +1,70 @@
+import React from 'react';
+import { Zap } from 'lucide-react';
+import { useTranslation } from '../i18n';
+import { User } from '../types';
+
+interface AppFooterProps {
+  user: User | null;
+  navigateTo: (view: string) => void;
+}
+
+const AppFooter: React.FC<AppFooterProps> = ({ user, navigateTo }) => {
+  const { t } = useTranslation();
+
+  return (
+    <footer className={`border-t border-white/[0.06] glass-panel mt-auto ${user ? 'pb-20 md:pb-0' : ''}`}>
+      <div className="w-full px-4 py-16">
+        <div className="grid md:grid-cols-4 gap-12 mb-12">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-purple-900/40">
+                <Zap size={16} className="text-white fill-white" />
+              </div>
+              <span className="text-xl font-bold tracking-tight">
+                <span className="text-white">CitedBy</span><span className="text-amber-400">.ai</span>
+              </span>
+            </div>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              {t.footer.tagline}
+            </p>
+          </div>
+          <div>
+            <h4 className="font-bold text-white mb-6">{t.footer.product}</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li><button onClick={() => navigateTo('analyze')} className="hover:text-primary transition-colors text-left">{t.footer.freeAudit}</button></li>
+              <li><button onClick={() => navigateTo('directory')} className="hover:text-primary transition-colors text-left">{t.footer.indexDirectory}</button></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.devApi}</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-white mb-6">{t.footer.aeoResources}</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.schemaGuide}</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.llmFunctioning}</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.aiComparison}</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.techBlog}</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-white mb-6">{t.footer.company}</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.about}</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.contact}</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.legal}</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t.footer.privacy}</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+          <p>{t.footer.copyright}</p>
+          <div className="flex gap-2 items-center mt-4 md:mt-0">
+             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+             {t.common.operationalSystems}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default AppFooter;

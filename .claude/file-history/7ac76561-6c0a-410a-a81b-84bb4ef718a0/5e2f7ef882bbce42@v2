@@ -1,0 +1,76 @@
+# CitedBy.ai — Instructions Projet
+
+## Architecture
+- SPA Vite + React avec routing dans App.tsx
+- Pages dans pages/ (28 fichiers .tsx)
+- Services dans services/ (12 fichiers .ts)
+- Composants dans components/ (7 fichiers)
+- i18n dans i18n/ (FR/EN/ES)
+- Design : dark theme Tailwind, accents purple/violet
+
+## Commandes
+- npm run dev → Vite dev server (port dynamique, souvent 5173+)
+- npm run build → Build production Vite
+- npm run preview → Preview production build
+
+## Stack technique
+- **Frontend** : React 18, Tailwind CSS (CDN), Lucide Icons
+- **AI** : Google Gemini (@google/genai) avec fallback simulation
+- **Auth** : Supabase (Auth + PostgreSQL) — Login mock en local (email + mdp quelconque)
+- **Paiement** : Stripe (interface unifiee StripeCheckout, integration reelle a venir)
+- **i18n** : Systeme custom React Context (FR/EN/ES)
+- **Validation** : Zod + React Hook Form
+- **Charts** : Recharts
+- **PDF** : jsPDF (generation factures)
+
+## Regles importantes
+- NE PAS migrer vers Next.js. L'architecture est Vite SPA.
+- NE PAS modifier services/analyzer.ts, services/criteria.ts, services/generator.ts
+- NE PAS supprimer de fichiers existants
+- Toute generation IA utilise GoogleGenAI avec fallback simulation si API key absente
+- Le design est dark theme : bg-[#1a1d21], border-white/5, rounded-2xl
+- Palette accents : gradient purple-500 → violet-600, text-purple-400
+
+## Composants partages (components/)
+- **StripeCheckout.tsx** — Interface de paiement Stripe unifiee (abonnements + one-time). Props : mode, productName, productDescription, productIcon, amount, amountDetails, userEmail, onConfirm, onBack, isProcessing, ctaLabel. Contient des commentaires `STRIPE_INTEGRATION_POINT` pour futur remplacement par les vrais elements Stripe (`<CardElement>`, `<CardNumberElement>`, etc.)
+- AICitationPreview.tsx — Preview citations IA
+- CategoryCard.tsx — Carte categorie
+- GenerationModal.tsx — Modal generation contenu
+- RecommendationCard.tsx — Carte recommandation
+- ScoreRing.tsx — Anneau de score visuel
+- SourceOfTruthModal.tsx — Modal source of truth
+
+## Flux de paiement (etat actuel)
+
+### Abonnements (Account.tsx & Plan.tsx)
+- Modal 3 etapes : recap → **StripeCheckout** (formulaire Stripe) → succes
+- Le recap montre plan actuel vs nouveau plan avec calcul prorata
+- StripeCheckout affiche : header stripe, resume commande, detail montants, formulaire carte (fake), bouton "Payer X €", badges confiance SSL/Stripe/Chiffre, mentions CGV
+- Le succes confirme le paiement et ajoute une facture dans l'historique
+- Plan upgrades : Starter (29€) → Pro (89€) → Agency (299€)
+
+### Recharges GTO Gas (Recharge.tsx)
+- Liste des 3 packs : Le Jerrican (50 Gas, 15€), La Pompe (200 Gas, 49€), La Citerne (1000 Gas, 199€)
+- Clic "Acheter" → **StripeCheckout** (mode one-time) avec detail TVA (HT + 20% TVA = TTC)
+- Colonne droite : upsells contextuels (pack superieur + abonnement monitoring)
+- Resultat : succes (avec telecharger facture PDF) ou erreur (avec retry)
+
+### Integration Stripe reelle (TODO)
+- Remplacer les fake inputs dans StripeCheckout par `<CardElement>` de @stripe/react-stripe-js
+- Wrapper le composant avec `<Elements>` provider
+- Chercher les commentaires `STRIPE_INTEGRATION_POINT` dans components/StripeCheckout.tsx (6 points)
+- Connecter onConfirm aux endpoints Stripe reels
+
+## Pages principales et navigation (sidebar)
+- Accueil → Nouvel Audit (Analyze)
+- Dashboard
+- Monitoring AEO
+- Outils Generatifs (GenerativeTools)
+- Annuaire Indexe (Directory / DirectoryEntity)
+- GTO Gas (Credits) → Recharge.tsx
+- Affiliation
+- Base Clients (Clients)
+- Ordres de Mission (MissionOrders)
+- Compte & Plan → Account.tsx (onglets Profil / Abonnement & Projets / Facturation)
+
+Note : Plan.tsx existe comme page standalone mais n'est PAS routee dans App.tsx actuellement. Le flux d'upgrade passe par Account.tsx (onglet Abonnement).

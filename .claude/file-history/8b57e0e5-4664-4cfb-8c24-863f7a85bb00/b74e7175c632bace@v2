@@ -1,0 +1,21 @@
+'use client';
+
+import React from 'react';
+import { I18nProvider } from '@/i18n';
+import { AppProvider } from '@/lib/app-context';
+import { ToastProvider } from '@/lib/toast-context';
+import AppShellWrapper from '@/components/layout/AppShellWrapper';
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <I18nProvider>
+      <AppProvider>
+        <ToastProvider>
+          <AppShellWrapper>
+            {children}
+          </AppShellWrapper>
+        </ToastProvider>
+      </AppProvider>
+    </I18nProvider>
+  );
+}

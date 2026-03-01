@@ -1,0 +1,46 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { Organization } from '@/types';
+import { PLANS } from '@/lib/constants';
+
+export function useSubscription(organizationId: string | null) {
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    if (!organizationId) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchOrg = async () => {
+      const { data } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('id', organizationId)
+        .single();
+      setOrganization(data);
+      setLoading(false);
+    };
+
+    fetchOrg();
+  }, [organizationId]);
+
+  const plan = organization?.plan || 'free';
+  const limits = PLANS[plan]?.limits;
+
+  const canUploadDocument = organization ? organization.doc_used < (limits?.documents_per_month ?? 0) : false;
+  const canCreateSurvey = organization ? organization.survey_used < (limits?.surveys ?? 0) : false;
+
+  return {
+    organization,
+    plan,
+    limits,
+    loading,
+    canUploadDocument,
+    canCreateSurvey,
+  };
+}

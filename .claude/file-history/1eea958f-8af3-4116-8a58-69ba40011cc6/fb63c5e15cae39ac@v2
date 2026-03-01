@@ -1,0 +1,302 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  PenTool,
+  ArrowLeft,
+  ArrowRight,
+  Sparkles,
+  Loader2,
+  Copy,
+  Check,
+  ShoppingCart,
+  Monitor,
+  Building,
+  UtensilsCrossed,
+  Heart,
+  DollarSign,
+  Scale,
+  GraduationCap,
+  Globe,
+} from 'lucide-react';
+import { PageHeader } from '@/components/page-header';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import type { ContentVertical, ContentType } from '@/types';
+
+const VERTICALS: { id: ContentVertical; label: string; icon: typeof Globe }[] = [
+  { id: 'ecommerce', label: 'E-commerce', icon: ShoppingCart },
+  { id: 'saas', label: 'SaaS', icon: Monitor },
+  { id: 'immobilier', label: 'Immobilier', icon: Building },
+  { id: 'restauration', label: 'Restauration', icon: UtensilsCrossed },
+  { id: 'sante', label: 'Sante', icon: Heart },
+  { id: 'finance', label: 'Finance', icon: DollarSign },
+  { id: 'juridique', label: 'Juridique', icon: Scale },
+  { id: 'education', label: 'Education', icon: GraduationCap },
+  { id: 'general', label: 'General', icon: Globe },
+];
+
+const CONTENT_TYPES: { id: ContentType; label: string; description: string }[] = [
+  { id: 'product_description', label: 'Description Produit', description: 'Fiche produit optimisee AEO' },
+  { id: 'landing_page', label: 'Landing Page', description: 'Contenu de page d\'atterrissage' },
+  { id: 'sales_email', label: 'Email Commercial', description: 'Email de prospection personnalise' },
+  { id: 'meta_tags', label: 'Meta Tags', description: 'Title + description SEO/AEO' },
+  { id: 'social_post', label: 'Post Social', description: 'Publication reseaux sociaux' },
+  { id: 'press_release', label: 'Communique de Presse', description: 'CP structure et optimise' },
+  { id: 'case_study', label: 'Etude de Cas', description: 'Temoignage client detaille' },
+  { id: 'newsletter', label: 'Newsletter', description: 'Email marketing regulier' },
+];
+
+const TONES = [
+  { id: 'professionnel', label: 'Professionnel' },
+  { id: 'decontracte', label: 'Decontracte' },
+  { id: 'autoritaire', label: 'Autoritaire' },
+  { id: 'empathique', label: 'Empathique' },
+  { id: 'technique', label: 'Technique' },
+];
+
+export default function ContentWriterPage() {
+  const [step, setStep] = useState(0);
+  const [vertical, setVertical] = useState<ContentVertical | null>(null);
+  const [contentType, setContentType] = useState<ContentType | null>(null);
+  const [brandName, setBrandName] = useState('');
+  const [product, setProduct] = useState('');
+  const [audience, setAudience] = useState('');
+  const [tone, setTone] = useState('professionnel');
+  const [generating, setGenerating] = useState(false);
+  const [result, setResult] = useState<{ title: string; content: string; score: number; tips: string[] } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerate = () => {
+    setGenerating(true);
+    setTimeout(() => {
+      setResult({
+        title: `${contentType === 'landing_page' ? 'Landing Page' : contentType === 'product_description' ? 'Description Produit' : 'Contenu'} — ${brandName}`,
+        content: `# ${brandName} — ${product}\n\n## Votre solution pour ${audience}\n\nDans un monde ou la visibilite digitale est essentielle, ${brandName} propose ${product} — une solution innovante conçue specifiquement pour ${audience}.\n\n### Pourquoi choisir ${brandName} ?\n\n- **Expertise prouvee** : +500 clients satisfaits dans le secteur\n- **Technologie de pointe** : Algorithmes IA proprietaires\n- **Support premium** : Equipe dediee disponible 24/7\n- **ROI mesurable** : Resultats visibles des le premier mois\n\n### Comment ça fonctionne\n\n1. **Analyse initiale** — Audit complet de votre situation actuelle\n2. **Strategie sur mesure** — Plan d'action adapte a vos objectifs\n3. **Implementation** — Deploiement rapide et accompagne\n4. **Optimisation continue** — Amelioration iterative basee sur les donnees\n\n### Temoignage client\n\n> "${brandName} a transforme notre approche. En 3 mois, nous avons augmente notre visibilite IA de 150%." — Directeur Marketing, Client Premium\n\n### Commencez aujourd'hui\n\nRejoinissez les entreprises qui font confiance a ${brandName} pour leur strategie digitale.`,
+        score: 84,
+        tips: [
+          'Ajouter des donnees chiffrees specifiques pour renforcer la credibilite',
+          'Integrer un Schema.org Product ou Service pour le balisage structure',
+          'Inclure une FAQ en bas de page pour maximiser l\'extractibilite IA',
+          'Ajouter des liens internes vers des etudes de cas pour enrichir le contexte',
+        ],
+      });
+      setGenerating(false);
+      setStep(3);
+    }, 2500);
+  };
+
+  const handleCopy = () => {
+    if (result) {
+      navigator.clipboard.writeText(result.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <PageHeader
+        title="Content Writer"
+        description="Generez du contenu marketing optimise AEO pour votre verticale."
+        breadcrumbs={[
+          { label: 'App', href: '/app' },
+          { label: 'Outils Generatifs', href: '/app/generative-tools' },
+          { label: 'Content Writer' },
+        ]}
+      />
+
+      {/* Progress Steps */}
+      <div className="flex items-center justify-center gap-2 mb-10">
+        {['Verticale', 'Type', 'Details', 'Resultat'].map((label, i) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+              step === i ? 'bg-primary text-black' : step > i ? 'bg-primary/20 text-primary' : 'bg-white/5 text-white/30'
+            }`}>
+              {step > i ? '✓' : i + 1}
+            </div>
+            <span className={`text-xs hidden sm:inline ${step === i ? 'text-white' : 'text-white/30'}`}>{label}</span>
+            {i < 3 && <div className={`w-8 h-px ${step > i ? 'bg-primary/30' : 'bg-white/10'}`} />}
+          </div>
+        ))}
+      </div>
+
+      {/* Step 0: Vertical */}
+      {step === 0 && (
+        <div className="max-w-3xl mx-auto animate-fade-in-up">
+          <h2 className="text-lg font-bold text-white mb-6 text-center">Choisissez votre verticale</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {VERTICALS.map((v) => {
+              const Icon = v.icon;
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => { setVertical(v.id); setStep(1); }}
+                  className={`p-4 rounded-xl border transition-all text-center hover:border-primary/30 hover:bg-primary/5 ${
+                    vertical === v.id ? 'bg-primary/10 border-primary/30' : 'bg-white/[0.02] border-white/10'
+                  }`}
+                >
+                  <Icon size={24} className="mx-auto mb-2 text-white/50" />
+                  <span className="text-sm text-white font-medium">{v.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Step 1: Content Type */}
+      {step === 1 && (
+        <div className="max-w-3xl mx-auto animate-fade-in-up">
+          <h2 className="text-lg font-bold text-white mb-6 text-center">Type de contenu</h2>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {CONTENT_TYPES.map((ct) => (
+              <button
+                key={ct.id}
+                onClick={() => { setContentType(ct.id); setStep(2); }}
+                className={`p-4 rounded-xl border transition-all text-left hover:border-primary/30 hover:bg-primary/5 ${
+                  contentType === ct.id ? 'bg-primary/10 border-primary/30' : 'bg-white/[0.02] border-white/10'
+                }`}
+              >
+                <span className="text-sm font-bold text-white">{ct.label}</span>
+                <p className="text-xs text-white/40 mt-1">{ct.description}</p>
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-start mt-6">
+            <Button variant="outline" size="sm" onClick={() => setStep(0)} className="gap-1.5">
+              <ArrowLeft size={14} /> Retour
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 2: Details Form */}
+      {step === 2 && (
+        <div className="max-w-xl mx-auto animate-fade-in-up">
+          <h2 className="text-lg font-bold text-white mb-6 text-center">Details du contenu</h2>
+          <Card className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1.5">Nom de la marque</label>
+              <input
+                type="text"
+                value={brandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                placeholder="Ex: CitedBy.ai"
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1.5">Produit / Service</label>
+              <input
+                type="text"
+                value={product}
+                onChange={(e) => setProduct(e.target.value)}
+                placeholder="Ex: Plateforme d'optimisation AEO"
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1.5">Audience cible</label>
+              <input
+                type="text"
+                value={audience}
+                onChange={(e) => setAudience(e.target.value)}
+                placeholder="Ex: Responsables marketing B2B"
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-1.5">Ton</label>
+              <div className="flex flex-wrap gap-2">
+                {TONES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setTone(t.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      tone === t.id ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-white/5 text-white/50 border border-white/10 hover:border-white/20'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button variant="outline" onClick={() => setStep(1)} className="gap-1.5">
+                <ArrowLeft size={14} /> Retour
+              </Button>
+              <Button
+                onClick={handleGenerate}
+                disabled={!brandName || !product || !audience || generating}
+                className="flex-1 gap-2"
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    Generation...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={16} />
+                    Generer le contenu
+                  </>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Step 3: Result */}
+      {step === 3 && result && (
+        <div className="max-w-4xl mx-auto animate-fade-in-up space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <PenTool size={20} className="text-primary" />
+              <h2 className="text-lg font-bold text-white">{result.title}</h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant="success">Score AEO: {result.score}/100</Badge>
+              <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? 'Copie !' : 'Copier'}
+              </Button>
+            </div>
+          </div>
+
+          <Card className="p-6">
+            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-6 max-h-[500px] overflow-y-auto">
+              <pre className="whitespace-pre-wrap text-sm text-white/70 font-sans leading-relaxed">
+                {result.content}
+              </pre>
+            </div>
+          </Card>
+
+          {/* AEO Tips */}
+          <Card className="p-5">
+            <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+              <Sparkles size={14} className="text-primary" />
+              Conseils AEO
+            </h3>
+            <ul className="space-y-2">
+              {result.tips.map((tip, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs text-white/50">
+                  <ArrowRight size={12} className="text-primary shrink-0 mt-0.5" />
+                  {tip}
+                </li>
+              ))}
+            </ul>
+          </Card>
+
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => { setStep(0); setResult(null); }} className="gap-1.5">
+              <ArrowLeft size={14} /> Nouveau contenu
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

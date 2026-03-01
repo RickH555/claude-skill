@@ -1,0 +1,9 @@
+{
+  "id": "20",
+  "subject": "Create globals.css with the full design system",
+  "description": "Create src/app/globals.css with TailwindCSS v4 import and the complete CitedBy.io dual-theme design system (light/dark CSS variables, foundations, scrollbar, animations, micro-interactions, utilities, accessibility)",
+  "activeForm": "Creating globals.css design system",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

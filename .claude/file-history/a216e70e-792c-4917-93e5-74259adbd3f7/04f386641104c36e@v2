@@ -1,0 +1,187 @@
+import React, { useState } from 'react';
+import { Share2, Copy, CheckCircle, Users, DollarSign, TrendingUp, ExternalLink, Gift, ArrowRight, Download, Calendar, Link2, Sparkles } from 'lucide-react';
+import { User } from '../types';
+
+interface AffiliationProps {
+  onBack: () => void;
+  user: User | null;
+}
+
+const Affiliation: React.FC<AffiliationProps> = ({ onBack, user }) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'referrals' | 'payouts'>('overview');
+  const [copied, setCopied] = useState(false);
+
+  const affiliateLink = `https://citedby.ai/ref/${user?.id || 'demo123'}`;
+  const affiliateCode = user?.id?.slice(0, 8).toUpperCase() || 'DEMO1234';
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const referrals = [
+    { id: 1, name: 'Marie L.', email: 'm***@gmail.com', date: '2026-02-15', status: 'active', credits: 50, commission: 7.50 },
+    { id: 2, name: 'Thomas B.', email: 't***@company.fr', date: '2026-02-10', status: 'active', credits: 200, commission: 24.50 },
+    { id: 3, name: 'Sarah K.', email: 's***@startup.io', date: '2026-01-28', status: 'pending', credits: 0, commission: 0 },
+    { id: 4, name: 'Lucas M.', email: 'l***@agency.com', date: '2026-01-15', status: 'active', credits: 1000, commission: 99.50 },
+    { id: 5, name: 'Emma D.', email: 'e***@shop.fr', date: '2025-12-20', status: 'active', credits: 50, commission: 7.50 },
+  ];
+
+  const payouts = [
+    { id: 'PAY-001', date: '2026-02-01', amount: 139.00, status: 'paid', method: 'Virement SEPA' },
+    { id: 'PAY-002', date: '2026-01-01', amount: 87.50, status: 'paid', method: 'Virement SEPA' },
+    { id: 'PAY-003', date: '2025-12-01', amount: 32.00, status: 'paid', method: 'PayPal' },
+  ];
+
+  const stats = {
+    totalReferrals: referrals.length,
+    activeReferrals: referrals.filter(r => r.status === 'active').length,
+    totalCommission: referrals.reduce((a, r) => a + r.commission, 0),
+    totalPaid: payouts.reduce((a, p) => a + p.amount, 0),
+    conversionRate: 80,
+  };
+
+  return (
+    <div className="w-full px-6 py-8 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Programme <span className="gradient-text">Affiliation</span></h1>
+          <p className="text-gray-500 text-sm mt-1">Gagnez 50% de commission sur chaque filleul</p>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full">
+          <Gift size={14} className="text-amber-400" />
+          <span className="text-sm text-amber-300 font-bold">50% de commission</span>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-white/[0.03] rounded-xl p-1 mb-8 w-fit">
+        {(['overview', 'referrals', 'payouts'] as const).map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)} className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab ? 'bg-amber-500/20 text-amber-300 border border-amber-500/20' : 'text-gray-500 hover:text-gray-300'}`}>
+            {tab === 'overview' ? 'Vue d\'ensemble' : tab === 'referrals' ? 'Filleuls' : 'Paiements'}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'overview' && (
+        <div>
+          {/* KPIs */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="ninja-card p-5">
+              <Users size={20} className="text-amber-400 mb-2" />
+              <div className="text-2xl font-bold text-white">{stats.totalReferrals}</div>
+              <div className="text-xs text-gray-500">Filleuls total</div>
+            </div>
+            <div className="ninja-card p-5">
+              <CheckCircle size={20} className="text-green-400 mb-2" />
+              <div className="text-2xl font-bold text-white">{stats.activeReferrals}</div>
+              <div className="text-xs text-gray-500">Filleuls actifs</div>
+            </div>
+            <div className="ninja-card p-5">
+              <DollarSign size={20} className="text-amber-400 mb-2" />
+              <div className="text-2xl font-bold text-white">{stats.totalCommission.toFixed(2)}\u20ac</div>
+              <div className="text-xs text-gray-500">Commissions en attente</div>
+            </div>
+            <div className="ninja-card p-5">
+              <TrendingUp size={20} className="text-green-400 mb-2" />
+              <div className="text-2xl font-bold text-white">{stats.totalPaid.toFixed(2)}\u20ac</div>
+              <div className="text-xs text-gray-500">Total pay\u00e9</div>
+            </div>
+          </div>
+
+          {/* Affiliate Link */}
+          <div className="ninja-card p-6 mb-8">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><Link2 size={18} className="text-amber-400" /> Votre lien d'affiliation</h3>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3">
+                <span className="text-sm text-gray-300 truncate flex-1">{affiliateLink}</span>
+                <button onClick={() => handleCopy(affiliateLink)} className="text-amber-400 hover:text-amber-300 shrink-0">
+                  {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
+                </button>
+              </div>
+              <button onClick={() => handleCopy(affiliateLink)} className="btn-gradient px-6 py-3 font-bold flex items-center gap-2 whitespace-nowrap">
+                <Share2 size={16} /> Copier le lien
+              </button>
+            </div>
+            <div className="mt-4 flex items-center gap-6 text-sm">
+              <div><span className="text-gray-500">Code :</span> <span className="text-amber-400 font-mono font-bold">{affiliateCode}</span></div>
+              <div><span className="text-gray-500">Taux de conversion :</span> <span className="text-green-400 font-bold">{stats.conversionRate}%</span></div>
+            </div>
+          </div>
+
+          {/* Marketing Assets */}
+          <div className="ninja-card p-6">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><Sparkles size={18} className="text-amber-400" /> Assets marketing</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                { name: 'Banni\u00e8re 728x90', type: 'PNG', size: '45 KB' },
+                { name: 'Carr\u00e9 300x300', type: 'PNG', size: '32 KB' },
+                { name: 'Kit email', type: 'HTML', size: '12 KB' },
+              ].map(asset => (
+                <div key={asset.name} className="p-4 bg-white/[0.02] border border-white/[0.06] rounded-xl flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-white">{asset.name}</div>
+                    <div className="text-[10px] text-gray-500">{asset.type} \u2022 {asset.size}</div>
+                  </div>
+                  <button className="text-amber-400 hover:text-amber-300"><Download size={16} /></button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'referrals' && (
+        <div className="ninja-card p-6">
+          <h3 className="text-lg font-bold text-white mb-4">Vos filleuls</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead><tr className="text-gray-500 border-b border-white/[0.06]"><th className="pb-3 font-medium">Nom</th><th className="pb-3 font-medium">Email</th><th className="pb-3 font-medium">Date</th><th className="pb-3 font-medium">Cr\u00e9dits achet\u00e9s</th><th className="pb-3 font-medium">Commission</th><th className="pb-3 font-medium">Statut</th></tr></thead>
+              <tbody>
+                {referrals.map(ref => (
+                  <tr key={ref.id} className="border-b border-white/[0.06] last:border-0">
+                    <td className="py-3 text-gray-300">{ref.name}</td>
+                    <td className="py-3 text-gray-500">{ref.email}</td>
+                    <td className="py-3 text-gray-500">{ref.date}</td>
+                    <td className="py-3 text-white font-semibold">{ref.credits}</td>
+                    <td className="py-3 text-amber-400 font-semibold">{ref.commission.toFixed(2)}\u20ac</td>
+                    <td className="py-3"><span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${ref.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{ref.status === 'active' ? 'Actif' : 'En attente'}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'payouts' && (
+        <div className="ninja-card p-6">
+          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><DollarSign size={18} className="text-amber-400" /> Historique des paiements</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead><tr className="text-gray-500 border-b border-white/[0.06]"><th className="pb-3 font-medium">R\u00e9f\u00e9rence</th><th className="pb-3 font-medium">Date</th><th className="pb-3 font-medium">Montant</th><th className="pb-3 font-medium">M\u00e9thode</th><th className="pb-3 font-medium">Statut</th></tr></thead>
+              <tbody>
+                {payouts.map(p => (
+                  <tr key={p.id} className="border-b border-white/[0.06] last:border-0">
+                    <td className="py-3 text-gray-300 font-mono text-xs">{p.id}</td>
+                    <td className="py-3 text-gray-500">{p.date}</td>
+                    <td className="py-3 text-white font-bold">{p.amount.toFixed(2)}\u20ac</td>
+                    <td className="py-3 text-gray-400">{p.method}</td>
+                    <td className="py-3"><span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] rounded-full font-bold">Pay\u00e9</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-6 p-4 bg-amber-500/[0.05] border border-amber-500/20 rounded-xl flex items-center gap-3">
+            <Calendar size={16} className="text-amber-400 shrink-0" />
+            <p className="text-sm text-gray-400">Les paiements sont effectu\u00e9s le 1er de chaque mois pour les commissions du mois pr\u00e9c\u00e9dent (minimum 50\u20ac).</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Affiliation;

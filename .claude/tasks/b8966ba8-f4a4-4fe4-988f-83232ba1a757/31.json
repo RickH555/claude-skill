@@ -1,0 +1,9 @@
+{
+  "id": "31",
+  "subject": "Run typecheck and build test, fix any errors",
+  "description": "Run pnpm run typecheck and pnpm run build, fix any errors that arise",
+  "activeForm": "Running typecheck and build test",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,88 @@
+import { describe, it, expect } from "vitest"
+import { quickScore } from "@/services/content_scorer"
+
+describe("quickScore (rule-based AEO scoring)", () => {
+  it("returns baseline score of 50 for empty content", () => {
+    const result = quickScore("")
+    expect(result.score).toBeLessThanOrEqual(50)
+  })
+
+  it("scores higher with H1 and H2 headings", () => {
+    const withHeadings = quickScore(
+      "# Main Title\n\nIntroduction paragraph with enough words to pass.\n\n## Section One\n\n## Section Two\n\n## Section Three\n\nContent here."
+    )
+    const withoutHeadings = quickScore(
+      "Just some plain text without any structure at all."
+    )
+    expect(withHeadings.score).toBeGreaterThan(withoutHeadings.score)
+  })
+
+  it("rewards answer-first pattern (50-300 char first paragraph)", () => {
+    const good = quickScore(
+      "The answer to this question is straightforward: AEO optimization helps brands become visible in AI responses through structured content.\n\nMore details here."
+    )
+    const bad = quickScore("Hi.\n\nMore text.")
+    expect(good.score).toBeGreaterThan(bad.score)
+  })
+
+  it("rewards data density (numbers, stats)", () => {
+    const withData = quickScore(
+      "Revenue grew 45% in 2024. Over 12,000 companies use AEO. Average ROI is 300%. The market is worth $5.2B. CTR improved by 23%."
+    )
+    const withoutData = quickScore(
+      "Revenue grew significantly. Many companies use AEO. The ROI is high. The market is growing. CTR improved."
+    )
+    expect(withData.score).toBeGreaterThan(withoutData.score)
+  })
+
+  it("rewards list items", () => {
+    const withLists = quickScore(
+      "Key benefits:\n- Monitoring\n- Tracking\n- Optimization\n- Reports"
+    )
+    expect(withLists.score).toBeGreaterThanOrEqual(50)
+  })
+
+  it("rewards FAQ sections", () => {
+    const withFAQ = quickScore(
+      "## FAQ\n\nQ: What is AEO?\nA: Answer Engine Optimization.\n\nQ: How does it work?\nA: It optimizes content."
+    )
+    const withoutFAQ = quickScore("Just normal content without questions.")
+    expect(withFAQ.score).toBeGreaterThan(withoutFAQ.score)
+  })
+
+  it("rewards longer content (500+ words)", () => {
+    const longContent = quickScore("word ".repeat(600))
+    const shortContent = quickScore("word ".repeat(100))
+    expect(longContent.score).toBeGreaterThan(shortContent.score)
+  })
+
+  it("penalizes very short content", () => {
+    const result = quickScore("Too short.")
+    expect(result.flags).toContain("Contenu trop court (< 200 mots)")
+  })
+
+  it("rewards Schema.org markers", () => {
+    const withSchema = quickScore(
+      'Content with schema.org references and json-ld markup for structured data.'
+    )
+    const withoutSchema = quickScore(
+      "Content without any structured data references at all."
+    )
+    expect(withSchema.score).toBeGreaterThan(withoutSchema.score)
+  })
+
+  it("clamps score between 0 and 100", () => {
+    const maxContent =
+      "# Title\n\n" +
+      "This is a well-structured answer with enough detail to pass validation.\n\n" +
+      "## Section 1\n\n## Section 2\n\n## Section 3\n\n" +
+      "Revenue: 45%, $12M, 5000 users, 300% ROI, 23% CTR, 8.5/10\n\n" +
+      "- Item 1\n- Item 2\n- Item 3\n\n" +
+      "## FAQ\n\nQ: Question?\nA: Answer.\n\nQ: Another?\nA: Yes.\n\nQ: More?\nA: Indeed.\n\n" +
+      "schema.org json-ld @type\n\n" +
+      "word ".repeat(600)
+    const result = quickScore(maxContent)
+    expect(result.score).toBeLessThanOrEqual(100)
+    expect(result.score).toBeGreaterThanOrEqual(0)
+  })
+})

@@ -1,0 +1,257 @@
+# CitedBy.ai — Contexte de Développement Claude Code
+
+> Fichier de contexte pour reprendre les modifications à tout moment.
+> Dernière mise à jour : 2026-02-14
+
+---
+
+## 1. Historique des sessions
+
+### Session 1 — Restauration Vite SPA (commit 8221f47)
+**Problème** : Une session Claude précédente avait cassé le projet en tentant une migration vers Next.js App Router.
+- `pages/` renommé en `_legacy_pages/`
+- `package.json` scripts pointant vers `next dev`
+- `vite` retiré des dépendances
+- `tsconfig.json` excluant `App.tsx`, `index.tsx`, `vite.config.ts`
+- `CLAUDE.md` réécrit pour Next.js
+
+**Corrections appliquées** :
+- Renommage `_legacy_pages/` → `pages/` (24 fichiers .tsx restaurés)
+- `package.json` : scripts corrigés vers `vite`, `vite build`, `vite preview`
+- `vite` + `@vitejs/plugin-react` réinstallés en devDependencies
+- `jspdf` + `html2canvas` ajoutés aux dependencies
+- `tsconfig.json` : exclusions supprimées (seul `node_modules` reste exclu)
+- `pages/Results.tsx` : `</div>` manquant ajouté (ligne ~321)
+- `pages/SchemaOrg.tsx` : `<script>` littéral en JSX échappé en `{'<script type="application/ld+json">'}`
+- `CLAUDE.md` : réécrit pour refléter l'architecture Vite SPA réelle
+
+### Session 2 — Ajout Suivi Bots IA (commit 88590de)
+**Demande** : Ajouter une page complète "Activation & Suivi des Bots IA" avec dashboard complet.
+
+**Fichiers créés** :
+- `pages/BotTracking.tsx` — Dashboard complet (659 lignes) avec :
+  - 4 KPIs (bots actifs, crawls/jour, crawls/semaine, pages indexées)
+  - Graphe d'activité de crawl 24h (barres interactives)
+  - Liste de 10 bots IA (GPTBot, ChatGPT-User, ClaudeBot, Google-Extended, PerplexityBot, CCBot, Applebot, Amazonbot, FacebookBot, anthropic-ai)
+  - Statuts : actif/inactif/bloqué avec toggles on/off
+  - Panneau détaillé expandable par bot (crawls, pages, fréquence, user-agent, règle robots.txt)
+  - Filtres (Tous/Actifs/Inactifs/Bloqués)
+  - 5 alertes contextuelles (warning/info/critical)
+  - Timeline live des crawls en temps réel (page, bot, temps de réponse, statut)
+  - Top 6 des pages les plus crawlées avec barres de progression
+  - Bouton Actualiser avec animation
+
+**Fichiers modifiés** :
+- `App.tsx` : import BotTracking, ajout `'bot-tracking'` au type union, route, sidebar active state
+- `pages/GenerativeTools.tsx` : ajout import `Bot` icon, nouvelle carte "Suivi Bots IA" (cyan)
+- `i18n/types.ts` : ajout `botTracking` + `botTrackingDesc` dans `generativeTools`
+- `i18n/locales/fr.ts` : "Suivi Bots IA" / "Activation & suivi des crawlers"
+- `i18n/locales/en.ts` : "AI Bot Tracking" / "Activation & crawler monitoring"
+- `i18n/locales/es.ts` : "Seguimiento Bots IA" / "Activación y seguimiento de crawlers"
+
+---
+
+## 2. Architecture du projet
+
+```
+CitedBy.ai — SPA Vite + React (PAS Next.js)
+├── App.tsx                  # Routing SPA, sidebar, state global
+├── index.tsx                # Point d'entrée React (div#root)
+├── index.html               # HTML avec Tailwind CDN, import maps
+├── types.ts                 # Types TypeScript partagés
+├── vite.config.ts           # Config Vite (port 3000, react plugin)
+├── package.json             # Scripts: dev/build/preview via Vite
+├── tsconfig.json            # Exclude: node_modules uniquement
+├── CLAUDE.md                # Instructions projet pour Claude Code
+├── pages/ (25 fichiers)     # Pages de l'application
+├── services/ (12 fichiers)  # Services métier et IA
+├── components/ (6 fichiers) # Composants réutilisables
+├── i18n/                    # Système i18n FR/EN/ES
+│   ├── context.tsx
+│   ├── index.ts
+│   ├── types.ts
+│   └── locales/ (fr.ts, en.ts, es.ts)
+├── app/                     # Vestiges Next.js (NON UTILISÉ, conservé)
+├── lib/                     # Vestiges Next.js (NON UTILISÉ, conservé)
+└── docs/                    # Documentation interne
+```
+
+### Pages (25)
+| Fichier | Route (`currentView`) | Description |
+|---|---|---|
+| Home.tsx | `home` | Landing page publique |
+| Login.tsx | `login` | Authentification |
+| Analyze.tsx | `analyze` | Nouvel Audit AEO |
+| Dashboard.tsx | `dashboard` | Dashboard Pro |
+| Projects.tsx | `projects` | Monitoring AEO |
+| Results.tsx | `results` | Rapport d'audit détaillé |
+| ActionPlan.tsx | — | Plan d'action (sous-vue Projects) |
+| History.tsx | `history` | Historique des analyses |
+| GenerativeTools.tsx | `generative-tools` | Hub des 7 outils génératifs |
+| SMCStudio.tsx | `smc-studio` | Création contenu AEO |
+| ContentWriter.tsx | `content-writer` | AI Content Writer B2B (Module #3) |
+| Reputation.tsx | `reputation` | Réputation IA (Module #4) |
+| SourceOfTruth.tsx | `source-of-truth` | Référence canonique LLM |
+| SchemaOrg.tsx | `schema-org` | Données structurées |
+| RobotsTxt.tsx | `robots-txt` | Optimisation robots.txt |
+| **BotTracking.tsx** | **`bot-tracking`** | **Activation & Suivi Bots IA (NOUVEAU)** |
+| Directory.tsx | `directory` | Annuaire Knowledge Graph |
+| DirectoryEntity.tsx | `directory-entity` | Fiche entité annuaire |
+| Recharge.tsx | `recharge` | GTO Gas Station (crédits) |
+| Plan.tsx | `plan` | Plan & Facturation |
+| Account.tsx | `account` | Mon Compte |
+| Clients.tsx | `clients` | Base clients |
+| Affiliation.tsx | `affiliation` | Programme partenaire |
+| PublisherRequest.tsx | `publisher-request` | Demande éditeur |
+| BlogOptimizer.tsx | — | Optimiseur de blog |
+
+### Services (12)
+| Fichier | Rôle | Modifiable ? |
+|---|---|---|
+| analyzer.ts | Analyse AEO principale | **NON** |
+| criteria.ts | Critères de scoring | **NON** |
+| generator.ts | Générateur de solutions | **NON** |
+| content_writer.ts | AI Content Writer (Module #3) | OUI |
+| reputation_service.ts | Réputation IA (Module #4) | OUI |
+| robots_service.ts | Génération robots.txt optimisé | OUI |
+| schema_service.ts | Génération Schema.org | OUI |
+| smc.ts | SMC Studio | OUI |
+| database.ts | Persistence localStorage | OUI |
+| llm_templates.ts | Templates prompts IA | OUI |
+| blog_prompt_db.ts | Base prompts blog | OUI |
+| pdf_prompt.ts | Prompt génération PDF | OUI |
+
+### Components (6)
+- AICitationPreview.tsx
+- CategoryCard.tsx
+- GenerationModal.tsx
+- RecommendationCard.tsx
+- ScoreRing.tsx
+- SourceOfTruthModal.tsx
+
+---
+
+## 3. Stack technique
+
+- **Frontend** : React 18, Tailwind CSS (CDN), Lucide Icons
+- **Build** : Vite 7.3.x + @vitejs/plugin-react
+- **AI** : Google Gemini (@google/genai) avec fallback simulation si API key absente
+- **Auth** : Supabase (Auth + PostgreSQL)
+- **Paiement** : Stripe
+- **i18n** : Système custom React Context (FR/EN/ES)
+- **Validation** : Zod + React Hook Form
+- **Charts** : Recharts
+- **PDF** : jsPDF + html2canvas
+- **Design** : Dark theme — `bg-[#1a1d21]`, `border-white/5`, `rounded-2xl`
+
+---
+
+## 4. Règles IMPÉRATIVES
+
+1. **NE PAS migrer vers Next.js.** L'architecture est Vite SPA.
+2. **NE PAS modifier** `services/analyzer.ts`, `services/criteria.ts`, `services/generator.ts`
+3. **NE PAS supprimer de fichiers existants**
+4. Toute génération IA utilise `GoogleGenAI` avec fallback simulation si API key absente
+5. Le design est dark theme : `bg-[#1a1d21]`, `border-white/5`, `rounded-2xl`
+6. Commandes : `npm run dev` (Vite), `npm run build` (Vite build), `npm run preview`
+
+---
+
+## 5. Erreurs TypeScript connues (non-bloquantes)
+
+Ces erreurs existent dans `tsc --noEmit` mais **ne bloquent pas Vite** (Vite utilise esbuild) :
+
+1. **App.tsx** — Type mismatch sur `onNavigate` prop (union type vs `string`) pour `Recharge.tsx` et `Clients.tsx`
+2. **Dashboard.tsx:128** — `.original` property access sur `demoData` qui n'a pas ce champ
+
+Ces erreurs sont pré-existantes et ne nécessitent pas de correction urgente.
+
+---
+
+## 6. Accès navigation (sidebar)
+
+```
+Accueil → home
+Nouvel Audit → analyze
+Dashboard → dashboard
+Monitoring AEO → projects (+ results)
+Outils Génératifs → generative-tools
+  ├── SMC Studio → smc-studio
+  ├── AI Content Writer → content-writer
+  ├── Réputation IA → reputation
+  ├── Source of Truth → source-of-truth
+  ├── Schema.org → schema-org
+  ├── Robots.txt → robots-txt
+  └── Suivi Bots IA → bot-tracking ← NOUVEAU
+Annuaire Indexé → directory (+ directory-entity)
+GTO Gas (Crédits) → recharge
+Affiliation → affiliation
+Plan & Factures → plan
+Mon Compte → account
+```
+
+---
+
+## 7. Données simulées
+
+Le projet fonctionne **sans backend** grâce à des données simulées :
+- `Dashboard.tsx` : 5 lignes de démo dans `demoData`
+- `BotTracking.tsx` : 10 bots IA, timeline de 20 événements, 5 alertes, graphe 24h
+- `Reputation.tsx` : Mentions IA simulées (ChatGPT, Perplexity, Claude, Gemini, Copilot)
+- `Directory.tsx` : Entités de démo (Stripe, Linear, etc.)
+- `Affiliation.tsx` : Données partenaire simulées
+- Toute génération IA avec `@google/genai` a un fallback simulation si pas d'API key
+
+---
+
+### Session 3 — Complétion complète (2026-02-14)
+**Demande** : Continuer le projet — corriger TS, ajouter les pages manquantes, Recharts, tests, déploiement.
+
+**Corrections appliquées** :
+- `tsconfig.json` : include corrigé pour cibler les fichiers racine (pages/, services/, components/) au lieu de `src/`. Exclusion de `src/` et `app/` (vestiges Next.js). Lib mise à jour vers ES2021.
+- `index.html` : Corrigé pour pointer vers `/index.tsx` (CitedBy.ai) au lieu de `/src/main.tsx` (LeadRadar). Titre, meta, styles et Tailwind CDN restaurés.
+- `vercel.json` : CSP mise à jour pour autoriser Tailwind CDN.
+
+**Fichiers créés** :
+- `pages/Messages.tsx` — Messagerie complète (560 lignes) avec :
+  - Layout deux colonnes : liste de conversations + fil de messages
+  - Recherche, filtres (Tous/Non lus/Support), 6 conversations démo
+  - Bulles de messages (envoyé/reçu), indicateur de saisie, barre d'envoi
+  - Design responsive mobile
+- `pages/AlertsAEO.tsx` — Alertes AEO complètes (730 lignes) avec :
+  - 4 KPIs (Critiques, Warnings, Info, Résolues)
+  - Liste de 10 alertes avec sévérités, expand/collapse, marquer résolu
+  - Panneau de configuration des alertes avec toggles
+  - Filtres et recherche
+
+**Fichiers modifiés** :
+- `pages/BotTracking.tsx` : Graphe 24h CSS remplacé par Recharts BarChart interactif avec tooltip custom dark, sparklines par bot
+- `App.tsx` : lazy imports Messages + AlertsAEO, routes ajoutées, placeholder Messages remplacé
+- `vite.config.ts` : Configuration Vitest ajoutée (jsdom, globals, setupFiles)
+- `package.json` : Scripts test/test:watch/test:coverage ajoutés
+
+**Tests ajoutés** :
+- `tests/setup.ts` : Setup Vitest avec @testing-library/jest-dom
+- `tests/scoring.test.ts` : 9 tests pour `calculateAiVisibilityScore` (détection marque, URL, services, concurrents, pertinence, clamp)
+- `tests/database.test.ts` : 8 tests pour le service database (CRUD, getProjectsFromHistory, localStorage)
+- **17/17 tests passent**
+
+**Dépendances ajoutées** (devDependencies) :
+- vitest, @testing-library/react, @testing-library/jest-dom, @testing-library/user-event, jsdom
+
+---
+
+## 8. Prochaines étapes possibles
+
+- [x] ~~Corriger les erreurs TS non-bloquantes~~
+- [x] ~~Ajouter les pages Messages et Alertes AEO~~
+- [x] ~~Ajouter des graphiques Recharts dans BotTracking~~
+- [x] ~~Tests unitaires (Vitest) — 17 tests passent~~
+- [x] ~~Build production — 2409 modules, toutes pages lazy-loaded~~
+- [ ] Connecter BotTracking à des données réelles (API logs serveur, Cloudflare)
+- [ ] Optimiser le bundle BotTracking (412 kB — tree-shaking Recharts)
+- [ ] Ajouter plus de tests (composants React avec Testing Library)
+- [ ] Authentification Supabase réelle (remplacer le mock user)
+- [ ] Intégration Stripe réelle (checkout, webhooks)
+- [ ] CI/CD pipeline (GitHub Actions)
+- [ ] Déploiement Vercel

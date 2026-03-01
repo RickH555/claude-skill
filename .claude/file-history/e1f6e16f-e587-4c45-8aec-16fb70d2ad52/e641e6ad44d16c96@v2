@@ -1,0 +1,56 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { PROJECTS } from "@/lib/constants";
+
+export default function Projects() {
+  return (
+    <section id="projects" className="border-b-4 border-white bg-black px-6 py-24">
+      <div className="mx-auto max-w-7xl">
+        <motion.h2
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 text-5xl font-black uppercase tracking-tighter text-white md:text-7xl"
+        >
+          PROJECTS<span className="text-brutal-red">.</span>
+        </motion.h2>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {PROJECTS.map((project, i) => (
+            <motion.a
+              key={project.title}
+              href={project.link}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="group border-4 border-white bg-black p-6 transition-all hover:-translate-y-1 hover:border-brutal-yellow hover:bg-brutal-yellow"
+            >
+              <h3 className="text-2xl font-black uppercase tracking-tight text-white transition-colors group-hover:text-black">
+                {project.title}
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-white/70 transition-colors group-hover:text-black/70">
+                {project.description}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="border-2 border-white/40 px-2 py-1 text-xs font-bold uppercase tracking-wider text-white/60 transition-colors group-hover:border-black/40 group-hover:text-black/60"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-4 text-sm font-black uppercase tracking-widest text-brutal-yellow transition-colors group-hover:text-black">
+                VIEW &rarr;
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

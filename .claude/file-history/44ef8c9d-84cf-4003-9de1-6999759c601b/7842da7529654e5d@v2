@@ -1,0 +1,615 @@
+# AUDIT COMPLET — CITEDBY.AI
+**Date :** 2026-02-22
+**Auditeur :** Claude Code (Opus 4.6)
+**Mode :** Lecture seule — aucun fichier modifié
+
+---
+
+## RÉSUMÉ EXÉCUTIF
+
+| Catégorie | 🔴 Critique | 🟠 Haute | 🟡 Moyenne | 🟢 Basse | ✅ OK |
+|-----------|:-----------:|:--------:|:----------:|:--------:|:-----:|
+| 1. Sécurité | 1 | 4 | 1 | 0 | 4 |
+| 2. Structure | 0 | 0 | 2 | 3 | 3 |
+| 3. Qualité code | 0 | 3 | 2 | 2 | 0 |
+| 4. Performance | 0 | 1 | 2 | 1 | 2 |
+| 5. API/Réseau | 0 | 1 | 1 | 1 | 2 |
+| 6. Boucles/Mémoire | 0 | 0 | 1 | 1 | 3 |
+| 7. Accessibilité | 0 | 2 | 2 | 0 | 1 |
+| 8. État/Données | 0 | 0 | 2 | 1 | 1 |
+| 9. Cohérence | 0 | 0 | 2 | 2 | 1 |
+| 10. Déploiement | 0 | 1 | 1 | 1 | 3 |
+| **TOTAL** | **1** | **12** | **16** | **12** | **20** |
+
+---
+
+# AUDIT 1 — SÉCURITÉ
+
+### 🔴 CRITIQUE — Clés API exposées côté client (VITE_ prefix)
+
+**Fichier(s) :**
+- `services/v3/citation-api-client.ts:41` — `VITE_OPENAI_API_KEY`
+- `services/v3/citation-api-client.ts:82` — `VITE_PERPLEXITY_API_KEY`
+- `services/v3/citation-api-client.ts:124` — `VITE_GEMINI_API_KEY`
+- `services/v3/query-generator.ts:49` — `VITE_GEMINI_API_KEY`
+
+**Risque :** Toute variable préfixée `VITE_` est incluse dans le bundle JavaScript envoyé au navigateur. N'importe quel utilisateur peut extraire ces clés depuis le JS compilé et les utiliser à volonté (facturation à votre charge, abus de quotas).
+**Recommandation :** Déplacer tous les appels API vers des edge functions Supabase (server-side). Supprimer le préfixe `VITE_` des clés sensibles. Le client doit appeler vos edge functions, pas directement OpenAI/Perplexity/Gemini.
+**Effort :** 1j
+
+---
+
+### 🟠 HAUTE — Fichiers .env dans l'historique Git
+
+**Fichier(s) :** Commits `9420840a` et `8221f474` (git log)
+**Risque :** Même si `.gitignore` exclut correctement `.env` et `.env.local`, des fichiers `.env` ont été commités dans l'historique. Les secrets sont récupérables via `git log`.
+**Recommandation :** Révoquer et régénérer toutes les clés API qui ont pu être exposées. Considérer `git filter-branch` ou `BFG Repo-Cleaner` pour purger l'historique.
+**Effort :** 2h
+
+---
+
+### 🟠 HAUTE — Validation d'entrées insuffisante
+
+**Fichier(s) :** 379 éléments de formulaire détectés dans les fichiers `.tsx`
+**Risque :** Seule `pages/Home.tsx:36-44` effectue une validation URL basique ("URL invalide"). Aucune bibliothèque de sanitization (DOMPurify, validator.js) n'est utilisée. Les URLs entrées par l'utilisateur ne sont pas validées de manière robuste.
+**Recommandation :** Implémenter une validation systématique avec Zod (déjà en dépendance) sur tous les formulaires. Valider les URLs côté client ET serveur.
+**Effort :** 1j
+
+---
+
+### 🟠 HAUTE — Vulnérabilité de sévérité HIGH dans les dépendances
+
+**Fichier(s) :** `package.json` (dépendances transitives)
+**Risque :** `npm audit` rapporte des vulnérabilités HIGH : injection de commande dans `glob` (via `@next/eslint-plugin-next` et `eslint-config-next`). Vulnérabilités modérées dans `ajv` (ReDoS) et `cookie`/`@supabase/ssr`.
+**Recommandation :** `npm audit fix` pour les correctifs automatiques. Mettre à jour `eslint-config-next` et `@supabase/ssr`.
+**Effort :** 30min
+
+---
+
+### 🟠 HAUTE — Dépendances massivement obsolètes
+
+**Fichier(s) :** `package.json`
+**Risque :** 23 packages obsolètes dont des écarts majeurs :
+
+| Package | Actuel | Dernier | Écart |
+|---------|--------|---------|-------|
+| `stripe` | 15.12.0 | 20.3.1 | 5 majeures |
+| `next` | 14.2.35 | 16.1.6 | 2 majeures |
+| `react` | 18.3.1 | 19.2.4 | 1 majeure |
+| `@google/genai` | 0.14.1 | 1.42.0 | 1 majeure |
+| `eslint` | 8.57.1 | 10.0.1 | 2 majeures |
+| `tailwindcss` | 3.4.19 | 4.2.0 | 1 majeure |
+| `zod` | 3.25.76 | 4.3.6 | 1 majeure |
+
+**Recommandation :** Planifier une mise à jour progressive en commençant par Stripe (risque de dépréciation d'API) et `@supabase/ssr`.
+**Effort :** 1j (progressif)
+
+---
+
+### 🟡 MOYENNE — Redirection ouverte potentielle
+
+**Fichier(s) :**
+- `src/components/settings/credit-packs.tsx:41` — `window.location.href = checkoutUrl`
+- `src/pages/SettingsPage.tsx:175` — `window.location.href = url`
+
+**Risque :** Si `checkoutUrl` ou `url` provient d'une source non fiable (réponse API compromise), un attaquant pourrait rediriger l'utilisateur vers un site malveillant.
+**Recommandation :** Valider que l'URL de destination commence par `https://checkout.stripe.com` ou un domaine autorisé avant la redirection.
+**Effort :** 15min
+
+---
+
+### ✅ OK — Pas de dangerouslySetInnerHTML, eval(), innerHTML
+### ✅ OK — service_role uniquement dans les edge functions (côté serveur)
+### ✅ OK — Politiques RLS présentes dans `supabase/migrations/002_rls_policies.sql`
+### ✅ OK — `.gitignore` exclut correctement `.env`, `.env.local`, `.env.*.local`
+
+---
+
+# AUDIT 2 — STRUCTURE DU PROJET
+
+### 🟡 MOYENNE — 9 composants orphelins (jamais importés)
+
+**Fichier(s) :**
+- `components/AICitationPreview.tsx`
+- `components/AppFooter.tsx`
+- `components/layout/AppSidebar.tsx`
+- `components/MobileBottomNav.tsx`
+- `components/Navbar.tsx`
+- `components/SourceOfTruthModal.tsx`
+- `components/ui/EmptyState.tsx`
+- `components/ui/KPICard.tsx`
+- `components/ui/ProgressBar.tsx`
+
+**Risque :** Code mort qui alourdit la maintenance et peut générer de la confusion.
+**Recommandation :** Vérifier manuellement si ces composants sont utilisés dynamiquement (string interpolation, etc.). Si non, les supprimer ou les archiver.
+**Effort :** 30min
+
+---
+
+### 🟡 MOYENNE — Double arborescence racine + src/
+
+**Fichier(s) :** `pages/`, `components/`, `services/` en racine ET `src/pages/`, `src/components/`, `src/hooks/`, `src/lib/`, `src/utils/`
+**Risque :** Deux applications coexistent (CitedBy SPA + LeadRadar). La séparation n'est pas documentée clairement, ce qui peut mener à des confusions et des imports croisés.
+**Recommandation :** Documenter explicitement la séparation dans CLAUDE.md ou README. Considérer un monorepo (workspaces npm) pour isoler les deux apps.
+**Effort :** 2h
+
+---
+
+### 🟢 BASSE — Fichier backup oublié
+
+**Fichier(s) :** `App.tsx.backup` (racine du projet)
+**Risque :** Résidu de développement, aucun impact fonctionnel.
+**Recommandation :** Supprimer si plus nécessaire.
+**Effort :** 5min
+
+---
+
+### 🟢 BASSE — Fichiers de config résiduels
+
+**Fichier(s) :** `.claude-context.md` (12 KB), `.mcp.json` (335 octets)
+**Risque :** Aucun impact fonctionnel, mais encombre le repo.
+**Recommandation :** Ajouter au `.gitignore` s'ils sont générés automatiquement.
+**Effort :** 5min
+
+---
+
+### 🟢 BASSE — Fichiers de documentation accumulés
+
+**Fichier(s) :** `ACTION-PLAN-SCORE-PROJECTION.md`, `DEPLOYMENT_AUDIT.md`, `NAV-2-LEVELS.md`, `PHASE6-REMAINING-PAGES.md`, `REBUILD.md`, `SIDEBAR-ONLY-NAV.md`, `UIUX-PRO-REDESIGN.md`
+**Risque :** 7 fichiers Markdown de planification en racine qui encombrent le projet.
+**Recommandation :** Déplacer dans un dossier `docs/planning/` ou supprimer si obsolètes.
+**Effort :** 10min
+
+---
+
+### ✅ OK — Aucune import circulaire détectée dans services/
+### ✅ OK — Aucun résidu Next.js (page.tsx / layout.tsx)
+### ✅ OK — Build propre, aucun warning
+
+---
+
+# AUDIT 3 — QUALITÉ DU CODE
+
+### 🟠 HAUTE — 3 fichiers dépassent 1000 lignes
+
+**Fichier(s) :**
+
+| Fichier | Lignes |
+|---------|--------|
+| `pages/AiMonitoring.tsx` | 1317 |
+| `pages/Clients.tsx` | 1200 |
+| `pages/EeatBuilder.tsx` | 1199 |
+
+**Risque :** Fichiers monolithiques difficiles à maintenir, tester et débugger. Forte probabilité de bugs cachés.
+**Recommandation :** Extraire les sous-sections en composants dédiés. Chaque page devrait avoir < 500 lignes avec la logique dans des hooks custom.
+**Effort :** 1j par fichier
+
+---
+
+### 🟠 HAUTE — 20+ fichiers dépassent 500 lignes
+
+**Fichier(s) :** (top 10 après les > 1000)
+
+| Fichier | Lignes |
+|---------|--------|
+| `pages/Account.tsx` | 959 |
+| `pages/MissionOrders.tsx` | 884 |
+| `pages/Home.tsx` | 755 |
+| `pages/Directory.tsx` | 749 |
+| `src/lib/constants.ts` | 742 |
+| `pages/AlertsAEO.tsx` | 732 |
+| `App.tsx` | 723 |
+| `pages/SMCStudio.tsx` | 716 |
+| `pages/Projects.tsx` | 693 |
+| `pages/ApiDeveloper.tsx` | 692 |
+
+**Risque :** Dette technique accumulée. Coût de maintenance croissant.
+**Recommandation :** Refactoring progressif en extrayant la logique métier dans des hooks et les sous-sections dans des composants.
+**Effort :** 2h par fichier
+
+---
+
+### 🟠 HAUTE — Duplication massive des appels generateContent
+
+**Fichier(s) :** 25+ services dupliquent le même pattern d'appel `ai.models.generateContent()` :
+- `services/content_writer.ts`, `services/generator.ts` (3 appels), `services/smc.ts` (4 appels), `services/reputation_service.ts` (2 appels), `services/robots_service.ts`, `services/schema_service.ts`, `services/mega-generator.ts`, `services/llm-json-generator.ts`, `services/llms-txt-generator.ts`, `services/answer-first-audit.ts`, `services/ai-monitoring.ts`, `services/ai-citation-simulator.ts`, `services/eeat/*.ts` (6 fichiers), `services/ai-response-layer/*.ts` (3 fichiers), `services/v3/citation-api-client.ts`, `services/v3/query-generator.ts`
+
+**Risque :** Un changement d'API Gemini nécessite des modifications dans 25+ fichiers. Risque élevé d'incohérence et de bugs.
+**Recommandation :** `lib/ai-provider.ts` existe déjà — centraliser TOUS les appels via ce provider unique avec gestion d'erreur, retry et logging standardisés.
+**Effort :** 1j
+
+---
+
+### 🟡 MOYENNE — 40 utilisations de `any`
+
+**Fichier(s) :** (pires fichiers)
+
+| Fichier | Occurrences |
+|---------|-------------|
+| `pages/Account.tsx` | 8 |
+| `services/llm_templates.ts` | 4 |
+| `pages/Dashboard.tsx` | 4 |
+| `pages/AiMonitoring.tsx` | 3 |
+| `pages/SourceOfTruth.tsx` | 2 |
+| `pages/EeatBuilder.tsx` | 2 |
+| `pages/BotTracking.tsx` | 2 |
+| `App.tsx` | 2 |
+
+**Risque :** Perte de type safety. Bugs potentiels non détectés à la compilation.
+**Recommandation :** Remplacer progressivement par des types explicites ou `unknown` avec type guards.
+**Effort :** 2h
+
+---
+
+### 🟡 MOYENNE — 264 occurrences de `bg-[var(--bg-surface)]`
+
+**Fichier(s) :** Réparti dans tous les fichiers `.tsx`
+**Risque :** Duplication CSS. Difficulté à changer le thème globalement.
+**Recommandation :** Créer un composant `Card` ou `Surface` réutilisable qui encapsule ce style, ou utiliser une classe Tailwind custom dans `tailwind.config.ts`.
+**Effort :** 2h
+
+---
+
+### 🟢 BASSE — 12 TODOs non résolus
+
+**Fichier(s) :**
+- `lib/ai-provider.ts:30` — "TODO: Replace with proper error reporting (Sentry)"
+- `lib/stripe.ts:23-25` — "TODO: Set STRIPE_PRICE_* in env" (x3)
+- `services/generator.ts:129,168,198` — Sentry TODOs (x3)
+- `services/content_writer.ts:122` — Sentry TODO
+- `services/reputation_service.ts:314,342` — Sentry TODOs (x2)
+- `services/smc.ts:50,81,114,150` — Sentry TODOs (x4)
+
+**Recommandation :** Intégrer Sentry pour le monitoring d'erreurs. Configurer les prix Stripe via variables d'environnement.
+**Effort :** 2h
+
+---
+
+### 🟢 BASSE — noUnusedLocals / noUnusedParameters absents du tsconfig
+
+**Fichier(s) :** `tsconfig.json`
+**Risque :** Les imports et variables inutilisés ne sont pas détectés.
+**Recommandation :** Ajouter `"noUnusedLocals": true` et `"noUnusedParameters": true`.
+**Effort :** 5min (+ correction des erreurs résultantes)
+
+---
+
+# AUDIT 4 — PERFORMANCE
+
+### 🟠 HAUTE — Bundle de 2.7 MB dominé par 3 librairies vendor
+
+**Fichier(s) :** `dist/assets/`
+
+| Chunk | Taille | Gzip |
+|-------|--------|------|
+| `index-*.js` (main) | 453 KB | 120 KB |
+| `jspdf.es.min-*.js` | 385 KB | 126 KB |
+| `generateCategoricalChart-*.js` (Recharts) | 376 KB | 104 KB |
+| `html2canvas.esm-*.js` | 201 KB | 47 KB |
+
+**Risque :** Temps de chargement initial élevé, surtout sur mobile. Les 3 librairies lourdes (jsPDF, Recharts, html2canvas) totalisent 962 KB bruts.
+**Recommandation :** Charger jsPDF et html2canvas dynamiquement (`import()`) uniquement quand l'utilisateur génère un PDF ou capture un screenshot. Évaluer une alternative plus légère à Recharts (ex: chart.js, lightweight-charts).
+**Effort :** 2h
+
+---
+
+### 🟡 MOYENNE — Aucune page n'utilise React.memo
+
+**Fichier(s) :** Les 36 pages dans `pages/` (aucune n'utilise `React.memo` ou `memo()`)
+**Risque :** Re-renders inutiles sur chaque changement de state parent. Impact proportionnel à la complexité des composants.
+**Recommandation :** Appliquer `React.memo` sur les pages les plus lourdes en priorité (AiMonitoring, Clients, EeatBuilder, Account).
+**Effort :** 30min
+
+---
+
+### 🟡 MOYENNE — 309 handlers inline dans le JSX
+
+**Fichier(s) :** 309 occurrences de `onClick={() =>` et `onChange={() =>` dans les fichiers `.tsx`
+**Risque :** Chaque handler inline crée une nouvelle référence à chaque render, provoquant des re-renders en cascade des composants enfants.
+**Recommandation :** Extraire dans des `useCallback` pour les handlers dans des composants fréquemment re-rendus. Prioriser les pages à fort trafic.
+**Effort :** Variable (2h pour les cas critiques)
+
+---
+
+### 🟢 BASSE — ~10 useEffect potentiellement sans tableau de dépendances
+
+**Fichier(s) :** `App.tsx:62,163,187,214,483`, `components/AICitationPreview.tsx:18`, `components/CommandPalette.tsx:8`, etc.
+**Risque :** Vérification manuelle nécessaire — le grep détecte les `useEffect(() =>` sans `[` sur la même ligne, mais le tableau peut être sur la ligne suivante.
+**Recommandation :** Revue manuelle de chaque occurrence.
+**Effort :** 30min
+
+---
+
+### ✅ OK — Lazy loading bien implémenté (32 pages via React.lazy)
+### ✅ OK — Aucune image embarquée dans le bundle production (images uniquement dans qa/)
+
+---
+
+# AUDIT 5 — API ET RÉSEAU
+
+### 🟠 HAUTE — Seulement 14 patterns de gestion d'erreur
+
+**Fichier(s) :** Ensemble du codebase (`.catch()`, `try...catch`, `.then()` combinés)
+**Risque :** Avec 17 appels `fetch()` et 25+ appels `generateContent()`, le ratio de gestion d'erreur est dangereusement bas. Un échec API non attrapé peut crasher l'UI ou afficher une page blanche.
+**Recommandation :** Encapsuler chaque appel API dans un try/catch avec feedback utilisateur (toast d'erreur). Centraliser la gestion d'erreur dans `lib/ai-provider.ts`.
+**Effort :** 2h
+
+---
+
+### 🟡 MOYENNE — URLs d'API hardcodées dans les services
+
+**Fichier(s) :**
+- `services/v3/citation-api-client.ts:46` — `https://api.openai.com/v1/chat/completions`
+- `services/v3/citation-api-client.ts:87` — `https://api.perplexity.ai/chat/completions`
+- `supabase/functions/distribute/index.ts:104` — `https://api.resend.com/emails`
+
+**Risque :** Difficulté à changer d'endpoint ou à configurer un proxy. Aucune abstraction pour les URLs.
+**Recommandation :** Centraliser les URLs d'API dans un fichier de configuration ou des variables d'environnement.
+**Effort :** 30min
+
+---
+
+### 🟢 BASSE — Pas de mécanisme de retry/backoff général
+
+**Fichier(s) :** `services/v3/citation-checker.ts` implémente un rate limiting local, mais aucun retry avec backoff exponentiel n'existe pour les appels Gemini/OpenAI.
+**Risque :** En cas de rate limit 429 ou erreur transitoire 503, l'appel échoue définitivement.
+**Recommandation :** Implémenter un wrapper avec retry exponentiel (3 tentatives, délai doublé).
+**Effort :** 1h
+
+---
+
+### ✅ OK — Rate limiting présent pour le citation checking
+### ✅ OK — Aucune boucle d'appels API dangereuse détectée
+
+---
+
+# AUDIT 6 — BOUCLES INFINIES ET MÉMOIRE
+
+### 🟡 MOYENNE — 20 useEffect à vérifier manuellement
+
+**Fichier(s) :** `App.tsx` (5 occurrences), `components/AICitationPreview.tsx:18`, `components/CommandPalette.tsx:8`, `components/GenerationModal.tsx:17`, `components/OnboardingModal.tsx:8`, `components/ScoreRing.tsx:16`, `components/ShortcutsModal.tsx:6`, `components/SourceOfTruthModal.tsx:26,35`, `i18n/context.tsx:72`, `i18n/LanguageSelector.tsx:26`, `pages/Account.tsx:81,85`, `pages/AiMonitoring.tsx:88,99`, `pages/Analyze.tsx:21`
+**Risque :** Si certains de ces useEffect manquent réellement de tableau de dépendances, ils se déclenchent à chaque render (boucle potentielle).
+**Recommandation :** Revue manuelle systématique. Activer la règle ESLint `react-hooks/exhaustive-deps`.
+**Effort :** 1h
+
+---
+
+### 🟢 BASSE — Fuite potentielle de subscription dans useProspects
+
+**Fichier(s) :** `src/hooks/useProspects.ts:201` — `.subscribe()` sans cleanup visible
+**Risque :** Accumulation de listeners en mémoire si le composant est monté/démonté fréquemment.
+**Recommandation :** Vérifier manuellement et ajouter un `unsubscribe()` dans le return du useEffect si absent.
+**Effort :** 15min
+
+---
+
+### ✅ OK — setInterval / clearInterval équilibrés (2 / 4 — chaque setInterval a son cleanup)
+### ✅ OK — addEventListener / removeEventListener équilibrés (4 / 4)
+### ✅ OK — IntersectionObserver correctement nettoyé avec `observer.disconnect()`
+
+---
+
+# AUDIT 7 — ACCESSIBILITÉ
+
+### 🟠 HAUTE — 193 champs de formulaire sans labels accessibles
+
+**Fichier(s) :** Répartis dans tous les `.tsx` (input, select, textarea sans `aria-label` ni association label/id)
+**Risque :** Inaccessible aux lecteurs d'écran. Non conforme WCAG 2.1. Risque légal selon la législation applicable.
+**Recommandation :** Ajouter `aria-label` ou des `<label htmlFor="...">` à tous les champs de formulaire.
+**Effort :** 2h
+
+---
+
+### 🟠 HAUTE — 145 occurrences de classes à contraste insuffisant
+
+**Fichier(s) :** 145 usages de `text-gray-600`, `text-slate-600`, `text-zinc-600`, `text-[var(--text-disabled)]` dans les `.tsx`
+**Risque :** Sur le thème sombre (`bg-[#1a1d21]`), ces couleurs grises à 600 peuvent ne pas respecter le ratio de contraste WCAG AA (4.5:1).
+**Recommandation :** Vérifier le contraste avec un outil (WebAIM Contrast Checker). Remplacer par des nuances plus claires si nécessaire (ex: `text-gray-400`).
+**Effort :** 1h
+
+---
+
+### 🟡 MOYENNE — Boutons sans texte accessible
+
+**Fichier(s) :** `App.tsx:691`, `components/AICitationPreview.tsx:46,75,86`, `components/CategoryCard.tsx:43`, `components/CommandPalette.tsx:93`, `components/GenerationModal.tsx:78,121,129,183`
+**Risque :** Les boutons icône sans `aria-label` sont invisibles pour les lecteurs d'écran.
+**Recommandation :** Ajouter `aria-label` descriptif à chaque bouton contenant uniquement une icône.
+**Effort :** 30min
+
+---
+
+### 🟡 MOYENNE — 6 liens sans texte accessible
+
+**Fichier(s) :** `pages/Clients.tsx:643`, `pages/DirectoryEntity.tsx:48`, `pages/History.tsx:69`, `pages/MissionOrders.tsx:586,698`, `src/components/prospect/ApproachModal.tsx:164`
+**Risque :** Liens non descriptifs pour les technologies d'assistance.
+**Recommandation :** Ajouter `aria-label` ou du texte visible descriptif.
+**Effort :** 15min
+
+---
+
+### ✅ OK — Toutes les images ont un attribut `alt`
+
+---
+
+# AUDIT 8 — GESTION D'ÉTAT ET DONNÉES
+
+### 🟡 MOYENNE — Utilisation intensive de localStorage (37 occurrences)
+
+**Fichier(s) :** Répartis dans de nombreux fichiers
+**Clés identifiées :** `citedby_onboarded`, `citedby-whitelabel`, `STORAGE_KEY`, `STORAGE_KEYS.apiKeys`, `STORAGE_KEYS.webhooks`, `DB_KEY`, `SCHEDULES_KEY`, `HISTORY_KEY`, `LOCALE_STORAGE_KEY`, `DEMO_AUTH_STORAGE_KEY`, `DEMO_PROFILE_STORAGE_KEY`
+**Risque :** localStorage est limité à ~5MB par domaine. Le stockage de données volumineuses (audits complets, historiques) peut atteindre cette limite silencieusement. 57 usages de `JSON.stringify` suggèrent des objets complexes stockés.
+**Recommandation :** Migrer les données volumineuses vers Supabase. Garder localStorage uniquement pour les préférences légères (langue, thème, onboarding).
+**Effort :** 1j
+
+---
+
+### 🟡 MOYENNE — Pas de solution de state management global
+
+**Fichier(s) :** 3 contextes React seulement : `ToastContext`, `I18nContext`, `AuthContext`
+**Risque :** Avec 36 pages, la prop-drilling ou la duplication d'état entre pages est probable. Aucun Zustand, Redux, ou useReducer détecté.
+**Recommandation :** Évaluer Zustand (léger, 1KB) pour centraliser l'état partagé (user, credits, current audit, etc.).
+**Effort :** 2h (setup initial)
+
+---
+
+### 🟢 BASSE — Données sensibles non stockées dans localStorage
+
+**Risque :** Les clés API et tokens sont gérés via les variables d'environnement, pas via localStorage. Bon point.
+
+---
+
+### ✅ OK — Auth gérée correctement via Supabase Auth Context
+
+---
+
+# AUDIT 9 — COHÉRENCE ET STANDARDS
+
+### 🟡 MOYENNE — 7 services en snake_case (convention incohérente)
+
+**Fichier(s) :**
+- `services/blog_prompt_db.ts`
+- `services/content_writer.ts`
+- `services/llm_templates.ts`
+- `services/pdf_prompt.ts`
+- `services/reputation_service.ts`
+- `services/robots_service.ts`
+- `services/schema_service.ts`
+
+**Risque :** Incohérence avec les autres services en kebab-case (`ai-monitoring.ts`, `ai-citation-simulator.ts`, etc.). Confusion lors des imports.
+**Recommandation :** Ces fichiers sont dans la liste "sacrée" (CLAUDE_RULES.md) — ne PAS renommer sans approbation explicite. Documenter la convention.
+**Effort :** 30min (si renommage approuvé)
+
+---
+
+### 🟡 MOYENNE — 65 console.log/warn/error restants
+
+**Fichier(s) :** Répartis dans tout le codebase
+**Risque :** Fuite d'information en production. Pollution de la console utilisateur. Performance marginalement impactée.
+**Recommandation :** Remplacer par un logger conditionnel (ex: `if (import.meta.env.DEV) console.log(...)`) ou intégrer Sentry pour les erreurs.
+**Effort :** 1h
+
+---
+
+### 🟢 BASSE — 1 page sans export default
+
+**Fichier(s) :** `pages/Results.tsx`
+**Risque :** Peut causer des erreurs avec `React.lazy()` qui attend un export default.
+**Recommandation :** Vérifier que l'import dynamique fonctionne (le build passe donc c'est probablement OK). Ajouter un export default par cohérence.
+**Effort :** 5min
+
+---
+
+### 🟢 BASSE — Commentaires multilingues
+
+**Fichier(s) :** Mélange de commentaires en français et en anglais dans le code
+**Risque :** Incohérence mineure. Peut gêner des contributeurs internationaux.
+**Recommandation :** Standardiser sur une langue (anglais recommandé pour le code).
+**Effort :** Non prioritaire
+
+---
+
+### ✅ OK — Pages en PascalCase correct
+
+---
+
+# AUDIT 10 — DÉPLOIEMENT ET PRODUCTION
+
+### 🟠 HAUTE — Clés API frontend (rappel audit 1)
+
+**Fichier(s) :** `vite.config.ts` ne contient aucune restriction ; les 5 variables `VITE_*` sont toutes exposées :
+- `VITE_GEMINI_API_KEY`
+- `VITE_OPENAI_API_KEY`
+- `VITE_PERPLEXITY_API_KEY`
+- `VITE_SUPABASE_ANON_KEY` (acceptable — clé publique by design)
+- `VITE_SUPABASE_URL` (acceptable — URL publique)
+
+**Risque :** Cf. Audit 1 — CRITIQUE.
+**Recommandation :** Seules `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` devraient être côté client.
+**Effort :** 1j (cf. audit 1)
+
+---
+
+### 🟡 MOYENNE — Coexistence scripts Vite + Next.js
+
+**Fichier(s) :** `package.json` contient à la fois :
+- `dev`, `build`, `preview` (Vite)
+- `dev:next`, `build:next`, `start:next`, `lint` (Next.js)
+
+**Risque :** Confusion pour les nouveaux développeurs. Double configuration potentiellement conflictuelle.
+**Recommandation :** Documenter clairement dans README.md que le frontend SPA utilise Vite et que Next.js est le backend. Préfixer explicitement les scripts.
+**Effort :** 15min
+
+---
+
+### 🟢 BASSE — Pas de .env.local.example
+
+**Fichier(s) :** `.env.example` existe (OK), mais pas de `.env.local.example`
+**Risque :** Les développeurs peuvent manquer des variables spécifiques au local.
+**Recommandation :** Fusionner ou documenter la distinction entre `.env` et `.env.local`.
+**Effort :** 10min
+
+---
+
+### ✅ OK — `.env.example` existe
+### ✅ OK — `vercel.json` configuré
+### ✅ OK — Sourcemaps non activées en production (défaut Vite)
+
+---
+
+## PLAN D'ACTION PRIORITAIRE
+
+### Corrections immédiates (avant mise en production)
+
+1. **🔴 Déplacer les appels API (OpenAI, Perplexity, Gemini) vers des edge functions** — Les clés `VITE_OPENAI_API_KEY`, `VITE_PERPLEXITY_API_KEY`, `VITE_GEMINI_API_KEY` sont exposées dans le bundle client. C'est la faille la plus critique.
+2. **🟠 Révoquer et régénérer toutes les clés API** qui ont pu être exposées via l'historique Git.
+3. **🟠 Corriger les vulnérabilités npm** — `npm audit fix` pour les dépendances à sévérité HIGH.
+4. **🟠 Ajouter try/catch** autour de tous les appels `generateContent()` et `fetch()` sans gestion d'erreur.
+
+### Corrections court terme (semaine 1)
+
+5. **🟠 Centraliser les appels Gemini** via `lib/ai-provider.ts` pour éliminer la duplication dans 25+ fichiers.
+6. **🟠 Refactorer les 3 fichiers > 1000 lignes** (AiMonitoring, Clients, EeatBuilder).
+7. **🟠 Ajouter des labels accessibles** aux 193 champs de formulaire.
+8. **🟠 Vérifier le contraste** des 145 occurrences de couleurs grises sur fond sombre.
+9. **🟠 Mettre à jour Stripe SDK** (15 → 20) et `@supabase/ssr` (0.3 → 0.8).
+10. **🟡 Valider les redirections URL** dans `credit-packs.tsx` et `SettingsPage.tsx`.
+
+### Améliorations moyen terme (mois 1)
+
+11. **🟡 Charger jsPDF, html2canvas dynamiquement** pour réduire le bundle initial.
+12. **🟡 Ajouter React.memo** sur les pages les plus lourdes.
+13. **🟡 Migrer les données volumineuses** de localStorage vers Supabase.
+14. **🟡 Évaluer Zustand** pour le state management global.
+15. **🟡 Nettoyer les 65 console.log** restants.
+16. **🟡 Supprimer les 9 composants orphelins** après vérification.
+17. **🟡 Intégrer Sentry** pour le monitoring d'erreurs (résout 12 TODOs).
+18. **🟢 Activer `noUnusedLocals` / `noUnusedParameters`** dans tsconfig.
+19. **🟢 Supprimer `App.tsx.backup`** et archiver les fichiers MD de planification.
+20. **🟢 Documenter la séparation** CitedBy SPA vs LeadRadar dans le README.
+
+---
+
+## MÉTRIQUES DU PROJET
+
+| Métrique | Valeur |
+|----------|--------|
+| Nombre total de fichiers TS/TSX | **179** (92 TS + 87 TSX) |
+| Lignes de code total | **42 630** |
+| Taille du bundle (dist/) | **2.7 MB** (brut) / ~450 KB gzip (main chunk) |
+| Nombre de pages | **36** (3 direct + 33 lazy) |
+| Nombre de services | **41** (15 racine + 26 sous-dossiers) |
+| Nombre de composants | **29** |
+| Types dédiés | **7** fichiers |
+| Utilisation de `any` | **40** occurrences |
+| console.log restants | **65** |
+| Composants orphelins | **9** |
+| TODOs non résolus | **12** |
+| Formulaires sans labels | **193** |
+| Handlers inline | **309** |
+| Vulnérabilités npm (HIGH) | **3** |
+| Dépendances obsolètes | **23** |
+| Couverture de tests | **Minimale** (2 fichiers test : `database.test.ts`, `scoring.test.ts`) |
+
+---
+
+*Rapport généré automatiquement par Claude Code — audit en lecture seule.*

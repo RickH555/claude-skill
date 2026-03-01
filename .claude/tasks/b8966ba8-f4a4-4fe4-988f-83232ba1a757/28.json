@@ -1,0 +1,9 @@
+{
+  "id": "28",
+  "subject": "Run typecheck and commit",
+  "description": "Verify pnpm run typecheck passes and commit all changes with descriptive message",
+  "activeForm": "Running typecheck and committing",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

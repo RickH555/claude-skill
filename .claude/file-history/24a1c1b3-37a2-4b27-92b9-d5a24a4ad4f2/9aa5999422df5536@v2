@@ -1,0 +1,637 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Bot, ArrowLeft, Activity, Eye, Clock, AlertTriangle, CheckCircle2,
+  XCircle, ToggleLeft, ToggleRight, TrendingUp, FileText, RefreshCw,
+  Shield, Zap, BarChart3, Globe, ChevronDown, ChevronUp, Bell
+} from 'lucide-react';
+import { useTranslation } from '../i18n';
+
+interface BotTrackingProps {
+  onBack: () => void;
+  user: { name: string; plan: string; credits: number } | null;
+}
+
+interface AIBot {
+  id: string;
+  name: string;
+  agent: string;
+  icon: string;
+  color: string;
+  bgColor: string;
+  description: string;
+  status: 'active' | 'inactive' | 'blocked';
+  enabled: boolean;
+  lastCrawl: string;
+  crawlsToday: number;
+  crawlsWeek: number;
+  pagesVisited: number;
+  frequency: string;
+  trend: number;
+}
+
+interface CrawlEvent {
+  botId: string;
+  botName: string;
+  botIcon: string;
+  timestamp: string;
+  page: string;
+  status: 'success' | 'blocked' | 'error';
+  responseTime: number;
+}
+
+interface BotAlert {
+  id: string;
+  type: 'warning' | 'info' | 'critical';
+  message: string;
+  botName: string;
+  timestamp: string;
+}
+
+// Simulated AI bots data
+const generateBots = (): AIBot[] => [
+  {
+    id: 'gptbot',
+    name: 'GPTBot',
+    agent: 'GPTBot',
+    icon: 'G',
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10',
+    description: 'OpenAI (ChatGPT)',
+    status: 'active',
+    enabled: true,
+    lastCrawl: 'Il y a 12 min',
+    crawlsToday: 47,
+    crawlsWeek: 312,
+    pagesVisited: 156,
+    frequency: '~15 min',
+    trend: 12,
+  },
+  {
+    id: 'chatgpt-user',
+    name: 'ChatGPT-User',
+    agent: 'ChatGPT-User',
+    icon: 'C',
+    color: 'text-emerald-300',
+    bgColor: 'bg-emerald-500/10',
+    description: 'OpenAI Live Browsing',
+    status: 'active',
+    enabled: true,
+    lastCrawl: 'Il y a 34 min',
+    crawlsToday: 18,
+    crawlsWeek: 89,
+    pagesVisited: 42,
+    frequency: '~45 min',
+    trend: 5,
+  },
+  {
+    id: 'claudebot',
+    name: 'ClaudeBot',
+    agent: 'ClaudeBot',
+    icon: 'A',
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-500/10',
+    description: 'Anthropic (Claude)',
+    status: 'active',
+    enabled: true,
+    lastCrawl: 'Il y a 8 min',
+    crawlsToday: 52,
+    crawlsWeek: 387,
+    pagesVisited: 198,
+    frequency: '~12 min',
+    trend: 18,
+  },
+  {
+    id: 'google-extended',
+    name: 'Google-Extended',
+    agent: 'Google-Extended',
+    icon: 'G',
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/10',
+    description: 'Google Gemini / Vertex AI',
+    status: 'active',
+    enabled: true,
+    lastCrawl: 'Il y a 3 min',
+    crawlsToday: 78,
+    crawlsWeek: 542,
+    pagesVisited: 234,
+    frequency: '~8 min',
+    trend: 24,
+  },
+  {
+    id: 'perplexitybot',
+    name: 'PerplexityBot',
+    agent: 'PerplexityBot',
+    icon: 'P',
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-500/10',
+    description: 'Perplexity AI (Answer Engine)',
+    status: 'active',
+    enabled: true,
+    lastCrawl: 'Il y a 22 min',
+    crawlsToday: 31,
+    crawlsWeek: 198,
+    pagesVisited: 87,
+    frequency: '~25 min',
+    trend: 8,
+  },
+  {
+    id: 'ccbot',
+    name: 'CCBot',
+    agent: 'CCBot',
+    icon: 'CC',
+    color: 'text-gray-400',
+    bgColor: 'bg-gray-500/10',
+    description: 'Common Crawl (Foundation LLMs)',
+    status: 'active',
+    enabled: true,
+    lastCrawl: 'Il y a 2h',
+    crawlsToday: 8,
+    crawlsWeek: 45,
+    pagesVisited: 312,
+    frequency: '~3h',
+    trend: -2,
+  },
+  {
+    id: 'applebot',
+    name: 'Applebot',
+    agent: 'Applebot',
+    icon: '',
+    color: 'text-gray-300',
+    bgColor: 'bg-gray-400/10',
+    description: 'Apple Intelligence / Siri',
+    status: 'inactive',
+    enabled: true,
+    lastCrawl: 'Il y a 6h',
+    crawlsToday: 3,
+    crawlsWeek: 21,
+    pagesVisited: 45,
+    frequency: '~6h',
+    trend: -5,
+  },
+  {
+    id: 'amazonbot',
+    name: 'Amazonbot',
+    agent: 'Amazonbot',
+    icon: 'A',
+    color: 'text-yellow-400',
+    bgColor: 'bg-yellow-500/10',
+    description: 'Amazon Alexa / Q',
+    status: 'inactive',
+    enabled: true,
+    lastCrawl: 'Il y a 12h',
+    crawlsToday: 1,
+    crawlsWeek: 12,
+    pagesVisited: 28,
+    frequency: '~12h',
+    trend: -8,
+  },
+  {
+    id: 'facebookbot',
+    name: 'FacebookBot',
+    agent: 'FacebookBot',
+    icon: 'M',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-600/10',
+    description: 'Meta AI (Llama Training)',
+    status: 'blocked',
+    enabled: false,
+    lastCrawl: 'Jamais',
+    crawlsToday: 0,
+    crawlsWeek: 0,
+    pagesVisited: 0,
+    frequency: 'N/A',
+    trend: 0,
+  },
+  {
+    id: 'anthropic-ai',
+    name: 'anthropic-ai',
+    agent: 'anthropic-ai',
+    icon: 'A',
+    color: 'text-orange-300',
+    bgColor: 'bg-orange-400/10',
+    description: 'Anthropic (New Agent)',
+    status: 'active',
+    enabled: true,
+    lastCrawl: 'Il y a 18 min',
+    crawlsToday: 29,
+    crawlsWeek: 167,
+    pagesVisited: 92,
+    frequency: '~20 min',
+    trend: 15,
+  },
+];
+
+const generateTimeline = (): CrawlEvent[] => {
+  const pages = ['/index.html', '/about', '/products', '/blog/ai-guide', '/faq', '/pricing', '/contact', '/blog/seo-tips', '/docs/api', '/team'];
+  const bots = [
+    { id: 'gptbot', name: 'GPTBot', icon: 'G' },
+    { id: 'claudebot', name: 'ClaudeBot', icon: 'A' },
+    { id: 'google-extended', name: 'Google-Extended', icon: 'G' },
+    { id: 'perplexitybot', name: 'PerplexityBot', icon: 'P' },
+    { id: 'chatgpt-user', name: 'ChatGPT-User', icon: 'C' },
+    { id: 'anthropic-ai', name: 'anthropic-ai', icon: 'A' },
+  ];
+
+  const events: CrawlEvent[] = [];
+  const now = Date.now();
+
+  for (let i = 0; i < 20; i++) {
+    const bot = bots[Math.floor(Math.random() * bots.length)];
+    const minutesAgo = Math.floor(Math.random() * 120);
+    const timestamp = new Date(now - minutesAgo * 60000);
+    const statuses: ('success' | 'blocked' | 'error')[] = ['success', 'success', 'success', 'success', 'success', 'blocked', 'error'];
+
+    events.push({
+      botId: bot.id,
+      botName: bot.name,
+      botIcon: bot.icon,
+      timestamp: timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      page: pages[Math.floor(Math.random() * pages.length)],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      responseTime: Math.floor(Math.random() * 800) + 50,
+    });
+  }
+
+  return events.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+};
+
+const generateAlerts = (): BotAlert[] => [
+  { id: '1', type: 'warning', message: 'Fréquence de crawl en baisse pour Applebot (-40% cette semaine)', botName: 'Applebot', timestamp: 'Il y a 1h' },
+  { id: '2', type: 'info', message: 'ClaudeBot a augmenté sa fréquence de crawl de 18% cette semaine', botName: 'ClaudeBot', timestamp: 'Il y a 3h' },
+  { id: '3', type: 'critical', message: 'FacebookBot est bloqué par votre robots.txt actuel', botName: 'FacebookBot', timestamp: 'Il y a 5h' },
+  { id: '4', type: 'info', message: 'Google-Extended a indexé 42 nouvelles pages aujourd\'hui', botName: 'Google-Extended', timestamp: 'Il y a 6h' },
+  { id: '5', type: 'warning', message: 'Amazonbot n\'a pas crawlé votre site depuis 12 heures', botName: 'Amazonbot', timestamp: 'Il y a 12h' },
+];
+
+// Activity chart data (24h)
+const HOURLY_DATA = [12, 18, 8, 5, 3, 2, 4, 15, 28, 42, 38, 45, 52, 48, 55, 60, 58, 50, 42, 35, 28, 22, 18, 15];
+
+const BotTracking: React.FC<BotTrackingProps> = ({ onBack, user }) => {
+  const { t } = useTranslation();
+  const [bots, setBots] = useState<AIBot[]>(generateBots());
+  const [timeline] = useState<CrawlEvent[]>(generateTimeline());
+  const [alerts] = useState<BotAlert[]>(generateAlerts());
+  const [expandedBot, setExpandedBot] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'blocked'>('all');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const totalCrawlsToday = bots.reduce((sum, b) => sum + b.crawlsToday, 0);
+  const totalCrawlsWeek = bots.reduce((sum, b) => sum + b.crawlsWeek, 0);
+  const activeBots = bots.filter(b => b.status === 'active').length;
+  const totalPages = bots.reduce((sum, b) => sum + b.pagesVisited, 0);
+  const maxHourly = Math.max(...HOURLY_DATA);
+
+  const filteredBots = bots.filter(b => {
+    if (filterStatus === 'all') return true;
+    return b.status === filterStatus;
+  });
+
+  const toggleBot = (botId: string) => {
+    setBots(prev => prev.map(b => {
+      if (b.id !== botId) return b;
+      const newEnabled = !b.enabled;
+      return {
+        ...b,
+        enabled: newEnabled,
+        status: newEnabled ? (b.crawlsToday > 0 ? 'active' : 'inactive') : 'blocked',
+      };
+    }));
+  };
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setBots(generateBots());
+      setIsRefreshing(false);
+    }, 1500);
+  };
+
+  const statusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>Actif</span>;
+      case 'inactive':
+        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-400"><span className="w-2 h-2 rounded-full bg-yellow-400"></span>Inactif</span>;
+      case 'blocked':
+        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400"><span className="w-2 h-2 rounded-full bg-red-400"></span>Bloqué</span>;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="max-w-[1400px] mx-auto px-6 py-8 animate-in fade-in duration-500">
+
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+            <ArrowLeft size={20} className="text-gray-400" />
+          </button>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-white">{(t as any).botTracking?.title || 'Activation & Suivi des Bots IA'}</h1>
+              <span className="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full border border-primary/20 flex items-center gap-1">
+                <Activity size={12} /> LIVE
+              </span>
+            </div>
+            <p className="text-gray-400 text-sm mt-1">{(t as any).botTracking?.subtitle || 'Surveillez et contrôlez l\'accès des crawlers IA à votre site'}</p>
+          </div>
+        </div>
+        <button
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl text-sm text-gray-300 transition-all"
+        >
+          <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+          {isRefreshing ? 'Actualisation...' : 'Actualiser'}
+        </button>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-emerald-500/10 rounded-lg"><Bot size={18} className="text-emerald-400" /></div>
+            <span className="text-xs text-gray-500 uppercase font-bold">Bots Actifs</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{activeBots}<span className="text-gray-500 text-lg">/{bots.length}</span></p>
+        </div>
+        <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-blue-500/10 rounded-lg"><Eye size={18} className="text-blue-400" /></div>
+            <span className="text-xs text-gray-500 uppercase font-bold">Crawls Aujourd'hui</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{totalCrawlsToday}</p>
+          <p className="text-xs text-emerald-400 mt-1">+14% vs hier</p>
+        </div>
+        <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-purple-500/10 rounded-lg"><BarChart3 size={18} className="text-purple-400" /></div>
+            <span className="text-xs text-gray-500 uppercase font-bold">Crawls Semaine</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{totalCrawlsWeek.toLocaleString()}</p>
+          <p className="text-xs text-emerald-400 mt-1">+8% vs semaine précédente</p>
+        </div>
+        <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-orange-500/10 rounded-lg"><FileText size={18} className="text-orange-400" /></div>
+            <span className="text-xs text-gray-500 uppercase font-bold">Pages Indexées</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{totalPages}</p>
+          <p className="text-xs text-gray-400 mt-1">sur l'ensemble des bots</p>
+        </div>
+      </div>
+
+      {/* Main Grid */}
+      <div className="grid lg:grid-cols-3 gap-6 mb-8">
+
+        {/* Bot List (2/3) */}
+        <div className="lg:col-span-2 space-y-6">
+
+          {/* Activity Chart */}
+          <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <TrendingUp size={18} className="text-primary" /> Activité de Crawl (24h)
+              </h2>
+              <div className="flex gap-2">
+                {['GPTBot', 'ClaudeBot', 'Gemini'].map((name, i) => (
+                  <span key={name} className={`text-[10px] px-2 py-0.5 rounded-full ${i === 0 ? 'bg-emerald-500/20 text-emerald-400' : i === 1 ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>{name}</span>
+                ))}
+              </div>
+            </div>
+            <div className="h-32 flex items-end gap-1">
+              {HOURLY_DATA.map((value, i) => (
+                <div key={i} className="flex-1 group relative">
+                  <div
+                    className="bg-primary/30 hover:bg-primary/50 rounded-t-sm transition-all cursor-pointer relative"
+                    style={{ height: `${(value / maxHourly) * 100}%` }}
+                  >
+                    <div
+                      className="absolute bottom-0 left-0 right-0 bg-primary rounded-t-sm"
+                      style={{ height: `${Math.min(100, (value / maxHourly) * 70)}%` }}
+                    ></div>
+                  </div>
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    {value} crawls
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between text-[10px] text-gray-600 mt-2 px-1">
+              {['00h', '03h', '06h', '09h', '12h', '15h', '18h', '21h'].map(h => (
+                <span key={h}>{h}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Bot Filter + List */}
+          <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Shield size={18} className="text-primary" /> Bots IA Surveillés
+              </h2>
+              <div className="flex gap-2">
+                {(['all', 'active', 'inactive', 'blocked'] as const).map(status => (
+                  <button
+                    key={status}
+                    onClick={() => setFilterStatus(status)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      filterStatus === status
+                        ? 'bg-primary/20 text-primary border border-primary/30'
+                        : 'bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    {status === 'all' ? 'Tous' : status === 'active' ? 'Actifs' : status === 'inactive' ? 'Inactifs' : 'Bloqués'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {filteredBots.map(bot => (
+                <div key={bot.id} className="border border-white/5 rounded-xl overflow-hidden transition-all hover:border-white/10">
+                  {/* Bot Row */}
+                  <div
+                    className="flex items-center gap-4 p-4 cursor-pointer hover:bg-white/[0.02] transition-colors"
+                    onClick={() => setExpandedBot(expandedBot === bot.id ? null : bot.id)}
+                  >
+                    {/* Bot Icon */}
+                    <div className={`w-10 h-10 rounded-xl ${bot.bgColor} flex items-center justify-center font-bold text-sm ${bot.color}`}>
+                      {bot.icon}
+                    </div>
+
+                    {/* Bot Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white text-sm">{bot.name}</span>
+                        <span className="text-xs text-gray-500">{bot.description}</span>
+                      </div>
+                      <div className="flex items-center gap-4 mt-1">
+                        <span className="text-xs text-gray-500">
+                          <Clock size={10} className="inline mr-1" />{bot.lastCrawl}
+                        </span>
+                        <span className="text-xs text-gray-500">{bot.crawlsToday} crawls/jour</span>
+                        {bot.trend !== 0 && (
+                          <span className={`text-xs font-bold ${bot.trend > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {bot.trend > 0 ? '+' : ''}{bot.trend}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    {statusBadge(bot.status)}
+
+                    {/* Toggle */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleBot(bot.id); }}
+                      className="p-1 hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      {bot.enabled ? (
+                        <ToggleRight size={28} className="text-primary" />
+                      ) : (
+                        <ToggleLeft size={28} className="text-gray-600" />
+                      )}
+                    </button>
+
+                    {/* Expand */}
+                    {expandedBot === bot.id ? <ChevronUp size={16} className="text-gray-500" /> : <ChevronDown size={16} className="text-gray-500" />}
+                  </div>
+
+                  {/* Expanded Detail */}
+                  {expandedBot === bot.id && (
+                    <div className="border-t border-white/5 bg-white/[0.01] p-4 animate-in fade-in duration-200">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Crawls Aujourd'hui</p>
+                          <p className="text-xl font-bold text-white">{bot.crawlsToday}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Crawls Cette Semaine</p>
+                          <p className="text-xl font-bold text-white">{bot.crawlsWeek}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Pages Visitées</p>
+                          <p className="text-xl font-bold text-white">{bot.pagesVisited}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Fréquence Moyenne</p>
+                          <p className="text-xl font-bold text-white">{bot.frequency}</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-white/5">
+                        <p className="text-xs text-gray-500 mb-2">User-Agent: <code className="bg-white/5 px-2 py-0.5 rounded text-gray-300">{bot.agent}</code></p>
+                        <p className="text-xs text-gray-500">
+                          Règle robots.txt : <code className={`px-2 py-0.5 rounded ${bot.enabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                            {bot.enabled ? 'Allow: /' : 'Disallow: /'}
+                          </code>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (1/3) */}
+        <div className="space-y-6">
+
+          {/* Alerts */}
+          <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-6">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+              <Bell size={18} className="text-yellow-400" /> Alertes
+            </h2>
+            <div className="space-y-3">
+              {alerts.map(alert => (
+                <div key={alert.id} className={`p-3 rounded-xl border ${
+                  alert.type === 'critical' ? 'bg-red-500/5 border-red-500/20' :
+                  alert.type === 'warning' ? 'bg-yellow-500/5 border-yellow-500/20' :
+                  'bg-blue-500/5 border-blue-500/20'
+                }`}>
+                  <div className="flex items-start gap-2">
+                    {alert.type === 'critical' ? <XCircle size={14} className="text-red-400 mt-0.5 shrink-0" /> :
+                     alert.type === 'warning' ? <AlertTriangle size={14} className="text-yellow-400 mt-0.5 shrink-0" /> :
+                     <CheckCircle2 size={14} className="text-blue-400 mt-0.5 shrink-0" />}
+                    <div>
+                      <p className="text-xs text-gray-300 leading-relaxed">{alert.message}</p>
+                      <p className="text-[10px] text-gray-600 mt-1">{alert.timestamp}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Live Timeline */}
+          <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-6">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+              <Activity size={18} className="text-primary" /> Timeline Live
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </h2>
+            <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
+              {timeline.slice(0, 15).map((event, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors">
+                  <span className="text-[10px] text-gray-600 w-10 shrink-0 font-mono">{event.timestamp}</span>
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold ${
+                    event.botId.includes('gpt') || event.botId.includes('chatgpt') ? 'bg-emerald-500/10 text-emerald-400' :
+                    event.botId.includes('claude') || event.botId.includes('anthropic') ? 'bg-orange-500/10 text-orange-400' :
+                    event.botId.includes('google') ? 'bg-blue-500/10 text-blue-400' :
+                    'bg-purple-500/10 text-purple-400'
+                  }`}>
+                    {event.botIcon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-300 truncate">{event.page}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-600">{event.responseTime}ms</span>
+                    {event.status === 'success' ? (
+                      <CheckCircle2 size={12} className="text-emerald-400" />
+                    ) : event.status === 'blocked' ? (
+                      <XCircle size={12} className="text-red-400" />
+                    ) : (
+                      <AlertTriangle size={12} className="text-yellow-400" />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top Pages */}
+          <div className="bg-[#1a1d21] border border-white/5 rounded-2xl p-6">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
+              <Globe size={18} className="text-blue-400" /> Pages les Plus Crawlées
+            </h2>
+            <div className="space-y-3">
+              {[
+                { page: '/index.html', crawls: 234, pct: 100 },
+                { page: '/blog/ai-guide', crawls: 187, pct: 80 },
+                { page: '/faq', crawls: 156, pct: 67 },
+                { page: '/products', crawls: 132, pct: 56 },
+                { page: '/about', crawls: 98, pct: 42 },
+                { page: '/pricing', crawls: 76, pct: 32 },
+              ].map((item, idx) => (
+                <div key={idx}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-gray-300 font-mono truncate mr-2">{item.page}</span>
+                    <span className="text-gray-500 shrink-0">{item.crawls}</span>
+                  </div>
+                  <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-primary/40 rounded-full" style={{ width: `${item.pct}%` }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BotTracking;

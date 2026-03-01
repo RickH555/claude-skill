@@ -1,0 +1,144 @@
+import { createClient } from "@/lib/supabase/client"
+import type { DBProject, AnalysisRun, DBRecommendation, GeneratedContentRow } from "@/lib/db"
+
+// ============================================================
+// Client-side database helpers (for 'use client' components)
+// Uses the browser Supabase client
+// ============================================================
+
+function getSupabase() {
+  return createClient()
+}
+
+// Projects
+export async function getProjectsClient(workspaceId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false })
+
+  if (error) throw error
+  return data as DBProject[]
+}
+
+export async function getProjectClient(projectId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", projectId)
+    .single()
+
+  if (error) throw error
+  return data as DBProject
+}
+
+export async function createProjectClient(input: {
+  workspace_id: string
+  name: string
+  domain: string
+  brand_name?: string
+  industry?: string
+  competitors?: string[]
+  keywords?: string[]
+}) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("projects")
+    .insert(input)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data as DBProject
+}
+
+export async function deleteProjectClient(projectId: string) {
+  const supabase = getSupabase()
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", projectId)
+
+  if (error) throw error
+}
+
+// Analysis Runs
+export async function getProjectRunsClient(projectId: string, limit = 10) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("analysis_runs")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+    .limit(limit)
+
+  if (error) throw error
+  return data as AnalysisRun[]
+}
+
+export async function getRunResultsClient(runId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("run_results")
+    .select("*")
+    .eq("run_id", runId)
+
+  if (error) throw error
+  return data
+}
+
+// Recommendations
+export async function getProjectRecommendationsClient(projectId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("recommendations")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("priority", { ascending: true })
+
+  if (error) throw error
+  return data as DBRecommendation[]
+}
+
+export async function updateRecommendationStatusClient(recId: string, status: string) {
+  const supabase = getSupabase()
+  const { error } = await supabase
+    .from("recommendations")
+    .update({ status })
+    .eq("id", recId)
+
+  if (error) throw error
+}
+
+// Generated Contents
+export async function getProjectContentsClient(projectId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("generated_contents")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false })
+
+  if (error) throw error
+  return data as GeneratedContentRow[]
+}
+
+// User Workspace
+export async function getUserWorkspaceClient() {
+  const supabase = getSupabase()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from("workspace_users")
+    .select("workspace_id, role, workspaces(*)")
+    .eq("user_id", user.id)
+    .limit(1)
+    .single()
+
+  if (error && error.code !== "PGRST116") throw error
+  return data as { workspace_id: string; role: string; workspaces: Record<string, unknown> } | null
+}

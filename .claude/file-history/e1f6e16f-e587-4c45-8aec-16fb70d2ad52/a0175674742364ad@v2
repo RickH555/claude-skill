@@ -1,0 +1,75 @@
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const NAV_ITEMS = [
+  { label: "ABOUT", href: "#about" },
+  { label: "PROJECTS", href: "#projects" },
+  { label: "SKILLS", href: "#skills" },
+  { label: "CONTACT", href: "#contact" },
+];
+
+export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <nav className="fixed top-0 left-0 z-50 w-full border-b-4 border-white bg-black">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <a
+          href="#"
+          className="text-2xl font-black uppercase tracking-tighter text-white transition-colors hover:text-brutal-yellow"
+        >
+          AD.
+        </a>
+
+        {/* Desktop links */}
+        <div className="hidden gap-8 md:flex">
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="text-sm font-bold uppercase tracking-widest text-white transition-colors hover:text-brutal-yellow"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+
+        {/* Mobile toggle */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="text-2xl font-black text-white md:hidden"
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? "CLOSE" : "MENU"}
+        </button>
+      </div>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: "auto" }}
+            exit={{ height: 0 }}
+            className="overflow-hidden border-t-4 border-white bg-black md:hidden"
+          >
+            <div className="flex flex-col gap-4 px-6 py-6">
+              {NAV_ITEMS.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="text-xl font-black uppercase tracking-widest text-white transition-colors hover:text-brutal-yellow"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+}

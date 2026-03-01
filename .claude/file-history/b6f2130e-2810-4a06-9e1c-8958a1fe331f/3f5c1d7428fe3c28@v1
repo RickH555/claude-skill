@@ -1,0 +1,56 @@
+export interface SchemaInput {
+  name: string;
+  url: string;
+  logoUrl: string;
+  description: string;
+  socialProfiles: string[];
+  contactPhone: string;
+  contactEmail: string;
+  alternateName: string;
+}
+
+export const generateJsonLd = (data: SchemaInput): string => {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${data.url}/#organization`,
+        "name": data.name,
+        "url": data.url,
+        "logo": {
+          "@type": "ImageObject",
+          "url": data.logoUrl
+        },
+        "description": data.description,
+        "alternateName": data.alternateName || undefined,
+        "sameAs": data.socialProfiles.filter(url => url.length > 0),
+        "contactPoint": (data.contactPhone || data.contactEmail) ? {
+          "@type": "ContactPoint",
+          "telephone": data.contactPhone || undefined,
+          "email": data.contactEmail || undefined,
+          "contactType": "customer service"
+        } : undefined
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${data.url}/#website`,
+        "url": data.url,
+        "name": data.name,
+        "publisher": {
+          "@id": `${data.url}/#organization`
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": `${data.url}/search?q={search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  };
+
+  return JSON.stringify(schema, null, 2);
+};

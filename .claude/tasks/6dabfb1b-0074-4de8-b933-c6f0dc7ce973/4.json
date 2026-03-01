@@ -1,0 +1,9 @@
+{
+  "id": "4",
+  "subject": "Phase 3: Vérifier modules 3 et 4",
+  "description": "Vérifier content_writer.ts, reputation_service.ts, ContentWriter.tsx, Reputation.tsx, GenerativeTools.tsx",
+  "activeForm": "Vérifiant les modules Content Writer et Réputation",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

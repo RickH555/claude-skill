@@ -1,0 +1,151 @@
+import Stripe from 'https://esm.sh/stripe@15.12.0?target=denonext';
+import { corsHeaders, createAdminClient, enforceRateLimit, jsonResponse, parseJsonBody } from '../_shared/common.ts';
+
+interface CheckoutPayload {
+  price_id?: string;
+  pack_id?: 'pack_20' | 'pack_50' | 'pack_120' | 'pack_300';
+  user_id: string;
+  purchase_origin?: 'manual' | 'auto';
+}
+
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY manquante');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2024-04-10',
+});
+
+interface CreditPack {
+  id: 'pack_20' | 'pack_50' | 'pack_120' | 'pack_300';
+  priceId: string;
+  creditsBase: number;
+  creditsBonus: number;
+}
+
+const getConfiguredPacks = (): CreditPack[] =>
+  [
+    {
+      id: 'pack_20',
+      priceId: Deno.env.get('STRIPE_PRICE_CREDITS_20') ?? '',
+      creditsBase: 20,
+      creditsBonus: 0,
+    },
+    {
+      id: 'pack_50',
+      priceId: Deno.env.get('STRIPE_PRICE_CREDITS_50') ?? '',
+      creditsBase: 50,
+      creditsBonus: 5,
+    },
+    {
+      id: 'pack_120',
+      priceId: Deno.env.get('STRIPE_PRICE_CREDITS_120') ?? '',
+      creditsBase: 120,
+      creditsBonus: 15,
+    },
+    {
+      id: 'pack_300',
+      priceId: Deno.env.get('STRIPE_PRICE_CREDITS_300') ?? '',
+      creditsBase: 300,
+      creditsBonus: 50,
+    },
+  ].filter((pack) => pack.priceId);
+
+const resolvePack = (payload: CheckoutPayload): CreditPack | null => {
+  const packs = getConfiguredPacks();
+  if (payload.pack_id) {
+    return packs.find((pack) => pack.id === payload.pack_id) ?? null;
+  }
+  if (payload.price_id) {
+    return packs.find((pack) => pack.priceId === payload.price_id) ?? null;
+  }
+  return packs.find((pack) => pack.id === 'pack_20') ?? null;
+};
+
+/**
+ * Cree une session checkout Stripe pour achat cash de credits.
+ */
+Deno.serve(async (request: Request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
+  try {
+    enforceRateLimit(`checkout:${ip}`, 100);
+    if (request.method !== 'POST') {
+      return jsonResponse({ error: 'Method not allowed' }, 405);
+    }
+    const payload = await parseJsonBody<CheckoutPayload>(request);
+    if (!payload.user_id) {
+      return jsonResponse({ error: 'user_id requis' }, 400);
+    }
+
+    const admin = createAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from('profiles')
+      .select('id, email, full_name, stripe_customer_id')
+      .eq('id', payload.user_id)
+      .single<{
+        id: string;
+        email: string;
+        full_name: string | null;
+        stripe_customer_id: string | null;
+      }>();
+    if (profileError || !profile) {
+      throw new Error('Profil introuvable');
+    }
+
+    let customerId = profile.stripe_customer_id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: profile.email,
+        name: profile.full_name ?? undefined,
+        metadata: { user_id: profile.id },
+      });
+      customerId = customer.id;
+      await admin
+        .from('profiles')
+        .update({
+          stripe_customer_id: customerId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', profile.id);
+    }
+
+    const selectedPack = resolvePack(payload);
+    if (!selectedPack) {
+      throw new Error('pack_id/price_id credits invalide ou non configure');
+    }
+
+    const appUrl = Deno.env.get('APP_URL') ?? 'http://localhost:5173';
+    const creditsTotal = selectedPack.creditsBase + selectedPack.creditsBonus;
+    const checkoutSession = await stripe.checkout.sessions.create({
+      customer: customerId,
+      mode: 'payment',
+      line_items: [{ price: selectedPack.priceId, quantity: 1 }],
+      client_reference_id: profile.id,
+      metadata: {
+        user_id: profile.id,
+        pack_id: selectedPack.id,
+        credits_base: String(selectedPack.creditsBase),
+        credits_bonus: String(selectedPack.creditsBonus),
+        credits_total: String(creditsTotal),
+        purchase_origin: payload.purchase_origin ?? 'manual',
+      },
+      payment_intent_data: {
+        setup_future_usage: 'off_session',
+      },
+      success_url: `${appUrl}/reglages?checkout=success`,
+      cancel_url: `${appUrl}/reglages?checkout=cancel`,
+      allow_promotion_codes: true,
+    });
+
+    return jsonResponse({
+      url: checkoutSession.url,
+      session_id: checkoutSession.id,
+    });
+  } catch (error) {
+    return jsonResponse({ error: error instanceof Error ? error.message : 'Erreur checkout' }, 500);
+  }
+});

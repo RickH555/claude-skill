@@ -1,0 +1,71 @@
+import React, { useEffect, useState } from 'react';
+
+interface ScoreRingProps {
+  score: number;
+  size?: number;
+  strokeWidth?: number;
+  noAnimation?: boolean;
+}
+
+const ScoreRing: React.FC<ScoreRingProps> = ({ score, size = 120, strokeWidth = 8, noAnimation = false }) => {
+  const [animatedScore, setAnimatedScore] = useState(noAnimation ? score : 0);
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (animatedScore / 100) * circumference;
+
+  useEffect(() => {
+    if (noAnimation) {
+      setAnimatedScore(score);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setAnimatedScore(score);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [score, noAnimation]);
+
+  const getColor = (s: number) => {
+    if (s >= 80) return '#a855f7'; // Purple
+    if (s >= 60) return '#c084fc'; // Light Purple
+    if (s >= 40) return '#7c3aed'; // Violet
+    return '#ef4444'; // Red
+  };
+
+  const color = getColor(animatedScore);
+
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* Background Ring */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#ffffff"
+          strokeOpacity="0.08"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        {/* Progress Ring */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className={noAnimation ? '' : "transition-all duration-1000 ease-out"}
+        />
+      </svg>
+      <div className="absolute flex flex-col items-center">
+        <span className="text-3xl font-bold font-sans" style={{ color }}>{animatedScore}</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">AEO Score</span>
+      </div>
+    </div>
+  );
+};
+
+export default ScoreRing;

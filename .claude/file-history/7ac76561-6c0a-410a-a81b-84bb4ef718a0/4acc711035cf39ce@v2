@@ -1,0 +1,1190 @@
+import React, { useState, useMemo, useRef } from 'react';
+import {
+  Search, Filter, MoreVertical, Download, Plus,
+  Building2, Mail, Phone, Calendar, CreditCard,
+  FileText, ShieldCheck, AlertCircle, CheckCircle2,
+  ArrowLeft, Wallet, TrendingUp, Users, X, Globe,
+  Target, ClipboardList, ExternalLink, Save, Zap
+} from 'lucide-react';
+
+interface MissionInfo {
+  missionId: string;
+  analyzedUrl: string;
+  aeoScore: number;
+  budget: number;
+  missionStatus: 'nouveau' | 'accepte' | 'en_cours' | 'termine' | 'refuse';
+  deadline: string;
+  recommendations: number;
+}
+
+interface Client {
+  id: string;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  role: string;
+  status: 'active' | 'pending' | 'churned';
+  plan: 'Starter' | 'Pro' | 'Agency';
+  mrr: number;
+  avatar: string;
+  source: 'direct' | 'mission';
+  createdAt: string;
+  contract: {
+    startDate: string;
+    renewalDate: string;
+    billingCycle: 'Mensuel' | 'Annuel';
+    paymentMethod: 'Stripe (CB)' | 'Virement' | 'Prélèvement SEPA';
+    slaLevel: 'Standard' | 'Gold' | 'Platinum';
+    nextInvoiceAmount: number;
+  };
+  legal: {
+    address: string;
+    vatNumber: string;
+    siret: string;
+    country: string;
+  };
+  mission?: MissionInfo;
+}
+
+// Clients existants (directs)
+const DIRECT_CLIENTS: Client[] = [
+  {
+    id: 'C-001',
+    companyName: 'TechFlow Solutions',
+    contactName: 'Thomas Durand',
+    role: 'CTO',
+    email: 'thomas@techflow.io',
+    phone: '+33 6 12 34 56 78',
+    status: 'active',
+    plan: 'Agency',
+    mrr: 299,
+    avatar: 'TD',
+    source: 'direct',
+    createdAt: '2023-09-15',
+    contract: {
+      startDate: '2023-09-15',
+      renewalDate: '2024-09-15',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Stripe (CB)',
+      slaLevel: 'Platinum',
+      nextInvoiceAmount: 358.80
+    },
+    legal: {
+      address: '45 Avenue de la République, 75011 Paris',
+      vatNumber: 'FR 12 345678901',
+      siret: '890 123 456 00012',
+      country: 'France'
+    }
+  },
+  {
+    id: 'C-002',
+    companyName: 'GreenGarden Bio',
+    contactName: 'Sophie Martin',
+    role: 'CMO',
+    email: 's.martin@greengarden.com',
+    phone: '+33 6 98 76 54 32',
+    status: 'active',
+    plan: 'Pro',
+    mrr: 89,
+    avatar: 'SM',
+    source: 'direct',
+    createdAt: '2024-01-10',
+    contract: {
+      startDate: '2024-01-10',
+      renewalDate: '2025-01-10',
+      billingCycle: 'Annuel',
+      paymentMethod: 'Prélèvement SEPA',
+      slaLevel: 'Gold',
+      nextInvoiceAmount: 1068.00
+    },
+    legal: {
+      address: '12 Zone Industrielle Nord, 69000 Lyon',
+      vatNumber: 'FR 88 555444333',
+      siret: '555 444 333 00024',
+      country: 'France'
+    }
+  },
+  {
+    id: 'C-003',
+    companyName: 'OmniMedia Group',
+    contactName: 'Julie Ferrand',
+    role: 'Head of SEO',
+    email: 'j.ferrand@omnimedia.fr',
+    phone: '+33 1 44 55 66 77',
+    status: 'active',
+    plan: 'Agency',
+    mrr: 299,
+    avatar: 'JF',
+    source: 'direct',
+    createdAt: '2023-11-01',
+    contract: {
+      startDate: '2023-11-01',
+      renewalDate: '2024-11-01',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Virement',
+      slaLevel: 'Platinum',
+      nextInvoiceAmount: 358.80
+    },
+    legal: {
+      address: 'Tour Montparnasse, 75015 Paris',
+      vatNumber: 'FR 99 111222333',
+      siret: '111 222 333 00099',
+      country: 'France'
+    }
+  },
+];
+
+// Clients issus des Ordres de Mission
+const MISSION_CLIENTS: Client[] = [
+  {
+    id: 'C-M001',
+    companyName: 'TechVision SAS',
+    contactName: 'Sophie Martin',
+    role: 'Dirigeante',
+    email: 'sophie.martin@techvision.fr',
+    phone: '+33 6 12 34 56 78',
+    status: 'pending',
+    plan: 'Starter',
+    mrr: 0,
+    avatar: 'SM',
+    source: 'mission',
+    createdAt: '2026-02-12',
+    contract: {
+      startDate: '-',
+      renewalDate: '-',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Stripe (CB)',
+      slaLevel: 'Standard',
+      nextInvoiceAmount: 0
+    },
+    legal: { address: '-', vatNumber: 'En attente', siret: 'En attente', country: 'France' },
+    mission: {
+      missionId: 'MIS-2026-001',
+      analyzedUrl: 'https://www.techvision.fr',
+      aeoScore: 34,
+      budget: 2500,
+      missionStatus: 'nouveau',
+      deadline: '2026-03-15',
+      recommendations: 4
+    }
+  },
+  {
+    id: 'C-M002',
+    companyName: 'GreenLeaf Énergie',
+    contactName: 'Jean-Pierre Dubois',
+    role: 'Directeur Marketing',
+    email: 'jp.dubois@greenleaf.eco',
+    phone: '-',
+    status: 'active',
+    plan: 'Pro',
+    mrr: 89,
+    avatar: 'JD',
+    source: 'mission',
+    createdAt: '2026-02-09',
+    contract: {
+      startDate: '2026-02-11',
+      renewalDate: '2027-02-11',
+      billingCycle: 'Annuel',
+      paymentMethod: 'Virement',
+      slaLevel: 'Gold',
+      nextInvoiceAmount: 1068.00
+    },
+    legal: { address: '22 Rue de l\'Énergie, 31000 Toulouse', vatNumber: 'FR 77 888999000', siret: '888 999 000 00015', country: 'France' },
+    mission: {
+      missionId: 'MIS-2026-002',
+      analyzedUrl: 'https://www.greenleaf-energie.fr',
+      aeoScore: 22,
+      budget: 4800,
+      missionStatus: 'accepte',
+      deadline: '2026-04-01',
+      recommendations: 5
+    }
+  },
+  {
+    id: 'C-M003',
+    companyName: 'Boutique Artisan',
+    contactName: 'Marie Leclerc',
+    role: 'Fondatrice',
+    email: 'marie@boutique-artisan.com',
+    phone: '+33 7 98 76 54 32',
+    status: 'active',
+    plan: 'Starter',
+    mrr: 29,
+    avatar: 'ML',
+    source: 'mission',
+    createdAt: '2026-02-02',
+    contract: {
+      startDate: '2026-02-02',
+      renewalDate: '2027-02-02',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Stripe (CB)',
+      slaLevel: 'Standard',
+      nextInvoiceAmount: 34.80
+    },
+    legal: { address: '5 Place du Marché, 13001 Marseille', vatNumber: 'FR 33 222111444', siret: '222 111 444 00033', country: 'France' },
+    mission: {
+      missionId: 'MIS-2026-003',
+      analyzedUrl: 'https://boutique-artisan.com',
+      aeoScore: 45,
+      budget: 1800,
+      missionStatus: 'en_cours',
+      deadline: '2026-03-01',
+      recommendations: 3
+    }
+  },
+  {
+    id: 'C-M004',
+    companyName: 'Finance Plus',
+    contactName: 'Alexandre Moreau',
+    role: 'CEO',
+    email: 'a.moreau@financeplus.fr',
+    phone: '-',
+    status: 'active',
+    plan: 'Pro',
+    mrr: 89,
+    avatar: 'AM',
+    source: 'mission',
+    createdAt: '2026-01-21',
+    contract: {
+      startDate: '2026-01-21',
+      renewalDate: '2027-01-21',
+      billingCycle: 'Annuel',
+      paymentMethod: 'Prélèvement SEPA',
+      slaLevel: 'Gold',
+      nextInvoiceAmount: 1068.00
+    },
+    legal: { address: '100 Avenue des Champs-Élysées, 75008 Paris', vatNumber: 'FR 55 666777888', siret: '666 777 888 00021', country: 'France' },
+    mission: {
+      missionId: 'MIS-2026-004',
+      analyzedUrl: 'https://www.financeplus.fr',
+      aeoScore: 58,
+      budget: 3200,
+      missionStatus: 'termine',
+      deadline: '2026-02-10',
+      recommendations: 2
+    }
+  },
+  {
+    id: 'C-M005',
+    companyName: 'StartupLab',
+    contactName: 'Laura Chen',
+    role: 'COO',
+    email: 'laura.chen@startuplab.io',
+    phone: '-',
+    status: 'pending',
+    plan: 'Starter',
+    mrr: 0,
+    avatar: 'LC',
+    source: 'mission',
+    createdAt: '2026-02-13',
+    contract: {
+      startDate: '-',
+      renewalDate: '-',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Stripe (CB)',
+      slaLevel: 'Standard',
+      nextInvoiceAmount: 0
+    },
+    legal: { address: '-', vatNumber: 'En attente', siret: 'En attente', country: 'France' },
+    mission: {
+      missionId: 'MIS-2026-005',
+      analyzedUrl: 'https://startuplab.io',
+      aeoScore: 15,
+      budget: 7500,
+      missionStatus: 'nouveau',
+      deadline: '2026-05-01',
+      recommendations: 6
+    }
+  },
+  {
+    id: 'C-M006',
+    companyName: 'WellnessZone',
+    contactName: 'Camille Petit',
+    role: 'Gérante',
+    email: 'camille@wellnesszone.fr',
+    phone: '-',
+    status: 'active',
+    plan: 'Starter',
+    mrr: 29,
+    avatar: 'CP',
+    source: 'mission',
+    createdAt: '2026-02-13',
+    contract: {
+      startDate: '2026-02-14',
+      renewalDate: '2027-02-14',
+      billingCycle: 'Mensuel',
+      paymentMethod: 'Stripe (CB)',
+      slaLevel: 'Standard',
+      nextInvoiceAmount: 34.80
+    },
+    legal: { address: '8 Rue du Bien-Être, 44000 Nantes', vatNumber: 'FR 44 333222111', siret: '333 222 111 00044', country: 'France' },
+    mission: {
+      missionId: 'MIS-2026-007',
+      analyzedUrl: 'https://wellnesszone.fr',
+      aeoScore: 28,
+      budget: 3500,
+      missionStatus: 'en_cours',
+      deadline: '2026-03-25',
+      recommendations: 4
+    }
+  },
+];
+
+const ALL_INITIAL_CLIENTS = [...DIRECT_CLIENTS, ...MISSION_CLIENTS];
+
+interface ClientsProps {
+  onBack: () => void;
+  onNavigate: (view: string) => void;
+  user: { name: string; email: string; plan: 'free' | 'pro' | 'enterprise'; credits: number } | null;
+  directClientCount: number;
+  maxClients: number;
+}
+
+const MISSION_STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  nouveau: { label: 'Nouveau', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
+  accepte: { label: 'Accepté', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+  en_cours: { label: 'En cours', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+  termine: { label: 'Terminé', color: 'text-green-400 bg-green-500/10 border-green-500/20' },
+  refuse: { label: 'Refusé', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
+};
+
+const getScoreColor = (score: number) => {
+  if (score >= 70) return 'text-green-400';
+  if (score >= 50) return 'text-yellow-400';
+  if (score >= 30) return 'text-orange-400';
+  return 'text-red-400';
+};
+
+const Clients: React.FC<ClientsProps> = ({ onBack, onNavigate, user, directClientCount, maxClients }) => {
+  const [clients, setClients] = useState<Client[]>(ALL_INITIAL_CLIENTS);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'direct' | 'mission'>('all');
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
+  const [showLimitAlert, setShowLimitAlert] = useState(false);
+
+  // Compteur de clients directs ajoutés manuellement (excluant les clients mission)
+  const addedDirectClients = useMemo(() => clients.filter(c => c.source === 'direct').length, [clients]);
+  const totalDirectCount = directClientCount + addedDirectClients - DIRECT_CLIENTS.length; // nouveaux directs ajoutés cette session + ceux du mois
+  const isAtLimit = totalDirectCount >= maxClients && user?.plan !== 'enterprise';
+  const planLabel = user?.plan === 'free' ? 'Starter' : user?.plan === 'pro' ? 'Pro' : 'Agency';
+
+  // New client form state
+  const [newClient, setNewClient] = useState({
+    companyName: '',
+    contactName: '',
+    email: '',
+    phone: '',
+    role: '',
+    plan: 'Starter' as 'Starter' | 'Pro' | 'Agency',
+    address: '',
+    siret: '',
+    vatNumber: '',
+  });
+
+  const filteredClients = useMemo(() => {
+    return clients.filter(client => {
+      const matchesSearch = client.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            client.contactName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            client.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
+      const matchesSource = sourceFilter === 'all' || client.source === sourceFilter;
+      return matchesSearch && matchesStatus && matchesSource;
+    });
+  }, [clients, searchTerm, statusFilter, sourceFilter]);
+
+  const totalMRR = useMemo(() => clients.reduce((acc, curr) => curr.status === 'active' ? acc + curr.mrr : acc, 0), [clients]);
+  const activeCount = useMemo(() => clients.filter(c => c.status === 'active').length, [clients]);
+  const missionClientCount = useMemo(() => clients.filter(c => c.source === 'mission').length, [clients]);
+
+  // --- EXPORT CSV ---
+  const handleExportCSV = () => {
+    const headers = [
+      'ID', 'Entreprise', 'Contact', 'Rôle', 'Email', 'Téléphone',
+      'Statut', 'Plan', 'MRR (€)', 'Source', 'Date création',
+      'Cycle facturation', 'Méthode paiement', 'SLA',
+      'Adresse', 'SIRET', 'TVA', 'Pays',
+      'Mission ID', 'URL analysée', 'Score AEO', 'Budget mission (€)', 'Statut mission', 'Deadline mission'
+    ];
+
+    const rows = filteredClients.map(c => [
+      c.id,
+      c.companyName,
+      c.contactName,
+      c.role,
+      c.email,
+      c.phone,
+      c.status,
+      c.plan,
+      c.mrr,
+      c.source,
+      c.createdAt,
+      c.contract.billingCycle,
+      c.contract.paymentMethod,
+      c.contract.slaLevel,
+      c.legal.address,
+      c.legal.siret,
+      c.legal.vatNumber,
+      c.legal.country,
+      c.mission?.missionId || '',
+      c.mission?.analyzedUrl || '',
+      c.mission?.aeoScore || '',
+      c.mission?.budget || '',
+      c.mission?.missionStatus || '',
+      c.mission?.deadline || '',
+    ]);
+
+    const csvContent = [
+      headers.join(';'),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';'))
+    ].join('\n');
+
+    // BOM for Excel UTF-8 compatibility
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `citedby-clients-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // --- TENTATIVE OUVERTURE MODAL ---
+  const handleOpenNewClient = () => {
+    if (isAtLimit) {
+      setShowLimitAlert(true);
+      return;
+    }
+    setShowNewClientModal(true);
+  };
+
+  // --- ADD NEW CLIENT ---
+  const handleAddClient = () => {
+    if (!newClient.companyName.trim() || !newClient.contactName.trim() || !newClient.email.trim()) return;
+
+    const id = `C-${String(clients.length + 1).padStart(3, '0')}`;
+    const avatar = newClient.contactName
+      .split(' ')
+      .map(n => n.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('');
+
+    const client: Client = {
+      id,
+      companyName: newClient.companyName,
+      contactName: newClient.contactName,
+      email: newClient.email,
+      phone: newClient.phone || '-',
+      role: newClient.role || '-',
+      status: 'pending',
+      plan: newClient.plan,
+      mrr: 0,
+      avatar,
+      source: 'direct',
+      createdAt: new Date().toISOString().slice(0, 10),
+      contract: {
+        startDate: '-',
+        renewalDate: '-',
+        billingCycle: 'Mensuel',
+        paymentMethod: 'Stripe (CB)',
+        slaLevel: 'Standard',
+        nextInvoiceAmount: 0,
+      },
+      legal: {
+        address: newClient.address || '-',
+        vatNumber: newClient.vatNumber || 'En attente',
+        siret: newClient.siret || 'En attente',
+        country: 'France',
+      },
+    };
+
+    setClients(prev => [client, ...prev]);
+    setShowNewClientModal(false);
+    setNewClient({ companyName: '', contactName: '', email: '', phone: '', role: '', plan: 'Starter', address: '', siret: '', vatNumber: '' });
+  };
+
+  // --- RENDER DETAIL VIEW ---
+  if (selectedClient) {
+    const m = selectedClient.mission;
+    const mStatusConf = m ? MISSION_STATUS_LABELS[m.missionStatus] : null;
+
+    return (
+      <div className="w-full px-6 py-8 animate-in fade-in slide-in-from-right duration-300">
+        <button
+          onClick={() => setSelectedClient(null)}
+          className="flex items-center text-gray-500 hover:text-white mb-6 transition-colors group"
+        >
+          <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+          Retour à la base clients
+        </button>
+
+        {/* Header Fiche Client */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/[0.08] flex items-center justify-center text-white font-bold text-2xl shadow-inner">
+              {selectedClient.avatar}
+            </div>
+            <div>
+              <h1 className="text-3xl font-sans font-bold text-white mb-1">{selectedClient.companyName}</h1>
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-sm text-gray-500 flex items-center gap-1">
+                  <Building2 size={14} /> {selectedClient.id}
+                </span>
+                <span className={`px-2 py-0.5 text-xs font-bold rounded-full border ${
+                  selectedClient.status === 'active' ? 'bg-purple-500/10 border-white/[0.1] text-purple-300' :
+                  selectedClient.status === 'pending' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+                  'bg-red-500/10 border-red-500/20 text-red-400'
+                }`}>
+                  {selectedClient.status === 'active' ? 'Actif' : selectedClient.status === 'pending' ? 'En attente' : 'Inactif'}
+                </span>
+                <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full border ${
+                  selectedClient.source === 'mission'
+                    ? 'bg-orange-500/10 border-orange-500/20 text-orange-400'
+                    : 'bg-white/5 border-white/10 text-gray-500'
+                }`}>
+                  {selectedClient.source === 'mission' ? 'Via Mission' : 'Client direct'}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/[0.04] border border-white/[0.08] hover:bg-purple-500/10 rounded-full text-sm font-medium text-white transition-colors flex items-center gap-2">
+              <Download size={16} /> Factures
+            </button>
+            <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-full hover:from-purple-600 hover:to-violet-700 transition-colors flex items-center gap-2">
+              <FileText size={16} /> Éditer Contrat
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* Colonne Gauche: Info Contact & Plan */}
+          <div className="space-y-6">
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Users size={16} /> Contact Principal
+              </h3>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-white/[0.08] flex items-center justify-center text-sm font-bold">
+                  {selectedClient.avatar}
+                </div>
+                <div>
+                  <p className="font-bold text-white">{selectedClient.contactName}</p>
+                  <p className="text-xs text-gray-500">{selectedClient.role}</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <Mail size={16} className="text-purple-400" />
+                  <a href={`mailto:${selectedClient.email}`} className="hover:text-white transition-colors">{selectedClient.email}</a>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <Phone size={16} className="text-purple-400" />
+                  <span>{selectedClient.phone}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <Calendar size={16} className="text-purple-400" />
+                  <span>Client depuis le {selectedClient.createdAt}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <ShieldCheck size={16} /> Abonnement
+              </h3>
+              <div className="flex justify-between items-end mb-4">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Plan Actuel</p>
+                  <p className="text-xl font-bold text-white">{selectedClient.plan}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500 mb-1">MRR</p>
+                  <p className="text-xl font-bold text-purple-300">{selectedClient.mrr}€</p>
+                </div>
+              </div>
+              <div className="p-3 bg-white/[0.04] rounded-2xl border border-white/[0.06]">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-500">Cycle</span>
+                  <span className="text-white font-medium">{selectedClient.contract.billingCycle}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">SLA</span>
+                  <span className="text-purple-400 font-bold">{selectedClient.contract.slaLevel}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mission AEO Card (only for mission clients) */}
+            {m && (
+              <div className="bg-gradient-to-br from-orange-500/5 to-amber-500/5 border border-orange-500/15 rounded-2xl p-6">
+                <h3 className="text-sm font-bold text-orange-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <ClipboardList size={16} /> Ordre de Mission
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Mission</span>
+                    <span className="text-white font-mono text-xs">{m.missionId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">URL analysée</span>
+                    <a href={m.analyzedUrl} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 flex items-center gap-1">
+                      {m.analyzedUrl.replace('https://', '').replace('www.', '')}
+                      <ExternalLink size={11} />
+                    </a>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Score AEO</span>
+                    <span className={`font-bold ${getScoreColor(m.aeoScore)}`}>{m.aeoScore}/100</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Budget mission</span>
+                    <span className="text-white font-semibold">{m.budget.toLocaleString('fr-FR')} €</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Recommandations</span>
+                    <span className="text-gray-300">{m.recommendations}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Deadline</span>
+                    <span className="text-gray-300">{new Date(m.deadline).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">Statut mission</span>
+                    {mStatusConf && (
+                      <span className={`px-2 py-0.5 text-[11px] font-semibold rounded-md border ${mStatusConf.color}`}>
+                        {mStatusConf.label}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => onNavigate('mission-orders')}
+                  className="mt-4 w-full py-2 bg-orange-500/10 border border-orange-500/20 rounded-xl text-sm text-orange-400 hover:bg-orange-500/20 transition-colors flex items-center justify-center gap-2"
+                >
+                  <ClipboardList size={14} />
+                  Voir dans Ordres de Mission
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Colonne Centrale: Données Contractuelles */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-lg font-sans font-bold text-white mb-6 flex items-center gap-2 border-b border-white/[0.08] pb-4">
+                <FileText size={20} className="text-purple-400" /> Informations Contractuelles
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Date de début</label>
+                    <div className="flex items-center gap-2 text-sm text-white font-medium">
+                      <Calendar size={16} className="text-gray-500" />
+                      {selectedClient.contract.startDate}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Prochain Renouvellement</label>
+                    <div className="flex items-center gap-2 text-sm text-white font-medium">
+                      <Calendar size={16} className="text-gray-500" />
+                      {selectedClient.contract.renewalDate}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Méthode de paiement</label>
+                    <div className="flex items-center gap-2 text-sm text-white font-medium">
+                      <CreditCard size={16} className="text-gray-500" />
+                      {selectedClient.contract.paymentMethod}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Entité Légale</label>
+                    <p className="text-sm text-white font-medium">{selectedClient.companyName}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">SIRET</label>
+                    <p className="text-sm text-gray-300 font-mono">{selectedClient.legal.siret}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Numéro TVA</label>
+                    <p className="text-sm text-gray-300 font-mono">{selectedClient.legal.vatNumber}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500 block mb-1">Adresse de facturation</label>
+                    <p className="text-sm text-gray-300">{selectedClient.legal.address}</p>
+                    <p className="text-sm text-gray-300">{selectedClient.legal.country}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/5 to-transparent">
+               <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Prochaine Facture</h3>
+                  <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20">
+                    {selectedClient.contract.nextInvoiceAmount > 0 ? 'Programmé' : 'Aucune'}
+                  </span>
+               </div>
+               <div className="flex justify-between items-center">
+                  <div>
+                     <p className="text-3xl font-bold text-white">{selectedClient.contract.nextInvoiceAmount.toFixed(2)} € <span className="text-sm font-normal text-gray-500">TTC</span></p>
+                     <p className="text-xs text-gray-500 mt-1">Prévu le {selectedClient.contract.renewalDate}</p>
+                  </div>
+                  <button className="px-4 py-2 bg-white/[0.08] hover:bg-white/20 rounded-full text-sm text-white transition-colors">
+                     Générer pro-forma
+                  </button>
+               </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // --- RENDER LIST VIEW ---
+  return (
+    <div className="max-w-[1400px] mx-auto px-6 py-8 animate-in fade-in duration-500">
+
+      {/* Header Dashboard */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
+        <div>
+          <h1 className="text-3xl font-sans font-bold text-white mb-2">Base Clients</h1>
+          <p className="text-gray-500">Gérez vos contrats, facturations et relations clients.</p>
+        </div>
+
+        <div className="flex gap-3 items-center">
+           {/* Quota indicateur */}
+           {user && user.plan !== 'enterprise' && (
+             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+               <span className="text-[11px] text-gray-500">Clients directs</span>
+               <span className={`text-sm font-bold ${isAtLimit ? 'text-red-400' : 'text-white'}`}>
+                 {totalDirectCount}/{maxClients}
+               </span>
+             </div>
+           )}
+           <button
+             onClick={handleExportCSV}
+             className="px-4 py-2.5 bg-white/[0.04] hover:bg-purple-500/10 border border-white/[0.08] rounded-2xl text-gray-300 flex items-center gap-2 transition-colors"
+           >
+              <Download size={18} /> Export CSV
+           </button>
+           <button
+             onClick={handleOpenNewClient}
+             className={`px-4 py-2.5 font-bold rounded-2xl flex items-center gap-2 transition-colors shadow-lg ${
+               isAtLimit
+                 ? 'bg-white/[0.06] border border-white/[0.08] text-gray-400 shadow-none cursor-not-allowed'
+                 : 'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white shadow-purple-500/20'
+             }`}
+           >
+              <Plus size={18} /> Nouveau Client
+              {isAtLimit && <span className="text-[10px] ml-1 text-red-400">Limite</span>}
+           </button>
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-300">
+              <Wallet size={24} />
+           </div>
+           <div>
+              <p className="text-sm text-gray-500">MRR Total</p>
+              <p className="text-2xl font-bold text-white">{totalMRR} €</p>
+           </div>
+        </div>
+        <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <Users size={24} />
+           </div>
+           <div>
+              <p className="text-sm text-gray-500">Clients Actifs</p>
+              <p className="text-2xl font-bold text-white">{activeCount}</p>
+           </div>
+        </div>
+        <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-400">
+              <ClipboardList size={24} />
+           </div>
+           <div>
+              <p className="text-sm text-gray-500">Via Missions</p>
+              <p className="text-2xl font-bold text-white">{missionClientCount}</p>
+           </div>
+        </div>
+        <div className="ninja-card p-5 rounded-2xl border border-white/[0.08] flex items-center gap-4">
+           <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
+              <TrendingUp size={24} />
+           </div>
+           <div>
+              <p className="text-sm text-gray-500">Total Clients</p>
+              <p className="text-2xl font-bold text-white">{clients.length}</p>
+           </div>
+        </div>
+      </div>
+
+      {/* Filters & Search */}
+      <div className="flex flex-col gap-3 mb-6 bg-[#111111] p-3 rounded-2xl border border-white/[0.08]">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+          <div className="relative w-full md:w-96">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+              <input
+                type="text"
+                placeholder="Rechercher une entreprise, un contact ou un email..."
+                className="w-full bg-[#0f1115] border border-white/[0.08] rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:border-purple-500/50 outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+          </div>
+          <div className="flex gap-2 w-full md:w-auto overflow-x-auto no-scrollbar">
+              {(['all', 'active', 'pending', 'churned'] as const).map(status => (
+                <button
+                    key={status}
+                    onClick={() => setStatusFilter(status)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
+                      statusFilter === status ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                    }`}
+                >
+                    {status === 'all' ? 'Tous' : status === 'active' ? 'Actifs' : status === 'pending' ? 'En attente' : 'Inactifs'}
+                </button>
+              ))}
+          </div>
+        </div>
+        {/* Source filter */}
+        <div className="flex gap-2">
+          {([
+            { key: 'all' as const, label: 'Toutes sources' },
+            { key: 'direct' as const, label: 'Clients directs' },
+            { key: 'mission' as const, label: 'Via Ordres de Mission' },
+          ]).map(f => (
+            <button
+              key={f.key}
+              onClick={() => setSourceFilter(f.key)}
+              className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-colors ${
+                sourceFilter === f.key
+                  ? 'bg-orange-500/15 text-orange-300 border border-orange-500/25'
+                  : 'text-gray-600 hover:text-gray-400 border border-transparent'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Clients Table */}
+      <div className="bg-[#111111] border border-white/[0.08] rounded-2xl overflow-hidden">
+         <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+               <thead>
+                  <tr className="border-b border-white/[0.08] text-xs text-gray-500 uppercase bg-white/[0.02]">
+                     <th className="p-4 font-medium pl-6">Entreprise</th>
+                     <th className="p-4 font-medium">Contact</th>
+                     <th className="p-4 font-medium">Plan</th>
+                     <th className="p-4 font-medium">Statut</th>
+                     <th className="p-4 font-medium">Source</th>
+                     <th className="p-4 font-medium">Score AEO</th>
+                     <th className="p-4 font-medium text-right pr-6">Revenus</th>
+                  </tr>
+               </thead>
+               <tbody className="text-sm divide-y divide-white/5">
+                  {filteredClients.map((client) => (
+                     <tr
+                        key={client.id}
+                        className="hover:bg-white/[0.02] transition-colors cursor-pointer group"
+                        onClick={() => setSelectedClient(client)}
+                     >
+                        <td className="p-4 pl-6">
+                           <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-xs font-bold text-gray-300">
+                                 {client.avatar}
+                              </div>
+                              <div>
+                                <span className="font-bold text-white group-hover:text-purple-400 transition-colors block">{client.companyName}</span>
+                                {client.mission && (
+                                  <span className="text-[10px] text-gray-600 font-mono">{client.mission.missionId}</span>
+                                )}
+                              </div>
+                           </div>
+                        </td>
+                        <td className="p-4">
+                           <div className="flex flex-col">
+                              <span className="text-gray-300">{client.contactName}</span>
+                              <span className="text-xs text-gray-500">{client.email}</span>
+                           </div>
+                        </td>
+                        <td className="p-4">
+                           <span className={`px-2 py-1 rounded text-xs font-bold border ${
+                              client.plan === 'Agency' ? 'bg-purple-500/10 text-purple-400 border-white/[0.1]' :
+                              client.plan === 'Pro' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                              'bg-gray-500/10 text-gray-500 border-gray-500/20'
+                           }`}>
+                              {client.plan}
+                           </span>
+                        </td>
+                        <td className="p-4">
+                           <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                 client.status === 'active' ? 'bg-green-400' :
+                                 client.status === 'pending' ? 'bg-amber-400 animate-pulse' :
+                                 'bg-red-500'
+                              }`}></div>
+                              <span className="text-gray-300">{
+                                client.status === 'active' ? 'Actif' :
+                                client.status === 'pending' ? 'En attente' : 'Inactif'
+                              }</span>
+                           </div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
+                            client.source === 'mission'
+                              ? 'bg-orange-500/10 text-orange-400 border-orange-500/20'
+                              : 'bg-white/5 text-gray-500 border-white/10'
+                          }`}>
+                            {client.source === 'mission' ? 'Mission' : 'Direct'}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          {client.mission ? (
+                            <span className={`font-bold ${getScoreColor(client.mission.aeoScore)}`}>
+                              {client.mission.aeoScore}/100
+                            </span>
+                          ) : (
+                            <span className="text-gray-600">-</span>
+                          )}
+                        </td>
+                        <td className="p-4 text-right pr-6 font-bold text-white">
+                           {client.mrr > 0 ? `${client.mrr} €/mois` : '-'}
+                        </td>
+                     </tr>
+                  ))}
+               </tbody>
+            </table>
+         </div>
+         {filteredClients.length === 0 && (
+            <div className="p-12 text-center text-gray-500">
+               Aucun client ne correspond à votre recherche.
+            </div>
+         )}
+      </div>
+
+      {/* Footer bar */}
+      <div className="mt-4 flex items-center justify-between text-xs text-gray-600 px-2">
+        <span>{filteredClients.length} client{filteredClients.length > 1 ? 's' : ''} affiché{filteredClients.length > 1 ? 's' : ''} sur {clients.length}</span>
+        <span>Export : {filteredClients.length} lignes</span>
+      </div>
+
+      {/* --- ALERTE LIMITE ATTEINTE --- */}
+      {showLimitAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLimitAlert(false)} />
+          <div className="relative bg-[#111111] border border-red-500/20 rounded-2xl w-full max-w-md shadow-2xl shadow-red-500/5 overflow-hidden">
+            <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-b border-white/[0.06] p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <AlertCircle size={32} className="text-red-400" />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Limite de clients atteinte</h2>
+              <p className="text-sm text-gray-400">
+                Votre plan <span className="font-bold text-white">{planLabel}</span> autorise <span className="font-bold text-white">{maxClients}</span> client{maxClients > 1 ? 's' : ''} direct{maxClients > 1 ? 's' : ''} maximum.
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between p-3 bg-white/[0.03] rounded-xl border border-white/[0.06]">
+                <span className="text-sm text-gray-400">Clients directs utilisés</span>
+                <span className="text-lg font-bold text-red-400">{totalDirectCount}/{maxClients}</span>
+              </div>
+              <div className="p-3 bg-orange-500/5 border border-orange-500/10 rounded-xl">
+                <p className="text-xs text-orange-300/80 flex items-center gap-2">
+                  <ClipboardList size={14} className="text-orange-400 shrink-0" />
+                  Les clients reçus via <span className="font-bold">Ordres de Mission</span> ne sont pas soumis à cette limite.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLimitAlert(false)}
+                  className="flex-1 px-4 py-2.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-xl transition-colors"
+                >
+                  Fermer
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLimitAlert(false);
+                    onNavigate('account');
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-purple-500/20"
+                >
+                  <Zap size={16} /> Upgrader
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL NOUVEAU CLIENT --- */}
+      {showNewClientModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowNewClientModal(false)} />
+          <div className="relative bg-[#111111] border border-white/[0.08] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-[#111111] border-b border-white/[0.06] p-5 flex items-center justify-between rounded-t-2xl z-10">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Plus size={18} className="text-purple-400" />
+                Nouveau Client
+              </h2>
+              <button
+                onClick={() => setShowNewClientModal(false)}
+                className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4">
+              {/* Entreprise */}
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Entreprise *</label>
+                <input
+                  type="text"
+                  value={newClient.companyName}
+                  onChange={e => setNewClient(p => ({ ...p, companyName: e.target.value }))}
+                  placeholder="Nom de l'entreprise"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Nom du contact *</label>
+                  <input
+                    type="text"
+                    value={newClient.contactName}
+                    onChange={e => setNewClient(p => ({ ...p, contactName: e.target.value }))}
+                    placeholder="Prénom Nom"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Rôle</label>
+                  <input
+                    type="text"
+                    value={newClient.role}
+                    onChange={e => setNewClient(p => ({ ...p, role: e.target.value }))}
+                    placeholder="CEO, CTO, CMO..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Email *</label>
+                  <input
+                    type="email"
+                    value={newClient.email}
+                    onChange={e => setNewClient(p => ({ ...p, email: e.target.value }))}
+                    placeholder="email@entreprise.com"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Téléphone</label>
+                  <input
+                    type="tel"
+                    value={newClient.phone}
+                    onChange={e => setNewClient(p => ({ ...p, phone: e.target.value }))}
+                    placeholder="+33 6 00 00 00 00"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5">Plan</label>
+                <div className="flex gap-2">
+                  {(['Starter', 'Pro', 'Agency'] as const).map(plan => (
+                    <button
+                      key={plan}
+                      onClick={() => setNewClient(p => ({ ...p, plan }))}
+                      className={`flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
+                        newClient.plan === plan
+                          ? plan === 'Agency'
+                            ? 'bg-purple-500/20 border-purple-500/30 text-purple-300'
+                            : plan === 'Pro'
+                              ? 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                              : 'bg-white/10 border-white/20 text-white'
+                          : 'bg-white/[0.03] border-white/[0.06] text-gray-500 hover:bg-white/[0.06]'
+                      }`}
+                    >
+                      {plan}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-white/[0.06] pt-4">
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Informations légales (optionnel)</p>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={newClient.address}
+                    onChange={e => setNewClient(p => ({ ...p, address: e.target.value }))}
+                    placeholder="Adresse de facturation"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={newClient.siret}
+                      onChange={e => setNewClient(p => ({ ...p, siret: e.target.value }))}
+                      placeholder="SIRET"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                    />
+                    <input
+                      type="text"
+                      value={newClient.vatNumber}
+                      onChange={e => setNewClient(p => ({ ...p, vatNumber: e.target.value }))}
+                      placeholder="N° TVA"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-purple-500/50"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="sticky bottom-0 bg-[#111111] border-t border-white/[0.06] p-5 flex items-center justify-between rounded-b-2xl">
+              <button
+                onClick={() => setShowNewClientModal(false)}
+                className="px-4 py-2.5 text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleAddClient}
+                disabled={!newClient.companyName.trim() || !newClient.contactName.trim() || !newClient.email.trim()}
+                className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-purple-500/20"
+              >
+                <Save size={16} />
+                Créer le client
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Clients;

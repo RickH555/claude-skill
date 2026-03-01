@@ -1,0 +1,636 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Sparkles,
+  Eye,
+  BarChart3,
+  Shield,
+  Zap,
+  Quote,
+  Target,
+  CheckCircle,
+  Star,
+  ChevronDown,
+  Users,
+  TrendingUp,
+  Globe,
+} from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "CitedBy.ai — Soyez cite par les IA generatives",
+  description:
+    "Plateforme AEO leader : monitoring IA, tracking de citations, benchmark concurrentiel, generation de contenu optimise. Essai gratuit.",
+  openGraph: {
+    title: "CitedBy.ai — Soyez cite par les IA generatives",
+    description:
+      "Monitoring, citations, benchmark et contenu AEO pour etre visible sur ChatGPT, Perplexity, Gemini, Claude.",
+  },
+};
+
+const FEATURES = [
+  {
+    icon: Eye,
+    title: "Monitoring IA en temps reel",
+    description:
+      "Suivez comment ChatGPT, Perplexity, Gemini, Claude et Copilot percoivent votre marque. Alertes instantanees.",
+  },
+  {
+    icon: Quote,
+    title: "Tracking des citations",
+    description:
+      "Detectez chaque citation URL et mention de marque dans les reponses des IA generatives.",
+  },
+  {
+    icon: Target,
+    title: "Benchmark concurrentiel",
+    description:
+      "Comparez votre part de voix IA face a vos concurrents. Identifiez les opportunites.",
+  },
+  {
+    icon: Zap,
+    title: "Contenu optimise AEO",
+    description:
+      "Generez du contenu concu pour etre cite : landing pages, FAQ, articles, Schema.org.",
+  },
+  {
+    icon: BarChart3,
+    title: "Analytics & ROI",
+    description:
+      "Dashboard executif avec metriques business : cout par citation, ROI contenu, tendances.",
+  },
+  {
+    icon: Shield,
+    title: "API REST & Integrations",
+    description:
+      "Integrez CitedBy.ai a votre stack : API publique, Google Search Console, webhooks.",
+  },
+];
+
+const PLANS = [
+  {
+    name: "Starter",
+    price: "0",
+    period: "",
+    description: "Pour decouvrir l'AEO",
+    features: [
+      "1 projet",
+      "5 scans / mois",
+      "5 moteurs IA",
+      "Score de visibilite",
+      "Recommandations basiques",
+    ],
+    cta: "Commencer gratuitement",
+    highlighted: false,
+  },
+  {
+    name: "Pro",
+    price: "49",
+    period: "/mois",
+    description: "Pour les equipes marketing",
+    features: [
+      "5 projets",
+      "Scans illimites",
+      "5 moteurs IA",
+      "Tracking citations & mentions",
+      "Generation de contenu AEO",
+      "Benchmark concurrents",
+      "Dashboard executif",
+      "Support prioritaire",
+    ],
+    cta: "Essai gratuit 14 jours",
+    highlighted: true,
+  },
+  {
+    name: "Agency",
+    price: "199",
+    period: "/mois",
+    description: "Pour les agences et entreprises",
+    features: [
+      "Projets illimites",
+      "Scans illimites",
+      "5 moteurs IA",
+      "API REST publique",
+      "Integration GSC",
+      "Rapports PDF automatises",
+      "Multi-tenant (equipes)",
+      "Onboarding dedie",
+      "SLA 99.9%",
+    ],
+    cta: "Contacter les ventes",
+    highlighted: false,
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    name: "Marie Dupont",
+    role: "Head of SEO, TechCorp",
+    content:
+      "En 3 mois, notre score de visibilite IA est passe de 32 a 78. Nos citations sur ChatGPT ont triple.",
+    rating: 5,
+  },
+  {
+    name: "Thomas Martin",
+    role: "CEO, AgenceDigitale.fr",
+    content:
+      "CitedBy.ai nous permet de proposer un service AEO unique a nos clients. Le ROI est immediat.",
+    rating: 5,
+  },
+  {
+    name: "Sophie Leblanc",
+    role: "CMO, SaaS Solutions",
+    content:
+      "L'outil de monitoring est incroyable. On voit en temps reel comment les IA citent nos concurrents.",
+    rating: 5,
+  },
+];
+
+const FAQ = [
+  {
+    q: "Qu'est-ce que l'AEO (Answer Engine Optimization) ?",
+    a: "L'AEO est l'optimisation de votre presence dans les reponses des moteurs IA (ChatGPT, Perplexity, Gemini, Claude). Contrairement au SEO classique qui vise les resultats de recherche, l'AEO vise a ce que les IA citent et recommandent votre marque.",
+  },
+  {
+    q: "Comment fonctionne le monitoring ?",
+    a: "CitedBy.ai envoie des requetes test aux 5 principaux moteurs IA avec des prompts lies a votre secteur. Nous analysons les reponses pour detecter vos citations, mentions et la visibilite de votre marque. Vous recevez un score de 0 a 100.",
+  },
+  {
+    q: "Quels moteurs IA sont supportes ?",
+    a: "Nous monitorons ChatGPT (OpenAI), Perplexity, Google Gemini, Claude (Anthropic) et Microsoft Copilot. De nouveaux moteurs sont ajoutes regulierement.",
+  },
+  {
+    q: "En quoi est-ce different du SEO classique ?",
+    a: "Le SEO optimise pour les resultats de recherche Google. L'AEO optimise pour que les IA generatives citent votre marque dans leurs reponses. Les deux sont complementaires — un bon SEO aide votre AEO, mais l'AEO necessite des techniques specifiques (Schema.org, Answer-First, contenu extractible).",
+  },
+  {
+    q: "Puis-je tester gratuitement ?",
+    a: "Oui. Le plan Starter est gratuit avec 1 projet et 5 scans par mois. Le plan Pro offre un essai gratuit de 14 jours sans engagement.",
+  },
+];
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen flex flex-col bg-[#0a0a0f]">
+      {/* Navbar */}
+      <header className="border-b border-white/5 backdrop-blur-xl bg-[#0a0a0f]/80 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-black font-serif font-bold text-lg">
+              C
+            </div>
+            <span className="font-bold text-lg text-white">CitedBy.ai</span>
+          </div>
+          <nav className="hidden md:flex items-center gap-8 text-sm text-white/50">
+            <a href="#features" className="hover:text-white transition-colors">
+              Features
+            </a>
+            <a href="#pricing" className="hover:text-white transition-colors">
+              Tarifs
+            </a>
+            <a href="#testimonials" className="hover:text-white transition-colors">
+              Temoignages
+            </a>
+            <a href="#faq" className="hover:text-white transition-colors">
+              FAQ
+            </a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors"
+            >
+              Connexion
+            </Link>
+            <Link
+              href="/register"
+              className="px-4 py-2 bg-primary text-black rounded-xl text-sm font-bold hover:bg-emerald-400 transition-all"
+            >
+              Commencer
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden pt-20 pb-32 px-4 sm:px-6">
+        {/* Gradient orbs */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/15 blur-[150px] rounded-full -z-10" />
+        <div className="absolute top-40 left-1/4 w-[400px] h-[400px] bg-blue-500/10 blur-[120px] rounded-full -z-10" />
+
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8">
+            <Sparkles size={14} />
+            <span>Plateforme #1 d&apos;Answer Engine Optimization</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif font-bold mb-6 tracking-tight text-white leading-[1.1]">
+            Devenez la Reference{" "}
+            <span className="text-primary italic">
+              des Intelligences Artificielles
+            </span>
+          </h1>
+
+          <p className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Monitorez, analysez et optimisez votre visibilite dans les reponses
+            de ChatGPT, Perplexity, Gemini, Claude et Copilot.
+          </p>
+
+          {/* CTA */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <Link
+              href="/register"
+              className="px-8 py-4 bg-primary hover:bg-emerald-400 text-black font-bold rounded-xl text-lg flex items-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/20"
+            >
+              Commencer l&apos;audit gratuit <ArrowRight size={20} />
+            </Link>
+            <a
+              href="#features"
+              className="px-8 py-4 border border-white/10 text-white/70 hover:text-white hover:border-white/20 font-medium rounded-xl text-lg flex items-center gap-2 transition-all"
+            >
+              Decouvrir les features
+            </a>
+          </div>
+
+          {/* Social Proof */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+            {[
+              { value: "5", label: "Moteurs IA monitorés" },
+              { value: "47K+", label: "Citations trackées" },
+              { value: "2,500+", label: "Marques actives" },
+              { value: "98%", label: "Satisfaction client" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-3xl font-bold text-white">{stat.value}</p>
+                <p className="text-xs text-white/30 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Logos */}
+      <section className="py-12 border-y border-white/5">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <p className="text-center text-xs text-white/20 uppercase tracking-wider mb-8">
+            Compatible avec les moteurs IA leaders
+          </p>
+          <div className="flex items-center justify-center gap-12 flex-wrap opacity-40">
+            {["ChatGPT", "Perplexity", "Gemini", "Claude", "Copilot"].map(
+              (name) => (
+                <span
+                  key={name}
+                  className="text-white/60 font-medium text-lg"
+                >
+                  {name}
+                </span>
+              )
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="py-24 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm text-primary font-medium uppercase tracking-wider mb-3">
+              Fonctionnalites
+            </p>
+            <h2 className="text-4xl font-serif font-bold text-white mb-4">
+              Tout ce qu&apos;il faut pour dominer l&apos;AEO
+            </h2>
+            <p className="text-white/40 max-w-xl mx-auto">
+              De la detection a l&apos;optimisation, une suite complete pour
+              maximiser votre visibilite dans les reponses des IA.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.title}
+                className="group p-6 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10 transition-all"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <feature.icon size={22} className="text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-white/40 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-24 px-4 sm:px-6 bg-white/[0.01]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm text-primary font-medium uppercase tracking-wider mb-3">
+              Comment ca marche
+            </p>
+            <h2 className="text-4xl font-serif font-bold text-white mb-4">
+              3 etapes pour etre cite
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                icon: Globe,
+                title: "Connectez votre site",
+                desc: "Ajoutez votre domaine, marque et concurrents. Notre IA analyse votre presence actuelle.",
+              },
+              {
+                step: "02",
+                icon: TrendingUp,
+                title: "Monitorez en continu",
+                desc: "Scans automatiques sur 5 moteurs IA. Alertes en temps reel sur les citations et mentions.",
+              },
+              {
+                step: "03",
+                icon: Zap,
+                title: "Optimisez et dominez",
+                desc: "Suivez les recommandations, generez du contenu AEO et grimpez dans les reponses des IA.",
+              },
+            ].map((step) => (
+              <div key={step.step} className="text-center">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <step.icon size={28} className="text-primary" />
+                </div>
+                <span className="text-xs text-primary font-mono font-bold">
+                  ETAPE {step.step}
+                </span>
+                <h3 className="text-lg font-semibold text-white mt-2 mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-white/40">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="py-24 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm text-primary font-medium uppercase tracking-wider mb-3">
+              Tarifs
+            </p>
+            <h2 className="text-4xl font-serif font-bold text-white mb-4">
+              Des tarifs simples et transparents
+            </h2>
+            <p className="text-white/40">
+              Commencez gratuitement, evoluez selon vos besoins.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {PLANS.map((plan) => (
+              <div
+                key={plan.name}
+                className={`rounded-2xl p-8 ${
+                  plan.highlighted
+                    ? "bg-primary/5 border-2 border-primary/30 relative"
+                    : "border border-white/5 bg-white/[0.02]"
+                }`}
+              >
+                {plan.highlighted && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-black text-xs font-bold rounded-full">
+                    Populaire
+                  </div>
+                )}
+                <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                <p className="text-sm text-white/40 mt-1 mb-6">
+                  {plan.description}
+                </p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-white">
+                    {plan.price === "0" ? "Gratuit" : `${plan.price}€`}
+                  </span>
+                  {plan.period && (
+                    <span className="text-white/30 text-sm">{plan.period}</span>
+                  )}
+                </div>
+                <Link
+                  href="/register"
+                  className={`block text-center py-3 rounded-xl font-semibold text-sm transition-all ${
+                    plan.highlighted
+                      ? "bg-primary text-black hover:bg-emerald-400"
+                      : "bg-white/5 text-white hover:bg-white/10"
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+                <ul className="mt-6 space-y-3">
+                  {plan.features.map((f) => (
+                    <li
+                      key={f}
+                      className="flex items-center gap-2 text-sm text-white/60"
+                    >
+                      <CheckCircle
+                        size={14}
+                        className={
+                          plan.highlighted ? "text-primary" : "text-white/30"
+                        }
+                      />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section
+        id="testimonials"
+        className="py-24 px-4 sm:px-6 bg-white/[0.01]"
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm text-primary font-medium uppercase tracking-wider mb-3">
+              Temoignages
+            </p>
+            <h2 className="text-4xl font-serif font-bold text-white mb-4">
+              Ils nous font confiance
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t) => (
+              <div
+                key={t.name}
+                className="p-6 rounded-2xl border border-white/5 bg-white/[0.02]"
+              >
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <Star
+                      key={i}
+                      size={14}
+                      className="text-amber-400 fill-amber-400"
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-white/60 leading-relaxed mb-4">
+                  &ldquo;{t.content}&rdquo;
+                </p>
+                <div>
+                  <p className="text-sm font-medium text-white">{t.name}</p>
+                  <p className="text-xs text-white/30">{t.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-24 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm text-primary font-medium uppercase tracking-wider mb-3">
+              FAQ
+            </p>
+            <h2 className="text-4xl font-serif font-bold text-white mb-4">
+              Questions frequentes
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {FAQ.map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden"
+              >
+                <summary className="flex items-center justify-between p-5 cursor-pointer list-none text-white font-medium hover:bg-white/[0.02] transition-colors">
+                  {item.q}
+                  <ChevronDown
+                    size={18}
+                    className="text-white/30 group-open:rotate-180 transition-transform shrink-0 ml-4"
+                  />
+                </summary>
+                <div className="px-5 pb-5 text-sm text-white/50 leading-relaxed">
+                  {item.a}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 px-4 sm:px-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent -z-10" />
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-4xl font-serif font-bold text-white mb-4">
+            Pret a dominer l&apos;AEO ?
+          </h2>
+          <p className="text-white/40 mb-8 max-w-xl mx-auto">
+            Rejoignez plus de 2 500 marques qui utilisent CitedBy.ai pour etre
+            citees par les intelligences artificielles.
+          </p>
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-emerald-400 text-black font-bold rounded-xl text-lg transition-all hover:shadow-lg hover:shadow-primary/20"
+          >
+            Commencer gratuitement <ArrowRight size={20} />
+          </Link>
+          <p className="text-xs text-white/20 mt-4">
+            Pas de carte bancaire requise
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-12 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-black font-serif font-bold">
+                  C
+                </div>
+                <span className="font-bold text-white">CitedBy.ai</span>
+              </div>
+              <p className="text-xs text-white/30 leading-relaxed">
+                La plateforme #1 d&apos;Answer Engine Optimization pour les
+                entreprises B2B.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
+                Produit
+              </h4>
+              <ul className="space-y-2 text-sm text-white/30">
+                <li>
+                  <a href="#features" className="hover:text-white/60 transition-colors">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#pricing" className="hover:text-white/60 transition-colors">
+                    Tarifs
+                  </a>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-white/60 transition-colors">
+                    Connexion
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
+                Ressources
+              </h4>
+              <ul className="space-y-2 text-sm text-white/30">
+                <li>
+                  <a href="#faq" className="hover:text-white/60 transition-colors">
+                    FAQ
+                  </a>
+                </li>
+                <li>
+                  <span className="text-white/20">Blog (bientot)</span>
+                </li>
+                <li>
+                  <span className="text-white/20">Documentation API</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
+                Legal
+              </h4>
+              <ul className="space-y-2 text-sm text-white/30">
+                <li>
+                  <span className="text-white/20">Mentions legales</span>
+                </li>
+                <li>
+                  <span className="text-white/20">Politique de confidentialite</span>
+                </li>
+                <li>
+                  <span className="text-white/20">CGU</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="pt-8 border-t border-white/5 text-center text-xs text-white/20">
+            &copy; {new Date().getFullYear()} CitedBy.ai — Tous droits
+            reserves.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

@@ -1,0 +1,15 @@
+'use client';
+export const dynamic = 'force-dynamic';
+import { useAppContext } from '@/lib/app-context';
+import MonthlyReportPage from '@/views/v3/MonthlyReportPage';
+
+export default function MonthlyReportPageWrapper() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return (
+    <MonthlyReportPage
+      onBack={goBack}
+      user={user}
+      onNavigate={navigateTo}
+    />
+  );
+}

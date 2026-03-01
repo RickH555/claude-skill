@@ -1,0 +1,9 @@
+{
+  "id": "26",
+  "subject": "Create login page with Suspense boundary",
+  "description": "Create src/app/(auth)/login/page.tsx with proper Suspense wrapping for useSearchParams",
+  "activeForm": "Creating login page",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

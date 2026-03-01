@@ -1,0 +1,56 @@
+interface Citation {
+  id: number
+  model: string
+  query: string
+  cited: boolean
+  date: string
+}
+
+const citations: Citation[] = [
+  { id: 1, model: 'ChatGPT', query: 'Meilleur outil SEO IA', cited: true, date: '2025-01-15' },
+  { id: 2, model: 'Claude', query: 'Alternatives à Semrush', cited: true, date: '2025-01-14' },
+  { id: 3, model: 'Perplexity', query: 'Outils de marketing digital', cited: false, date: '2025-01-13' },
+  { id: 4, model: 'Gemini', query: 'Suivi de marque en ligne', cited: true, date: '2025-01-12' },
+  { id: 5, model: 'ChatGPT', query: 'Visibilité marque IA', cited: false, date: '2025-01-11' },
+]
+
+export default function MonitoringPage() {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Monitoring</h2>
+
+      <div className="overflow-x-auto rounded-xl bg-white shadow-sm">
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-gray-200 bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 font-medium text-gray-600">Modèle IA</th>
+              <th className="px-6 py-3 font-medium text-gray-600">Requête</th>
+              <th className="px-6 py-3 font-medium text-gray-600">Cité</th>
+              <th className="px-6 py-3 font-medium text-gray-600">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {citations.map((citation) => (
+              <tr key={citation.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 font-medium text-gray-900">{citation.model}</td>
+                <td className="px-6 py-4 text-gray-700">{citation.query}</td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                      citation.cited
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {citation.cited ? 'Oui' : 'Non'}
+                  </span>
+                </td>
+                <td className="px-6 py-4 text-gray-500">{citation.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}

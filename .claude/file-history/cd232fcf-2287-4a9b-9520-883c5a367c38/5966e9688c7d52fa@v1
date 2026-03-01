@@ -1,0 +1,498 @@
+
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { User } from '../types';
+import { Check, Download, ArrowLeft, ShieldCheck, LayoutList, History, FileText, Zap, Database, Fuel, Droplet, CreditCard, Star, Loader2, Sparkles, ArrowUpRight } from 'lucide-react';
+import jsPDF from 'jspdf';
+import StripeCheckout from '../components/StripeCheckout';
+
+interface PlanProps {
+  onBack: () => void;
+  user: User | null;
+  onUpgrade: (plan: 'free' | 'pro' | 'enterprise') => void;
+  initialTab?: 'my-plan' | 'pricing' | 'billing';
+}
+
+const Plan: React.FC<PlanProps> = ({ onBack, user, onUpgrade, initialTab = 'my-plan' }) => {
+  const [activeTab, setActiveTab] = useState<'my-plan' | 'pricing' | 'billing'>(initialTab);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [upgradeModal, setUpgradeModal] = useState<{ planId: string; planName: string; newPrice: number } | null>(null);
+  const [paymentStep, setPaymentStep] = useState<'recap' | 'payment' | 'success'>('recap');
+  const [paidAmount, setPaidAmount] = useState(0);
+  const [paymentHistory, setPaymentHistory] = useState([
+    { id: 'INV-2024-003', date: '01/03/2024', amount: 89.00, desc: 'Abonnement Pro (Mensuel)', status: 'Payé' },
+    { id: 'INV-2024-002', date: '01/02/2024', amount: 89.00, desc: 'Abonnement Pro (Mensuel)', status: 'Payé' },
+    { id: 'INV-2024-001', date: '15/01/2024', amount: 49.00, desc: 'Pack GTO Gas (La Pompe)', status: 'Payé' },
+  ]);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
+  useEffect(() => {
+    if (upgradeModal && paymentStep === 'success') { document.body.style.overflow = 'hidden'; }
+    return () => { document.body.style.overflow = ''; };
+  }, [upgradeModal, paymentStep]);
+
+  const plans = [
+    {
+      id: 'free',
+      name: 'Starter',
+      price: 29,
+      period: '/mois',
+      icon: <Droplet size={24} />,
+      features: ['1 Projet Actif / mois', 'Audit manuel', 'Support communauté'],
+      cta: 'Plan Actuel',
+      current: user?.plan === 'free'
+    },
+    {
+      id: 'pro',
+      name: 'Pro',
+      price: 89,
+      period: '/mois',
+      icon: <Fuel size={24} />,
+      popular: true,
+      features: ['Indexation IA', '3 Projets Actifs / mois', 'Monitoring Continu', 'Support Prioritaire', 'API Access (Beta)', 'Rapports PDF marque blanche'],
+      cta: 'Passer Pro',
+      current: user?.plan === 'pro'
+    },
+    {
+      id: 'enterprise',
+      name: 'Agency',
+      price: 299,
+      period: '/mois',
+      icon: <Database size={24} />,
+      features: ['Indexation IA', 'Projets illimités', 'Dedicated Account Manager', 'API Full Access', 'SSO & Sécurité avancée', 'Formation AEO équipe'],
+      cta: 'Passer Agency',
+      current: user?.plan === 'enterprise'
+    }
+  ];
+
+  const currentPlanPrice = user?.plan === 'enterprise' ? 299 : user?.plan === 'pro' ? 89 : 29;
+  const currentPlanName = user?.plan === 'enterprise' ? 'Agency' : user?.plan === 'pro' ? 'Pro' : 'Starter';
+
+  const handleUpgradeClick = (planId: string) => {
+    const targetPlan = plans.find(p => p.id === planId);
+    if (!targetPlan || targetPlan.current) return;
+    setUpgradeModal({ planId, planName: targetPlan.name, newPrice: targetPlan.price });
+    setPaymentStep('payment');
+  };
+
+  const handleProcessPayment = () => {
+    if (!upgradeModal) return;
+    setIsProcessing(true);
+    setTimeout(() => {
+      const amountPaid = upgradeModal.newPrice - currentPlanPrice;
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const invoiceNum = `INV-${now.getFullYear()}-${String(paymentHistory.length + 1).padStart(3, '0')}`;
+      const newInvoice = {
+        id: invoiceNum,
+        date: dateStr,
+        amount: amountPaid,
+        desc: `Upgrade ${currentPlanName} → ${upgradeModal.planName} (Prorata)`,
+        status: 'Payé',
+      };
+      setPaymentHistory(prev => [newInvoice, ...prev]);
+      setPaidAmount(amountPaid);
+      onUpgrade(upgradeModal.planId as any);
+      setIsProcessing(false);
+      setPaymentStep('success');
+    }, 2500);
+  };
+
+  const handleCloseUpgradeModal = () => {
+    setUpgradeModal(null);
+    setPaymentStep('recap');
+    setPaidAmount(0);
+  };
+
+  const generateInvoice = (payment: { id: string; date: string; amount: number; desc: string; status: string }) => {
+    if (!user) return;
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text("CitedBy.ai", 20, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Facture N° ${payment.id}`, 20, 30);
+    doc.text(`Date : ${payment.date}`, 20, 35);
+
+    // Client Info
+    doc.text("Facturé à :", 140, 30);
+    doc.setFont("helvetica", "bold");
+    doc.text(user.name || "Client", 140, 35);
+    doc.setFont("helvetica", "normal");
+    doc.text(user.email || "", 140, 40);
+
+    // Line Items Header
+    doc.line(20, 55, 190, 55);
+    doc.setFont("helvetica", "bold");
+    doc.text("Description", 20, 62);
+    doc.text("Montant HT", 160, 62);
+    doc.line(20, 66, 190, 66);
+
+    // Item
+    const priceHT = (payment.amount / 1.2).toFixed(2);
+    const tva = (payment.amount - parseFloat(priceHT)).toFixed(2);
+
+    doc.setFont("helvetica", "normal");
+    doc.text(payment.desc, 20, 75);
+    doc.text(`${priceHT} €`, 160, 75);
+
+    // Totals
+    doc.line(20, 90, 190, 90);
+    doc.text("Sous-total HT :", 130, 100);
+    doc.text(`${priceHT} €`, 160, 100);
+    
+    doc.text("TVA (20%) :", 130, 107);
+    doc.text(`${tva} €`, 160, 107);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Total TTC :", 130, 117);
+    doc.text(`${payment.amount.toFixed(2)} €`, 160, 117);
+
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.text("Merci de votre confiance. Paiement effectué par CB.", 20, 140);
+
+    doc.save(`Facture_${payment.id}.pdf`);
+  };
+
+  return (
+    <div className="w-full px-4 py-10 animate-in fade-in duration-500 min-h-screen">
+      {/* ── STEP 2 : PLEINE PAGE DE PAIEMENT (comme Recharge.tsx) ── */}
+      {upgradeModal && paymentStep === 'payment' && (
+        <div className="animate-in fade-in slide-in-from-right duration-500">
+          <StripeCheckout
+            mode="subscription"
+            productName={`Plan ${upgradeModal.planName}`}
+            productDescription={`Upgrade ${currentPlanName} → ${upgradeModal.planName}`}
+            amount={upgradeModal.newPrice - currentPlanPrice}
+            amountDetails={[
+              { label: `Nouveau plan (${upgradeModal.planName})`, value: `${upgradeModal.newPrice.toFixed(2)} €` },
+              { label: `Crédit plan ${currentPlanName}`, value: `- ${currentPlanPrice.toFixed(2)} €` },
+              { label: 'À payer aujourd\'hui', value: `${(upgradeModal.newPrice - currentPlanPrice).toFixed(2)} €`, highlight: true, separator: true },
+            ]}
+            userEmail={user?.email}
+            onConfirm={handleProcessPayment}
+            onBack={() => setPaymentStep('recap')}
+            isProcessing={isProcessing}
+          />
+        </div>
+      )}
+
+      {/* Contenu principal — masqué pendant le paiement */}
+      {!(upgradeModal && paymentStep === 'payment') && (<>
+
+      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-white mb-6 transition-colors">
+        <ArrowLeft size={18} className="mr-2" /> Retour
+      </button>
+
+      <div className="text-center mb-10">
+         <h1 className="text-4xl font-sans font-bold text-white mb-4">Plan & Facturation</h1>
+         <p className="text-gray-500 max-w-2xl mx-auto">Gérez vos informations personnelles, votre abonnement et vos préférences.</p>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="flex justify-center mb-12">
+        <div className="inline-flex bg-white/[0.04] p-1.5 rounded-2xl border border-white/[0.08]">
+          <button
+            onClick={() => setActiveTab('my-plan')}
+            className={`px-6 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'my-plan' ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'
+            }`}
+          >
+            <ShieldCheck size={16} /> Mon Abonnement
+          </button>
+          <button
+            onClick={() => setActiveTab('pricing')}
+            className={`px-6 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'pricing' ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'
+            }`}
+          >
+            <LayoutList size={16} /> Changer d'offre
+          </button>
+          <button
+            onClick={() => setActiveTab('billing')}
+            className={`px-6 py-2.5 rounded-2xl text-sm font-bold transition-all flex items-center gap-2 ${
+              activeTab === 'billing' ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'
+            }`}
+          >
+            <History size={16} /> Historique & Factures
+          </button>
+        </div>
+      </div>
+
+      {/* TAB: MON ABONNEMENT */}
+      {activeTab === 'my-plan' && (
+        <div className="animate-in fade-in slide-in-from-left-4 duration-300 grid md:grid-cols-2 gap-8">
+            {/* Current Plan Card */}
+            <div className="ninja-card p-8 rounded-2xl border border-white/[0.08] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-3xl -z-10"></div>
+                
+                <div className="flex justify-between items-start mb-8">
+                    <div>
+                        <p className="text-sm text-gray-500 uppercase tracking-wider mb-1">Plan Actuel</p>
+                        <h3 className="text-3xl font-sans font-bold text-white capitalize">{user?.plan}</h3>
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                            <span className="text-xs text-purple-300 font-bold">Actif • Renouvellement le 01/04/2024</span>
+                        </div>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-white/[0.04] flex items-center justify-center text-white">
+                        {user?.plan === 'pro' ? <Fuel /> : user?.plan === 'enterprise' ? <Database /> : <Droplet />}
+                    </div>
+                </div>
+
+                <div className="space-y-4 mb-8 bg-black/20 p-6 rounded-2xl border border-white/[0.06]">
+                    <div>
+                        <div className="flex justify-between items-end mb-2">
+                            <span className="text-sm text-gray-500">Projets Actifs (Quota Mensuel)</span>
+                            <span className="text-sm font-bold text-white">{user?.plan === 'free' ? '1 max' : user?.plan === 'pro' ? '3 max' : 'Illimité'}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary rounded-full" style={{ width: user?.plan === 'free' ? '100%' : '66%' }}></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="flex justify-between items-end mb-2">
+                            <span className="text-sm text-gray-500">Crédits GTO Gas</span>
+                            <span className="text-sm font-bold text-white">{user?.credits} restants</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                            <div className="h-full bg-accent rounded-full" style={{ width: '40%' }}></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex gap-4">
+                    <button onClick={() => setActiveTab('pricing')} className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold rounded-2xl hover:from-purple-600 hover:to-violet-700 transition-colors">
+                        Mettre à niveau
+                    </button>
+                    <button className="px-4 py-3 bg-white/[0.04] text-gray-300 font-bold rounded-2xl hover:bg-purple-500/10 transition-colors border border-white/[0.08]">
+                        Gérer Stripe
+                    </button>
+                </div>
+            </div>
+
+            {/* Billing Info */}
+            <div className="ninja-card p-8 rounded-2xl border border-white/[0.08] flex flex-col justify-between">
+                <div>
+                    <h3 className="font-bold text-white mb-6 flex items-center gap-2">
+                        <CreditCard size={20} className="text-gray-500" /> Moyen de paiement
+                    </h3>
+                    <div className="flex items-center gap-4 bg-white/[0.04] p-4 rounded-2xl border border-white/[0.06] mb-6">
+                        <div className="w-10 h-6 bg-white rounded flex items-center justify-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-4" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-white">•••• •••• •••• 4242</p>
+                            <p className="text-xs text-gray-500">Expire le 12/25</p>
+                        </div>
+                        <button className="ml-auto text-xs text-purple-400 hover:underline">Modifier</button>
+                    </div>
+                    
+                    <h3 className="font-bold text-white mb-4">Adresse de facturation</h3>
+                    <div className="text-sm text-gray-500 space-y-1">
+                        <p>{user?.name}</p>
+                        <p>123 Avenue de l'Innovation</p>
+                        <p>75011 Paris, France</p>
+                        <p className="mt-2 text-xs text-gray-500">TVA: FR 12 345 678 901</p>
+                    </div>
+                </div>
+                
+                <button className="text-sm text-gray-500 hover:text-white transition-colors text-left mt-6">
+                    Mettre à jour les informations de facturation
+                </button>
+            </div>
+        </div>
+      )}
+
+      {/* TAB: PRICING (UPSELL) */}
+      {activeTab === 'pricing' && (
+        <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="grid md:grid-cols-3 gap-6">
+                {plans.map((plan) => (
+                    <div 
+                        key={plan.id} 
+                        className={`relative ninja-card rounded-2xl p-6 border flex flex-col transition-all ${
+                            plan.popular
+                                ? 'border-purple-500 bg-white/[0.04] shadow-[0_0_40px_rgba(168,85,247,0.15)] scale-105 z-10'
+                                : 'border-white/[0.08] hover:border-white/20'
+                        } ${plan.current ? 'opacity-75 grayscale-[0.5]' : ''}`}
+                    >
+                        {plan.popular && (
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-500 to-violet-600 text-white font-bold text-xs px-4 py-1 rounded-full uppercase tracking-wider">
+                                Recommandé
+                            </div>
+                        )}
+                        
+                        <div className="mb-6 flex items-center justify-between">
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${plan.popular ? 'bg-purple-500/20 text-purple-400' : 'bg-white/[0.04] text-gray-500'}`}>
+                                {plan.icon}
+                            </div>
+                            {plan.current && (
+                                <span className="bg-purple-500/10 text-purple-300 text-xs px-2 py-1 rounded border border-white/[0.1]">Actuel</span>
+                            )}
+                        </div>
+
+                        <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                        <div className="flex items-baseline gap-1 mb-6">
+                            <span className="text-3xl font-sans font-bold text-white">{plan.price}€</span>
+                            <span className="text-sm text-gray-500">{plan.period}</span>
+                        </div>
+
+                        <ul className="space-y-3 mb-8 flex-1">
+                            {plan.features.map((feat, i) => (
+                                <li 
+                                    key={i} 
+                                    className={`flex items-start gap-3 text-sm ${
+                                        feat === 'Indexation IA'
+                                            ? 'text-white font-bold bg-white/[0.04] -mx-2 p-2 rounded-full'
+                                            : 'text-gray-300'
+                                    }`}
+                                >
+                                    {feat === 'Indexation IA' ? (
+                                        <Sparkles size={16} className="mt-0.5 text-accent shrink-0 animate-pulse" />
+                                    ) : (
+                                        <Check size={16} className={`mt-0.5 ${plan.popular ? 'text-purple-400' : 'text-gray-500'} shrink-0`} />
+                                    )}
+                                    {feat}
+                                </li>
+                            ))}
+                        </ul>
+
+                        <button
+                            onClick={() => handleUpgradeClick(plan.id)}
+                            disabled={plan.current || isProcessing}
+                            className={`w-full py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
+                                plan.popular
+                                    ? 'bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white shadow-lg shadow-purple-500/20'
+                                    : 'bg-white/[0.08] hover:bg-purple-500/20 text-white hover:text-white border border-white/[0.08]'
+                            } ${plan.current ? 'cursor-not-allowed opacity-50' : ''}`}
+                        >
+                            {isProcessing && !plan.current ? <Loader2 className="animate-spin" /> : plan.cta}
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+      )}
+
+      {/* TAB: FACTURATION */}
+      {activeTab === 'billing' && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="ninja-card rounded-2xl border border-white/[0.08] overflow-hidden">
+                <div className="p-6 border-b border-white/[0.08] flex justify-between items-center bg-white/[0.04]">
+                    <h3 className="font-bold text-white flex items-center gap-2">
+                        <FileText size={20} className="text-gray-500" /> Historique des paiements
+                    </h3>
+                    <button className="text-xs bg-white/[0.04] hover:bg-purple-500/10 border border-white/[0.08] px-3 py-1.5 rounded-full text-gray-300 transition-colors">
+                        Tout télécharger
+                    </button>
+                </div>
+                
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-[#000000] text-xs text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-4 font-medium">Référence</th>
+                                <th className="px-6 py-4 font-medium">Date</th>
+                                <th className="px-6 py-4 font-medium">Description</th>
+                                <th className="px-6 py-4 font-medium">Montant</th>
+                                <th className="px-6 py-4 font-medium">Statut</th>
+                                <th className="px-6 py-4 font-medium text-right">Facture</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {paymentHistory.map((payment) => (
+                                <tr key={payment.id} className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 text-sm font-medium text-white">{payment.id}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-500">{payment.date}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-300">{payment.desc}</td>
+                                    <td className="px-6 py-4 text-sm font-bold text-white">{payment.amount.toFixed(2)} €</td>
+                                    <td className="px-6 py-4">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-300 border border-white/[0.1]">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div> Payé
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <button 
+                                            onClick={() => generateInvoice(payment)}
+                                            className="text-gray-500 hover:text-purple-400 transition-colors p-2 hover:bg-white/[0.04] rounded-full" 
+                                            title="Télécharger PDF"
+                                        >
+                                            <Download size={18} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div className="p-4 bg-white/[0.04] border-t border-white/[0.08] text-center">
+                    <button className="text-xs text-gray-500 hover:text-white transition-colors">
+                        Charger plus de factures...
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
+
+      </>)}
+
+      {/* MODAL SUCCÈS */}
+      {upgradeModal && paymentStep === 'success' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => !isProcessing && handleCloseUpgradeModal()} />
+          <div className="relative bg-[#111111] border border-purple-500/20 rounded-2xl w-full max-w-lg shadow-2xl shadow-purple-500/10 max-h-[90vh] overflow-y-auto">
+            <div className="p-8 text-center space-y-5">
+              <div className="w-20 h-20 mx-auto rounded-full bg-green-500/10 border-2 border-green-500/20 flex items-center justify-center">
+                <Check size={40} className="text-green-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white mb-2">Paiement confirmé !</h2>
+                <p className="text-sm text-gray-400">
+                  Vous êtes maintenant sur le plan <span className="text-purple-400 font-bold">{upgradeModal.planName}</span>.
+                </p>
+              </div>
+              <div className="bg-white/[0.03] rounded-xl border border-white/[0.06] p-4 space-y-2 text-left">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Montant débité</span>
+                  <span className="text-white font-bold">{paidAmount.toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Moyen de paiement</span>
+                  <span className="text-white">•••• 4242</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Prochain renouvellement</span>
+                  <span className="text-white">{upgradeModal.newPrice}€/mois</span>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => { handleCloseUpgradeModal(); setActiveTab('my-plan'); }}
+                  className="flex-1 px-4 py-2.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-xl transition-colors">
+                  Mon abonnement
+                </button>
+                <button onClick={() => { handleCloseUpgradeModal(); setActiveTab('billing'); }}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 text-sm">
+                  <FileText size={16} /> Voir ma facture
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+};
+
+export default Plan;

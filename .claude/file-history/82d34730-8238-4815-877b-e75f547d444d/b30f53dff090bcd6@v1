@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitedBy.ai - AEO/GEO Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#000000',
+                        surface: '#09090b', // Zinc 950
+                        surfaceHighlight: '#18181b', // Zinc 900
+                        primary: '#fbbf24', // Amber 400 (The WaitForIt Yellow)
+                        primaryDark: '#d97706', // Amber 600
+                        secondary: '#ffffff', // White
+                        accent: '#f59e0b', // Amber 500
+                        danger: '#ef4444',
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'Inter', 'sans-serif'],
+                        serif: ['Instrument Serif', 'serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'DM Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            /* Minimalist gradient top lighting */
+            background-image: radial-gradient(circle at 50% 0%, #171717 0%, #000000 50%);
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Custom Scrollbar - Dark & Yellow */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fbbf24; 
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+    "tailwindcss": "https://esm.sh/tailwindcss@^4.1.18",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@^3.4.0",
+    "next/": "https://esm.sh/next@^16.1.4/",
+    "next": "https://esm.sh/next@^16.1.4",
+    "@supabase/ssr": "https://esm.sh/@supabase/ssr@^0.8.0",
+    "clsx": "https://esm.sh/clsx@^2.1.1",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.90.1",
+    "stripe": "https://esm.sh/stripe@^20.2.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

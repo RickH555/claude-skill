@@ -1,0 +1,236 @@
+// ================================================================
+// MODULE LINGUISTIQUE — TYPES
+// Langues supportées : Français, English, Español
+// ================================================================
+
+export type Locale = 'fr' | 'en' | 'es';
+
+export interface TranslationDictionary {
+  // === NAVIGATION ===
+  nav: {
+    home: string;
+    newAudit: string;
+    dashboard: string;
+    monitoringAEO: string;
+    generativeTools: string;
+    indexedDirectory: string;
+    gtoGas: string;
+    affiliation: string;
+    planBilling: string;
+    myAccount: string;
+    baseClients: string;
+    missionOrders: string;
+    alertsAEO: string;
+    accountPlan: string;
+    login: string;
+    logout: string;
+    // Mobile nav
+    dash: string;
+    projects: string;
+    audit: string;
+    account: string;
+  };
+
+  // === COMMON ===
+  common: {
+    back: string;
+    next: string;
+    cancel: string;
+    save: string;
+    copy: string;
+    copied: string;
+    download: string;
+    regenerate: string;
+    generate: string;
+    search: string;
+    loading: string;
+    error: string;
+    success: string;
+    confirm: string;
+    close: string;
+    add: string;
+    remove: string;
+    edit: string;
+    delete: string;
+    yes: string;
+    no: string;
+    or: string;
+    credits: string;
+    credit: string;
+    score: string;
+    optional: string;
+    required: string;
+    submit: string;
+    returnToDashboard: string;
+    featureInDev: string;
+    comingSoon: string;
+    operationalSystems: string;
+  };
+
+  // === FOOTER ===
+  footer: {
+    product: string;
+    aeoResources: string;
+    company: string;
+    about: string;
+    contact: string;
+    legal: string;
+    privacy: string;
+    freeAudit: string;
+    indexDirectory: string;
+    devApi: string;
+    schemaGuide: string;
+    llmFunctioning: string;
+    aiComparison: string;
+    techBlog: string;
+    tagline: string;
+    copyright: string;
+  };
+
+  // === HOME ===
+  home: {
+    heroTitle: string;
+    heroSubtitle: string;
+    ctaAudit: string;
+    ctaDemo: string;
+  };
+
+  // === GENERATIVE TOOLS HUB ===
+  generativeTools: {
+    title: string;
+    suitePro: string;
+    searchPlaceholder: string;
+    whyUse: string;
+    // Tool cards
+    smcStudio: string;
+    smcStudioDesc: string;
+    contentWriter: string;
+    contentWriterDesc: string;
+    reputation: string;
+    reputationDesc: string;
+    sourceOfTruth: string;
+    sourceOfTruthDesc: string;
+    schemaOrg: string;
+    schemaOrgDesc: string;
+    robotsTxt: string;
+    robotsTxtDesc: string;
+    botTracking: string;
+    botTrackingDesc: string;
+    blogOptimizer: string;
+    blogOptimizerDesc: string;
+    // Explanatory section
+    structuredContent: string;
+    structuredContentDesc: string;
+    technicalData: string;
+    technicalDataDesc: string;
+    sourceAuthority: string;
+    sourceAuthorityDesc: string;
+  };
+
+  // === CONTENT WRITER (MODULE #3) ===
+  contentWriter: {
+    title: string;
+    subtitle: string;
+    // Steps
+    step1Title: string;
+    step2Title: string;
+    step3Title: string;
+    step4Title: string;
+    // Verticals
+    verticals: Record<string, string>;
+    // Content types
+    contentTypes: Record<string, string>;
+    // Tones
+    tones: Record<string, string>;
+    // Form labels
+    brandName: string;
+    brandUrl: string;
+    productOrService: string;
+    targetAudience: string;
+    tone: string;
+    language: string;
+    additionalContext: string;
+    generateContent: string;
+    modifyBrief: string;
+    aeoTips: string;
+    schemaJsonLd: string;
+    framework: string;
+    // Languages for content generation
+    contentLanguages: Record<string, string>;
+  };
+
+  // === REPUTATION (MODULE #4) ===
+  reputation: {
+    title: string;
+    subtitle: string;
+    heuristicBadge: string;
+    // Form
+    brandName: string;
+    brandUrl: string;
+    industry: string;
+    competitors: string;
+    keywords: string;
+    addCompetitor: string;
+    addKeyword: string;
+    launchScan: string;
+    scanning: string;
+    // Results
+    aiVisibility: string;
+    breakdown: string;
+    dominantThemes: string;
+    competitorComparison: string;
+    alerts: string;
+    simulatedMentions: string;
+    recommendations: string;
+    // Sentiment
+    positive: string;
+    neutral: string;
+    negative: string;
+    // Alert severities
+    critical: string;
+    warning: string;
+    info: string;
+    // Action plan
+    generateActionPlan: string;
+    actionPlan: string;
+  };
+
+  // === ANALYZE ===
+  analyze: {
+    title: string;
+    subtitle: string;
+    urlPlaceholder: string;
+    startAnalysis: string;
+    analyzing: string;
+    limitReached: string;
+    analysisError: string;
+  };
+
+  // === ERRORS & ALERTS ===
+  alerts: {
+    loginRequired: string;
+    insufficientCredits: string;
+    redirectToRecharge: string;
+    analysisFirst: string;
+  };
+
+  // === AI PROMPTS (system instructions language) ===
+  prompts: {
+    outputLanguageInstruction: string;
+    respondIn: string;
+  };
+}
+
+export interface LocaleConfig {
+  code: Locale;
+  name: string;
+  nativeName: string;
+  flag: string;
+  dir: 'ltr' | 'rtl';
+}
+
+export const SUPPORTED_LOCALES: LocaleConfig[] = [
+  { code: 'fr', name: 'French', nativeName: 'Fran\u00e7ais', flag: '\ud83c\uddeb\ud83c\uddf7', dir: 'ltr' },
+  { code: 'en', name: 'English', nativeName: 'English', flag: '\ud83c\uddec\ud83c\udde7', dir: 'ltr' },
+  { code: 'es', name: 'Spanish', nativeName: 'Espa\u00f1ol', flag: '\ud83c\uddea\ud83c\uddf8', dir: 'ltr' },
+];

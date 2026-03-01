@@ -1,0 +1,92 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Globe } from 'lucide-react';
+import { useTranslation } from './context';
+import { SUPPORTED_LOCALES, Locale } from './types';
+
+// ================================================================
+// LANGUAGE SELECTOR — Dropdown sélecteur de langue
+// Styles : ninja-card, cohérent avec le design CitedBy.ai
+// ================================================================
+
+interface LanguageSelectorProps {
+  /** Compact mode : affiche uniquement le drapeau + code (pour la navbar) */
+  compact?: boolean;
+  /** Classe CSS additionnelle */
+  className?: string;
+}
+
+export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ compact = false, className = '' }) => {
+  const { locale, setLocale } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const currentLocale = SUPPORTED_LOCALES.find(l => l.code === locale)!;
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (code: Locale) => {
+    setLocale(code);
+    setIsOpen(false);
+  };
+
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      {/* Trigger button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-2 rounded-full border border-white/[0.08] transition-all hover:border-primary/50 hover:bg-purple-500/10 group ${
+          compact
+            ? 'px-2.5 py-1.5 bg-white/[0.04]'
+            : 'px-3 py-2 bg-[#111111]'
+        }`}
+        title={`Language: ${currentLocale.nativeName}`}
+      >
+        {compact ? (
+          <span className="text-xs font-bold text-gray-300 group-hover:text-purple-400 uppercase">{currentLocale.code}</span>
+        ) : (
+          <>
+            <span className="text-sm font-medium text-gray-300 group-hover:text-white">{currentLocale.nativeName}</span>
+            <Globe size={14} className="text-gray-500 group-hover:text-purple-400" />
+          </>
+        )}
+      </button>
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div className="absolute top-full mt-2 right-0 z-[100] min-w-[180px] bg-[#0f1115] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          {SUPPORTED_LOCALES.map((loc) => (
+            <button
+              key={loc.code}
+              onClick={() => handleSelect(loc.code)}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all ${
+                locale === loc.code
+                  ? 'bg-purple-500/10 text-purple-400 border-l-2 border-primary'
+                  : 'text-gray-500 hover:bg-white/[0.04] hover:text-white border-l-2 border-transparent'
+              }`}
+            >
+              <span className="text-lg leading-none">{loc.flag}</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">{loc.nativeName}</span>
+                <span className="text-[10px] text-gray-500 uppercase">{loc.name}</span>
+              </div>
+              {locale === loc.code && (
+                <span className="ml-auto text-purple-400 text-xs">&#10003;</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default LanguageSelector;

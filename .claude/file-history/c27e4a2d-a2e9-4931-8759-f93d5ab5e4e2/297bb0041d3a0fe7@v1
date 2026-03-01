@@ -1,0 +1,10 @@
+import PageHeader from '@/components/layout/PageHeader';
+
+export default function CampaignsPage() {
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Campagnes" description="Créez et gérez vos campagnes marketing." />
+      <p className="text-[var(--text-tertiary)]">Bientôt disponible.</p>
+    </div>
+  );
+}

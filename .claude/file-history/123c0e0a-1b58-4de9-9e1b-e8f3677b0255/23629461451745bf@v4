@@ -1,0 +1,139 @@
+// ============================================
+// CitedBy.ai - Integrations Service
+// ============================================
+
+import type {
+  IntegrationConnection,
+  IntegrationKPI,
+  IntegrationPeriod,
+  IntegrationProvider,
+  IntegrationState,
+  TrafficDataPoint,
+  AttributionRow,
+  AIQueryRow,
+} from '../types/integrations.ts'
+
+const STORAGE_KEY = 'citedby_integrations'
+
+// ---- Connection State ----
+
+function defaultState(): IntegrationState {
+  return {
+    connections: [
+      { provider: 'ga4', status: 'disconnected', accountName: null, connectedAt: null },
+      { provider: 'search_console', status: 'disconnected', accountName: null, connectedAt: null },
+    ],
+    period: '30d',
+  }
+}
+
+export function getIntegrationState(): IntegrationState {
+  const raw = localStorage.getItem(STORAGE_KEY)
+  return raw ? JSON.parse(raw) : defaultState()
+}
+
+function saveState(state: IntegrationState): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+}
+
+export function hasAnyConnection(state: IntegrationState): boolean {
+  return state.connections.some((c) => c.status === 'connected')
+}
+
+// ---- OAuth Simulation ----
+
+export function connectProvider(provider: IntegrationProvider): Promise<IntegrationConnection> {
+  return new Promise((resolve) => {
+    const state = getIntegrationState()
+    const conn = state.connections.find((c) => c.provider === provider)!
+    conn.status = 'connecting'
+    saveState(state)
+
+    setTimeout(() => {
+      conn.status = 'connected'
+      conn.accountName = provider === 'ga4' ? 'citedby.ai - GA4' : 'citedby.ai - Search Console'
+      conn.connectedAt = new Date().toISOString()
+      saveState(state)
+      resolve(conn)
+    }, 2000)
+  })
+}
+
+export function disconnectProvider(provider: IntegrationProvider): void {
+  const state = getIntegrationState()
+  const conn = state.connections.find((c) => c.provider === provider)!
+  conn.status = 'disconnected'
+  conn.accountName = null
+  conn.connectedAt = null
+  saveState(state)
+}
+
+export function setPeriod(period: IntegrationPeriod): void {
+  const state = getIntegrationState()
+  state.period = period
+  saveState(state)
+}
+
+// ---- Mock Data Generators ----
+
+function daysForPeriod(period: IntegrationPeriod): number {
+  return period === '7d' ? 7 : period === '30d' ? 30 : 90
+}
+
+export function getKPIs(period: IntegrationPeriod): IntegrationKPI {
+  const mul = daysForPeriod(period) / 30
+  return {
+    aiVisits: Math.round(4820 * mul),
+    aiConversions: Math.round(234 * mul),
+    aiTrafficShare: 12.4 + (Math.random() * 2 - 1),
+    avgAiCTR: 3.8 + (Math.random() * 0.6 - 0.3),
+  }
+}
+
+export function getTrafficData(period: IntegrationPeriod): TrafficDataPoint[] {
+  const days = daysForPeriod(period)
+  const data: TrafficDataPoint[] = []
+  const now = new Date()
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    data.push({
+      date: d.toISOString().slice(0, 10),
+      chatgpt: Math.floor(40 + Math.random() * 60),
+      perplexity: Math.floor(20 + Math.random() * 40),
+      claude: Math.floor(15 + Math.random() * 30),
+      gemini: Math.floor(10 + Math.random() * 25),
+      copilot: Math.floor(5 + Math.random() * 15),
+    })
+  }
+
+  return data
+}
+
+export function getAttributionData(): AttributionRow[] {
+  return [
+    { source: 'ChatGPT', visits: 2340, pageViews: 5670, avgDuration: '2:45', bounceRate: 34.2, conversions: 98, trend: 'up' },
+    { source: 'Perplexity', visits: 1120, pageViews: 2890, avgDuration: '3:12', bounceRate: 28.1, conversions: 67, trend: 'up' },
+    { source: 'Claude', visits: 780, pageViews: 1950, avgDuration: '2:58', bounceRate: 31.5, conversions: 42, trend: 'stable' },
+    { source: 'Gemini', visits: 420, pageViews: 980, avgDuration: '2:15', bounceRate: 41.3, conversions: 18, trend: 'down' },
+    { source: 'Copilot', visits: 160, pageViews: 340, avgDuration: '1:50', bounceRate: 45.8, conversions: 9, trend: 'stable' },
+  ]
+}
+
+export function getAIQueries(): AIQueryRow[] {
+  return [
+    { query: 'meilleur outil SEO IA', impressions: 12400, clicks: 890, ctr: 7.2, position: 1.3, isAIReferral: true },
+    { query: 'suivi citations IA', impressions: 8900, clicks: 620, ctr: 6.9, position: 1.8, isAIReferral: true },
+    { query: 'optimisation AEO', impressions: 6700, clicks: 340, ctr: 5.1, position: 2.4, isAIReferral: true },
+    { query: 'monitoring marque ChatGPT', impressions: 4500, clicks: 280, ctr: 6.2, position: 1.5, isAIReferral: true },
+    { query: 'alternative Semrush IA', impressions: 3200, clicks: 190, ctr: 5.9, position: 3.1, isAIReferral: false },
+    { query: 'analyse visibilite IA', impressions: 2800, clicks: 150, ctr: 5.4, position: 2.7, isAIReferral: true },
+    { query: 'SEO generatif', impressions: 2100, clicks: 110, ctr: 5.2, position: 4.2, isAIReferral: false },
+    { query: 'audit contenu IA', impressions: 1800, clicks: 95, ctr: 5.3, position: 3.8, isAIReferral: true },
+  ]
+}
+
+export function getProviderLabel(provider: IntegrationProvider): string {
+  return provider === 'ga4' ? 'Google Analytics 4' : 'Search Console'
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "content": "Execute Audit 1 — Security",
+    "status": "in_progress",
+    "activeForm": "Executing Security audit"
+  },
+  {
+    "content": "Execute Audit 2 — Project Structure",
+    "status": "in_progress",
+    "activeForm": "Executing Project Structure audit"
+  },
+  {
+    "content": "Execute Audit 3 — Code Quality",
+    "status": "in_progress",
+    "activeForm": "Executing Code Quality audit"
+  },
+  {
+    "content": "Execute Audit 4 — Performance",
+    "status": "in_progress",
+    "activeForm": "Executing Performance audit"
+  },
+  {
+    "content": "Execute Audit 5 — API & Network",
+    "status": "in_progress",
+    "activeForm": "Executing API & Network audit"
+  },
+  {
+    "content": "Execute Audit 6 — Loops & Memory",
+    "status": "in_progress",
+    "activeForm": "Executing Loops & Memory audit"
+  },
+  {
+    "content": "Execute Audit 7 — Accessibility",
+    "status": "in_progress",
+    "activeForm": "Executing Accessibility audit"
+  },
+  {
+    "content": "Execute Audit 8 — State & Data",
+    "status": "in_progress",
+    "activeForm": "Executing State & Data audit"
+  },
+  {
+    "content": "Execute Audit 9 — Coherence & Standards",
+    "status": "in_progress",
+    "activeForm": "Executing Coherence & Standards audit"
+  },
+  {
+    "content": "Execute Audit 10 — Deployment & Production",
+    "status": "in_progress",
+    "activeForm": "Executing Deployment & Production audit"
+  },
+  {
+    "content": "Generate AUDIT_REPORT.md",
+    "status": "pending",
+    "activeForm": "Generating AUDIT_REPORT.md"
+  }
+]

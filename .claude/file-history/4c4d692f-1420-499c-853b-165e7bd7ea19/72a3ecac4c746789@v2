@@ -1,0 +1,18 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-plugins-official",
+    "lastUpdated": "2026-02-24T21:17:59.830Z"
+  },
+  "claude-code-workflows": {
+    "source": {
+      "source": "github",
+      "repo": "wshobson/agents"
+    },
+    "installLocation": "C:\\Users\\User\\.claude\\plugins\\marketplaces\\claude-code-workflows",
+    "lastUpdated": "2026-02-24T22:00:00.000Z"
+  }
+}

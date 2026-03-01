@@ -1,0 +1,599 @@
+2026-02-26T10:24:02.364Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-02-26T10:24:02.369Z [DEBUG] MDM settings load completed in 19ms
+2026-02-26T10:24:02.461Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-26T10:24:02.462Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-26T10:24:02.462Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-26T10:24:02.462Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-26T10:24:02.521Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-02-26T10:24:02.574Z [DEBUG] Applying permission update: Adding 165 allow rule(s) to destination 'localSettings': ["Bash(npx vite build)","Bash(npx claude-code-templates@latest:*)","WebSearch","Bash(echo:*)","Bash(gh auth status:*)","Bash(ls:*)","Bash(npm run build:*)","Bash(npm run dev:*)","Bash(start http://localhost:3000)","Bash(node -e:*)","Bash(npx --yes playwright install:*)","Bash(npx --yes playwright screenshot:*)","Bash(dir:*)","Bash(npm install:*)","Bash(node:*)","Bash(npx next start:*)","Bash(taskkill:*)","Bash(npx tsc:*)","mcp__puppeteer__puppeteer_navigate","mcp__puppeteer__puppeteer_screenshot","mcp__puppeteer__puppeteer_evaluate","mcp__puppeteer__puppeteer_click","mcp__puppeteer__puppeteer_fill","Bash(npx vite:*)","Bash(git init:*)","Bash(git add:*)","Bash(git commit -m \"$\\(cat <<''EOF''\nRestore Vite SPA architecture after broken Next.js migration\n\n- Rename _legacy_pages/ back to pages/ \\(24 .tsx files restored\\)\n- Fix package.json scripts to use vite instead of next\n- Install vite and @vitejs/plugin-react as devDependencies\n- Remove tsconfig.json exclusions blocking SPA files\n- Fix JSX syntax error in Results.tsx \\(missing closing div\\)\n- Fix JSX syntax error in SchemaOrg.tsx \\(literal script tag\\)\n- Install missing jspdf and html2canvas dependencies\n- Rewrite CLAUDE.md to reflect actual Vite SPA architecture\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")","Bash(git commit:*)","Bash(timeout:*)","mcp__filesystem__list_directory","mcp__filesystem__directory_tree","mcp__filesystem__read_text_file","Bash(robocopy:*)","Bash(powershell:*)","WebFetch(domain:ninjapromo.io)","Bash(fi)","mcp__filesystem__read_multiple_files","Bash(for file in pages/Recharge.tsx pages/Account.tsx pages/Affiliation.tsx pages/GenerativeTools.tsx pages/SMCStudio.tsx pages/SchemaOrg.tsx pages/RobotsTxt.tsx pages/SourceOfTruth.tsx pages/ContentWriter.tsx pages/Reputation.tsx pages/BotTracking.tsx pages/ActionPlan.tsx pages/Projects.tsx pages/Directory.tsx)","Bash(do echo \"=== $file ===\")","Bash(if grep -q \"ninja-card\\\\|btn-gradient\\\\|gradient-text\" \"$file\")","Bash(then echo \"UPDATED\")","Bash(else echo \"NEEDS UPDATE\")","Bash(done)","Bash(for file in components/CategoryCard.tsx components/ScoreRing.tsx)","Bash(start:*)","Bash(xcopy:*)","Bash(cmd /c \"robocopy \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS X-Final-Rick-Test\"\" \"\"C:\\\\Users\\\\User\\\\Downloads\\\\SaaS-Backup-NinjaPromo-2026-02-12\"\" /E /XD node_modules .git dist /XF nul /NFL /NDL\")","Bash(cd:*)","mcp__filesystem__list_allowed_directories","Bash(findstr:*)","mcp__filesystem__search_files","Bash(npm view:*)","Bash(npx next build)","Bash(curl:*)","Bash(npx vitest run)","mcp__puppeteer__puppeteer_select","mcp__filesystem__write_file","mcp__sequential-thinking__sequentialthinking","Bash(find:*)","mcp__filesystem__read_media_file","Bash(powershell.exe -NoProfile -Command \"Get-ChildItem ''C:\\\\Users\\\\User\\\\Downloads'' -Filter ''*frontend*'' | ForEach-Object { Copy-Item -LiteralPath $_FullName -Destination ''C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png'' }\")","Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*frontend*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\capture-frontend.png\"\" }')","Bash(powershell.exe -NoProfile -Command 'Get-ChildItem \"\"C:\\\\Users\\\\User\\\\Downloads\"\" -Filter \"\"*bandeau*\"\" | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination \"\"C:\\\\Users\\\\User\\\\Downloads\\\\bandeau-copy.png\"\" }')","Bash(netstat:*)","Bash(wmic process where ProcessId=49720 get CommandLine,ExecutablePath:*)","Bash(tasklist:*)","Bash(grep:*)","Bash(wc:*)","mcp__puppeteer__puppeteer_hover","mcp__filesystem__create_directory","Bash(cat:*)","mcp__filesystem__list_directory_with_sizes","Bash(wmic process:*)","mcp__memory__create_entities","Bash(npm i:*)","Bash(ngrok:*)","Bash(npm audit:*)","Bash(git checkout:*)","Bash(tee:*)","Bash(test:*)","Bash(tail:*)","Bash(cd \"C:/Users/User/citedby-ai\" && rm -rf .next && npm run build 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && git restore . 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && rm -rf \\\\\n  \"app/\\(app\\)/analyze\" \\\\\n  \"app/\\(app\\)/citations\" \\\\\n  \"app/\\(app\\)/dashboard\" \\\\\n  \"app/\\(app\\)/history\" \\\\\n  \"app/\\(app\\)/layout.tsx\" \\\\\n  \"app/\\(app\\)/marketplace\" \\\\\n  \"app/\\(app\\)/monitoring\" \\\\\n  \"app/\\(app\\)/projects\" \\\\\n  \"app/\\(app\\)/results\" \\\\\n  \"app/\\(app\\)/settings\" \\\\\n  \"app/\\(app\\)/tools\" \\\\\n  \"app/\\(public\\)/login\" \\\\\n  \"app/api/ai\" \\\\\n  \"lib/api-client.ts\" \\\\\n  \"lib/app-context.tsx\" \\\\\n  \"lib/route-map.ts\" \\\\\n  \"lib/toast-context.tsx\" \\\\\n  \"views/\" \\\\\n  \"src/views-lr/\" \\\\\n  \"tsconfig.tsbuildinfo\" \\\\\n  \".next\" \\\\\n  2>&1)","Bash(echo done:*)","Bash(uipro:*)","Bash(cd \"C:/Users/User/citedby-ai\" && python3 .claude/skills/ui-ux-pro-max/scripts/search.py \"SaaS AEO SEO analytics dark mode professional\" --design-system -p \"CitedBy.ai\" 2>&1 || python .claude/skills/ui-ux-pro-max/scripts/search.py \"SaaS AEO SEO analytics dark mode professional\" --design-system -p \"CitedBy.ai\" 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && python .claude/skills/ui-ux-pro-max/scripts/search.py \"landing hero social-proof pricing\" --domain landing 2>&1)","Bash(cd /c/Users/User && python .claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism\" --domain style 2>&1)","Bash(cd /c/Users/User/citedby-ai && python .claude/skills/ui-ux-pro-max/scripts/search.py \"glassmorphism\" --domain style 2>&1)","Bash(python3 skills/ui-ux-pro-max/scripts/search.py \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1 || python skills/ui-ux-pro-max/scripts/search.py \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1)","Bash(python3 \"$HOME/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1 || python \"$HOME/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"SaaS product modern professional\" --design-system -p \"SaaS Landing Page\" 2>&1)","Bash(python3:*)","Bash(uipro --version 2>/dev/null || uipro-cli --version 2>/dev/null || npx uipro-cli --version 2>/dev/null)","Bash(gsd --help 2>&1 || gsd -h 2>&1 || gsd 2>&1)","Bash(gsd hello world:*)","WebFetch(domain:github.com)","Bash(npm uninstall:*)","Bash(git clone:*)","Bash(claude:*)","Bash(cp:*)","Bash(npx get-shit-done-cc@latest:*)","Bash(sort:*)","Bash(xargs basename:*)","Bash(cd /c/Users/User && npx create-next-app@latest personal-site --typescript --tailwind --eslint --app --src-dir --no-import-alias --use-npm 2>&1)","Bash(cd /c/Users/User/personal-site && npm run lint 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && supabase functions deploy ai-proxy --no-verify-jwt 2>&1)","Bash(cd \"C:/Users/User/citedby-ai\" && npx supabase --version 2>&1)","WebFetch(domain:next.frase.io)","WebFetch(domain:searchendurance.com)","WebFetch(domain:www.frase.io)","WebFetch(domain:selfmademillennials.com)","WebFetch(domain:www.demandsage.com)","WebFetch(domain:juliety.com)","WebFetch(domain:www.g2.com)","WebFetch(domain:help.frase.io)","Bash(npx playwright:*)","WebFetch(domain:www.stan.store)","WebFetch(domain:www.hopp.co)","WebFetch(domain:help.stan.store)","WebFetch(domain:whop.com)","Bash(head:*)","Bash(cd \"C:/Users/User/stan-io\" && ./node_modules/.bin/tsc --noEmit --pretty -- pages/Dashboard.tsx pages/AllProducts.tsx pages/DigitalProducts.tsx pages/Courses.tsx pages/MyStore.tsx 2>&1)","Bash(echo CCPM_LIST_NOT_AVAILABLE:*)","Bash(ccpm:*)","mcp__memory__search_nodes","Bash(npx supabase --version 2>&1 || supabase --version 2>&1)","Bash(npx supabase:*)","Bash(SUPABASE_ACCESS_TOKEN=sbp_8d1963f9205da08d0a34d689ecff258c387f93c9 npx supabase:*)","Bash(cd /c/Users/User/nexus-ai && VERCEL_TOKEN=vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB npx vercel whoami --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB 2>&1)","Bash(cd /c/Users/User/nexus-ai && npx vercel --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB --yes 2>&1)","Bash(cd /c/Users/User/nexus-ai && npx vercel --token vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production --value \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvYXhjeGxubmtyZXp3d2tmcGhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODcyNzQsImV4cCI6MjA4NzM2MzI3NH0.nFsrjQFumprdTe8bIqNrJSeXBNYj8dGin4uXslEGON8\" --yes --scope \"$SCOPE\" 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add SUPABASE_SERVICE_ROLE_KEY production --value \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvYXhjeGxubmtyZXp3d2tmcGhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTc4NzI3NCwiZXhwIjoyMDg3MzYzMjc0fQ.qWVAYZ7xfCzqFQAkRgCArO0gq0wiWYlcVuigCCc-1jI\" --yes --scope \"$SCOPE\" 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && SCOPE=\"nuancesmen-gmailcoms-projects\" && npx vercel env add STRIPE_SECRET_KEY production --value \"sk_test_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add STRIPE_WEBHOOK_SECRET production --value \"whsec_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY production --value \"pk_test_placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add OPENAI_API_KEY production --value \"sk-placeholder\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_APP_URL production --value \"https://nexus-ai-silk-six.vercel.app\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add NEXT_PUBLIC_APP_NAME production --value \"NexusAI\" --yes --scope \"$SCOPE\" 2>&1 && npx vercel env add RESEND_API_KEY production --value \"re_placeholder\" --yes --scope \"$SCOPE\" 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add STRIPE_WEBHOOK_SECRET production --value \"whsec_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY production --value \"pk_test_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add OPENAI_API_KEY production --value \"sk-placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_APP_URL production --value \"https://nexus-ai-silk-six.vercel.app\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add NEXT_PUBLIC_APP_NAME production --value \"NexusAI\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add RESEND_API_KEY production --value \"re_placeholder\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env ls --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel --prod --yes --scope nuancesmen-gmailcoms-projects 2>&1)","WebFetch(domain:nexus-ai-silk-six.vercel.app)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env rm OPENAI_API_KEY production --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(cd /c/Users/User/nexus-ai && export VERCEL_TOKEN=\"vcp_2xFnuq4bClW1fS1femhkSXjboguqYnvrG2RKlpPTOl84n4gOaP0QXXxB\" && npx vercel env add OPENAI_API_KEY production --value \"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\" --yes --scope nuancesmen-gmailcoms-projects 2>&1)","Bash(pip install:*)","Bash(echo === SURVEY ===:*)","Bash(echo === Anon SELECT active surveys ===:*)","Bash(grep Type error\\\\|error TS:*)","Bash(mkdir -p /c/Users/User/nexus-ai/test-docs/scan && cd /c/Users/User/nexus-ai && node test-docs/scan-clicks.mjs 2>&1)","Bash(pnpm --version 2>/dev/null && node --version 2>/dev/null && npm --version 2>/dev/null)","Bash(pnpm:*)","Bash(cd /c/Users/User/loyalty-app/apps && npx create-expo-app@latest mobile --template tabs 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo install expo-camera expo-location expo-localization expo-notifications expo-secure-store react-native-url-polyfill 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest init -d 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest add button card input label table dialog tabs badge select textarea toast 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/dashboard && npx shadcn@latest add button card input label table dialog tabs badge select textarea sonner 2>&1)","Bash(git:*)","Bash(echo FOUND: $f:*)","Bash(cd \"C:/Users/User/loyalty-app/apps/mobile\" && npx expo install react-native-nfc-manager 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web --offline 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo install react-native-url-polyfill 2>&1)","Bash(cd /c/Users/User/loyalty-app/apps/mobile && npx expo start --web --offline --port 8082 2>&1)"]
+2026-02-26T10:24:02.580Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-26T10:24:02.597Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-26T10:24:02.600Z [DEBUG] [STARTUP] Running setup()...
+2026-02-26T10:24:02.632Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\User\.claude\skills, project=[]
+2026-02-26T10:24:02.713Z [WARN] Failed to parse YAML frontmatter in C:\Users\User\.claude\skills\competitors-analysis\SKILL.md: Unexpected flow-seq-start at node end at line 6, column 31:
+
+argument-hint: [product-name] [competitor-url]
+                              ^
+2026-02-26T10:24:02.899Z [DEBUG] Error log sink initialized
+2026-02-26T10:24:03.045Z [DEBUG] [STARTUP] setup() completed in 445ms
+2026-02-26T10:24:03.046Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-26T10:24:03.052Z [DEBUG] Git remote URL: null
+2026-02-26T10:24:03.052Z [DEBUG] No git remote URL found
+2026-02-26T10:24:03.145Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default, Profile 1
+2026-02-26T10:24:03.154Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-02-26T10:24:03.195Z [DEBUG] Loaded 90 installed plugins from C:\Users\User\.claude\plugins\installed_plugins.json
+2026-02-26T10:24:03.195Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-26T10:24:03.213Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-26T10:24:03.213Z [DEBUG] Total plugin skills loaded: 0
+2026-02-26T10:24:03.213Z [DEBUG] Total plugin commands loaded: 0
+2026-02-26T10:24:03.213Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-26T10:24:03.216Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=C:\Users\User\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code\vendor\ripgrep\x64-win32\rg.exe)
+2026-02-26T10:24:03.251Z [DEBUG] Total plugin agents loaded: 0
+2026-02-26T10:24:03.507Z [DEBUG] Loaded 179 unique skills (179 unconditional, 0 conditional, managed: 0, user: 139, project: 0, additional: 0, legacy commands: 40)
+2026-02-26T10:24:03.508Z [DEBUG] getSkills returning: 179 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-02-26T10:24:03.514Z [DEBUG] [STARTUP] Commands and agents loaded in 468ms
+2026-02-26T10:24:03.541Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-02-26T10:24:03.574Z [DEBUG] [keybindings] KeybindingSetup initialized with 102 bindings, 0 warnings
+2026-02-26T10:24:03.828Z [DEBUG] [keybindings] Watching for changes to C:\Users\User\.claude\keybindings.json
+2026-02-26T10:24:03.858Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101443858
+2026-02-26T10:24:03.859Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:03.861Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:03.862Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:03.862Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101443858 to C:\Users\User\.claude.json
+2026-02-26T10:24:03.864Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:03.877Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101443877
+2026-02-26T10:24:03.877Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:03.879Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:03.880Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:03.880Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101443877 to C:\Users\User\.claude.json
+2026-02-26T10:24:03.881Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:05.209Z [DEBUG] Writing to temp file: C:\Users\User\.claude\settings.local.json.tmp.58008.1772101445209
+2026-02-26T10:24:05.209Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:05.210Z [DEBUG] Temp file written successfully, size: 15845 bytes
+2026-02-26T10:24:05.211Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:05.211Z [DEBUG] Renaming C:\Users\User\.claude\settings.local.json.tmp.58008.1772101445209 to C:\Users\User\.claude\settings.local.json
+2026-02-26T10:24:05.212Z [DEBUG] File C:\Users\User\.claude\settings.local.json written atomically
+2026-02-26T10:24:05.317Z [DEBUG] Grove: Using fresh cached config
+2026-02-26T10:24:05.451Z [DEBUG] Not in a GitHub repository, skipping path mapping update
+2026-02-26T10:24:05.454Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-26T10:24:05.454Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-02-26T10:24:05.763Z [DEBUG] [STARTUP] showSetupScreens() completed in 2222ms
+2026-02-26T10:24:05.763Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-26T10:24:05.764Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-26T10:24:05.764Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-26T10:24:05.765Z [DEBUG] Total LSP servers loaded: 0
+2026-02-26T10:24:05.765Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-26T10:24:05.765Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-26T10:24:05.813Z [DEBUG] LSP server manager initialized successfully
+2026-02-26T10:24:05.814Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-26T10:24:07.505Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-26T10:24:07.505Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-26T10:24:07.505Z [DEBUG] Passes: Cache stale, returning cached data and refreshing in background
+2026-02-26T10:24:07.509Z [DEBUG] [STARTUP] MCP configs loaded in 4929ms
+2026-02-26T10:24:07.533Z [DEBUG] MCP server "github": Starting connection with timeout of 30000ms
+2026-02-26T10:24:07.564Z [DEBUG] MCP server "puppeteer": Starting connection with timeout of 30000ms
+2026-02-26T10:24:07.591Z [DEBUG] MCP server "slack": Starting connection with timeout of 30000ms
+2026-02-26T10:24:07.684Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-26T10:24:07.684Z [DEBUG] Found 0 hook matchers in settings
+2026-02-26T10:24:07.684Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-02-26T10:24:07.684Z [DEBUG] Initialized versioned plugins system with 90 plugins
+2026-02-26T10:24:07.734Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-02-26T10:24:07.741Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101447741
+2026-02-26T10:24:07.741Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:07.743Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:07.744Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:07.744Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101447741 to C:\Users\User\.claude.json
+2026-02-26T10:24:07.745Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:07.748Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-26T10:24:07.759Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101447759
+2026-02-26T10:24:07.759Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:07.760Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:07.760Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:07.760Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101447759 to C:\Users\User\.claude.json
+2026-02-26T10:24:07.762Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:07.891Z [DEBUG] [keybindings] KeybindingSetup initialized with 102 bindings, 0 warnings
+2026-02-26T10:24:08.071Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-02-26T10:24:08.080Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-02-26T10:24:08.085Z [DEBUG] performStartupChecks called
+2026-02-26T10:24:08.086Z [DEBUG] Starting background plugin installations
+2026-02-26T10:24:08.087Z [DEBUG] performBackgroundPluginInstallations called
+2026-02-26T10:24:08.103Z [DEBUG] Loaded 1 CLAUDE.md/rules files:
+  [User] C:\Users\User\.claude\CLAUDE.md (9448 chars)
+2026-02-26T10:24:08.130Z [DEBUG] Watching for changes in setting files C:\Users\User\.claude\settings.json, C:\Users\User\.claude\settings.local.json...
+2026-02-26T10:24:08.136Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448136
+2026-02-26T10:24:08.137Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.137Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.138Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.138Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448136 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.138Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.145Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448145
+2026-02-26T10:24:08.146Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.146Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.147Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.147Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448145 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.147Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.153Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448153
+2026-02-26T10:24:08.153Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.154Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.154Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.154Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448153 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.155Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.161Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448161
+2026-02-26T10:24:08.161Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.162Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.162Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.162Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448161 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.163Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.163Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-26T10:24:08.173Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448173
+2026-02-26T10:24:08.173Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.175Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.175Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.175Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448173 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.176Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.199Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448199
+2026-02-26T10:24:08.200Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.279Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.279Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.279Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448199 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.281Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.290Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-26T10:24:08.290Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-02-26T10:24:08.290Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-02-26T10:24:08.408Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448408
+2026-02-26T10:24:08.408Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.410Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.410Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.410Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448408 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.411Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.428Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101448428
+2026-02-26T10:24:08.428Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:08.430Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:08.430Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:08.430Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101448428 to C:\Users\User\.claude.json
+2026-02-26T10:24:08.431Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:08.467Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-02-26T10:24:08.470Z [DEBUG] Watching for changes in skill/command directories: C:\Users\User\.claude\skills, C:\Users\User\.claude\commands, C:\Users\User\.claude\skills, C:\Users\User\.claude\commands...
+2026-02-26T10:24:08.522Z [DEBUG] Org fast mode: disabled (extra_usage_disabled)
+2026-02-26T10:24:08.524Z [DEBUG] Security messages are fresh (<1h old), skipping fetch
+2026-02-26T10:24:08.988Z [DEBUG] [claudeai-mcp] Fetched 4 servers
+2026-02-26T10:24:09.088Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101449088
+2026-02-26T10:24:09.088Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:09.089Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:09.090Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:09.090Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101449088 to C:\Users\User\.claude.json
+2026-02-26T10:24:09.092Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:09.108Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101449108
+2026-02-26T10:24:09.108Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:09.110Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:09.110Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:09.110Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101449108 to C:\Users\User\.claude.json
+2026-02-26T10:24:09.111Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:09.127Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101449127
+2026-02-26T10:24:09.127Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:09.129Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:09.129Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:09.129Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101449127 to C:\Users\User\.claude.json
+2026-02-26T10:24:09.130Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:09.138Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101449138
+2026-02-26T10:24:09.139Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:09.140Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:09.140Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:09.140Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101449138 to C:\Users\User\.claude.json
+2026-02-26T10:24:09.141Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:09.316Z [DEBUG] MCP server "claude.ai Google Calendar": Initializing claude.ai proxy transport for server mcpsrv_01JjdLtNRew7bYjqkDyFaYrZ
+2026-02-26T10:24:09.317Z [DEBUG] MCP server "claude.ai Google Calendar": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01JjdLtNRew7bYjqkDyFaYrZ
+2026-02-26T10:24:09.320Z [DEBUG] MCP server "claude.ai Google Calendar": claude.ai proxy transport created successfully
+2026-02-26T10:24:09.323Z [DEBUG] MCP server "claude.ai Google Calendar": Starting connection with timeout of 30000ms
+2026-02-26T10:24:09.335Z [DEBUG] MCP server "claude.ai Gmail": Initializing claude.ai proxy transport for server mcpsrv_016tWg5aMW1Gar57jopAT9Lx
+2026-02-26T10:24:09.335Z [DEBUG] MCP server "claude.ai Gmail": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_016tWg5aMW1Gar57jopAT9Lx
+2026-02-26T10:24:09.336Z [DEBUG] MCP server "claude.ai Gmail": claude.ai proxy transport created successfully
+2026-02-26T10:24:09.338Z [DEBUG] MCP server "claude.ai Gmail": Starting connection with timeout of 30000ms
+2026-02-26T10:24:09.344Z [DEBUG] MCP server "claude.ai Supabase": Initializing claude.ai proxy transport for server mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-26T10:24:09.344Z [DEBUG] MCP server "claude.ai Supabase": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_0173WoGyW2YS1e468NcMJkVt
+2026-02-26T10:24:09.345Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy transport created successfully
+2026-02-26T10:24:09.347Z [DEBUG] MCP server "claude.ai Supabase": Starting connection with timeout of 30000ms
+2026-02-26T10:24:09.354Z [DEBUG] MCP server "claude.ai Gamma": Initializing claude.ai proxy transport for server mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-26T10:24:09.354Z [DEBUG] MCP server "claude.ai Gamma": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01C49jciDPGcVEKrHvSCYUab
+2026-02-26T10:24:09.354Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy transport created successfully
+2026-02-26T10:24:09.357Z [DEBUG] MCP server "claude.ai Gamma": Starting connection with timeout of 30000ms
+2026-02-26T10:24:09.903Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101449903
+2026-02-26T10:24:09.903Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:09.910Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:09.910Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:09.910Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101449903 to C:\Users\User\.claude.json
+2026-02-26T10:24:09.911Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:09.912Z [DEBUG] Passes eligibility cached for org 0e714d1f-2f2f-4c21-91c1-17b70825dbc6: true
+2026-02-26T10:24:11.983Z [DEBUG] MCP server "claude.ai Google Calendar": claude.ai proxy connection failed after 2667ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJWojaq1sQfLpUZiP"}
+2026-02-26T10:24:11.984Z [ERROR] MCP server "claude.ai Google Calendar" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJWojaq1sQfLpUZiP"}
+2026-02-26T10:24:12.025Z [DEBUG] MCP server "claude.ai Google Calendar": Authentication required for claude.ai proxy server
+2026-02-26T10:24:12.033Z [DEBUG] MCP server "claude.ai Gmail": claude.ai proxy connection failed after 2698ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJX49hA9yjPFUarfe"}
+2026-02-26T10:24:12.033Z [ERROR] MCP server "claude.ai Gmail" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJX49hA9yjPFUarfe"}
+2026-02-26T10:24:12.034Z [DEBUG] MCP server "claude.ai Gmail": Authentication required for claude.ai proxy server
+2026-02-26T10:24:12.037Z [DEBUG] MCP server "claude.ai Supabase": claude.ai proxy connection failed after 2693ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJc1sAN5Uugca9koP"}
+2026-02-26T10:24:12.037Z [ERROR] MCP server "claude.ai Supabase" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJc1sAN5Uugca9koP"}
+2026-02-26T10:24:12.038Z [DEBUG] MCP server "claude.ai Supabase": Authentication required for claude.ai proxy server
+2026-02-26T10:24:12.043Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy connection failed after 2689ms: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJdW127gTcBfjn6HJ"}
+2026-02-26T10:24:12.043Z [ERROR] MCP server "claude.ai Gamma" Error: Streamable HTTP error: Error POSTing to endpoint: {"type":"error","error":{"type":"authentication_error","message":"MCP server requires authentication but no OAuth token is configured."},"request_id":"req_011CYWWxJdW127gTcBfjn6HJ"}
+2026-02-26T10:24:12.045Z [DEBUG] MCP server "claude.ai Gamma": Authentication required for claude.ai proxy server
+2026-02-26T10:24:12.410Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101452410
+2026-02-26T10:24:12.411Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:12.412Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:12.412Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:12.412Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101452410 to C:\Users\User\.claude.json
+2026-02-26T10:24:12.414Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:12.421Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101452421
+2026-02-26T10:24:12.421Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:12.422Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:12.423Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:12.423Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101452421 to C:\Users\User\.claude.json
+2026-02-26T10:24:12.424Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:13.095Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-02-26T10:24:14.131Z [ERROR] MCP server "slack" Server stderr: Please set SLACK_BOT_TOKEN and SLACK_TEAM_ID environment variables
+2026-02-26T10:24:14.132Z [DEBUG] MCP server "slack": Connection failed after 6542ms: MCP error -32000: Connection closed
+2026-02-26T10:24:14.132Z [ERROR] MCP server "slack" Connection failed: MCP error -32000: Connection closed
+2026-02-26T10:24:14.194Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101454194
+2026-02-26T10:24:14.195Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:14.207Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:14.207Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:14.207Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101454194 to C:\Users\User\.claude.json
+2026-02-26T10:24:14.209Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:14.215Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101454215
+2026-02-26T10:24:14.215Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:14.216Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:14.216Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:14.216Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101454215 to C:\Users\User\.claude.json
+2026-02-26T10:24:14.217Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:14.222Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101454222
+2026-02-26T10:24:14.222Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:14.223Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:14.223Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:14.223Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101454222 to C:\Users\User\.claude.json
+2026-02-26T10:24:14.224Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:14.229Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101454229
+2026-02-26T10:24:14.229Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:14.230Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:14.230Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:14.230Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101454229 to C:\Users\User\.claude.json
+2026-02-26T10:24:14.231Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:14.319Z [ERROR] MCP server "github" Server stderr: GitHub MCP Server running on stdio
+2026-02-26T10:24:14.319Z [DEBUG] MCP server "github": Successfully connected to undefined server in 6803ms
+2026-02-26T10:24:14.320Z [DEBUG] MCP server "github": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"hasResourceSubscribe":false,"serverVersion":{"name":"github-mcp-server","version":"0.6.2"}}
+2026-02-26T10:24:14.320Z [DEBUG] [MCP] Server "github" connected with subscribe=false
+2026-02-26T10:24:14.383Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101454383
+2026-02-26T10:24:14.383Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:14.384Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:14.384Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:14.384Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101454383 to C:\Users\User\.claude.json
+2026-02-26T10:24:14.385Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:14.390Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101454390
+2026-02-26T10:24:14.390Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:14.391Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:14.391Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:14.391Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101454390 to C:\Users\User\.claude.json
+2026-02-26T10:24:14.392Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:15.053Z [DEBUG] MCP server "puppeteer": Successfully connected to undefined server in 7491ms
+2026-02-26T10:24:15.053Z [DEBUG] MCP server "puppeteer": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":true,"hasResourceSubscribe":false,"serverVersion":{"name":"example-servers/puppeteer","version":"0.1.0"}}
+2026-02-26T10:24:15.053Z [DEBUG] [MCP] Server "puppeteer" connected with subscribe=false
+2026-02-26T10:24:15.061Z [DEBUG] MCP server "filesystem": Starting connection with timeout of 30000ms
+2026-02-26T10:24:15.087Z [DEBUG] MCP server "memory": Starting connection with timeout of 30000ms
+2026-02-26T10:24:15.129Z [DEBUG] MCP server "sequential-thinking": Starting connection with timeout of 30000ms
+2026-02-26T10:24:15.212Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101455212
+2026-02-26T10:24:15.217Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:15.218Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:15.219Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:15.219Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101455212 to C:\Users\User\.claude.json
+2026-02-26T10:24:15.220Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:15.228Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101455227
+2026-02-26T10:24:15.228Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:15.229Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:15.229Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:15.229Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101455227 to C:\Users\User\.claude.json
+2026-02-26T10:24:15.230Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:21.029Z [ERROR] MCP server "memory" Server stderr: Knowledge Graph MCP Server running on stdio
+2026-02-26T10:24:21.029Z [DEBUG] MCP server "memory": Successfully connected to undefined server in 5945ms
+2026-02-26T10:24:21.029Z [DEBUG] MCP server "memory": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"hasResourceSubscribe":false,"serverVersion":{"name":"memory-server","version":"0.6.3"}}
+2026-02-26T10:24:21.029Z [DEBUG] [MCP] Server "memory" connected with subscribe=false
+2026-02-26T10:24:21.096Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101461096
+2026-02-26T10:24:21.097Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:21.099Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:21.099Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:21.099Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101461096 to C:\Users\User\.claude.json
+2026-02-26T10:24:21.101Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:21.109Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101461109
+2026-02-26T10:24:21.109Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:21.110Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:21.111Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:21.111Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101461109 to C:\Users\User\.claude.json
+2026-02-26T10:24:21.112Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:21.120Z [ERROR] MCP server "sequential-thinking" Server stderr: Sequential Thinking MCP Server running on stdio
+2026-02-26T10:24:21.121Z [DEBUG] MCP server "sequential-thinking": Successfully connected to undefined server in 5997ms
+2026-02-26T10:24:21.121Z [DEBUG] MCP server "sequential-thinking": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"hasResourceSubscribe":false,"serverVersion":{"name":"sequential-thinking-server","version":"0.2.0"}}
+2026-02-26T10:24:21.121Z [DEBUG] [MCP] Server "sequential-thinking" connected with subscribe=false
+2026-02-26T10:24:21.140Z [ERROR] MCP server "filesystem" Server stderr: Secure MCP Filesystem Server running on stdio
+2026-02-26T10:24:21.140Z [DEBUG] MCP server "filesystem": Successfully connected to undefined server in 6081ms
+2026-02-26T10:24:21.140Z [DEBUG] MCP server "filesystem": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"hasResourceSubscribe":false,"serverVersion":{"name":"secure-filesystem-server","version":"0.2.0"}}
+2026-02-26T10:24:21.141Z [DEBUG] [MCP] Server "filesystem" connected with subscribe=false
+2026-02-26T10:24:21.149Z [DEBUG] MCP server "filesystem": Received ListRoots request from server
+2026-02-26T10:24:21.165Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101461165
+2026-02-26T10:24:21.166Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:21.166Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:21.167Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:21.167Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101461165 to C:\Users\User\.claude.json
+2026-02-26T10:24:21.167Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:21.173Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101461173
+2026-02-26T10:24:21.173Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:21.174Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:21.174Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:21.174Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101461173 to C:\Users\User\.claude.json
+2026-02-26T10:24:21.175Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:21.182Z [DEBUG] MCP server "brave-search": Starting connection with timeout of 30000ms
+2026-02-26T10:24:21.208Z [DEBUG] MCP server "google-maps": Starting connection with timeout of 30000ms
+2026-02-26T10:24:21.252Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101461252
+2026-02-26T10:24:21.252Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:21.253Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:21.253Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:21.253Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101461252 to C:\Users\User\.claude.json
+2026-02-26T10:24:21.255Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:21.262Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101461262
+2026-02-26T10:24:21.262Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:21.263Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:21.263Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:21.263Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101461262 to C:\Users\User\.claude.json
+2026-02-26T10:24:21.265Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:25.356Z [ERROR] MCP server "google-maps" Server stderr: GOOGLE_MAPS_API_KEY environment variable is not set
+2026-02-26T10:24:25.357Z [DEBUG] MCP server "google-maps": Connection failed after 4150ms: MCP error -32000: Connection closed
+2026-02-26T10:24:25.357Z [ERROR] MCP server "google-maps" Connection failed: MCP error -32000: Connection closed
+2026-02-26T10:24:25.401Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101465401
+2026-02-26T10:24:25.401Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:25.403Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:25.403Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:25.403Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101465401 to C:\Users\User\.claude.json
+2026-02-26T10:24:25.404Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:25.410Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101465410
+2026-02-26T10:24:25.411Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:25.412Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:25.412Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:25.412Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101465410 to C:\Users\User\.claude.json
+2026-02-26T10:24:25.413Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:25.441Z [ERROR] MCP server "brave-search" Server stderr: Error: BRAVE_API_KEY environment variable is required
+2026-02-26T10:24:25.442Z [DEBUG] MCP server "brave-search": Connection failed after 4262ms: MCP error -32000: Connection closed
+2026-02-26T10:24:25.442Z [ERROR] MCP server "brave-search" Connection failed: MCP error -32000: Connection closed
+2026-02-26T10:24:25.486Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101465486
+2026-02-26T10:24:25.486Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:25.487Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:25.487Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:25.487Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101465486 to C:\Users\User\.claude.json
+2026-02-26T10:24:25.488Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:25.493Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101465493
+2026-02-26T10:24:25.493Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:25.494Z [DEBUG] Temp file written successfully, size: 16276 bytes
+2026-02-26T10:24:25.494Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:25.494Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101465493 to C:\Users\User\.claude.json
+2026-02-26T10:24:25.495Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:33.725Z [DEBUG] [bridge] Prerequisites passed, enabling bridge
+2026-02-26T10:24:34.511Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101474511
+2026-02-26T10:24:34.511Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:34.512Z [DEBUG] Temp file written successfully, size: 16345 bytes
+2026-02-26T10:24:34.512Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:34.512Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101474511 to C:\Users\User\.claude.json
+2026-02-26T10:24:34.513Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:34.518Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-02-26T10:24:34.993Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101474993
+2026-02-26T10:24:34.994Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:34.995Z [DEBUG] Temp file written successfully, size: 16373 bytes
+2026-02-26T10:24:34.995Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:34.995Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101474993 to C:\Users\User\.claude.json
+2026-02-26T10:24:34.996Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:35.024Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101475024
+2026-02-26T10:24:35.024Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:35.025Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:35.026Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:35.026Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101475024 to C:\Users\User\.claude.json
+2026-02-26T10:24:35.027Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:35.041Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-02-26T10:24:35.129Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101475129
+2026-02-26T10:24:35.130Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:35.132Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:35.132Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:35.132Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101475129 to C:\Users\User\.claude.json
+2026-02-26T10:24:35.133Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:35.145Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101475145
+2026-02-26T10:24:35.145Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:35.146Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:35.147Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:35.147Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101475145 to C:\Users\User\.claude.json
+2026-02-26T10:24:35.148Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:35.155Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-02-26T10:24:35.193Z [DEBUG] git pull: cwd=C:\Users\User\.claude\plugins\marketplaces\claude-plugins-official ref=default
+2026-02-26T10:24:48.078Z [DEBUG] Successfully refreshed marketplace: claude-plugins-official
+2026-02-26T10:24:48.078Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-02-26T10:24:49.466Z [DEBUG] Using provided version for typescript-lsp@claude-plugins-official: 1.0.0
+2026-02-26T10:24:49.469Z [DEBUG] Using provided version for pyright-lsp@claude-plugins-official: 1.0.0
+2026-02-26T10:24:49.470Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/obra/superpowers.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1772101489470_ieitfd
+2026-02-26T10:24:49.485Z [DEBUG] Caching plugin from source: {"source":"url","url":"https://github.com/vercel/vercel-deploy-claude-code-plugin.git"} to temporary path C:\Users\User\.claude\plugins\cache\temp_git_1772101489485_immaos
+2026-02-26T10:24:49.503Z [DEBUG] Using manifest version for code-simplifier@claude-plugins-official: 1.0.0
+2026-02-26T10:24:49.507Z [DEBUG] Using manifest version for claude-code-setup@claude-plugins-official: 1.0.0
+2026-02-26T10:24:49.515Z [DEBUG] Using manifest version for stripe@claude-plugins-official: 0.1.0
+2026-02-26T10:24:49.516Z [DEBUG] Using manifest version for claude-md-management@claude-plugins-official: 1.0.0
+2026-02-26T10:24:49.520Z [DEBUG] Using git SHA for plugin-dev@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.522Z [DEBUG] Using git SHA for frontend-design@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.523Z [DEBUG] Using git SHA for feature-dev@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.523Z [DEBUG] Using git SHA for supabase@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.523Z [DEBUG] Using git SHA for context7@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.523Z [DEBUG] Using git SHA for github@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.524Z [DEBUG] Using git SHA for serena@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.524Z [DEBUG] Using git SHA for pr-review-toolkit@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.524Z [DEBUG] Using git SHA for agent-sdk-dev@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:49.524Z [DEBUG] Using git SHA for code-review@claude-plugins-official: 55b58ec6e564
+2026-02-26T10:24:54.061Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101494061
+2026-02-26T10:24:54.062Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:54.063Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:54.063Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:54.063Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101494061 to C:\Users\User\.claude.json
+2026-02-26T10:24:54.064Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:54.072Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101494072
+2026-02-26T10:24:54.073Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:54.074Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:54.074Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:54.074Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101494072 to C:\Users\User\.claude.json
+2026-02-26T10:24:54.076Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:54.087Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101494087
+2026-02-26T10:24:54.088Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:54.089Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:54.089Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:54.089Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101494087 to C:\Users\User\.claude.json
+2026-02-26T10:24:54.090Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:54.098Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101494098
+2026-02-26T10:24:54.099Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:54.100Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:54.100Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:54.100Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101494098 to C:\Users\User\.claude.json
+2026-02-26T10:24:54.101Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:54.101Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-02-26T10:24:54.106Z [DEBUG] [bridge:repl] initReplBridge #1 starting (initialMessages=2)
+2026-02-26T10:24:54.110Z [DEBUG] [bridge:api] POST /v1/environments/bridge bridgeId=cfc3640b-0216-4d65-bafc-9458678e0bf5
+2026-02-26T10:24:54.676Z [DEBUG] [bridge:api] POST /v1/environments/bridge -> 200 environment_id=env_01C8wGBZBGA66Uf4j66J3T2D
+2026-02-26T10:24:54.676Z [DEBUG] [bridge:api] >>> {"machine_name":"DESKTOP-8D0FQRD","directory":"C:\\Users\\User","branch":"HEAD","git_repo_url":null}
+2026-02-26T10:24:54.676Z [DEBUG] [bridge:api] <<< {"environment_id":"env_01C8wGBZBGA66Uf4j66J3T2D","organization_uuid":"0e714d1f-2f2f-4c21-91c1-17b70825dbc6","environment_secret":"sk-ant-o...BQAA"}
+2026-02-26T10:24:54.676Z [DEBUG] [bridge:repl] Environment registered: env_01C8wGBZBGA66Uf4j66J3T2D
+2026-02-26T10:24:54.992Z [DEBUG] [bridge:repl] Session created: session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:24:54.995Z [DEBUG] [bridge:repl] Starting work poll loop for env=env_01C8wGBZBGA66Uf4j66J3T2D
+2026-02-26T10:24:54.998Z [DEBUG] [bridge:repl] Ready: env=env_01C8wGBZBGA66Uf4j66J3T2D session=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:24:55.000Z [DEBUG] [bridge:repl] Hook initialized, session=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:24:55.004Z [DEBUG] [useDeferredValue] Messages deferred by 1 (2→3)
+2026-02-26T10:24:55.041Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101495041
+2026-02-26T10:24:55.042Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:55.043Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:55.043Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:55.043Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101495041 to C:\Users\User\.claude.json
+2026-02-26T10:24:55.044Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:55.052Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101495052
+2026-02-26T10:24:55.052Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:55.053Z [DEBUG] Temp file written successfully, size: 16372 bytes
+2026-02-26T10:24:55.054Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:55.054Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101495052 to C:\Users\User\.claude.json
+2026-02-26T10:24:55.055Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:24:55.561Z [DEBUG] Cloned repository from https://github.com/vercel/vercel-deploy-claude-code-plugin.git to C:\Users\User\.claude\plugins\cache\temp_git_1772101489485_immaos
+2026-02-26T10:24:55.565Z [DEBUG] Successfully cached plugin vercel to C:\Users\User\.claude\plugins\cache\vercel
+2026-02-26T10:24:55.565Z [DEBUG] Using manifest version for vercel@claude-plugins-official: 1.0.0
+2026-02-26T10:24:55.608Z [DEBUG] Cloned repository from https://github.com/obra/superpowers.git to C:\Users\User\.claude\plugins\cache\temp_git_1772101489470_ieitfd
+2026-02-26T10:24:55.611Z [DEBUG] Successfully cached plugin superpowers to C:\Users\User\.claude\plugins\cache\superpowers
+2026-02-26T10:24:55.611Z [DEBUG] Using manifest version for superpowers@claude-plugins-official: 4.3.1
+2026-02-26T10:24:55.727Z [DEBUG] [bridge:api] GET .../work/poll -> 200 workId=work_01LkVjyqYF1MBTB6KxZ88MWi type=session sessionId=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:24:55.727Z [DEBUG] [bridge:api] <<< {"id":"work_01LkVjyqYF1MBTB6KxZ88MWi","type":"work","environment_id":"env_01C8wGBZBGA66Uf4j66J3T2D","state":"queued","data":{"type":"session","id":"session_01LkVjyqYF1MBTB6KxZ88MWi"},"metadata":{},"actor":{"ip_address":"0.0.0.0","user_agent":"account-lookup-fallback","type":"user_actor","email_address":"y6j4xscdrc@privaterelay.appleid.com","user_id":"user_014uHeeanLTY62e3qyLXzKYn"},"secret":"eyJ2ZXJz...fQ==","created_at":"2026-02-26T10:24:57.481762Z","acknowledged_at":null,"started_at":"2026-02-26T10:24:57.577344Z","stop_requested_at":null,"stopped_at":null,"latest_heartbeat_at":null}
+2026-02-26T10:24:55.730Z [DEBUG] [bridge:repl] Work received: workId=work_01LkVjyqYF1MBTB6KxZ88MWi workSessionId=session_01LkVjyqYF1MBTB6KxZ88MWi currentSessionId=session_01LkVjyqYF1MBTB6KxZ88MWi match=true
+2026-02-26T10:24:55.730Z [DEBUG] [bridge:repl] Ingress URL: wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:24:55.730Z [DEBUG] [bridge:repl] Creating HybridTransport: session=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:24:55.731Z [DEBUG] HybridTransport: POST URL = https://api.anthropic.com/v1/session_ingress/session/session_01LkVjyqYF1MBTB6KxZ88MWi/events
+2026-02-26T10:24:55.732Z [DEBUG] WebSocketTransport: Opening wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:24:55.732Z [DEBUG] [bridge:repl] Work accepted, continuing poll loop
+2026-02-26T10:24:56.180Z [DEBUG] WebSocketTransport: Connected
+2026-02-26T10:24:56.180Z [DEBUG] [bridge:repl] Ingress transport connected
+2026-02-26T10:24:56.960Z [DEBUG] [bridge:api] GET .../work/poll -> 200 (no work, 1 consecutive empty polls)
+2026-02-26T10:24:56.966Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101496966
+2026-02-26T10:24:56.966Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:24:56.967Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:24:56.967Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:24:56.967Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101496966 to C:\Users\User\.claude.json
+2026-02-26T10:24:56.968Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:02.908Z [DEBUG] [bridge:api] GET .../work/poll -> 200 workId=work_01LkVjyqYF1MBTB6KxZ88MWi type=session sessionId=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:02.908Z [DEBUG] [bridge:api] <<< {"id":"work_01LkVjyqYF1MBTB6KxZ88MWi","type":"work","environment_id":"env_01C8wGBZBGA66Uf4j66J3T2D","state":"queued","data":{"type":"session","id":"session_01LkVjyqYF1MBTB6KxZ88MWi"},"metadata":{},"actor":{"ip_address":"0.0.0.0","user_agent":"account-lookup-fallback","type":"user_actor","email_address":"y6j4xscdrc@privaterelay.appleid.com","user_id":"user_014uHeeanLTY62e3qyLXzKYn"},"secret":"eyJ2ZXJz...fQ==","created_at":"2026-02-26T10:24:57.481762Z","acknowledged_at":null,"started_at":"2026-02-26T10:24:57.577344Z","stop_requested_at":null,"stopped_at":null,"latest_heartbeat_at":null}
+2026-02-26T10:25:02.908Z [DEBUG] [bridge:repl] Work received while transport connected, replacing with fresh token (workId=work_01LkVjyqYF1MBTB6KxZ88MWi)
+2026-02-26T10:25:02.908Z [DEBUG] [bridge:repl] Work received: workId=work_01LkVjyqYF1MBTB6KxZ88MWi workSessionId=session_01LkVjyqYF1MBTB6KxZ88MWi currentSessionId=session_01LkVjyqYF1MBTB6KxZ88MWi match=true
+2026-02-26T10:25:02.911Z [DEBUG] [bridge:repl] Ingress URL: wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:02.911Z [DEBUG] [bridge:repl] Creating HybridTransport: session=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:02.911Z [DEBUG] HybridTransport: POST URL = https://api.anthropic.com/v1/session_ingress/session/session_01LkVjyqYF1MBTB6KxZ88MWi/events
+2026-02-26T10:25:02.911Z [DEBUG] WebSocketTransport: Opening wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:02.911Z [DEBUG] [bridge:repl] Work accepted, continuing poll loop
+2026-02-26T10:25:03.034Z [ERROR] WebSocketTransport: Closed: 1005
+2026-02-26T10:25:03.035Z [DEBUG] WebSocketTransport: Disconnected from wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi (code 1005)
+2026-02-26T10:25:03.318Z [DEBUG] WebSocketTransport: Connected
+2026-02-26T10:25:03.318Z [DEBUG] [bridge:repl] Ingress transport connected
+2026-02-26T10:25:04.131Z [DEBUG] [bridge:api] GET .../work/poll -> 200 (no work, 1 consecutive empty polls)
+2026-02-26T10:25:08.215Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101508215
+2026-02-26T10:25:08.216Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:08.217Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:08.218Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:08.218Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101508215 to C:\Users\User\.claude.json
+2026-02-26T10:25:08.219Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:08.226Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101508226
+2026-02-26T10:25:08.227Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:08.228Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:08.228Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:08.228Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101508226 to C:\Users\User\.claude.json
+2026-02-26T10:25:08.230Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:08.251Z [DEBUG] [bridge:api] GET .../work/poll -> 200 workId=work_01LkVjyqYF1MBTB6KxZ88MWi type=session sessionId=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:08.251Z [DEBUG] [bridge:api] <<< {"id":"work_01LkVjyqYF1MBTB6KxZ88MWi","type":"work","environment_id":"env_01C8wGBZBGA66Uf4j66J3T2D","state":"queued","data":{"type":"session","id":"session_01LkVjyqYF1MBTB6KxZ88MWi"},"metadata":{},"actor":{"ip_address":"0.0.0.0","user_agent":"account-lookup-fallback","type":"user_actor","email_address":"y6j4xscdrc@privaterelay.appleid.com","user_id":"user_014uHeeanLTY62e3qyLXzKYn"},"secret":"eyJ2ZXJz...fQ==","created_at":"2026-02-26T10:24:57.481762Z","acknowledged_at":null,"started_at":"2026-02-26T10:24:57.577344Z","stop_requested_at":null,"stopped_at":null,"latest_heartbeat_at":null}
+2026-02-26T10:25:08.251Z [DEBUG] [bridge:repl] Work received while transport connected, replacing with fresh token (workId=work_01LkVjyqYF1MBTB6KxZ88MWi)
+2026-02-26T10:25:08.251Z [DEBUG] [bridge:repl] Work received: workId=work_01LkVjyqYF1MBTB6KxZ88MWi workSessionId=session_01LkVjyqYF1MBTB6KxZ88MWi currentSessionId=session_01LkVjyqYF1MBTB6KxZ88MWi match=true
+2026-02-26T10:25:08.252Z [DEBUG] [bridge:repl] Ingress URL: wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:08.252Z [DEBUG] [bridge:repl] Creating HybridTransport: session=session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:08.252Z [DEBUG] HybridTransport: POST URL = https://api.anthropic.com/v1/session_ingress/session/session_01LkVjyqYF1MBTB6KxZ88MWi/events
+2026-02-26T10:25:08.252Z [DEBUG] WebSocketTransport: Opening wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi
+2026-02-26T10:25:08.252Z [DEBUG] [bridge:repl] Work accepted, continuing poll loop
+2026-02-26T10:25:08.378Z [ERROR] WebSocketTransport: Closed: 1005
+2026-02-26T10:25:08.378Z [DEBUG] WebSocketTransport: Disconnected from wss://api.anthropic.com/v1/session_ingress/ws/session_01LkVjyqYF1MBTB6KxZ88MWi (code 1005)
+2026-02-26T10:25:08.655Z [DEBUG] WebSocketTransport: Connected
+2026-02-26T10:25:08.655Z [DEBUG] [bridge:repl] Ingress transport connected
+2026-02-26T10:25:09.440Z [DEBUG] [bridge:api] GET .../work/poll -> 200 (no work, 1 consecutive empty polls)
+2026-02-26T10:25:23.120Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101523120
+2026-02-26T10:25:23.120Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:23.121Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:23.122Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:23.122Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101523120 to C:\Users\User\.claude.json
+2026-02-26T10:25:23.123Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:23.132Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101523132
+2026-02-26T10:25:23.132Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:23.133Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:23.133Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:23.133Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101523132 to C:\Users\User\.claude.json
+2026-02-26T10:25:23.134Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:31.107Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101531107
+2026-02-26T10:25:31.107Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:31.108Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:31.109Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:31.109Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101531107 to C:\Users\User\.claude.json
+2026-02-26T10:25:31.110Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:31.119Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101531119
+2026-02-26T10:25:31.120Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:31.121Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:31.121Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:31.121Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101531119 to C:\Users\User\.claude.json
+2026-02-26T10:25:31.122Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:39.128Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101539128
+2026-02-26T10:25:39.129Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:39.129Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:39.130Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:39.130Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101539128 to C:\Users\User\.claude.json
+2026-02-26T10:25:39.387Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:39.395Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101539395
+2026-02-26T10:25:39.395Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:39.396Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:39.397Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:39.397Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101539395 to C:\Users\User\.claude.json
+2026-02-26T10:25:39.398Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:57.864Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101557864
+2026-02-26T10:25:57.864Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:57.866Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:57.866Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:57.866Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101557864 to C:\Users\User\.claude.json
+2026-02-26T10:25:57.867Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:57.875Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101557875
+2026-02-26T10:25:57.876Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:57.877Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:57.877Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:57.877Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101557875 to C:\Users\User\.claude.json
+2026-02-26T10:25:57.878Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:57.884Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101557884
+2026-02-26T10:25:57.884Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:57.885Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:57.885Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:57.885Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101557884 to C:\Users\User\.claude.json
+2026-02-26T10:25:57.972Z [DEBUG] File C:\Users\User\.claude.json written atomically
+2026-02-26T10:25:57.978Z [DEBUG] Writing to temp file: C:\Users\User\.claude.json.tmp.58008.1772101557978
+2026-02-26T10:25:57.979Z [DEBUG] Preserving file permissions: 100666
+2026-02-26T10:25:57.980Z [DEBUG] Temp file written successfully, size: 16415 bytes
+2026-02-26T10:25:57.980Z [DEBUG] Applied original permissions to temp file
+2026-02-26T10:25:57.980Z [DEBUG] Renaming C:\Users\User\.claude.json.tmp.58008.1772101557978 to C:\Users\User\.claude.json
+2026-02-26T10:25:57.981Z [DEBUG] File C:\Users\User\.claude.json written atomically

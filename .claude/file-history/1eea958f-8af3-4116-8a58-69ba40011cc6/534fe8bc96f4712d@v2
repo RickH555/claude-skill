@@ -1,0 +1,47 @@
+"use client"
+
+import React, { createContext, useContext, useMemo } from 'react'
+import { MOCK_USER } from './mock-data'
+import type { User } from '@/types'
+
+interface MockAuthContextValue {
+  user: User
+  isAuthenticated: boolean
+  signOut: () => void
+}
+
+const MockAuthContext = createContext<MockAuthContextValue>({
+  user: MOCK_USER,
+  isAuthenticated: true,
+  signOut: () => {},
+})
+
+export function MockAuthProvider({ children }: { children: React.ReactNode }) {
+  const value = useMemo<MockAuthContextValue>(() => ({
+    user: MOCK_USER,
+    isAuthenticated: true,
+    signOut: () => {
+      window.location.href = '/login'
+    },
+  }), [])
+
+  return (
+    <MockAuthContext.Provider value={value}>
+      {children}
+    </MockAuthContext.Provider>
+  )
+}
+
+export function useMockAuth() {
+  return useContext(MockAuthContext)
+}
+
+/**
+ * Returns true if Supabase env vars are not configured,
+ * meaning we should use mock auth instead.
+ */
+export function shouldUseMockAuth(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  return !url || url === 'https://placeholder.supabase.co' || !key || key === 'placeholder'
+}

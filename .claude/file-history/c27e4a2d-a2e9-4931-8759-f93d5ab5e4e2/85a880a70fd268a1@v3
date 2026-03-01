@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe';
+import { createServerSupabase } from '@/lib/supabase/server';
+
+export async function POST(request: NextRequest) {
+  const body = await request.text();
+  const signature = request.headers.get('stripe-signature');
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!signature || !webhookSecret) {
+    return NextResponse.json({ error: 'Missing stripe-signature or webhook secret' }, { status: 400 });
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    const stripe = getStripe();
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err: any) {
+    console.error('Webhook signature verification failed:', err.message);
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  }
+
+  const supabase = await createServerSupabase();
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const stripeCustomerId = session.customer as string;
+      const plan = session.metadata?.plan as 'pro' | 'business' | undefined;
+      const merchantId = session.metadata?.merchant_id;
+
+      if (stripeCustomerId && plan) {
+        // Try to update by stripe_customer_id first, then fall back to merchant_id from metadata
+        const { data: updated } = await supabase
+          .from('merchants')
+          .update({ plan, stripe_customer_id: stripeCustomerId })
+          .eq('stripe_customer_id', stripeCustomerId)
+          .select('id');
+
+        if ((!updated || updated.length === 0) && merchantId) {
+          await supabase
+            .from('merchants')
+            .update({ plan, stripe_customer_id: stripeCustomerId })
+            .eq('id', merchantId);
+        }
+      }
+      break;
+    }
+
+    case 'customer.subscription.updated': {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = subscription.customer as string;
+
+      const priceId = subscription.items.data[0]?.price.id;
+      let plan: 'free' | 'pro' | 'business' = 'free';
+
+      if (priceId === process.env.STRIPE_PRO_PRICE_ID) plan = 'pro';
+      else if (priceId === process.env.STRIPE_BUSINESS_PRICE_ID) plan = 'business';
+
+      if (subscription.status === 'active') {
+        await supabase
+          .from('merchants')
+          .update({ plan })
+          .eq('stripe_customer_id', customerId);
+      }
+      break;
+    }
+
+    case 'customer.subscription.deleted': {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = subscription.customer as string;
+
+      await supabase
+        .from('merchants')
+        .update({ plan: 'free' })
+        .eq('stripe_customer_id', customerId);
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  return NextResponse.json({ received: true });
+}

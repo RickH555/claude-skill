@@ -1,0 +1,162 @@
+// services/v3/citation-api-client.ts
+//
+// Appelle les APIs des 3 moteurs IA pour vérifier les citations.
+// Instance séparée — NE réutilise PAS l'instance de services/generator.ts.
+
+import { GoogleGenAI } from '@google/genai';
+import type { EngineId } from '../../config/engine-weights';
+
+export interface APICallResult {
+  engine: EngineId;
+  prompt: string;
+  responseText: string;
+  sources: string[];
+  latencyMs: number;
+  isSimulated: boolean;
+  error?: string;
+}
+
+// ─── Simulated responses ───
+
+function simulateResponse(engine: EngineId, prompt: string): APICallResult {
+  const responses: Record<EngineId, string> = {
+    chatgpt: `Based on my analysis, there are several options to consider for "${prompt.slice(0, 50)}". I recommend exploring the top providers in this space. Key factors include reliability, pricing, and customer support. Many users have found success with established platforms that offer comprehensive solutions. Consider reviewing recent comparisons and user testimonials before making a decision.`,
+    perplexity: `According to recent sources, "${prompt.slice(0, 50)}" involves several key considerations. Based on web data, the leading solutions include various established providers. Sources suggest comparing features, pricing tiers, and integration capabilities. Recent reviews highlight the importance of scalability and support quality. [Sources: example.com, review-site.com]`,
+    gemini: `Here's what I found about "${prompt.slice(0, 50)}". There are multiple approaches and providers worth considering. The most recommended options typically offer strong integration capabilities, competitive pricing, and reliable customer support. Industry experts suggest evaluating based on your specific needs and scale requirements.`,
+  };
+
+  return {
+    engine,
+    prompt,
+    responseText: responses[engine],
+    sources: engine === 'perplexity' ? ['example.com', 'review-site.com'] : [],
+    latencyMs: 200 + Math.random() * 300,
+    isSimulated: true,
+  };
+}
+
+// ─── ChatGPT (OpenAI) ───
+
+async function callChatGPT(prompt: string): Promise<APICallResult> {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  if (!apiKey) return simulateResponse('chatgpt', prompt);
+
+  const start = Date.now();
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 1000,
+        temperature: 0.3,
+      }),
+    });
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || '';
+
+    return {
+      engine: 'chatgpt',
+      prompt,
+      responseText: text,
+      sources: [],
+      latencyMs: Date.now() - start,
+      isSimulated: false,
+    };
+  } catch (error) {
+    return {
+      ...simulateResponse('chatgpt', prompt),
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+// ─── Perplexity ───
+
+async function callPerplexity(prompt: string): Promise<APICallResult> {
+  const apiKey = import.meta.env.VITE_PERPLEXITY_API_KEY;
+  if (!apiKey) return simulateResponse('perplexity', prompt);
+
+  const start = Date.now();
+  try {
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'sonar',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 1000,
+        temperature: 0.3,
+      }),
+    });
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || '';
+    const sources = data.citations || [];
+
+    return {
+      engine: 'perplexity',
+      prompt,
+      responseText: text,
+      sources,
+      latencyMs: Date.now() - start,
+      isSimulated: false,
+    };
+  } catch (error) {
+    return {
+      ...simulateResponse('perplexity', prompt),
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+// ─── Gemini ───
+
+async function callGemini(prompt: string): Promise<APICallResult> {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!apiKey) return simulateResponse('gemini', prompt);
+
+  const start = Date.now();
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+    });
+
+    const text = response.text || '';
+
+    return {
+      engine: 'gemini',
+      prompt,
+      responseText: text,
+      sources: [],
+      latencyMs: Date.now() - start,
+      isSimulated: false,
+    };
+  } catch (error) {
+    return {
+      ...simulateResponse('gemini', prompt),
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+// ─── Dispatcher ───
+
+export async function callAIEngine(engine: EngineId, prompt: string): Promise<APICallResult> {
+  switch (engine) {
+    case 'chatgpt': return callChatGPT(prompt);
+    case 'perplexity': return callPerplexity(prompt);
+    case 'gemini': return callGemini(prompt);
+    default: return simulateResponse('chatgpt', prompt);
+  }
+}

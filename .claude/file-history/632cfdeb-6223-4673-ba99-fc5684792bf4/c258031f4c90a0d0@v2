@@ -1,0 +1,306 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+/* Light theme overrides for app components */
+.light {
+  --background: 0 0% 98%;
+  --foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+}
+
+body {
+  @apply bg-background text-foreground;
+}
+
+/* Light mode specific overrides */
+.light body,
+.light {
+  --cb-bg: #f8f9fa;
+  --cb-card: #ffffff;
+  --cb-card-border: rgba(0,0,0,0.08);
+  --cb-text: #1a1a2e;
+  --cb-text-muted: #6b7280;
+  --cb-sidebar: #ffffff;
+  --cb-sidebar-border: rgba(0,0,0,0.08);
+}
+
+.dark {
+  --cb-bg: #0a0a0f;
+  --cb-card: #1a1d21;
+  --cb-card-border: rgba(255,255,255,0.05);
+  --cb-text: #ffffff;
+  --cb-text-muted: rgba(255,255,255,0.5);
+  --cb-sidebar: #0d0f12;
+  --cb-sidebar-border: rgba(255,255,255,0.1);
+}
+
+.glass-panel {
+  @apply bg-white/5 backdrop-blur-md border border-white/5;
+}
+
+/* ============================================================
+   Animations & Micro-interactions
+   ============================================================ */
+
+/* Fade in from bottom */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Slide in from left */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale in (for modals) */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pulse glow (for notification badges) */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Shimmer loading skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Spin */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Counter count-up (for stats) */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Utility animation classes */
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.4s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-count-up {
+  animation: count-up 0.6s ease-out forwards;
+}
+
+/* Stagger delay utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Card hover effect */
+.card-hover {
+  @apply transition-all duration-200;
+}
+.card-hover:hover {
+  @apply border-white/10 bg-white/[0.04] shadow-lg shadow-black/20;
+  transform: translateY(-2px);
+}
+
+/* Button press effect */
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Link underline animation */
+.link-animated {
+  @apply relative;
+}
+.link-animated::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300;
+}
+.link-animated:hover::after {
+  @apply w-full;
+}
+
+/* Skeleton loading block */
+.skeleton {
+  @apply rounded-xl animate-shimmer;
+  min-height: 1rem;
+}
+
+/* Score ring animation */
+@keyframes score-fill {
+  from { stroke-dashoffset: 283; }
+}
+
+/* Smooth page transitions */
+.page-enter {
+  animation: fade-in-up 0.4s ease-out;
+}
+
+/* ============================================================
+   Accessibility — WCAG 2.1 AA
+   ============================================================ */
+
+/* Focus-visible ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default focus outline (replaced by focus-visible) */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip to content link */
+.skip-to-content {
+  @apply absolute -top-10 left-4 z-[100] px-4 py-2 bg-primary text-black font-medium rounded-lg text-sm transition-all;
+}
+.skip-to-content:focus {
+  @apply top-4;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High contrast focus for dark mode */
+.dark *:focus-visible {
+  outline-color: #10b981;
+}
+
+/* Ensure minimum touch target (44x44px) */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

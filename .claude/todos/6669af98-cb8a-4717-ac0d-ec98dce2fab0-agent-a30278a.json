@@ -1,0 +1,52 @@
+[
+  {
+    "content": "Apply CSS variable migration to Account.tsx",
+    "status": "completed",
+    "activeForm": "Applying CSS variable migration to Account.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to Recharge.tsx",
+    "status": "completed",
+    "activeForm": "Applying CSS variable migration to Recharge.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to Plan.tsx",
+    "status": "completed",
+    "activeForm": "Applying CSS variable migration to Plan.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to Projects.tsx",
+    "status": "completed",
+    "activeForm": "Applying CSS variable migration to Projects.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to Affiliation.tsx",
+    "status": "completed",
+    "activeForm": "Applying CSS variable migration to Affiliation.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to Clients.tsx",
+    "status": "completed",
+    "activeForm": "Applying CSS variable migration to Clients.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to MissionOrders.tsx",
+    "status": "in_progress",
+    "activeForm": "Applying CSS variable migration to MissionOrders.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to AlertsAEO.tsx",
+    "status": "pending",
+    "activeForm": "Applying CSS variable migration to AlertsAEO.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to Directory.tsx",
+    "status": "pending",
+    "activeForm": "Applying CSS variable migration to Directory.tsx"
+  },
+  {
+    "content": "Apply CSS variable migration to DirectoryEntity.tsx",
+    "status": "pending",
+    "activeForm": "Applying CSS variable migration to DirectoryEntity.tsx"
+  }
+]

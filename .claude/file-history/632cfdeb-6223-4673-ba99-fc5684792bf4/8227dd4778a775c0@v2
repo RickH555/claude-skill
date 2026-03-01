@@ -1,0 +1,100 @@
+/**
+ * In-memory rate limiter using sliding window
+ * For production at scale, replace with Redis-based implementation
+ */
+
+interface RateLimitEntry {
+  count: number
+  resetAt: number
+}
+
+const store = new Map<string, RateLimitEntry>()
+
+// Clean up expired entries periodically
+const CLEANUP_INTERVAL = 60_000 // 1 minute
+let lastCleanup = Date.now()
+
+function cleanup() {
+  const now = Date.now()
+  if (now - lastCleanup < CLEANUP_INTERVAL) return
+  lastCleanup = now
+  const expired: string[] = []
+  store.forEach((entry, key) => {
+    if (now > entry.resetAt) expired.push(key)
+  })
+  expired.forEach((key) => store.delete(key))
+}
+
+/** Per-plan rate limits (requests per minute) */
+export const PLAN_LIMITS: Record<string, number> = {
+  free: 20,
+  starter: 20,
+  pro: 60,
+  expert: 120,
+  agency: 300,
+}
+
+/** Default API key rate limit (per minute) */
+export const API_KEY_DEFAULT_LIMIT = 60
+
+interface RateLimitResult {
+  success: boolean
+  limit: number
+  remaining: number
+  resetAt: number
+}
+
+/**
+ * Check rate limit for a given identifier
+ * @param identifier - Unique key (user ID, API key ID, IP)
+ * @param maxRequests - Maximum requests per window
+ * @param windowMs - Window duration in ms (default: 60s)
+ */
+export function checkRateLimit(
+  identifier: string,
+  maxRequests: number,
+  windowMs: number = 60_000
+): RateLimitResult {
+  cleanup()
+  const now = Date.now()
+  const entry = store.get(identifier)
+
+  if (!entry || now > entry.resetAt) {
+    // New window
+    store.set(identifier, { count: 1, resetAt: now + windowMs })
+    return {
+      success: true,
+      limit: maxRequests,
+      remaining: maxRequests - 1,
+      resetAt: now + windowMs,
+    }
+  }
+
+  if (entry.count >= maxRequests) {
+    return {
+      success: false,
+      limit: maxRequests,
+      remaining: 0,
+      resetAt: entry.resetAt,
+    }
+  }
+
+  entry.count += 1
+  return {
+    success: true,
+    limit: maxRequests,
+    remaining: maxRequests - entry.count,
+    resetAt: entry.resetAt,
+  }
+}
+
+/**
+ * Build rate limit headers for API responses
+ */
+export function rateLimitHeaders(result: RateLimitResult): Record<string, string> {
+  return {
+    "X-RateLimit-Limit": String(result.limit),
+    "X-RateLimit-Remaining": String(result.remaining),
+    "X-RateLimit-Reset": String(Math.ceil(result.resetAt / 1000)),
+  }
+}

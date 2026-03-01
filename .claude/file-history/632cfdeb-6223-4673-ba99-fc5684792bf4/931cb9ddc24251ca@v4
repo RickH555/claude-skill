@@ -1,0 +1,161 @@
+"use client";
+
+import Link from "next/link";
+import { FolderOpen, TrendingUp, Activity, ArrowRight, BarChart3, ArrowUpRight, ArrowDownRight, Quote } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { VisibilityTrendChart } from "@/components/charts/visibility-trend-chart";
+import { EngineBreakdownChart } from "@/components/charts/engine-breakdown-chart";
+
+// Mock trend data — will come from aggregated Supabase queries
+const MOCK_TREND_DATA = [
+  { date: "1 Jan", score: 35, citations: 2, mentions: 5 },
+  { date: "8 Jan", score: 38, citations: 3, mentions: 7 },
+  { date: "15 Jan", score: 42, citations: 3, mentions: 8 },
+  { date: "22 Jan", score: 45, citations: 5, mentions: 10 },
+  { date: "29 Jan", score: 51, citations: 6, mentions: 12 },
+  { date: "5 Fev", score: 55, citations: 7, mentions: 15 },
+  { date: "12 Fev", score: 58, citations: 8, mentions: 18 },
+  { date: "19 Fev", score: 64, citations: 10, mentions: 22 },
+];
+
+const MOCK_ENGINE_DATA = [
+  { engine: "ChatGPT", score: 72, mentions: 15, citations: 5 },
+  { engine: "Perplexity", score: 58, mentions: 8, citations: 3 },
+  { engine: "Gemini", score: 45, mentions: 5, citations: 1 },
+  { engine: "Claude", score: 61, mentions: 10, citations: 4 },
+  { engine: "Copilot", score: 33, mentions: 2, citations: 0 },
+];
+
+const MOCK_ACTIVITY = [
+  { type: "citation", message: "Nouvelle citation detectee sur ChatGPT", time: "Il y a 2h", color: "bg-emerald-500" },
+  { type: "mention", message: "Mention marque sur Perplexity", time: "Il y a 5h", color: "bg-blue-500" },
+  { type: "alert", message: "Concurrent detecte sur Gemini", time: "Hier", color: "bg-amber-500" },
+  { type: "run", message: "Scan hebdomadaire termine", time: "Hier", color: "bg-purple-500" },
+];
+
+export default function DashboardPage() {
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <header className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white mb-2">Tableau de Bord</h1>
+        <p className="text-white/40">Vue d'ensemble de votre performance AEO.</p>
+      </header>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="p-5">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <p className="text-xs text-white/40 uppercase">Score Moyen</p>
+              <h3 className="text-3xl font-bold mt-1 text-white">64<span className="text-sm text-white/30">/100</span></h3>
+            </div>
+            <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
+              <TrendingUp size={18} />
+            </div>
+          </div>
+          <span className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+            <ArrowUpRight size={12} /> +12% <span className="text-white/30">vs mois dernier</span>
+          </span>
+        </Card>
+
+        <Card className="p-5">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <p className="text-xs text-white/40 uppercase">Citations URL</p>
+              <h3 className="text-3xl font-bold mt-1 text-white">24</h3>
+            </div>
+            <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-400">
+              <Quote size={18} />
+            </div>
+          </div>
+          <span className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+            <ArrowUpRight size={12} /> +8 <span className="text-white/30">cette semaine</span>
+          </span>
+        </Card>
+
+        <Card className="p-5">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <p className="text-xs text-white/40 uppercase">Mentions Marque</p>
+              <h3 className="text-3xl font-bold mt-1 text-white">67</h3>
+            </div>
+            <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400">
+              <Activity size={18} />
+            </div>
+          </div>
+          <span className="text-xs text-red-400 font-medium flex items-center gap-1">
+            <ArrowDownRight size={12} /> -3% <span className="text-white/30">vs mois dernier</span>
+          </span>
+        </Card>
+
+        <Card className="p-5">
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <p className="text-xs text-white/40 uppercase">Projets Actifs</p>
+              <h3 className="text-3xl font-bold mt-1 text-white">1</h3>
+            </div>
+            <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-400">
+              <FolderOpen size={18} />
+            </div>
+          </div>
+          <Link href="/app/projects" className="text-xs text-primary hover:text-primary/80 flex items-center gap-1">
+            Gerer <ArrowRight size={12} />
+          </Link>
+        </Card>
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid lg:grid-cols-5 gap-6 mb-8">
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BarChart3 size={16} className="text-primary" />
+              Evolution du score AEO
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <VisibilityTrendChart data={MOCK_TREND_DATA} metric="score" />
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Activity size={16} className="text-primary" />
+              Score par moteur IA
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EngineBreakdownChart data={MOCK_ENGINE_DATA} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Activity Feed */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Activite recente</CardTitle>
+            <Link href="/app/analytics" className="text-xs text-primary hover:text-primary/80">
+              Voir tout
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1">
+            {MOCK_ACTIVITY.map((item, i) => (
+              <div key={i} className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                  <span className="text-sm text-white/70">{item.message}</span>
+                </div>
+                <span className="text-xs text-white/30">{item.time}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

@@ -1,0 +1,56 @@
+import { NextResponse } from 'next/server';
+import { generateAiResponse } from '@/lib/ai-provider';
+import { calculateAiVisibilityScore } from '@/lib/scoring';
+
+// Mock DB for MVP
+const MOCK_PROMPTS = [
+  "Quelles sont les meilleures agences SEO à Paris ?",
+  "Qui est le leader du marché en optimisation AEO ?",
+  "Avis sur CitedBy.ai"
+];
+
+const MOCK_PROJECT_CONTEXT = {
+  brandName: "CitedBy.ai",
+  domain: "citedby.ai",
+  services: ["AEO", "SEO", "Optimization"],
+  competitors: ["SEMRush", "Ahrefs"]
+};
+
+export async function POST(req: Request) {
+  try {
+    const { projectId } = await req.json();
+    
+    // In a real app: Fetch prompts from DB for this project
+    const results = [];
+
+    for (const prompt of MOCK_PROMPTS) {
+      // 1. Call AI Provider (Stubbed Gemini / AI Overviews)
+      const answer = await generateAiResponse(prompt);
+      
+      // 2. Score the answer
+      const scoreResult = calculateAiVisibilityScore({
+        answer,
+        ...MOCK_PROJECT_CONTEXT
+      });
+
+      results.push({
+        prompt,
+        answer,
+        ...scoreResult
+      });
+    }
+
+    // In a real app: Save 'results' to Supabase 'run_results' table
+
+    return NextResponse.json({ 
+      success: true, 
+      runId: `run_${Date.now()}`,
+      resultsCount: results.length,
+      sampleResult: results[0]
+    });
+
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

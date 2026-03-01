@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="CitedBy.ai — Optimisez votre visibilité dans les réponses IA. Audit AEO, monitoring, outils génératifs." />
+    <title>CitedBy.ai — AEO Intelligence Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#7c3aed',
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              serif: ['Playfair Display', 'Georgia', 'serif'],
+            },
+          },
+        },
+      }
+    </script>
+    <style>
+      .btn-gradient {
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+        padding: 0.625rem 1.5rem;
+        border-radius: 9999px;
+        font-weight: 700;
+        transition: all 0.3s;
+      }
+      .btn-gradient:hover {
+        filter: brightness(1.15);
+        transform: translateY(-1px);
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .ninja-card {
+        background: #111111;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 1rem;
+      }
+      /* Custom scrollbar for specific elements */
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+      /* Global dark scrollbar */
+      * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); border: 2px solid transparent; background-clip: padding-box; }
+      ::-webkit-scrollbar-corner { background: transparent; }
+      /* Animations */
+      @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes zoom-in { from { transform: scale(0.95); } to { transform: scale(1); } }
+      @keyframes slide-in-from-bottom { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      @keyframes slide-in-from-right { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      .animate-in { animation: fade-in 0.5s ease-out, zoom-in 0.3s ease-out; }
+      .animate-slide-up { animation: slide-in-from-bottom 0.3s ease-out; }
+      .animate-slide-right { animation: slide-in-from-right 0.3s ease-out; }
+    </style>
+  </head>
+  <body class="bg-black text-gray-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

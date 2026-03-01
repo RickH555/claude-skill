@@ -1,0 +1,27 @@
+// components/ui/Badge.tsx
+// Badge sémantique — statuts, tags, labels.
+
+import React from 'react';
+
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: 'default' | 'success' | 'warning' | 'error' | 'blue' | 'purple';
+  className?: string;
+}
+
+const VARIANT_STYLES = {
+  default: 'bg-white/[0.06] text-[var(--text-secondary)] border border-white/[0.06]',
+  success: 'bg-[var(--success-subtle)] text-[var(--success)] border border-green-500/20',
+  warning: 'bg-[var(--warning-subtle)] text-[var(--warning)] border border-amber-500/20',
+  error: 'bg-[var(--error-subtle)] text-[var(--error)] border border-red-500/20',
+  blue: 'bg-[var(--accent-subtle)] text-[var(--accent-text)] border border-blue-500/20',
+  purple: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
+};
+
+export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
+  return (
+    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-md inline-flex items-center ${VARIANT_STYLES[variant]} ${className}`}>
+      {children}
+    </span>
+  );
+}

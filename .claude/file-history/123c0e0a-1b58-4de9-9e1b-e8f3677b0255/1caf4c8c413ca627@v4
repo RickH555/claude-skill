@@ -1,0 +1,341 @@
+// ============================================
+// CitedBy.ai - API Developer Service
+// ============================================
+
+import type {
+  ApiKey,
+  ApiEndpoint,
+  ApiUsageDay,
+  ApiUsageKPI,
+  RateLimit,
+  Webhook,
+  WebhookEvent,
+} from '../types/api-developer.ts'
+
+const API_KEYS_KEY = 'citedby_api_keys'
+const WEBHOOKS_KEY = 'citedby_webhooks'
+
+function generateId(prefix: string): string {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+}
+
+function generateApiKey(): string {
+  const parts = Array.from({ length: 4 }, () => Math.random().toString(36).slice(2, 10))
+  return `cb_live_${parts.join('')}`
+}
+
+// ---- API Keys CRUD ----
+
+export function getApiKeys(): ApiKey[] {
+  const raw = localStorage.getItem(API_KEYS_KEY)
+  return raw ? JSON.parse(raw) : []
+}
+
+function saveApiKeys(keys: ApiKey[]): void {
+  localStorage.setItem(API_KEYS_KEY, JSON.stringify(keys))
+}
+
+export function createApiKey(name: string): ApiKey {
+  const key: ApiKey = {
+    id: generateId('key'),
+    name,
+    key: generateApiKey(),
+    createdAt: new Date().toISOString(),
+    status: 'active',
+    lastUsed: null,
+  }
+  const keys = getApiKeys()
+  keys.push(key)
+  saveApiKeys(keys)
+  return key
+}
+
+export function revokeApiKey(id: string): void {
+  const keys = getApiKeys()
+  const key = keys.find((k) => k.id === id)
+  if (key) {
+    key.status = 'revoked'
+    saveApiKeys(keys)
+  }
+}
+
+export function regenerateApiKey(id: string): ApiKey | null {
+  const keys = getApiKeys()
+  const key = keys.find((k) => k.id === id)
+  if (!key) return null
+  key.key = generateApiKey()
+  key.status = 'active'
+  key.createdAt = new Date().toISOString()
+  key.lastUsed = null
+  saveApiKeys(keys)
+  return key
+}
+
+export function truncateKey(key: string): string {
+  return key.slice(0, 12) + '••••••••' + key.slice(-4)
+}
+
+// ---- Webhooks CRUD ----
+
+export function getWebhooks(): Webhook[] {
+  const raw = localStorage.getItem(WEBHOOKS_KEY)
+  return raw ? JSON.parse(raw) : []
+}
+
+function saveWebhooks(webhooks: Webhook[]): void {
+  localStorage.setItem(WEBHOOKS_KEY, JSON.stringify(webhooks))
+}
+
+export function createWebhook(url: string, events: WebhookEvent[]): Webhook {
+  const webhook: Webhook = {
+    id: generateId('wh'),
+    url,
+    events,
+    active: true,
+    lastDelivery: null,
+    createdAt: new Date().toISOString(),
+  }
+  const webhooks = getWebhooks()
+  webhooks.push(webhook)
+  saveWebhooks(webhooks)
+  return webhook
+}
+
+export function toggleWebhook(id: string): void {
+  const webhooks = getWebhooks()
+  const wh = webhooks.find((w) => w.id === id)
+  if (wh) {
+    wh.active = !wh.active
+    saveWebhooks(webhooks)
+  }
+}
+
+export function deleteWebhook(id: string): void {
+  const webhooks = getWebhooks().filter((w) => w.id !== id)
+  saveWebhooks(webhooks)
+}
+
+// ---- Endpoints Documentation ----
+
+export function getEndpoints(): ApiEndpoint[] {
+  return [
+    {
+      method: 'GET',
+      path: '/v1/audit',
+      description: 'Lancer un audit AEO complet sur une URL. Retourne le score de visibilite, les recommandations et le schema markup detecte.',
+      gasCost: 10,
+      params: [
+        { name: 'url', type: 'string', required: true, description: 'URL de la page a auditer' },
+        { name: 'depth', type: 'number', required: false, description: 'Profondeur de crawl (1-5, defaut: 1)' },
+      ],
+      exampleResponse: `{
+  "score": 78,
+  "url": "https://example.com",
+  "recommendations": [
+    {"type": "schema", "priority": "high", "message": "Ajouter FAQPage schema"}
+  ],
+  "schemaDetected": ["Organization", "WebPage"],
+  "gasUsed": 10
+}`,
+    },
+    {
+      method: 'GET',
+      path: '/v1/monitoring',
+      description: 'Verifier la presence d\'une marque dans les reponses des IA generatives. Scanne ChatGPT, Perplexity, Claude, Gemini et Copilot.',
+      gasCost: 5,
+      params: [
+        { name: 'brand', type: 'string', required: true, description: 'Nom de la marque a surveiller' },
+        { name: 'url', type: 'string', required: true, description: 'URL du site de la marque' },
+        { name: 'models', type: 'string[]', required: false, description: 'Modeles a scanner (defaut: tous)' },
+      ],
+      exampleResponse: `{
+  "brand": "CitedBy.ai",
+  "results": [
+    {"model": "chatgpt", "cited": true, "position": 2, "snippet": "..."},
+    {"model": "perplexity", "cited": true, "position": 1, "snippet": "..."}
+  ],
+  "citationRate": 0.8,
+  "gasUsed": 5
+}`,
+    },
+    {
+      method: 'GET',
+      path: '/v1/citations',
+      description: 'Recuperer l\'historique des citations pour une marque. Supporte la pagination et le filtrage par modele IA.',
+      gasCost: 2,
+      params: [
+        { name: 'brand', type: 'string', required: true, description: 'Nom de la marque' },
+        { name: 'model', type: 'string', required: false, description: 'Filtrer par modele IA' },
+        { name: 'page', type: 'number', required: false, description: 'Numero de page (defaut: 1)' },
+        { name: 'limit', type: 'number', required: false, description: 'Resultats par page (defaut: 20, max: 100)' },
+      ],
+      exampleResponse: `{
+  "citations": [
+    {"id": "cit_1", "model": "chatgpt", "query": "meilleur outil SEO", "cited": true, "date": "2025-01-15"}
+  ],
+  "pagination": {"page": 1, "total": 156, "totalPages": 8},
+  "gasUsed": 2
+}`,
+    },
+    {
+      method: 'POST',
+      path: '/v1/schema',
+      description: 'Generer automatiquement du schema markup optimise pour l\'AEO a partir du contenu d\'une page.',
+      gasCost: 8,
+      params: [
+        { name: 'url', type: 'string', required: true, description: 'URL de la page source' },
+        { name: 'types', type: 'string[]', required: false, description: 'Types de schema a generer (FAQPage, HowTo, Article...)' },
+      ],
+      exampleResponse: `{
+  "schemas": [
+    {"type": "FAQPage", "jsonLd": "{...}", "confidence": 0.92}
+  ],
+  "url": "https://example.com/blog/post",
+  "gasUsed": 8
+}`,
+    },
+    {
+      method: 'GET',
+      path: '/v1/credits',
+      description: 'Consulter le solde de Gas restant et l\'historique de consommation du compte.',
+      gasCost: 0,
+      params: [],
+      exampleResponse: `{
+  "balance": 4250,
+  "plan": "pro",
+  "usage": {"today": 45, "thisMonth": 1230},
+  "rateLimit": {"limit": 1000, "remaining": 955, "resetsAt": "2025-01-16T00:00:00Z"},
+  "gasUsed": 0
+}`,
+    },
+  ]
+}
+
+// ---- Code Examples ----
+
+export function getCurlExample(endpoint: ApiEndpoint): string {
+  const baseUrl = 'https://api.citedby.ai'
+  if (endpoint.method === 'GET') {
+    const params = endpoint.params
+      .filter((p) => p.required)
+      .map((p) => `${p.name}=VALEUR`)
+      .join('&')
+    return `curl -X GET "${baseUrl}${endpoint.path}?${params}" \\
+  -H "Authorization: Bearer cb_live_VOTRE_CLE_API" \\
+  -H "Content-Type: application/json"`
+  }
+  const body = Object.fromEntries(endpoint.params.filter((p) => p.required).map((p) => [p.name, 'VALEUR']))
+  return `curl -X POST "${baseUrl}${endpoint.path}" \\
+  -H "Authorization: Bearer cb_live_VOTRE_CLE_API" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(body, null, 2)}'`
+}
+
+export function getJsExample(endpoint: ApiEndpoint): string {
+  const params = endpoint.params.filter((p) => p.required).map((p) => `${p.name}: 'VALEUR'`)
+  if (endpoint.method === 'GET') {
+    return `const params = new URLSearchParams({ ${params.join(', ')} })
+const response = await fetch(
+  \`https://api.citedby.ai${endpoint.path}?\${params}\`,
+  {
+    headers: {
+      'Authorization': 'Bearer cb_live_VOTRE_CLE_API',
+      'Content-Type': 'application/json'
+    }
+  }
+)
+const data = await response.json()
+console.log(data)`
+  }
+  return `const response = await fetch('https://api.citedby.ai${endpoint.path}', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer cb_live_VOTRE_CLE_API',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ ${params.join(', ')} })
+})
+const data = await response.json()
+console.log(data)`
+}
+
+export function getPythonExample(endpoint: ApiEndpoint): string {
+  const params = endpoint.params.filter((p) => p.required)
+  if (endpoint.method === 'GET') {
+    const pyParams = params.map((p) => `    "${p.name}": "VALEUR"`).join(',\n')
+    return `import requests
+
+response = requests.get(
+    "https://api.citedby.ai${endpoint.path}",
+    headers={"Authorization": "Bearer cb_live_VOTRE_CLE_API"},
+    params={
+${pyParams}
+    }
+)
+data = response.json()
+print(data)`
+  }
+  const pyBody = params.map((p) => `    "${p.name}": "VALEUR"`).join(',\n')
+  return `import requests
+
+response = requests.post(
+    "https://api.citedby.ai${endpoint.path}",
+    headers={
+        "Authorization": "Bearer cb_live_VOTRE_CLE_API",
+        "Content-Type": "application/json"
+    },
+    json={
+${pyBody}
+    }
+)
+data = response.json()
+print(data)`
+}
+
+// ---- Usage Data ----
+
+export function getUsageKPIs(): ApiUsageKPI {
+  return {
+    requestsPerDay: Math.floor(120 + Math.random() * 80),
+    errorRate: +(1.2 + Math.random() * 0.8).toFixed(1),
+    avgLatency: Math.floor(180 + Math.random() * 60),
+  }
+}
+
+export function getUsageHistory(): ApiUsageDay[] {
+  const data: ApiUsageDay[] = []
+  const now = new Date()
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    data.push({
+      date: d.toISOString().slice(0, 10),
+      success: Math.floor(100 + Math.random() * 150),
+      errors: Math.floor(Math.random() * 15),
+    })
+  }
+  return data
+}
+
+// ---- Rate Limits ----
+
+export function getRateLimits(): RateLimit[] {
+  return [
+    { tier: 'free', limit: 100 },
+    { tier: 'pro', limit: 1000 },
+    { tier: 'enterprise', limit: 10000 },
+  ]
+}
+
+// ---- Webhook Events Labels ----
+
+export function getWebhookEventLabel(event: WebhookEvent): string {
+  const labels: Record<WebhookEvent, string> = {
+    'audit.completed': 'Audit termine',
+    'monitoring.scan_completed': 'Scan termine',
+    'monitoring.alert': 'Alerte monitoring',
+    'credits.low': 'Credits bas',
+    'citations.new': 'Nouvelle citation',
+  }
+  return labels[event]
+}

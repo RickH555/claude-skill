@@ -1,0 +1,78 @@
+import { type FormEvent, useState } from 'react'
+import { Link } from 'react-router-dom'
+import Button from '../../components/ui/Button.tsx'
+import Input from '../../components/ui/Input.tsx'
+import Card from '../../components/ui/Card.tsx'
+
+export default function SettingsPage() {
+  const [name, setName] = useState('Jean Dupont')
+  const [email, setEmail] = useState('jean@exemple.com')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+
+  function handleProfileSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    console.log('Mise à jour du profil', { name, email })
+  }
+
+  function handlePasswordSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    console.log('Mise à jour du mot de passe', { currentPassword, newPassword })
+  }
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Paramètres</h2>
+
+      <Card title="Profil">
+        <form onSubmit={handleProfileSubmit} className="space-y-4">
+          <Input
+            label="Nom"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Button type="submit">Enregistrer</Button>
+        </form>
+      </Card>
+
+      <Card title="Cle API">
+        <p className="text-sm text-gray-600 mb-3">
+          Gerez vos cles API et accedez a la documentation complete.
+        </p>
+        <Link
+          to="/app/api-developer"
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Documentation API complete
+        </Link>
+      </Card>
+
+      <Card title="Mot de passe">
+        <form onSubmit={handlePasswordSubmit} className="space-y-4">
+          <Input
+            label="Mot de passe actuel"
+            type="password"
+            placeholder="••••••••"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
+          <Input
+            label="Nouveau mot de passe"
+            type="password"
+            placeholder="••••••••"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <Button type="submit">Modifier le mot de passe</Button>
+        </form>
+      </Card>
+    </div>
+  )
+}

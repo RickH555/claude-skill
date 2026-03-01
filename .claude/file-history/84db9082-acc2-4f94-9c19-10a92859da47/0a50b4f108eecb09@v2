@@ -1,0 +1,91 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { AnalysisReport } from './analysis-report';
+import { Loader2, Sparkles, RefreshCw } from 'lucide-react';
+import type { Analysis } from '@/types';
+
+interface AnalysisTabProps {
+  surveyId: string;
+  initialAnalysis: Analysis | null;
+}
+
+export function AnalysisTab({ surveyId, initialAnalysis }: AnalysisTabProps) {
+  const [analysis, setAnalysis] = useState<Analysis | null>(initialAnalysis);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function runAnalysis() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/surveys/${surveyId}/analyze`, {
+        method: 'POST',
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.error || 'Analysis failed');
+        return;
+      }
+      setAnalysis(json.data);
+    } catch {
+      setError('Failed to run analysis. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-16">
+        <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary mb-4" />
+        <p className="text-sm text-muted-foreground">Running AI analysis...</p>
+        <p className="text-xs text-muted-foreground mt-1">This may take up to 30 seconds</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-sm text-destructive mb-4">{error}</p>
+        <Button onClick={runAnalysis} variant="outline">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  if (!analysis) {
+    return (
+      <div className="text-center py-12">
+        <Sparkles className="mx-auto h-8 w-8 text-muted-foreground/50 mb-3" />
+        <p className="text-muted-foreground mb-1">No analysis yet</p>
+        <p className="text-xs text-muted-foreground mb-4">
+          Run AI analysis to get insights from your survey responses
+        </p>
+        <Button onClick={runAnalysis}>
+          <Sparkles className="h-4 w-4 mr-2" />
+          Run AI Analysis
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          Analyzed with {analysis.model_used} · {new Date(analysis.created_at).toLocaleString()}
+        </p>
+        <Button onClick={runAnalysis} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Re-analyze
+        </Button>
+      </div>
+      <AnalysisReport results={analysis.results} />
+    </div>
+  );
+}

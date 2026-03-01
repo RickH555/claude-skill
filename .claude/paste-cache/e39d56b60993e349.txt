@@ -1,0 +1,75 @@
+Voici les 5 idées les plus exploitables, classées par solidité réelle, pas par hype.
+
+1) Outils d’automatisation de saisie de données et de traitement de documents assistés par IA
+
+Catégorie : Productivité / B2B
+
+Pourquoi c’est exploitable :
+
+Problème universel et permanent (factures, contrats, formulaires).
+
+Les entreprises paient déjà pour ce type de solution.
+
+MVP simple : OCR + extraction + export (PDF → Excel/CRM).
+
+Possibilité de se spécialiser par niche (immobilier, cabinets comptables, RH).
+
+Validation marché :
+
+Solutions existantes comme UiPath, Rossum, DocParser confirment la demande.
+
+Forte traction sur les PME, pas uniquement les grands comptes.
+
+Risque : concurrence, mais contournable par spécialisation métier.
+
+2) Plateforme d’analyse d’enquêtes et de feedback client assistée par IA
+
+Catégorie : Data & Analytics
+
+Pourquoi c’est exploitable :
+
+Les entreprises collectent déjà du feedback mais l’analysent mal.
+
+Forte valeur perçue sur l’analyse des réponses ouvertes (verbatim).
+
+IA utilisée comme accélérateur, pas comme gadget.
+
+Cas d’usage clair :
+
+Synthèse automatique des retours clients.
+
+Détection de thèmes, signaux faibles, irritants.
+
+Rapports exploitables pour managers.
+
+Validation marché :
+
+Marché déjà prouvé par Qualtrics, Hotjar, Medallia.
+
+Place pour des outils plus simples et moins chers.
+
+3) Outils d’écriture IA spécialisés B2B (descriptions produits, pages de vente, emails)
+
+Catégorie : Content Creation / Marketing
+
+Pourquoi c’est exploitable :
+
+Demande massive et continue.
+
+Facile à packager par vertical (e-commerce, SaaS, immobilier, restauration).
+
+Monétisation simple (abonnement ou paiement par volume).
+
+Point clé :
+
+Ce n’est PAS un “générateur générique”, mais un outil orienté conversion métier.
+
+Validation marché :
+
+Jasper, Copy.ai, Writesonic confirment le modèle.
+
+Les niches mal servies restent nombreuses.
+
+Risque : banalité si mal positionné. Le différenciateur est le ciblage métier.
+
+4) Services de 

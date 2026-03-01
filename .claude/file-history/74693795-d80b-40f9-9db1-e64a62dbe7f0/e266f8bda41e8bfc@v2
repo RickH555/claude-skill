@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Gradient Button ── */
+.btn-gradient {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+  padding: 0.625rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+.btn-gradient:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+/* ── Gradient Text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Ninja Card (legacy) ── */
+.ninja-card {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.ninja-card:hover {
+  border-color: rgba(124, 58, 237, 0.2);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.06), 0 0 40px rgba(124, 58, 237, 0.03);
+}
+
+/* ── Glass Card (glassmorphism dark) ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.glass-card:hover {
+  border-color: rgba(124, 58, 237, 0.25);
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.08), 0 0 60px rgba(124, 58, 237, 0.04);
+}
+
+/* ── Glass Surface (for navbar, etc.) ── */
+.glass-surface {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Gradient Border Card ── */
+.gradient-border {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 1.25rem;
+}
+
+/* ── Section Glow (ambient background) ── */
+.section-glow {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(150px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── Custom scrollbar ── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+/* ── Global dark scrollbar ── */
+* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ── Animations ── */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoom-in { from { transform: scale(0.95); } to { transform: scale(1); } }
+@keyframes slide-in-from-bottom { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slide-in-from-right { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.animate-in { animation: fade-in 0.5s ease-out, zoom-in 0.3s ease-out; }
+.animate-slide-up { animation: slide-in-from-bottom 0.3s ease-out; }
+.animate-slide-right { animation: slide-in-from-right 0.3s ease-out; }
+
+/* ── Shimmer skeleton ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ── Scroll progress bar ── */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* ── Back to top button ── */
+@keyframes fade-up-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade-up { animation: fade-up-in 0.25s ease-out; }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

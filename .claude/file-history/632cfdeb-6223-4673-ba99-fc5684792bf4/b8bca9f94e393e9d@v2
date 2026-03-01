@@ -1,0 +1,85 @@
+import { NextRequest, NextResponse } from "next/server"
+import { authenticateApiKey } from "@/lib/api-auth"
+import { createClient } from "@/lib/supabase/server"
+
+/**
+ * GET /api/v1/scores?projectId=xxx — Get latest scores for a project
+ */
+export async function GET(req: NextRequest) {
+  const auth = await authenticateApiKey(req)
+  if (!auth.success) return auth.response
+
+  const projectId = req.nextUrl.searchParams.get("projectId")
+  if (!projectId) {
+    return NextResponse.json({ error: "projectId is required" }, { status: 400 })
+  }
+
+  const supabase = createClient()
+
+  // Verify project belongs to workspace
+  const { data: project } = await supabase
+    .from("projects")
+    .select("id, visibility_score, trend, last_run_at")
+    .eq("id", projectId)
+    .eq("workspace_id", auth.context.workspaceId)
+    .single()
+
+  if (!project) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 })
+  }
+
+  // Get latest run results
+  const { data: latestRun } = await supabase
+    .from("analysis_runs")
+    .select("id, global_score, total_prompts, citations_found, mentions_found, categories, completed_at")
+    .eq("project_id", projectId)
+    .eq("status", "completed")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single()
+
+  // Get per-engine scores if run exists
+  let engineScores: Record<string, unknown>[] = []
+  if (latestRun) {
+    const { data: results } = await supabase
+      .from("run_results")
+      .select("ai_engine, score, result_type, brand_mentioned, url_mentioned")
+      .eq("run_id", latestRun.id)
+
+    if (results) {
+      const engines: Record<string, { totalScore: number; count: number; citations: number; mentions: number }> = {}
+      for (const r of results) {
+        if (!engines[r.ai_engine]) {
+          engines[r.ai_engine] = { totalScore: 0, count: 0, citations: 0, mentions: 0 }
+        }
+        engines[r.ai_engine].totalScore += r.score
+        engines[r.ai_engine].count += 1
+        if (r.url_mentioned) engines[r.ai_engine].citations += 1
+        if (r.brand_mentioned) engines[r.ai_engine].mentions += 1
+      }
+      engineScores = Object.entries(engines).map(([engine, data]) => ({
+        engine,
+        averageScore: Math.round(data.totalScore / data.count),
+        citations: data.citations,
+        mentions: data.mentions,
+      }))
+    }
+  }
+
+  return NextResponse.json({
+    data: {
+      projectId: project.id,
+      visibilityScore: project.visibility_score,
+      trend: project.trend,
+      lastRunAt: project.last_run_at,
+      latestRun: latestRun ? {
+        globalScore: latestRun.global_score,
+        totalPrompts: latestRun.total_prompts,
+        citationsFound: latestRun.citations_found,
+        mentionsFound: latestRun.mentions_found,
+        completedAt: latestRun.completed_at,
+      } : null,
+      engineScores,
+    },
+  })
+}

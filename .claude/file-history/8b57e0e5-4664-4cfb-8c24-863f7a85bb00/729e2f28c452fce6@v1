@@ -1,0 +1,8 @@
+'use client';
+import { useAppContext } from '@/lib/app-context';
+import AlertSettingsPage from '@/views/v3/AlertSettingsPage';
+
+export default function AlertSettingsPageWrapper() {
+  const { goBack, user } = useAppContext();
+  return <AlertSettingsPage onBack={goBack} user={user} />;
+}

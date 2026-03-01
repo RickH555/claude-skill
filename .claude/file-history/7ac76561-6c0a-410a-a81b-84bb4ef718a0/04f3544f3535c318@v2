@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 700px at 10% -20%, rgba(16, 185, 129, 0.08), transparent 45%),
+    radial-gradient(1000px 500px at 100% 0%, rgba(59, 130, 246, 0.07), transparent 40%),
+    #0b0f1a;
+  color: #f8fafc;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.45;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+label {
+  font-family: Outfit, system-ui, sans-serif;
+}
+
+.dot-grid-bg {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.card-surface {
+  @apply rounded-2xl border border-leadradar-border bg-leadradar-card shadow-[0_10px_32px_rgba(2,6,23,0.35)];
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+  color: #ecfeff;
+}
+
+/* Custom scrollbar for modals */
+.modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-scroll::-webkit-scrollbar-track {
+  background: #1a1a2e;
+  border-radius: 3px;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: #7c3aed;
+  border-radius: 3px;
+}
+.modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9333ea;
+}

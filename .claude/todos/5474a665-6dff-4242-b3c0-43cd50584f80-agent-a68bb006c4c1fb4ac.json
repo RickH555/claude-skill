@@ -1,0 +1,32 @@
+[
+  {
+    "content": "FIX 1: Harden CORS in supabase/functions/_shared/cors.ts",
+    "status": "in_progress",
+    "activeForm": "Hardening CORS configuration"
+  },
+  {
+    "content": "FIX 2: Add role check to send-push-notification",
+    "status": "pending",
+    "activeForm": "Adding merchant role verification to send-push-notification"
+  },
+  {
+    "content": "FIX 3: Harden n8n-webhook-handler",
+    "status": "pending",
+    "activeForm": "Hardening n8n-webhook-handler with mandatory HMAC verification"
+  },
+  {
+    "content": "FIX 4: Fix open redirect in Login.tsx",
+    "status": "pending",
+    "activeForm": "Fixing open redirect vulnerability in Login.tsx"
+  },
+  {
+    "content": "FIX 5: Fix ProtectedRoute redirect to use query param",
+    "status": "pending",
+    "activeForm": "Fixing ProtectedRoute to use query parameter redirect"
+  },
+  {
+    "content": "FIX 6: Add role check to process-customer-scan",
+    "status": "pending",
+    "activeForm": "Adding customer role check to process-customer-scan"
+  }
+]

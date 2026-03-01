@@ -1,0 +1,134 @@
+from PIL import Image, ImageDraw, ImageFont
+import os
+
+W, H = 2480, 3508  # A4 at 300dpi
+img = Image.new("RGB", (W, H), "#FFFFFF")
+d = ImageDraw.Draw(img)
+
+# Fonts (use default, scale via size)
+def font(size):
+    try:
+        return ImageFont.truetype("arial.ttf", size)
+    except:
+        return ImageFont.load_default()
+
+f_title = font(72)
+f_head = font(48)
+f_body = font(38)
+f_small = font(32)
+f_big = font(96)
+
+# Colors
+DARK = "#1a1a2e"
+ACCENT = "#4361ee"
+GRAY = "#6b7280"
+LIGHT_BG = "#f8fafc"
+LINE = "#e2e8f0"
+
+# Header background
+d.rectangle([0, 0, W, 420], fill=DARK)
+
+# Company logo area
+d.text((140, 80), "ACME", fill="#FFFFFF", font=f_big)
+d.text((140, 200), "TECHNOLOGIES", fill=ACCENT, font=f_head)
+d.text((140, 270), "Innovation & Solutions", fill="#94a3b8", font=f_small)
+
+# INVOICE label
+d.text((1700, 100), "FACTURE", fill="#FFFFFF", font=f_title)
+d.text((1700, 200), "N° FAC-2026-0847", fill=ACCENT, font=f_body)
+d.text((1700, 260), "Date: 20 Février 2026", fill="#94a3b8", font=f_small)
+d.text((1700, 310), "Échéance: 22 Mars 2026", fill="#94a3b8", font=f_small)
+
+# From / To section
+y = 500
+d.text((140, y), "ÉMETTEUR", fill=ACCENT, font=f_head)
+d.text((140, y+70), "Acme Technologies SAS", fill=DARK, font=f_body)
+d.text((140, y+120), "42 Rue de l'Innovation", fill=GRAY, font=f_small)
+d.text((140, y+165), "75008 Paris, France", fill=GRAY, font=f_small)
+d.text((140, y+210), "SIRET: 847 293 156 00024", fill=GRAY, font=f_small)
+d.text((140, y+255), "TVA: FR 72 847293156", fill=GRAY, font=f_small)
+
+d.text((1300, y), "DESTINATAIRE", fill=ACCENT, font=f_head)
+d.text((1300, y+70), "TechVentures SARL", fill=DARK, font=f_body)
+d.text((1300, y+120), "18 Avenue des Champs-Élysées", fill=GRAY, font=f_small)
+d.text((1300, y+165), "69002 Lyon, France", fill=GRAY, font=f_small)
+d.text((1300, y+210), "SIRET: 923 471 685 00031", fill=GRAY, font=f_small)
+d.text((1300, y+255), "Contact: Marie Dubois", fill=GRAY, font=f_small)
+
+# Separator
+y = 860
+d.line([(140, y), (W-140, y)], fill=LINE, width=3)
+
+# Table header
+y = 920
+d.rectangle([140, y, W-140, y+80], fill=DARK)
+d.text((180, y+18), "DESCRIPTION", fill="#FFFFFF", font=f_body)
+d.text((1200, y+18), "QTÉ", fill="#FFFFFF", font=f_body)
+d.text((1500, y+18), "PRIX UNIT. HT", fill="#FFFFFF", font=f_body)
+d.text((1980, y+18), "TOTAL HT", fill="#FFFFFF", font=f_body)
+
+# Table rows
+items = [
+    ("Licence SaaS Enterprise - Annuelle", "1", "12 500,00 €", "12 500,00 €"),
+    ("Module Analytics Avancé", "1", "3 200,00 €", "3 200,00 €"),
+    ("Formation équipe (2 jours sur site)", "2", "1 800,00 €", "3 600,00 €"),
+    ("Support Premium 24/7 - 12 mois", "1", "4 500,00 €", "4 500,00 €"),
+    ("Intégration API personnalisée", "15", "650,00 €", "9 750,00 €"),
+    ("Migration de données existantes", "1", "2 450,00 €", "2 450,00 €"),
+]
+
+y = 1000
+for i, (desc, qty, unit, total) in enumerate(items):
+    row_y = y + i * 90
+    bg = LIGHT_BG if i % 2 == 0 else "#FFFFFF"
+    d.rectangle([140, row_y, W-140, row_y+90], fill=bg)
+    d.text((180, row_y+25), desc, fill=DARK, font=f_body)
+    d.text((1250, row_y+25), qty, fill=DARK, font=f_body)
+    d.text((1520, row_y+25), unit, fill=DARK, font=f_body)
+    d.text((1980, row_y+25), total, fill=DARK, font=f_body)
+
+# Bottom line
+bot_y = y + len(items) * 90
+d.line([(140, bot_y), (W-140, bot_y)], fill=LINE, width=3)
+
+# Totals section
+ty = bot_y + 60
+d.text((1500, ty), "Sous-total HT:", fill=GRAY, font=f_body)
+d.text((1980, ty), "36 000,00 €", fill=DARK, font=f_body)
+
+d.text((1500, ty+60), "TVA (20%):", fill=GRAY, font=f_body)
+d.text((1980, ty+60), "7 200,00 €", fill=DARK, font=f_body)
+
+d.text((1500, ty+120), "Remise commerciale:", fill=GRAY, font=f_body)
+d.text((1980, ty+120), "- 2 160,00 €", fill="#ef4444", font=f_body)
+
+# Total TTC box
+d.rectangle([1460, ty+200, W-140, ty+300], fill=ACCENT)
+d.text((1500, ty+220), "TOTAL TTC:", fill="#FFFFFF", font=f_head)
+d.text((1900, ty+220), "41 040,00 €", fill="#FFFFFF", font=f_head)
+
+# Payment info
+py = ty + 400
+d.line([(140, py-20), (W-140, py-20)], fill=LINE, width=3)
+d.text((140, py), "INFORMATIONS DE PAIEMENT", fill=ACCENT, font=f_head)
+d.text((140, py+70), "Banque: BNP Paribas", fill=DARK, font=f_body)
+d.text((140, py+120), "IBAN: FR76 3000 4028 3700 0100 0466 372", fill=DARK, font=f_body)
+d.text((140, py+170), "BIC/SWIFT: BNPAFRPPXXX", fill=DARK, font=f_body)
+d.text((140, py+220), "Référence: FAC-2026-0847", fill=DARK, font=f_body)
+
+# Conditions
+cy = py + 330
+d.text((140, cy), "CONDITIONS", fill=ACCENT, font=f_head)
+d.text((140, cy+70), "Paiement à 30 jours fin de mois. Pénalités de retard: 3x taux d'intérêt légal.", fill=GRAY, font=f_small)
+d.text((140, cy+115), "Indemnité forfaitaire de recouvrement: 40,00 €. Escompte pour paiement anticipé: néant.", fill=GRAY, font=f_small)
+
+# Footer
+d.rectangle([0, H-180, W, H], fill=DARK)
+d.text((140, H-130), "Acme Technologies SAS • Capital: 250 000 € • RCS Paris B 847 293 156", fill="#94a3b8", font=f_small)
+d.text((140, H-80), "contact@acme-tech.fr • +33 1 42 68 93 00 • www.acme-technologies.fr", fill="#94a3b8", font=f_small)
+
+# Save
+out_dir = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(out_dir, "facture-acme-2026-0847.png")
+img.save(path, "PNG", quality=95)
+print(f"Saved: {path}")

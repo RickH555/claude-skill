@@ -1,0 +1,75 @@
+import { describe, it, expect } from "vitest"
+import { stripHtml, sanitizeString, sanitizeInput, isValidUUID } from "@/lib/sanitize"
+
+describe("stripHtml", () => {
+  it("removes HTML tags", () => {
+    expect(stripHtml("<p>Hello</p>")).toBe("Hello")
+    expect(stripHtml("<script>alert('xss')</script>")).toBe("alert('xss')")
+  })
+
+  it("leaves plain text unchanged", () => {
+    expect(stripHtml("Just text")).toBe("Just text")
+  })
+
+  it("handles nested tags", () => {
+    expect(stripHtml("<div><b>Bold</b> text</div>")).toBe("Bold text")
+  })
+})
+
+describe("sanitizeString", () => {
+  it("trims whitespace", () => {
+    expect(sanitizeString("  hello  ")).toBe("hello")
+  })
+
+  it("strips HTML", () => {
+    expect(sanitizeString("<b>bold</b>")).toBe("bold")
+  })
+
+  it("enforces max length", () => {
+    const long = "a".repeat(200)
+    expect(sanitizeString(long, 100).length).toBe(100)
+  })
+
+  it("returns empty string for non-string input", () => {
+    expect(sanitizeString(123)).toBe("")
+    expect(sanitizeString(null)).toBe("")
+    expect(sanitizeString(undefined)).toBe("")
+  })
+})
+
+describe("sanitizeInput", () => {
+  it("sanitizes string values in object", () => {
+    const result = sanitizeInput({ name: "  <b>Test</b>  ", age: 25 })
+    expect(result.name).toBe("Test")
+    expect(result.age).toBe(25)
+  })
+
+  it("sanitizes nested objects", () => {
+    const result = sanitizeInput({ user: { name: "<script>xss</script>" } })
+    expect((result.user as { name: string }).name).toBe("xss")
+  })
+
+  it("sanitizes arrays of strings", () => {
+    const result = sanitizeInput({ tags: ["<b>one</b>", "two"] })
+    expect(result.tags).toEqual(["one", "two"])
+  })
+
+  it("preserves booleans", () => {
+    const result = sanitizeInput({ active: true })
+    expect(result.active).toBe(true)
+  })
+})
+
+describe("isValidUUID", () => {
+  it("validates correct UUIDs", () => {
+    expect(isValidUUID("550e8400-e29b-41d4-a716-446655440000")).toBe(true)
+    expect(isValidUUID("f47ac10b-58cc-4372-a567-0e02b2c3d479")).toBe(true)
+  })
+
+  it("rejects invalid UUIDs", () => {
+    expect(isValidUUID("not-a-uuid")).toBe(false)
+    expect(isValidUUID("")).toBe(false)
+    expect(isValidUUID("550e8400-e29b-41d4-a716")).toBe(false)
+    expect(isValidUUID("550e8400e29b41d4a716446655440000")).toBe(false)
+  })
+})

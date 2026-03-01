@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Restore CitedBy.ai Vite SPA architecture",
+  "description": "Restore the broken SaaS project by: 1) Renaming _legacy_pages back to pages, 2) Restoring Vite dependencies, 3) Fixing package.json scripts, 4) Verifying all imports and types, 5) Updating CLAUDE.md, 6) Testing the dev server",
+  "activeForm": "Restoring Vite SPA architecture",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,173 @@
+C:\Users\User\citedby-ai\components\AICitationPreview.tsx:9:type AIModel = 'perplexity' | 'chatgpt' | 'gemini';
+C:\Users\User\citedby-ai\components\AICitationPreview.tsx:70:          <ModelTab id="gemini" label="Gemini" icon={Zap} color="text-blue-400" />
+C:\Users\User\citedby-ai\config\engine-weights.ts:14:export type EngineId = 'chatgpt' | 'perplexity' | 'gemini';
+C:\Users\User\citedby-ai\config\engine-weights.ts:20:  gemini: number;
+C:\Users\User\citedby-ai\config\engine-weights.ts:25:  { criterionId: 'has_faq_section',          chatgpt: 1.3, perplexity: 1.8, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:26:  { criterionId: 'has_schema_faq',           chatgpt: 1.0, perplexity: 1.5, gemini: 1.6 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:27:  { criterionId: 'answer_first_intro',       chatgpt: 1.8, perplexity: 1.5, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:28:  { criterionId: 'clear_h1',                 chatgpt: 1.5, perplexity: 1.3, gemini: 1.4 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:29:  { criterionId: 'heading_hierarchy',        chatgpt: 1.3, perplexity: 1.2, gemini: 1.5 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:30:  { criterionId: 'headings_as_questions',    chatgpt: 1.6, perplexity: 1.7, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:31:  { criterionId: 'table_of_contents',        chatgpt: 1.2, perplexity: 1.4, gemini: 1.1 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:32:  { criterionId: 'content_length_min',       chatgpt: 1.4, perplexity: 1.3, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:33:  { criterionId: 'paragraph_structure',      chatgpt: 1.3, perplexity: 1.1, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:34:  { criterionId: 'bullet_lists',             chatgpt: 1.2, perplexity: 1.5, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:37:  { criterionId: 'has_schema_org',           chatgpt: 0.8, perplexity: 1.3, gemini: 1.5 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:38:  { criterionId: 'schema_webpage',           chatgpt: 0.7, perplexity: 1.2, gemini: 1.5 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:39:  { criterionId: 'schema_organization',      chatgpt: 0.6, perplexity: 1.1, gemini: 1.4 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:40:  { criterionId: 'schema_breadcrumb',        chatgpt: 0.5, perplexity: 1.3, gemini: 1.5 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:41:  { criterionId: 'schema_article',           chatgpt: 0.9, perplexity: 1.4, gemini: 1.5 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:42:  { criterionId: 'schema_product',           chatgpt: 0.8, perplexity: 1.5, gemini: 1.6 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:43:  { criterionId: 'schema_review',            chatgpt: 0.7, perplexity: 1.4, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:44:  { criterionId: 'schema_howto',             chatgpt: 1.2, perplexity: 1.3, gemini: 1.4 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:45:  { criterionId: 'open_graph_tags',          chatgpt: 0.6, perplexity: 0.8, gemini: 0.7 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:46:  { criterionId: 'twitter_cards',            chatgpt: 0.4, perplexity: 0.5, gemini: 0.5 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:49:  { criterionId: 'author_info',              chatgpt: 1.2, perplexity: 1.5, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:50:  { criterionId: 'date_published',           chatgpt: 1.0, perplexity: 1.6, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:51:  { criterionId: 'date_modified',            chatgpt: 1.1, perplexity: 1.7, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:52:  { criterionId: 'external_sources',         chatgpt: 1.3, perplexity: 1.8, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:53:  { criterionId: 'internal_links',           chatgpt: 1.1, perplexity: 1.2, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:54:  { criterionId: 'https_secure',             chatgpt: 0.8, perplexity: 1.0, gemini: 1.0 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:55:  { criterionId: 'canonical_url',            chatgpt: 0.7, perplexity: 1.0, gemini: 1.1 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:56:  { criterionId: 'no_broken_links',          chatgpt: 0.6, perplexity: 0.9, gemini: 0.8 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:57:  { criterionId: 'contact_info',             chatgpt: 0.8, perplexity: 1.0, gemini: 1.1 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:58:  { criterionId: 'about_page_link',          chatgpt: 0.7, perplexity: 1.1, gemini: 1.0 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:61:  { criterionId: 'meta_title',               chatgpt: 1.3, perplexity: 1.2, gemini: 1.4 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:62:  { criterionId: 'meta_description',         chatgpt: 1.2, perplexity: 1.3, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:63:  { criterionId: 'meta_robots_index',        chatgpt: 0.5, perplexity: 1.0, gemini: 1.0 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:64:  { criterionId: 'robots_txt_ai_friendly',   chatgpt: 0.3, perplexity: 1.5, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:65:  { criterionId: 'sitemap_exists',           chatgpt: 0.4, perplexity: 1.2, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:66:  { criterionId: 'page_speed',               chatgpt: 0.5, perplexity: 0.8, gemini: 1.0 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:67:  { criterionId: 'mobile_friendly',          chatgpt: 0.4, perplexity: 0.7, gemini: 0.9 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:68:  { criterionId: 'image_alt_text',           chatgpt: 0.9, perplexity: 1.0, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:69:  { criterionId: 'lang_attribute',           chatgpt: 0.8, perplexity: 0.9, gemini: 1.1 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:70:  { criterionId: 'hreflang',                 chatgpt: 0.5, perplexity: 0.7, gemini: 0.9 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:73:  { criterionId: 'readability_score',        chatgpt: 1.4, perplexity: 1.1, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:74:  { criterionId: 'no_jargon',               chatgpt: 1.3, perplexity: 1.0, gemini: 1.1 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:75:  { criterionId: 'definitions_provided',     chatgpt: 1.5, perplexity: 1.3, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:76:  { criterionId: 'comparative_data',         chatgpt: 1.3, perplexity: 1.5, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:77:  { criterionId: 'statistics_cited',         chatgpt: 1.4, perplexity: 1.7, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:78:  { criterionId: 'pros_cons_format',         chatgpt: 1.5, perplexity: 1.4, gemini: 1.1 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:79:  { criterionId: 'step_by_step',             chatgpt: 1.6, perplexity: 1.3, gemini: 1.2 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:80:  { criterionId: 'summary_conclusion',       chatgpt: 1.3, perplexity: 1.2, gemini: 1.1 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:81:  { criterionId: 'unique_value',             chatgpt: 1.4, perplexity: 1.5, gemini: 1.3 },
+C:\Users\User\citedby-ai\config\engine-weights.ts:82:  { criterionId: 'llm_txt_file',             chatgpt: 0.3, perplexity: 0.5, gemini: 0.4 },
+C:\Users\User\citedby-ai\i18n\types.ts:153:    generateContent: string;
+C:\Users\User\citedby-ai\lib\ai-provider.ts:24:    const response = await client.models.generateContent({
+C:\Users\User\citedby-ai\lib\ai-provider.ts:25:      model: 'gemini-2.5-flash', // GA model for production stability
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:13:type EngineId = 'chatgpt' | 'perplexity' | 'gemini';
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:19:  technical:       { chatgpt: 0.7, perplexity: 1.0, gemini: 1.1 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:20:  semantic:        { chatgpt: 1.4, perplexity: 1.4, gemini: 1.3 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:21:  content:         { chatgpt: 1.3, perplexity: 1.3, gemini: 1.1 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:22:  entity:          { chatgpt: 0.9, perplexity: 1.3, gemini: 1.1 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:23:  structured_data: { chatgpt: 0.7, perplexity: 1.2, gemini: 1.3 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:24:  geo:             { chatgpt: 1.4, perplexity: 1.4, gemini: 1.2 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:25:  trust:           { chatgpt: 0.8, perplexity: 1.1, gemini: 1.0 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:26:  freshness:       { chatgpt: 1.1, perplexity: 1.6, gemini: 1.3 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:27:  media:           { chatgpt: 0.9, perplexity: 1.0, gemini: 1.3 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:28:  ux:              { chatgpt: 0.5, perplexity: 0.8, gemini: 0.9 },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:35:  { id: 'gemini',     label: 'Gemini',      color: 'bg-purple-500',  bgFaded: 'bg-purple-500/30' },
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:107:  const currentEngineScores: Record<EngineId, number> = { chatgpt: 0, perplexity: 0, gemini: 0 };
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:108:  const projectedEngineScores: Record<EngineId, number> = { chatgpt: 0, perplexity: 0, gemini: 0 };
+C:\Users\User\citedby-ai\components\ScoreProjection.tsx:110:  for (const engine of ['chatgpt', 'perplexity', 'gemini'] as EngineId[]) {
+C:\Users\User\citedby-ai\i18n\locales\en.ts:165:    generateContent: 'Generate content',
+C:\Users\User\citedby-ai\i18n\locales\es.ts:165:    generateContent: 'Generar contenido',
+C:\Users\User\citedby-ai\i18n\locales\fr.ts:165:    generateContent: 'G\u00e9n\u00e9rer le contenu',
+C:\Users\User\citedby-ai\pages\AiMonitoring.tsx:810:                    <Area type="monotone" dataKey="gemini" name="Gemini" stroke="#f59e0b" fill="url(#colorGemini)" strokeWidth={2} />
+C:\Users\User\citedby-ai\pages\ContentWriter.tsx:3:import { generateContent } from '../services/content_writer';
+C:\Users\User\citedby-ai\pages\ContentWriter.tsx:73:      const output = await generateContent({
+C:\Users\User\citedby-ai\pages\ContentWriter.tsx:257:              {isGenerating ? <><Loader2 size={18} className="animate-spin" /> {t.common.loading}</> : <><Feather size={18} /> {t.contentWriter.generateContent}</>}
+C:\Users\User\citedby-ai\components\SourceOfTruthModal.tsx:60:  const generateContent = () => {
+C:\Users\User\citedby-ai\components\SourceOfTruthModal.tsx:68:    navigator.clipboard.writeText(generateContent());
+C:\Users\User\citedby-ai\components\SourceOfTruthModal.tsx:74:    const blob = new Blob([generateContent()], { type: format === 'json' ? 'application/json' : 'text/plain' });
+C:\Users\User\citedby-ai\components\SourceOfTruthModal.tsx:244:                <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap">{generateContent()}</pre>
+C:\Users\User\citedby-ai\services\ai-citation-simulator.ts:109:  const geminiResponse: AIEngineResponse = {
+C:\Users\User\citedby-ai\services\ai-citation-simulator.ts:134:    geminiResponse,
+C:\Users\User\citedby-ai\services\ai-citation-simulator.ts:277:  const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\ai-citation-simulator.ts:278:    model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\pages\Integrations.tsx:67:  gemini: '#f59e0b',
+C:\Users\User\citedby-ai\pages\Integrations.tsx:378:                      dataKey="gemini"
+C:\Users\User\citedby-ai\pages\Integrations.tsx:381:                      stroke={CHART_COLORS.gemini}
+C:\Users\User\citedby-ai\pages\Integrations.tsx:382:                      fill={`url(#grad-gemini)`}
+C:\Users\User\citedby-ai\types\integrations.ts:25:  gemini: number;
+C:\Users\User\citedby-ai\types\ai-monitoring.ts:52:  gemini: number;
+C:\Users\User\citedby-ai\supabase\functions\analyze\index.ts:130:  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+C:\Users\User\citedby-ai\supabase\functions\analyze\index.ts:182:    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+C:\Users\User\citedby-ai\supabase\functions\analyze\index.ts:185:    if (!geminiApiKey || !supabaseUrl || !serviceRoleKey) {
+C:\Users\User\citedby-ai\supabase\functions\analyze\index.ts:196:    let analysis = await callGemini('gemini-1.5-flash', prompt, geminiApiKey);
+C:\Users\User\citedby-ai\supabase\functions\analyze\index.ts:201:      const refined = await callGemini('gemini-1.5-pro', prompt, geminiApiKey);
+C:\Users\User\citedby-ai\services\answer-first-audit.ts:368:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\answer-first-audit.ts:369:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\content_writer.ts:57:export const generateContent = async (input: ContentWriterInput): Promise<GeneratedContent> => {
+C:\Users\User\citedby-ai\services\content_writer.ts:97:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\content_writer.ts:98:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\ai-monitoring.ts:151:    const gemini = seededInt(daySeed, 330, 0, 3);
+C:\Users\User\citedby-ai\services\ai-monitoring.ts:155:      citations: chatgpt + claude + perplexity + gemini + aiOverviews,
+C:\Users\User\citedby-ai\services\ai-monitoring.ts:159:      gemini,
+C:\Users\User\citedby-ai\services\ai-monitoring.ts:248:- timeSeries: tableau de points jour par jour avec date, citations, chatgpt, claude, perplexity, gemini, aiOverviews
+C:\Users\User\citedby-ai\services\ai-monitoring.ts:254:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\ai-monitoring.ts:255:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\llms-txt-generator.ts:197:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\llms-txt-generator.ts:198:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\generator.ts:99:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\generator.ts:100:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\generator.ts:156:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\generator.ts:157:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\generator.ts:186:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\generator.ts:187:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\llm-json-generator.ts:176:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\llm-json-generator.ts:177:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\integrations.ts:122:      gemini: randomBetween(20, 90),
+C:\Users\User\citedby-ai\services\mega-generator.ts:250:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\mega-generator.ts:251:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\reputation_service.ts:278:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\reputation_service.ts:279:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\reputation_service.ts:332:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\reputation_service.ts:333:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\ai-response-layer\recommend-json-generator.ts:111:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\ai-response-layer\recommend-json-generator.ts:112:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\robots_service.ts:186:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\robots_service.ts:187:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\ai-response-layer\query-page-generator.ts:183:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\ai-response-layer\query-page-generator.ts:184:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\eeat\trust-signals-generator.ts:82:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\eeat\trust-signals-generator.ts:83:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\pages\SourceOfTruth.tsx:136:      const content = generateContent();
+C:\Users\User\citedby-ai\pages\SourceOfTruth.tsx:155:  const generateContent = () => {
+C:\Users\User\citedby-ai\pages\SourceOfTruth.tsx:163:    navigator.clipboard.writeText(txt || generateContent());
+C:\Users\User\citedby-ai\pages\SourceOfTruth.tsx:169:    const blob = new Blob([content || generateContent()], { type: format === 'json' ? 'application/json' : 'text/plain' });
+C:\Users\User\citedby-ai\pages\SourceOfTruth.tsx:422:                            <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap">{generateContent()}</pre>
+C:\Users\User\citedby-ai\services\ai-response-layer\hub-generator.ts:170:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\ai-response-layer\hub-generator.ts:171:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\eeat\eeat-auditor.ts:233:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\eeat\eeat-auditor.ts:234:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\eeat\credentials-generator.ts:86:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\eeat\credentials-generator.ts:87:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\schema_service.ts:93:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\schema_service.ts:94:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\smc.ts:42:      const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\smc.ts:43:        model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\smc.ts:73:      const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\smc.ts:74:        model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\smc.ts:103:      const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\smc.ts:104:        model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\smc.ts:139:      const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\smc.ts:140:        model: 'gemini-2.5-pro', // GA Pro model for long-form writing
+C:\Users\User\citedby-ai\services\eeat\citation-block-generator.ts:78:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\eeat\citation-block-generator.ts:79:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\eeat\about-page-generator.ts:92:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\eeat\about-page-generator.ts:93:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\eeat\author-bio-generator.ts:97:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\eeat\author-bio-generator.ts:98:      model: 'gemini-2.5-flash',
+C:\Users\User\citedby-ai\services\v3\citation-api-client.ts:25:    gemini: `Here's what I found about "${prompt.slice(0, 50)}". There are multiple approaches and providers worth considering. The most recommended options typically offer strong integration capabilities, competitive pricing, and reliable customer support. Industry experts suggest evaluating based on your specific needs and scale requirements.`,
+C:\Users\User\citedby-ai\services\v3\citation-api-client.ts:125:  if (!apiKey) return simulateResponse('gemini', prompt);
+C:\Users\User\citedby-ai\services\v3\citation-api-client.ts:130:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\v3\citation-api-client.ts:131:      model: 'gemini-2.0-flash',
+C:\Users\User\citedby-ai\services\v3\citation-api-client.ts:138:      engine: 'gemini',
+C:\Users\User\citedby-ai\services\v3\citation-api-client.ts:147:      ...simulateResponse('gemini', prompt),
+C:\Users\User\citedby-ai\services\v3\citation-api-client.ts:159:    case 'gemini': return callGemini(prompt);
+C:\Users\User\citedby-ai\services\v3\citation-checker.ts:41:  gemini: 100,
+C:\Users\User\citedby-ai\services\v3\citation-checker.ts:57:  const engines: EngineId[] = ['chatgpt', 'perplexity', 'gemini'];
+C:\Users\User\citedby-ai\services\v3\citation-checker.ts:111:  const engines: EngineId[] = ['chatgpt', 'perplexity', 'gemini'];
+C:\Users\User\citedby-ai\services\v3\query-generator.ts:83:    const response = await ai.models.generateContent({
+C:\Users\User\citedby-ai\services\v3\query-generator.ts:84:      model: 'gemini-2.0-flash',

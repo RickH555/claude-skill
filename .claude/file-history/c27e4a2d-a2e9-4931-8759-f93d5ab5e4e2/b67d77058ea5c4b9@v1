@@ -1,0 +1,36 @@
+import { createServerSupabase } from '@/lib/supabase/server';
+import LoyaltyCard from '@/components/customer/LoyaltyCard';
+
+export default async function CustomerDashboard() {
+  const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: cards } = await supabase
+    .from('customer_cards')
+    .select('*, loyalty_programs(*)')
+    .eq('customer_id', user!.id);
+
+  return (
+    <div className="space-y-4 py-4">
+      <h1 className="text-xl font-bold text-[var(--text-primary)]">Mes cartes fidelite</h1>
+
+      {cards && cards.length > 0 ? (
+        cards.map((card: any, i: number) => (
+          <div key={card.id} className={`stagger-enter stagger-${Math.min(i + 1, 6)}`}>
+            <LoyaltyCard
+              programName={card.loyalty_programs.name}
+              type={card.loyalty_programs.type}
+              balance={card.balance}
+              target={card.loyalty_programs.target}
+              tier={card.tier}
+            />
+          </div>
+        ))
+      ) : (
+        <div className="text-center py-12 text-[var(--text-tertiary)]">
+          <p>Aucune carte. Scannez un QR code pour commencer !</p>
+        </div>
+      )}
+    </div>
+  );
+}

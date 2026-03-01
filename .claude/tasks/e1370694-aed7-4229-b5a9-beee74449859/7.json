@@ -1,0 +1,9 @@
+{
+  "id": "7",
+  "subject": "Phase 6: Build and verify everything works",
+  "description": "npm install, TypeScript check, verify all original + new files exist, count files (must be more than baseline), npm run dev must work.",
+  "activeForm": "Building and verifying",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,9 @@
+{
+  "id": "19",
+  "subject": "Self-review and commit",
+  "description": "Verify all files are correct, configs are valid, then commit with message: chore: initialize Next.js 15 project with all MVP dependencies",
+  "activeForm": "Self-reviewing and committing changes",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,172 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  FolderOpen,
+  Settings,
+  LogOut,
+  CreditCard,
+  Users,
+  BarChart3,
+  Menu,
+  X,
+  Crown,
+  Plug,
+  Key,
+} from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useWorkspace } from "@/lib/workspace-context";
+import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
+import { NotificationBell } from "@/components/notifications";
+
+interface SidebarProps {
+  user: { email: string; id: string };
+}
+
+const NAV_ITEMS = [
+  { href: "/app", label: "Tableau de bord", icon: LayoutDashboard },
+  { href: "/app/projects", label: "Projets", icon: FolderOpen },
+  { href: "/app/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/app/executive", label: "Executif", icon: Crown },
+];
+
+const BOTTOM_ITEMS = [
+  { href: "/app/team", label: "Equipe", icon: Users },
+  { href: "/app/settings/billing", label: "Abonnement", icon: CreditCard },
+  { href: "/app/settings/integrations", label: "Integrations", icon: Plug },
+  { href: "/app/settings/api", label: "API", icon: Key },
+  { href: "/app/settings", label: "Parametres", icon: Settings },
+];
+
+export function Sidebar({ user }: SidebarProps) {
+  const pathname = usePathname();
+  const { workspace } = useWorkspace();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const planBadge: Record<string, { label: string; variant: "default" | "success" | "warning" }> = {
+    starter: { label: "Starter", variant: "default" },
+    pro: { label: "Pro", variant: "success" },
+    agency: { label: "Agency", variant: "warning" },
+  };
+
+  const currentPlan = planBadge[workspace?.plan || "starter"] || planBadge.starter;
+
+  const isActive = (href: string) => {
+    if (href === "/app") return pathname === "/app";
+    return pathname.startsWith(href);
+  };
+
+  const navContent = (
+    <>
+      {/* Logo */}
+      <div className="p-6 border-b border-white/10">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-black font-serif font-bold text-lg">
+            C
+          </div>
+          <div>
+            <span className="font-bold text-lg text-white">CitedBy.ai</span>
+            {workspace && (
+              <p className="text-[10px] text-white/40 truncate max-w-[150px]">
+                {workspace.name}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Nav */}
+      <nav className="flex-1 p-3 space-y-1">
+        {NAV_ITEMS.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={() => setMobileOpen(false)}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+              isActive(item.href)
+                ? "bg-primary/10 text-primary"
+                : "text-white/50 hover:text-white hover:bg-white/5"
+            )}
+          >
+            <item.icon size={18} />
+            {item.label}
+          </Link>
+        ))}
+
+        <div className="my-3 border-t border-white/5" />
+
+        {BOTTOM_ITEMS.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={() => setMobileOpen(false)}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+              isActive(item.href)
+                ? "bg-primary/10 text-primary"
+                : "text-white/50 hover:text-white hover:bg-white/5"
+            )}
+          >
+            <item.icon size={18} />
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
+      {/* User Section */}
+      <div className="p-4 border-t border-white/10">
+        <div className="flex items-center gap-3 px-2 py-2">
+          <Avatar fallback={user.email} size="sm" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">{user.email}</p>
+            <Badge variant={currentPlan.variant} className="mt-0.5">
+              {currentPlan.label}
+            </Badge>
+          </div>
+          <NotificationBell />
+        </div>
+        <form action="/auth/signout" method="post">
+          <button className="w-full mt-2 flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/5 rounded-lg transition-colors">
+            <LogOut size={14} /> Deconnexion
+          </button>
+        </form>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile toggle */}
+      <button
+        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-xl bg-[#1a1d21] border border-white/10"
+        onClick={() => setMobileOpen(!mobileOpen)}
+      >
+        {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "w-64 border-r border-white/10 bg-[#0d0f12] flex flex-col sticky top-0 h-screen z-40 transition-transform",
+          "md:translate-x-0",
+          mobileOpen ? "translate-x-0 fixed inset-y-0 left-0" : "-translate-x-full fixed md:relative"
+        )}
+      >
+        {navContent}
+      </aside>
+    </>
+  );
+}

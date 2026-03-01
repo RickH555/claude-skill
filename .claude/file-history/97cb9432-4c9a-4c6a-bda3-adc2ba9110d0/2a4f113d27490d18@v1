@@ -1,0 +1,94 @@
+# Plan : Inscription annuaire subordonnée à la validation du Plan d'Action
+
+## Contexte
+L'utilisateur veut que l'inscription dans l'annuaire d'indexation (tunnel "Rejoindre l'Index" dans Directory.tsx) soit conditionnée à la validation de **toutes** les solutions d'amélioration de l'onglet "Plan d'action" dans la section "Monitoring AEO".
+
+Actuellement, le seul blocage est le quota de projets (abonnement). Il faut ajouter un 2ème pré-requis : toutes les recommendations du plan d'action doivent avoir une solution générée (`generatedSolutions[rec.id]` existe pour chaque `rec`).
+
+## Modèle de données existant
+
+```typescript
+// types.ts
+AnalysisResult {
+  recommendations: Recommendation[];  // Points d'optimisation
+  generatedSolutions?: Record<string, GeneratedSolution & { timestamp: string }>;
+  // Clé = recommendation.id → valeur = solution générée
+}
+```
+
+Une recommandation est "validée" quand `generatedSolutions[rec.id]` existe.
+Le plan d'action est "complet" quand TOUTES les recommendations ont une solution générée.
+
+## Fichiers à modifier
+
+### 1. `App.tsx` (lignes ~688-700)
+- Calculer `actionPlanComplete` : boolean indiquant si le dernier projet analysé a toutes ses solutions
+- Calculer `actionPlanProgress` : `{ completed: number, total: number }` pour l'affichage
+- Passer `history` (ou `actionPlanComplete` + `actionPlanProgress`) + `onNavigateToActionPlan` à Directory
+
+**Calcul dans App.tsx** :
+```tsx
+const actionPlanStatus = useMemo(() => {
+  if (history.length === 0) return { complete: false, completed: 0, total: 0 };
+  // Prendre le projet le plus récent (dernier analysé)
+  const latest = history[history.length - 1];
+  const total = latest.recommendations.length;
+  const completed = latest.recommendations.filter(rec =>
+    latest.generatedSolutions?.[rec.id]
+  ).length;
+  return { complete: total > 0 && completed === total, completed, total };
+}, [history]);
+```
+
+**Props ajoutés à Directory** :
+```tsx
+<Directory
+  ...existing props...
+  actionPlanComplete={actionPlanStatus.complete}
+  actionPlanProgress={actionPlanStatus}
+  onNavigateToActionPlan={() => {
+    setResultsTab('recommendations');
+    navigateTo('projects');
+  }}
+/>
+```
+
+### 2. `pages/Directory.tsx`
+**Interface** — Ajouter 3 props :
+```tsx
+interface DirectoryProps {
+  ...existing...
+  actionPlanComplete: boolean;
+  actionPlanProgress: { completed: number; total: number };
+  onNavigateToActionPlan: () => void;
+}
+```
+
+**Modifications dans le composant** :
+
+a) **Bouton "Rejoindre l'Index"** : en plus de la vérification quota, ajouter vérification `actionPlanComplete`
+   - Si `!actionPlanComplete` → afficher un modal "Plan d'action incomplet" avec la progression X/Y et un bouton CTA "Compléter le plan d'action" qui navigue vers le Monitoring AEO
+
+b) **Carte "Votre entreprise ici ?"** : même vérification sur le lien "Ajouter mon site"
+
+c) **Nouveau modal** : "Plan d'action incomplet"
+   - Icône ClipboardCheck (orange/amber)
+   - Titre : "Plan d'action à compléter"
+   - Message : "Vous devez valider toutes les solutions de votre plan d'action AEO avant de pouvoir rejoindre l'index."
+   - Barre de progression : X/Y solutions validées
+   - Bouton principal : "Compléter mon plan d'action →" → `onNavigateToActionPlan()`
+   - Bouton secondaire : "Fermer"
+
+d) **Badge sur le bouton header** : si `!actionPlanComplete`, afficher badge "Plan d'action" au lieu de laisser le bouton actif
+
+e) **Ordre de priorité des vérifications** :
+   1. D'abord vérifier quota (si limite atteinte → modal limite)
+   2. Ensuite vérifier plan d'action (si incomplet → modal plan d'action)
+   3. Sinon → ouvrir le tunnel
+
+## Vérification
+1. `npm run build` — doit passer sans erreur
+2. Avec un user "free" ayant 0 projets mais plan d'action incomplet → cliquer "Rejoindre l'Index" → modal "Plan d'action à compléter" avec progression
+3. Avec un user ayant atteint sa limite → modal "Limite de projets" (prioritaire sur le plan d'action)
+4. Avec plan d'action complet et quota disponible → tunnel s'ouvre normalement
+5. Badge "Plan d'action" visible sur le bouton quand le plan n'est pas complet

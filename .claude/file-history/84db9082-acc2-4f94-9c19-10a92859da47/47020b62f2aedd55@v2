@@ -1,0 +1,84 @@
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Footer } from '@/components/landing/footer';
+import { Calendar } from 'lucide-react';
+
+const posts = [
+  {
+    title: 'Introducing NexusAI: AI-Powered Document Processing & Feedback Analysis',
+    excerpt: 'Today we launch NexusAI, a unified platform that combines intelligent document extraction with smart survey analysis. Learn how GPT-4o Vision powers our document understanding.',
+    date: '2026-02-20',
+    category: 'Product',
+  },
+  {
+    title: 'How GPT-4o Vision Achieves 99% Accuracy on Invoice Extraction',
+    excerpt: 'A deep dive into how we use GPT-4o Vision to extract structured data from invoices, receipts, and contracts with confidence scores for every field.',
+    date: '2026-02-18',
+    category: 'Technology',
+  },
+  {
+    title: 'Building Better Surveys: 6 Question Types That Get Real Feedback',
+    excerpt: 'Learn how to use Rating, NPS, Multiple Choice, Single Choice, Open Ended, and Yes/No questions to get actionable customer feedback.',
+    date: '2026-02-15',
+    category: 'Guide',
+  },
+  {
+    title: 'From Raw Feedback to Actionable Insights in Seconds',
+    excerpt: 'Our AI analysis engine detects sentiment, identifies themes, and generates prioritized recommendations from your survey responses automatically.',
+    date: '2026-02-12',
+    category: 'Product',
+  },
+];
+
+export default function BlogPage() {
+  return (
+    <div className="min-h-screen">
+      <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">N</span>
+              </div>
+              <span className="text-lg font-bold">NexusAI</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost"><Link href="/login">Sign In</Link></Button>
+              <Button asChild><Link href="/signup">Get Started</Link></Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="mx-auto max-w-4xl px-6 py-16">
+        <h1 className="text-4xl font-bold tracking-tight text-center">Blog</h1>
+        <p className="mt-4 text-lg text-muted-foreground text-center">
+          Product updates, guides, and insights from the NexusAI team.
+        </p>
+
+        <div className="mt-12 space-y-6">
+          {posts.map((post) => (
+            <Card key={post.title} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
+                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">{post.category}</span>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </div>
+                </div>
+                <CardTitle className="text-xl">{post.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{post.excerpt}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

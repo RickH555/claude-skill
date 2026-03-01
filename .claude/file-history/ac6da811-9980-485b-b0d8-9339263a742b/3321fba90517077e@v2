@@ -1,0 +1,111 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { AuthorProfile, GeneratedAuthorBio } from "../../types/eeat";
+import { PROMPT_AUTHOR_BIO } from "./prompts";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackSimulation = async (profile: AuthorProfile): Promise<GeneratedAuthorBio> => {
+  await new Promise(resolve => setTimeout(resolve, 1800));
+
+  const creds = profile.credentials.map(c => c.name).join(', ');
+  const specs = profile.specializations.join(', ');
+  const eduStr = profile.education.map(e => `${e.degree} en ${e.field}, ${e.institution} (${e.year})`).join('. ');
+  const socials = profile.socialProfiles.map(s => `"${s.url}"`).join(', ');
+
+  const bioShort = `${profile.name}, ${profile.jobTitle} chez ${profile.organization}. ${profile.yearsExperience} ans d'experience en ${specs}. ${creds ? `Certifie ${creds}.` : ''} Expert reconnu dans son domaine.`.trim();
+
+  const bioLong = `${profile.name} est ${profile.jobTitle} chez ${profile.organization}, avec plus de ${profile.yearsExperience} ans d'experience dans le domaine. Specialise en ${specs}, il/elle accompagne les entreprises dans leur transformation digitale et leur strategie de visibilite.
+
+${profile.education.length > 0 ? `Formation : ${eduStr}.` : ''}
+${creds ? `Certifications : ${creds}.` : ''}
+${profile.awards && profile.awards.length > 0 ? `Recompense(s) : ${profile.awards.map(a => `${a.name} (${a.issuer}, ${a.year})`).join(', ')}.` : ''}
+${profile.publications && profile.publications.length > 0 ? `Auteur de ${profile.publications.length} publication(s) dans le secteur.` : ''}
+
+Son expertise est regulierement sollicitee par des entreprises et medias du secteur. Chaque contenu redige par ${profile.name} s'appuie sur une experience terrain et des donnees verifiables.`.trim();
+
+  const schemaOrg = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": profile.name,
+    "jobTitle": profile.jobTitle,
+    "worksFor": { "@type": "Organization", "name": profile.organization },
+    "description": bioShort,
+    ...(profile.photoUrl && { "image": profile.photoUrl }),
+    "sameAs": profile.socialProfiles.map(s => s.url),
+    ...(profile.credentials.length > 0 && {
+      "hasCredential": profile.credentials.map(c => ({
+        "@type": "EducationalOccupationalCredential",
+        "name": c.name,
+        "credentialCategory": c.type,
+        "recognizedBy": { "@type": "Organization", "name": c.issuer }
+      }))
+    }),
+    ...(profile.education.length > 0 && {
+      "alumniOf": profile.education.map(e => ({
+        "@type": "EducationalOrganization",
+        "name": e.institution
+      }))
+    }),
+    ...(profile.awards && profile.awards.length > 0 && {
+      "award": profile.awards.map(a => a.name)
+    }),
+    "knowsAbout": profile.specializations,
+  }, null, 2);
+
+  const htmlBlock = `<div class="flex items-start gap-4 p-6 bg-[#111111] border border-white/[0.06] rounded-2xl">
+  ${profile.photoUrl ? `<img src="${profile.photoUrl}" alt="${profile.name}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-500/30" />` : `<div class="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xl">${profile.name.charAt(0)}</div>`}
+  <div class="flex-1">
+    <h3 class="text-lg font-bold text-white">${profile.name}</h3>
+    <p class="text-sm text-purple-400 font-medium">${profile.jobTitle} — ${profile.organization}</p>
+    <p class="text-sm text-gray-400 mt-2 leading-relaxed">${bioShort}</p>
+    <div class="flex items-center gap-3 mt-3">
+      ${profile.socialProfiles.map(s => `<a href="${s.url}" target="_blank" rel="noopener" class="text-xs text-gray-500 hover:text-purple-400 transition-colors">${s.platform}</a>`).join('\n      ')}
+    </div>
+  </div>
+</div>`;
+
+  return { bioShort, bioLong, schemaOrg, htmlBlock };
+};
+
+export const generateAuthorBio = async (profile: AuthorProfile): Promise<GeneratedAuthorBio> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.warn("API_KEY not found, using simulation.");
+    return fallbackSimulation(profile);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        bioShort: { type: Type.STRING, description: "Bio courte (50 mots max)" },
+        bioLong: { type: Type.STRING, description: "Bio longue (150 mots max)" },
+        schemaOrg: { type: Type.STRING, description: "Schema.org Person JSON-LD complet" },
+        htmlBlock: { type: Type.STRING, description: "Bloc HTML pret a integrer avec Tailwind" },
+      },
+      required: ["bioShort", "bioLong", "schemaOrg", "htmlBlock"],
+    };
+
+    const prompt = `${PROMPT_AUTHOR_BIO}\n\n## PROFIL AUTEUR\n${JSON.stringify(profile, null, 2)}\n\nGenere les bios, le Schema.org Person et le bloc HTML.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3 }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(output);
+  } catch (error) {
+    console.error("Author Bio generation failed:", error);
+    return fallbackSimulation(profile);
+  }
+};

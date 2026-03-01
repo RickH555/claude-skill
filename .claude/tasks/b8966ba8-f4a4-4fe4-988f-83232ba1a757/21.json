@@ -1,0 +1,9 @@
+{
+  "id": "21",
+  "subject": "Create theme-context.tsx, utils.ts, layout.tsx, page.tsx",
+  "description": "Create the 4 TypeScript files for the root layout: theme-context provider, cn utility, root layout with Geist fonts and Toaster, and home page with redirect to /login",
+  "activeForm": "Creating root layout and supporting files",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,46 @@
+export type IntegrationType = 'ga4' | 'search-console';
+
+export interface Integration {
+  id: string;
+  type: IntegrationType;
+  name: string;
+  email: string;
+  property: string; // GA4 property or SC site
+  connectedAt: string;
+  status: 'connected' | 'disconnected' | 'error';
+}
+
+export interface AttributionKPI {
+  aiVisits: number;
+  aiConversions: number;
+  aiTrafficShare: number; // percentage
+  aiAvgCTR: number; // percentage
+}
+
+export interface TrafficDataPoint {
+  date: string;
+  chatgpt: number;
+  perplexity: number;
+  claude: number;
+  gemini: number;
+  copilot: number;
+}
+
+export interface AttributionRow {
+  source: string;
+  visits: number;
+  pageViews: number;
+  avgDuration: string; // "2m 34s"
+  bounceRate: number;
+  conversions: number;
+  trend: number; // percentage
+}
+
+export interface AIQuery {
+  query: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+  isAIReferral: boolean;
+}

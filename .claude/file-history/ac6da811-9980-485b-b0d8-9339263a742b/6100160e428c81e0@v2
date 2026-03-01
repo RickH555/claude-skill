@@ -1,0 +1,96 @@
+import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { TrustSignalsConfig, GeneratedTrustBlock } from "../../types/eeat";
+import { PROMPT_TRUST_SIGNALS } from "./prompts";
+
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return null;
+};
+
+const fallbackSimulation = async (config: TrustSignalsConfig, orgName: string): Promise<GeneratedTrustBlock> => {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  const certsHtml = config.certifications.length > 0
+    ? `<div class="mb-8"><h3 class="text-lg font-bold text-white mb-4">Certifications & Partenaires</h3><div class="flex flex-wrap gap-3">${config.certifications.map(c => `<div class="px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-lg"><span class="text-sm font-semibold text-purple-300">${c.name}</span><span class="text-xs text-gray-500 ml-2">par ${c.issuer}</span></div>`).join('')}</div></div>`
+    : '';
+
+  const pressHtml = config.pressMentions.length > 0
+    ? `<div class="mb-8"><h3 class="text-lg font-bold text-white mb-4">Ils parlent de nous</h3><div class="grid md:grid-cols-2 gap-4">${config.pressMentions.map(p => `<div class="p-4 bg-[#0a0a0a] border border-white/5 rounded-xl">${p.quote ? `<p class="text-sm text-gray-400 italic mb-2">"${p.quote}"</p>` : ''}<p class="text-xs text-gray-500 font-semibold">${p.outlet}</p></div>`).join('')}</div></div>`
+    : '';
+
+  const reviewsHtml = config.reviews.length > 0
+    ? `<div class="mb-8"><h3 class="text-lg font-bold text-white mb-4">Avis Clients</h3><div class="flex flex-wrap gap-4">${config.reviews.map(r => `<div class="p-4 bg-[#0a0a0a] border border-white/5 rounded-xl text-center min-w-[140px]"><p class="text-2xl font-bold text-amber-400">${r.rating}/5</p><p class="text-xs text-gray-500 mt-1">${r.count} avis sur ${r.platform}</p></div>`).join('')}</div></div>`
+    : '';
+
+  const guaranteesHtml = config.guarantees.length > 0
+    ? `<div class="mb-8"><h3 class="text-lg font-bold text-white mb-4">Nos Garanties</h3><div class="grid md:grid-cols-2 gap-4">${config.guarantees.map(g => {
+        const icons: Record<string, string> = { money_back: '💰', satisfaction: '✅', warranty: '🛡️', free_returns: '↩️' };
+        return `<div class="flex items-start gap-3 p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl"><span class="text-xl">${icons[g.type] || '✓'}</span><div><p class="text-sm font-semibold text-emerald-300">${g.details}</p>${g.duration ? `<p class="text-xs text-gray-500 mt-1">${g.duration}</p>` : ''}</div></div>`;
+      }).join('')}</div></div>`
+    : '';
+
+  const proofHtml = config.socialProof.length > 0
+    ? `<div class="mb-8"><div class="flex flex-wrap gap-6 justify-center">${config.socialProof.map(s => `<div class="text-center"><p class="text-2xl font-bold text-purple-400">${s.metric}</p>${s.description ? `<p class="text-xs text-gray-500 mt-1">${s.description}</p>` : ''}</div>`).join('')}</div></div>`
+    : '';
+
+  const badgesHtml = config.securityBadges.length > 0
+    ? `<div class="mb-8"><div class="flex flex-wrap gap-3 justify-center">${config.securityBadges.map(b => {
+        const labels: Record<string, string> = { ssl: 'SSL Securise', pci: 'PCI DSS', gdpr: 'Conforme RGPD', secure_payment: 'Paiement Securise' };
+        return `<div class="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs text-emerald-300 font-medium">${labels[b.type] || b.type}</div>`;
+      }).join('')}</div></div>`
+    : '';
+
+  const html = `<div class="space-y-6">${proofHtml}${certsHtml}${pressHtml}${reviewsHtml}${guaranteesHtml}${badgesHtml}</div>`;
+
+  const schemaOrg = config.reviews.length > 0 ? JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": orgName,
+    "aggregateRating": config.reviews.map(r => ({
+      "@type": "AggregateRating",
+      "ratingValue": r.rating.toString(),
+      "reviewCount": r.count.toString(),
+      "bestRating": "5",
+    }))[0],
+  }, null, 2) : '{}';
+
+  return { html, schemaOrg };
+};
+
+export const generateTrustSignals = async (config: TrustSignalsConfig, orgName: string): Promise<GeneratedTrustBlock> => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.warn("API_KEY not found, using simulation.");
+    return fallbackSimulation(config, orgName);
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const schema: Schema = {
+      type: Type.OBJECT,
+      properties: {
+        html: { type: Type.STRING, description: "HTML complet des blocs de confiance" },
+        schemaOrg: { type: Type.STRING, description: "Schema.org JSON-LD pour les avis" },
+      },
+      required: ["html", "schemaOrg"],
+    };
+
+    const prompt = `${PROMPT_TRUST_SIGNALS}\n\n## DONNEES\nOrganisation: ${orgName}\n${JSON.stringify(config, null, 2)}\n\nGenere les blocs HTML et le Schema.org.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: { responseMimeType: 'application/json', responseSchema: schema, temperature: 0.3 }
+    });
+
+    let output = response.text;
+    if (!output) throw new Error("Empty response");
+    output = output.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(output);
+  } catch (error) {
+    console.error("Trust Signals generation failed:", error);
+    return fallbackSimulation(config, orgName);
+  }
+};

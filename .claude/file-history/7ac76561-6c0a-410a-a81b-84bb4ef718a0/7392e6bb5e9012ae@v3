@@ -1,0 +1,355 @@
+import React, { useState } from 'react';
+import { AnalysisResult, CategoryScore, GeneratedSolution, User } from '../types';
+import CategoryCard from '../components/CategoryCard';
+import { Info, Download, Share2, ScanLine, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
+interface Props {
+  data: AnalysisResult;
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  onSaveSolution: (analysisId: string, recId: string, solution: GeneratedSolution) => void;
+  initialTab?: 'details' | 'archives' | 'overview'; // Expanded type to include overview
+  onNewAnalysis?: () => void;
+}
+
+export const Results: React.FC<Props> = ({ data, onBack, user, onDeductCredits, onSaveSolution, onNewAnalysis }) => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const categoryScores = Object.values(data.categories) as CategoryScore[];
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('full-pdf-report');
+    if (!element) return;
+
+    setIsExporting(true);
+    try {
+      // Wait a moment for the hidden div to render properly
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: 1000 // Force width to match container style
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // First page
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      // Subsequent pages if content overflows
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+      
+      const hostname = new URL(data.url).hostname;
+      pdf.save(`Audit_AEO_${hostname}_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (err) {
+      console.error('PDF Export failed', err);
+      alert('Erreur lors de la génération du PDF.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Rapport AEO - CitedBy.ai',
+      text: `Découvrez l'analyse AEO pour ${data.url} sur CitedBy.ai`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Lien du rapport copié dans le presse-papier !');
+      }
+    } catch (err) {
+      console.error('Share failed', err);
+    }
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 pb-20 pt-6 relative">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6 pt-6">
+        <div>
+          <h1 className="text-3xl font-sans font-bold text-white mb-2"><span className="gradient-text">{new URL(data.url).hostname}</span></h1>
+          <p className="text-gray-400 text-sm">Analysé le {new Date(data.timestamp).toLocaleDateString()} à {new Date(data.timestamp).toLocaleTimeString()}</p>
+        </div>
+        
+        {onNewAnalysis && (
+            <button 
+                onClick={onNewAnalysis}
+                className="btn-gradient flex items-center gap-2 px-6 py-3 text-white font-bold transition-all hover:scale-105"
+            >
+                <ScanLine size={18} /> Lancer un nouvel audit
+            </button>
+        )}
+      </div>
+
+      {/* Content - Single View (Details) */}
+      <div className="min-h-[500px]">
+          <div className="space-y-6 animate-in fade-in">
+            <div className="flex justify-between items-center mb-4">
+               <h3 className="text-lg font-sans font-semibold text-white">Analyse <span className="gradient-text">détaillée</span> par catégorie</h3>
+               <div className="flex gap-3">
+                  <button 
+                    onClick={handleShare}
+                    className="flex items-center gap-2 px-5 py-2.5 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] rounded-full text-sm text-gray-300 transition-colors"
+                  >
+                    <Share2 size={16} /> Partager
+                  </button>
+                  <button 
+                    onClick={handleDownloadPDF}
+                    disabled={isExporting}
+                    className="flex items-center gap-2 px-5 py-2.5 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] rounded-full text-sm text-purple-400 font-medium transition-colors"
+                  >
+                    {isExporting ? (
+                        <>
+                            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                            Génération...
+                        </>
+                    ) : (
+                        <>
+                            <Download size={16} /> Générer PDF Complet
+                        </>
+                    )}
+                  </button>
+               </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {categoryScores.map((cat, i) => (
+                <CategoryCard key={i} category={cat} />
+              ))}
+            </div>
+
+            {/* --- PROFESSIONAL PDF REPORT CONTAINER (HIDDEN) --- */}
+            <div 
+              id="full-pdf-report" 
+              className="bg-white text-black font-sans"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-9999px',
+                width: '1000px', 
+                padding: '60px',
+              }}
+            >
+              {/* PAGE 1: COVER */}
+              <div className="flex flex-col h-[1300px] relative border-b-2 border-gray-100 mb-10 pb-10">
+                  {/* Header Logo */}
+                  <div className="flex justify-between items-center mb-20">
+                      <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded bg-[#a855f7] flex items-center justify-center text-white font-serif font-bold text-3xl">C</div>
+                          <span className="font-serif text-3xl font-bold text-gray-900">CitedBy.ai</span>
+                      </div>
+                      <div className="text-right">
+                          <p className="text-gray-500 text-sm">Rapport d'Audit AEO</p>
+                          <p className="text-gray-900 font-bold">{new Date(data.timestamp).toLocaleDateString()}</p>
+                      </div>
+                  </div>
+
+                  {/* Title Section */}
+                  <div className="text-center mt-20 mb-20">
+                      <h1 className="text-5xl font-serif font-bold text-gray-900 mb-6 tracking-tight">Audit de Visibilité Générative</h1>
+                      <p className="text-2xl text-gray-500">{new URL(data.url).hostname}</p>
+                  </div>
+
+                  {/* Score Hero */}
+                  <div className="flex justify-center mb-20">
+                      <div className="relative w-64 h-64 flex items-center justify-center">
+                          {/* We recreate a static SVG ring for PDF to avoid animation glitches */}
+                          <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                              <circle cx="50" cy="50" r="45" fill="none" stroke="#f3f4f6" strokeWidth="8" />
+                              <circle 
+                                cx="50" 
+                                cy="50" 
+                                r="45" 
+                                fill="none" 
+                                stroke={data.globalScore >= 80 ? "#a855f7" : data.globalScore >= 50 ? "#c084fc" : "#ef4444"}
+                                strokeWidth="8" 
+                                strokeDasharray={`${(data.globalScore / 100) * 283} 283`}
+                                strokeLinecap="round"
+                              />
+                          </svg>
+                          <div className="absolute flex flex-col items-center">
+                              <span className="text-6xl font-bold text-gray-900">{data.globalScore}</span>
+                              <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">Score Global</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Executive Summary */}
+                  <div className="bg-gray-50 p-8 rounded-2xl border border-gray-200 mt-auto mb-10">
+                      <h3 className="font-bold text-gray-900 text-lg mb-4 flex items-center gap-2">
+                          <Info size={20} className="text-[#a855f7]" /> Synthèse de l'analyste
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed mb-4">
+                          L'analyse de <strong>{new URL(data.url).hostname}</strong> révèle une probabilité de citation par les assistants IA de <strong>{data.aiCitation.probability}%</strong>. 
+                          {data.globalScore < 50 
+                              ? " L'entité manque actuellement de signaux structurés pour être correctement identifiée par les Knowledge Graphs."
+                              : " L'entité possède une base solide mais nécessite des optimisations sémantiques pour garantir la primauté de la réponse."}
+                      </p>
+                      <div className="grid grid-cols-3 gap-6 pt-4 border-t border-gray-200">
+                          <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold">Confiance</p>
+                              <p className="text-lg font-bold text-gray-900">{data.categories['trust']?.score || 0}/100</p>
+                          </div>
+                          <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold">Technique</p>
+                              <p className="text-lg font-bold text-gray-900">{data.categories['technical']?.score || 0}/100</p>
+                          </div>
+                          <div>
+                              <p className="text-xs text-gray-500 uppercase font-bold">Autorité</p>
+                              <p className="text-lg font-bold text-gray-900">{data.categories['entity']?.score || 0}/100</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              {/* PAGE 2+: RAPPORT D'AUDIT DÉTAILLÉ (pas de plan d'action) */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {/* Section Header */}
+                  <div style={{ marginBottom: '32px', borderBottom: '3px solid #a855f7', paddingBottom: '12px' }}>
+                      <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#111827', margin: '0 0 4px 0', fontFamily: 'Georgia, serif' }}>
+                          Rapport d'Audit Détaillé
+                      </h2>
+                      <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
+                          Analyse de {categoryScores.length} catégories — {categoryScores.reduce((sum, c) => sum + c.items.length, 0)} critères évalués
+                      </p>
+                  </div>
+
+                  {/* TABLEAU RÉCAPITULATIF */}
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '40px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
+                      <thead>
+                          <tr style={{ backgroundColor: '#f8f5ff' }}>
+                              <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #d8b4fe' }}>Catégorie</th>
+                              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #d8b4fe', width: '80px' }}>Score</th>
+                              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #d8b4fe', width: '70px' }}>Conforme</th>
+                              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #d8b4fe', width: '70px' }}>Alerte</th>
+                              <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#dc2626', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #d8b4fe', width: '70px' }}>Échec</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {categoryScores.map((cat, i) => {
+                              const successCount = cat.items.filter(item => item.status === 'success').length;
+                              const warningCount = cat.items.filter(item => item.status === 'warning').length;
+                              const errorCount = cat.items.filter(item => item.status === 'error').length;
+                              return (
+                                  <tr key={i} style={{ backgroundColor: i % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                                      <td style={{ padding: '10px 16px', fontSize: '13px', fontWeight: 600, color: '#111827', borderBottom: '1px solid #f3f4f6' }}>{cat.name}</td>
+                                      <td style={{ padding: '10px 16px', textAlign: 'center', borderBottom: '1px solid #f3f4f6' }}>
+                                          <span style={{
+                                              display: 'inline-block', padding: '2px 14px', borderRadius: '12px', fontSize: '13px', fontWeight: 700,
+                                              backgroundColor: cat.score >= 80 ? '#f0fdf4' : cat.score >= 50 ? '#faf5ff' : '#fef2f2',
+                                              color: cat.score >= 80 ? '#16a34a' : cat.score >= 50 ? '#7c3aed' : '#dc2626',
+                                          }}>{cat.score}</span>
+                                      </td>
+                                      <td style={{ padding: '10px 16px', textAlign: 'center', fontSize: '13px', fontWeight: 600, color: '#16a34a', borderBottom: '1px solid #f3f4f6' }}>{successCount}</td>
+                                      <td style={{ padding: '10px 16px', textAlign: 'center', fontSize: '13px', fontWeight: 600, color: '#d97706', borderBottom: '1px solid #f3f4f6' }}>{warningCount}</td>
+                                      <td style={{ padding: '10px 16px', textAlign: 'center', fontSize: '13px', fontWeight: 600, color: '#dc2626', borderBottom: '1px solid #f3f4f6' }}>{errorCount}</td>
+                                  </tr>
+                              );
+                          })}
+                          {/* Total row */}
+                          <tr style={{ backgroundColor: '#f8f5ff', borderTop: '2px solid #d8b4fe' }}>
+                              <td style={{ padding: '10px 16px', fontSize: '13px', fontWeight: 700, color: '#111827' }}>Total</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'center' }}>
+                                  <span style={{ display: 'inline-block', padding: '2px 14px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, backgroundColor: '#a855f7', color: '#ffffff' }}>{data.globalScore}</span>
+                              </td>
+                              <td style={{ padding: '10px 16px', textAlign: 'center', fontSize: '13px', fontWeight: 700, color: '#16a34a' }}>{categoryScores.reduce((s, c) => s + c.items.filter(i => i.status === 'success').length, 0)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'center', fontSize: '13px', fontWeight: 700, color: '#d97706' }}>{categoryScores.reduce((s, c) => s + c.items.filter(i => i.status === 'warning').length, 0)}</td>
+                              <td style={{ padding: '10px 16px', textAlign: 'center', fontSize: '13px', fontWeight: 700, color: '#dc2626' }}>{categoryScores.reduce((s, c) => s + c.items.filter(i => i.status === 'error').length, 0)}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+
+                  {/* TABLEAUX DÉTAILLÉS PAR CATÉGORIE */}
+                  {categoryScores.map((cat, i) => (
+                      <div key={i} style={{ marginBottom: '28px' }}>
+                          {/* Category Header Bar */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', padding: '10px 16px', backgroundColor: '#f8f5ff', borderLeft: '4px solid #a855f7', borderRadius: '0 6px 6px 0' }}>
+                              <div style={{
+                                  width: '34px', height: '34px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  fontSize: '13px', fontWeight: 700,
+                                  backgroundColor: cat.score >= 80 ? '#f0fdf4' : cat.score >= 50 ? '#ffffff' : '#fef2f2',
+                                  color: cat.score >= 80 ? '#16a34a' : cat.score >= 50 ? '#7c3aed' : '#dc2626',
+                                  border: `2px solid ${cat.score >= 80 ? '#bbf7d0' : cat.score >= 50 ? '#c4b5fd' : '#fca5a5'}`,
+                              }}>
+                                  {cat.score}
+                              </div>
+                              <span style={{ fontSize: '15px', fontWeight: 700, color: '#111827', margin: 0, flex: 1 }}>{cat.name}</span>
+                              <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500 }}>{cat.items.length} critères</span>
+                          </div>
+                          {/* Criteria Table */}
+                          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #e5e7eb', borderRadius: '6px', overflow: 'hidden' }}>
+                              <thead>
+                                  <tr style={{ backgroundColor: '#f9fafb' }}>
+                                      <th style={{ padding: '7px 12px', textAlign: 'center', fontSize: '10px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', borderBottom: '1px solid #e5e7eb', width: '36px' }}>#</th>
+                                      <th style={{ padding: '7px 12px', textAlign: 'left', fontSize: '10px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', borderBottom: '1px solid #e5e7eb' }}>Critère évalué</th>
+                                      <th style={{ padding: '7px 12px', textAlign: 'center', fontSize: '10px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', borderBottom: '1px solid #e5e7eb', width: '130px' }}>Statut</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {cat.items.map((item, idx) => (
+                                      <tr key={idx} style={{ backgroundColor: idx % 2 === 0 ? '#ffffff' : '#fafafa' }}>
+                                          <td style={{ padding: '7px 12px', textAlign: 'center', fontSize: '11px', color: '#9ca3af', borderBottom: '1px solid #f3f4f6' }}>{idx + 1}</td>
+                                          <td style={{ padding: '7px 12px', fontSize: '12px', color: '#374151', borderBottom: '1px solid #f3f4f6' }}>{item.message}</td>
+                                          <td style={{ padding: '7px 12px', textAlign: 'center', borderBottom: '1px solid #f3f4f6' }}>
+                                              <span style={{
+                                                  display: 'inline-block', padding: '2px 10px', borderRadius: '10px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.02em',
+                                                  backgroundColor: item.status === 'success' ? '#f0fdf4' : item.status === 'error' ? '#fef2f2' : '#fffbeb',
+                                                  color: item.status === 'success' ? '#16a34a' : item.status === 'error' ? '#dc2626' : '#d97706',
+                                                  border: `1px solid ${item.status === 'success' ? '#bbf7d0' : item.status === 'error' ? '#fecaca' : '#fde68a'}`,
+                                              }}>
+                                                  {item.status === 'success' ? '✓ Conforme' : item.status === 'error' ? '✗ Non conforme' : '⚠ À optimiser'}
+                                              </span>
+                                          </td>
+                                      </tr>
+                                  ))}
+                              </tbody>
+                          </table>
+                      </div>
+                  ))}
+              </div>
+
+              {/* Footer */}
+              <div className="mt-20 pt-8 border-t border-gray-200 flex justify-between items-center text-gray-400 text-sm">
+                  <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded bg-gray-200 flex items-center justify-center text-gray-500 font-serif font-bold text-xs">C</div>
+                      <span>Généré par CitedBy.ai</span>
+                  </div>
+                  <p>Document confidentiel - Usage interne uniquement</p>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  );
+};

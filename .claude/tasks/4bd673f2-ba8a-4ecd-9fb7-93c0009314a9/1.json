@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Explorer le contexte du projet",
+  "description": "Vérifier les fichiers, docs, commits récents pour comprendre l'état actuel du projet",
+  "activeForm": "Exploration du contexte projet",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

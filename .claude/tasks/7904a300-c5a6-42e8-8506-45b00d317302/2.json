@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Verify build succeeds with restored pages",
+  "description": "Run TypeScript check and build to ensure everything compiles correctly",
+  "activeForm": "Verifying build",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

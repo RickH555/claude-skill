@@ -1,0 +1,219 @@
+import React, { useState } from 'react';
+import { User } from '../types';
+import { User as UserIcon, Mail, Shield, CreditCard, Key, Bell, LogOut, Fuel, Zap, Star, Check, Copy, AlertTriangle, Droplet, Database } from 'lucide-react';
+
+interface AccountProps {
+  user: User | null;
+  onLogout: () => void;
+  onNavigate: (view: any) => void;
+}
+
+const Account: React.FC<AccountProps> = ({ user, onLogout, onNavigate }) => {
+  const [apiKeyCopied, setApiKeyCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'billing'>('profile');
+
+  if (!user) return null;
+
+  const handleCopyApiKey = () => {
+    navigator.clipboard.writeText(`cb_${user.id}_${Math.random().toString(36).substr(2, 9)}`);
+    setApiKeyCopied(true);
+    setTimeout(() => setApiKeyCopied(false), 2000);
+  };
+
+  // Helper pour mapper le plan technique aux noms marketing GTO Gas
+  const getPlanDetails = (plan: string) => {
+    switch (plan) {
+      case 'enterprise':
+        return { 
+          name: 'La Citerne', 
+          icon: <Database size={14} className="fill-current" />, 
+          style: 'bg-purple-500/10 text-purple-500 border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]' 
+        };
+      case 'pro':
+        return { 
+          name: 'La Pompe', 
+          icon: <Fuel size={14} className="fill-current" />, 
+          style: 'bg-primary/10 text-primary border-primary/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
+        };
+      default:
+        return { 
+          name: 'Le Jerrican', 
+          icon: <Droplet size={14} />, 
+          style: 'bg-purple-500/5 text-gray-300 border-white/10' 
+        };
+    }
+  };
+
+  const planDetails = getPlanDetails(user.plan);
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-10 animate-in fade-in duration-500">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+          <h1 className="text-3xl font-sans font-bold text-white mb-2">Mon <span className="gradient-text">Compte</span></h1>
+          <p className="text-gray-400">Gérez vos informations personnelles, votre abonnement et vos préférences.</p>
+        </div>
+        <button 
+          onClick={onLogout}
+          className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors text-sm font-medium"
+        >
+          <LogOut size={16} /> Déconnexion
+        </button>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        
+        {/* Left Column: Profile Card & Navigation */}
+        <div className="space-y-6">
+           {/* Profile Summary */}
+           <div className="ninja-card p-6 rounded-2xl border border-white/10 text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-white/5 to-transparent"></div>
+              <div className="relative">
+                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-serif font-bold text-4xl shadow-xl shadow-primary/20 mb-4 border-4 border-[#050208]">
+                    {user.name.charAt(0).toUpperCase()}
+                </div>
+                <h2 className="text-xl font-bold text-white">{user.name}</h2>
+                <p className="text-sm text-gray-400 mb-4">{user.email}</p>
+                
+                {/* GTO Gas Plan Badge */}
+                <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-bold uppercase tracking-wide transition-all ${planDetails.style}`}>
+                    {planDetails.icon}
+                    {planDetails.name}
+                </div>
+              </div>
+           </div>
+
+           {/* GTO Gas Balance Card */}
+           <div className="ninja-card p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-accent/5 to-transparent relative overflow-hidden">
+              <div className="flex justify-between items-start mb-4">
+                  <div className="p-3 bg-accent/10 rounded-xl text-accent">
+                      <Fuel size={24} />
+                  </div>
+                  <button 
+                    onClick={() => onNavigate('recharge')}
+                    className="btn-gradient text-xs px-3 py-1.5"
+                  >
+                    Recharger
+                  </button>
+              </div>
+              <p className="text-sm text-gray-400 mb-1">Solde GTO Gas</p>
+              <div className="text-4xl font-serif font-bold text-white mb-2">{user.credits}</div>
+              <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                  <div className="bg-accent h-full rounded-full" style={{ width: `${Math.min((user.credits / 500) * 100, 100)}%` }}></div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Suffisant pour ~{Math.floor(user.credits / 10)} audits standards</p>
+           </div>
+        </div>
+
+        {/* Right Column: Details & Settings */}
+        <div className="lg:col-span-2 space-y-8">
+            
+            {/* API Access */}
+            <div className="ninja-card p-8 rounded-2xl border border-white/10">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <Key size={20} className="text-primary" /> Clés API & Intégrations
+                </h3>
+                <div className="bg-black/40 border border-white/10 rounded-xl p-4 flex items-center justify-between gap-4">
+                    <div className="flex-1 overflow-hidden">
+                        <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider">Clé Publique</p>
+                        <code className="text-sm text-purple-300 font-mono block truncate">cb_pk_live_{user.id.substring(0,8)}...</code>
+                    </div>
+                    <button 
+                        onClick={handleCopyApiKey}
+                        className="p-2 hover:bg-purple-500/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+                        title="Copier la clé"
+                    >
+                        {apiKeyCopied ? <Check size={18} className="text-primary" /> : <Copy size={18} />}
+                    </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                    Cette clé permet d'utiliser l'API CitedBy.ai pour automatiser vos audits. Ne la partagez jamais.
+                </p>
+            </div>
+
+            {/* General Settings Form */}
+            <div className="ninja-card p-8 rounded-2xl border border-white/10">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <UserIcon size={20} className="text-blue-400" /> Informations Personnelles
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-400">Nom Complet</label>
+                        <input 
+                            type="text" 
+                            defaultValue={user.name} 
+                            className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white focus:border-primary/50 outline-none"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-400">Email</label>
+                        <input 
+                            type="email" 
+                            defaultValue={user.email} 
+                            disabled
+                            className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-gray-400 cursor-not-allowed"
+                        />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                        <label className="text-sm font-medium text-gray-400">Workspace / Entreprise</label>
+                        <input 
+                            type="text" 
+                            defaultValue="Mon Espace Personnel" 
+                            className="w-full bg-[#111111] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white focus:border-primary/50 outline-none"
+                        />
+                    </div>
+                </div>
+                <div className="mt-6 flex justify-end">
+                    <button className="btn-gradient px-6 py-2.5 text-sm">
+                        Enregistrer les modifications
+                    </button>
+                </div>
+            </div>
+
+            {/* Notifications */}
+            <div className="ninja-card p-8 rounded-2xl border border-white/10">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <Bell size={20} className="text-purple-400" /> Préférences de notification
+                </h3>
+                <div className="space-y-4">
+                    {[
+                        { label: "Rapport d'audit terminé", desc: "Recevoir un email quand une analyse longue est finie.", default: true },
+                        { label: "Alerte de baisse de score", desc: "Notification si le score AEO chute de plus de 10%.", default: true },
+                        { label: "Offres & Nouveautés", desc: "Newsletters produit et mises à jour des algorithmes.", default: false },
+                    ].map((pref, i) => (
+                        <div key={i} className="flex items-start justify-between pb-4 border-b border-white/5 last:border-0 last:pb-0">
+                            <div>
+                                <p className="text-sm font-medium text-white">{pref.label}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">{pref.desc}</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" defaultChecked={pref.default} className="sr-only peer" />
+                                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Danger Zone */}
+            <div className="border border-red-500/20 rounded-2xl p-6 bg-red-500/5">
+                <h3 className="text-sm font-bold text-red-400 flex items-center gap-2 mb-2">
+                    <AlertTriangle size={16} /> Zone de danger
+                </h3>
+                <p className="text-xs text-gray-400 mb-4">
+                    La suppression du compte est irréversible. Toutes vos données d'audit et votre solde GTO Gas seront perdus.
+                </p>
+                <button className="text-xs font-bold text-red-500 hover:text-red-400 border border-red-500/30 hover:bg-red-500/10 px-4 py-2 rounded-lg transition-colors">
+                    Supprimer mon compte
+                </button>
+            </div>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Account;

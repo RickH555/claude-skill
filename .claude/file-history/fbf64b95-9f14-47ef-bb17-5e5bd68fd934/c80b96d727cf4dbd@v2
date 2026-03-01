@@ -1,0 +1,37 @@
+export const dynamic = 'force-dynamic';
+
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import { UploadZone } from '@/components/documents/upload-zone';
+
+export default async function UploadPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.organization_id) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-muted-foreground">Please set up your organization first.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 max-w-3xl">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Upload Documents</h1>
+        <p className="text-muted-foreground">
+          Upload documents and extract data using AI
+        </p>
+      </div>
+      <UploadZone organizationId={profile.organization_id} />
+    </div>
+  );
+}

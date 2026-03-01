@@ -1,0 +1,608 @@
+{
+  "numStartups": 70,
+  "installMethod": "global",
+  "hasSeenTasksHint": true,
+  "tipsHistory": {
+    "new-user-warmup": 7,
+    "plan-mode-for-complex-tasks": 69,
+    "terminal-setup": 64,
+    "memory-command": 63,
+    "theme-command": 64,
+    "status-line": 53,
+    "prompt-queue": 24,
+    "enter-to-steer-in-relatime": 64,
+    "todo-list": 64,
+    "install-github-app": 64,
+    "install-slack-app": 64,
+    "drag-and-drop-images": 66,
+    "double-esc-code-restore": 67,
+    "continue": 67,
+    "shift-tab": 67,
+    "image-paste": 64,
+    "desktop-app": 64,
+    "web-app": 65,
+    "mobile-app": 65,
+    "guest-passes": 70,
+    "overage-promo": 24,
+    "custom-agents": 66,
+    "agent-flag": 69,
+    "frontend-design-plugin": 63,
+    "permissions": 64,
+    "rename-conversation": 58,
+    "custom-commands": 58,
+    "ide-upsell-external-terminal": 30,
+    "git-worktrees": 61
+  },
+  "promptQueueUseCount": 425,
+  "autoConnectIde": true,
+  "cachedGrowthBookFeatures": {
+    "tengu_mcp_tool_search": true,
+    "tengu_scratch": false,
+    "tengu_disable_bypass_permissions_mode": false,
+    "tengu_1p_event_batch_config": {
+      "scheduledDelayMillis": 5000,
+      "maxExportBatchSize": 200,
+      "maxQueueSize": 8192
+    },
+    "tengu_event_sampling_config": {},
+    "tengu_log_segment_events": false,
+    "tengu_log_datadog_events": true,
+    "tengu_marble_anvil": true,
+    "tengu_tool_pear": false,
+    "tengu_scarf_coffee": false,
+    "tengu_keybinding_customization_release": true,
+    "tengu_penguins_enabled": true,
+    "tengu_thinkback": false,
+    "tengu_chomp_inflection": true,
+    "tengu_oboe": true,
+    "tengu_c4w_usage_limit_notifications_enabled": true,
+    "tengu_silver_lantern": false,
+    "tengu-top-of-feed-tip": {
+      "tip": "",
+      "color": ""
+    },
+    "tengu_react_vulnerability_warning": false,
+    "tengu_code_diff_cli": true,
+    "tengu_pr_status_cli": true,
+    "tengu_post_compact_survey": false,
+    "tengu_copper_lantern": false,
+    "tengu_claudeai_mcp_connectors": true,
+    "tengu_marble_kite": false,
+    "tengu_plan_mode_interview_phase": false,
+    "tengu_tst_names_in_messages": false,
+    "enhanced_telemetry_beta": false,
+    "tengu_tool_search_unsupported_models": [
+      "haiku"
+    ],
+    "tengu_vinteuil_phrase": true,
+    "tengu_pid_based_version_locking": true,
+    "tengu_system_prompt_global_cache": true,
+    "tengu_attribution_header": true,
+    "tengu_workout2": true,
+    "tengu_coral_fern": false,
+    "tengu_cache_plum_violet": true,
+    "tengu_streaming_tool_execution2": true,
+    "tengu_session_memory": false,
+    "tengu_plank_river_frost": "user_intent",
+    "tengu_copper_lantern_config": {
+      "meridian": "2026-02-05T07:59:00Z"
+    },
+    "tengu_marble_lantern_disabled": false,
+    "tengu_cork_m4q": true,
+    "tengu_file_write_optimization": true,
+    "tengu_chrome_auto_enable": false,
+    "tengu_permission_explainer": true,
+    "tengu_plum_vx3": true,
+    "tengu_sm_compact": false,
+    "tengu_compact_cache_prefix": true,
+    "tengu_compact_streaming_retry": false,
+    "tengu_tst_kx7": false,
+    "tengu_mcp_elicitation": false,
+    "tengu_bergotte_lantern": false,
+    "tengu_snippet_save": false,
+    "tengu_birthday_hat": false,
+    "tengu_fgts": false,
+    "tengu_prompt_cache_1h_config": {
+      "allowlist": [
+        "repl_main_thread*",
+        "sdk"
+      ]
+    },
+    "tengu_immediate_model_command": false,
+    "tengu_disable_streaming_to_non_streaming_fallback": false,
+    "tengu_penguins_off": null,
+    "tengu_worktree_mode": true,
+    "tengu_marble_sandcastle": true,
+    "tengu_pebble_leaf_prune": false,
+    "tengu_birch_mist": true,
+    "tengu_swann_brevity": "polished",
+    "tengu_crystal_beam": {
+      "budgetTokens": 0
+    },
+    "tengu_oak_drum": false,
+    "tengu_tool_input_aliasing": false,
+    "tengu_slate_nexus": true,
+    "tengu_streaming_text": false,
+    "tengu_destructive_command_warning": false,
+    "tengu_auto_background_agents": false,
+    "tengu_moth_copse": false,
+    "tengu_ccr_bridge": false,
+    "tengu_mulberry_fog": false,
+    "tengu_coral_whistle": false,
+    "tengu_amber_prism": false,
+    "tengu_bridge_min_version": {
+      "minVersion": "0.0.0"
+    },
+    "tengu_bridge_poll_interval_ms": 3000,
+    "tengu_amber_quartz": false,
+    "tengu_summarize_tool_results": false
+  },
+  "firstStartTime": "2026-02-07T20:58:20.475Z",
+  "userID": "0a7f3d69311bfe3545b75289e67a7fd594b0b39f964df84be4a1a1eb2bcef7fd",
+  "sonnet45MigrationComplete": true,
+  "opus45MigrationComplete": true,
+  "opusProMigrationComplete": true,
+  "thinkingMigrationComplete": true,
+  "cachedChromeExtensionInstalled": true,
+  "changelogLastFetched": 1772285568879,
+  "claudeCodeFirstTokenDate": "2025-11-29T11:43:21.746511Z",
+  "hasCompletedOnboarding": true,
+  "lastOnboardingVersion": "2.1.59",
+  "projects": {
+    "C:/Users/User/Documents/citedby-v3": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 1,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "lastCost": 0,
+      "lastAPIDuration": 0,
+      "lastAPIDurationWithoutRetries": 0,
+      "lastToolDuration": 0,
+      "lastDuration": 156595,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 0,
+      "lastTotalOutputTokens": 0,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastFpsAverage": 0.09,
+      "lastFpsLow1Pct": 4.31,
+      "lastModelUsage": {},
+      "lastSessionId": "7c72238e-41dc-439f-b94d-c6d230bef952"
+    },
+    "C:\\Users\\User\\Documents\\citedby-v3": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:\\Users\\User\\Desktop\\UltimateSaaSCitedbyai": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:\\Users\\User\\Downloads\\citedby.ai X2": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:\\Users\\User\\Downloads\\citedby-saasv12-audited": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:\\Users\\User\\Downloads\\citedby.ai xxxxx)": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:\\Users\\User\\Downloads\\SaaSV13 - Rick": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:\\Users\\User\\Downloads\\SMC TRADING SAAS": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:/Users/User": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": false,
+      "projectOnboardingSeenCount": 4,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "exampleFiles": [],
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "lastCost": 0,
+      "lastAPIDuration": 0,
+      "lastAPIDurationWithoutRetries": 0,
+      "lastToolDuration": 0,
+      "lastDuration": 72718,
+      "lastLinesAdded": 0,
+      "lastLinesRemoved": 0,
+      "lastTotalInputTokens": 0,
+      "lastTotalOutputTokens": 0,
+      "lastTotalCacheCreationInputTokens": 0,
+      "lastTotalCacheReadInputTokens": 0,
+      "lastTotalWebSearchRequests": 0,
+      "lastFpsAverage": 1.18,
+      "lastFpsLow1Pct": 13.48,
+      "lastModelUsage": {},
+      "lastSessionId": "7255b7e7-77fd-47e4-bc55-084f85166065",
+      "hasCompletedProjectOnboarding": true,
+      "lastSessionMetrics": {
+        "frame_duration_ms_count": 77,
+        "frame_duration_ms_min": 0.08209999999962747,
+        "frame_duration_ms_max": 74.20740000000114,
+        "frame_duration_ms_avg": 5.907927272726998,
+        "frame_duration_ms_p50": 0.8485000000000582,
+        "frame_duration_ms_p95": 23.097920000004915,
+        "frame_duration_ms_p99": 47.249972000000305,
+        "hook_duration_ms_count": 1,
+        "hook_duration_ms_min": 2311,
+        "hook_duration_ms_max": 2311,
+        "hook_duration_ms_avg": 2311,
+        "hook_duration_ms_p50": 2311,
+        "hook_duration_ms_p95": 2311,
+        "hook_duration_ms_p99": 2311
+      }
+    },
+    "C:/Users/User/Downloads/SaaSV13 - Rick": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "mcpServers": {},
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false,
+      "reactVulnerabilityCache": {
+        "detected": false,
+        "package": null,
+        "packageName": null,
+        "version": null,
+        "packageManager": null
+      },
+      "hasCompletedProjectOnboarding": true
+    },
+    "C:\\Users\\User\\citedby-ai": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    },
+    "C:\\Users\\User\\AstroLabDiffusion": {
+      "allowedTools": [],
+      "mcpContextUris": [],
+      "enabledMcpjsonServers": [],
+      "disabledMcpjsonServers": [],
+      "hasTrustDialogAccepted": true,
+      "projectOnboardingSeenCount": 0,
+      "hasClaudeMdExternalIncludesApproved": false,
+      "hasClaudeMdExternalIncludesWarningShown": false
+    }
+  },
+  "lastReleaseNotesSeen": "2.1.63",
+  "hasShownOpus46Notice": {
+    "0e714d1f-2f2f-4c21-91c1-17b70825dbc6": true
+  },
+  "groveConfigCache": {
+    "1f985a36-821f-4730-a874-2b75898dff63": {
+      "grove_enabled": true,
+      "timestamp": 1772278526322
+    }
+  },
+  "s1mAccessCache": {
+    "0e714d1f-2f2f-4c21-91c1-17b70825dbc6": {
+      "hasAccess": false,
+      "hasAccessNotAsDefault": false,
+      "timestamp": 1771705193924
+    }
+  },
+  "penguinModeOrgEnabled": false,
+  "passesEligibilityCache": {
+    "0e714d1f-2f2f-4c21-91c1-17b70825dbc6": {
+      "eligible": true,
+      "referral_code_details": {
+        "code": "SO6kWaQtJQ",
+        "campaign": "claude_code_guest_pass",
+        "referral_link": "https://claude.ai/referral/SO6kWaQtJQ"
+      },
+      "referrer_reward": null,
+      "remaining_passes": 3,
+      "timestamp": 1772285575334
+    }
+  },
+  "officialMarketplaceAutoInstallAttempted": true,
+  "officialMarketplaceAutoInstalled": true,
+  "clientDataCache": {
+    "data": {},
+    "timestamp": 1772182460753
+  },
+  "passesUpsellSeenCount": 4,
+  "hasVisitedPasses": false,
+  "passesLastSeenRemaining": 3,
+  "showSpinnerTree": false,
+  "opus46FeedSeenCount": 22,
+  "skillUsage": {
+    "senior-frontend": {
+      "usageCount": 3,
+      "lastUsedAt": 1772280969535
+    },
+    "debug": {
+      "usageCount": 3,
+      "lastUsedAt": 1771172995610
+    },
+    "ultra-think": {
+      "usageCount": 4,
+      "lastUsedAt": 1771707426613
+    },
+    "claude-developer-platform": {
+      "usageCount": 2,
+      "lastUsedAt": 1772278572812
+    },
+    "ui-ux-pro-max": {
+      "usageCount": 4,
+      "lastUsedAt": 1772105629499
+    },
+    "skills-search": {
+      "usageCount": 1,
+      "lastUsedAt": 1771968125829
+    },
+    "brainstorming": {
+      "usageCount": 7,
+      "lastUsedAt": 1772189153340
+    },
+    "writing-plans": {
+      "usageCount": 4,
+      "lastUsedAt": 1772190044234
+    },
+    "subagent-driven-development": {
+      "usageCount": 2,
+      "lastUsedAt": 1772066342197
+    },
+    "security-scan": {
+      "usageCount": 1,
+      "lastUsedAt": 1772103024765
+    },
+    "receiving-code-review": {
+      "usageCount": 1,
+      "lastUsedAt": 1772105916389
+    },
+    "superpowers:subagent-driven-development": {
+      "usageCount": 1,
+      "lastUsedAt": 1772190720291
+    },
+    "vercel:deploy": {
+      "usageCount": 1,
+      "lastUsedAt": 1772203010875
+    },
+    "executing-plans": {
+      "usageCount": 1,
+      "lastUsedAt": 1772283945165
+    }
+  },
+  "hasVisitedExtraUsage": true,
+  "effortCalloutDismissed": true,
+  "feedbackSurveyState": {
+    "lastShownTime": 1771374366313
+  },
+  "sonnet1m45MigrationComplete": true,
+  "cachedExtraUsageDisabledReason": "org_level_disabled",
+  "birthdayHatAnimationCount": 3,
+  "toolUsage": {
+    "Read": {
+      "usageCount": 963,
+      "lastUsedAt": 1772158543172
+    },
+    "Skill": {
+      "usageCount": 7,
+      "lastUsedAt": 1772151341002
+    },
+    "Bash": {
+      "usageCount": 1035,
+      "lastUsedAt": 1772158871210
+    },
+    "WebSearch": {
+      "usageCount": 34,
+      "lastUsedAt": 1772155770587
+    },
+    "WebFetch": {
+      "usageCount": 12,
+      "lastUsedAt": 1772104937827
+    },
+    "TaskCreate": {
+      "usageCount": 98,
+      "lastUsedAt": 1772151681009
+    },
+    "TaskUpdate": {
+      "usageCount": 209,
+      "lastUsedAt": 1772152943332
+    },
+    "Edit": {
+      "usageCount": 138,
+      "lastUsedAt": 1772104109312
+    },
+    "Task": {
+      "usageCount": 83,
+      "lastUsedAt": 1772151788866
+    },
+    "Glob": {
+      "usageCount": 84,
+      "lastUsedAt": 1772155215295
+    },
+    "Grep": {
+      "usageCount": 111,
+      "lastUsedAt": 1772157804528
+    },
+    "mcp__memory__search_nodes": {
+      "usageCount": 1,
+      "lastUsedAt": 1771970661496
+    },
+    "mcp__filesystem__list_allowed_directories": {
+      "usageCount": 3,
+      "lastUsedAt": 1772013323618
+    },
+    "mcp__filesystem__directory_tree": {
+      "usageCount": 16,
+      "lastUsedAt": 1772151359733
+    },
+    "mcp__filesystem__list_directory": {
+      "usageCount": 34,
+      "lastUsedAt": 1772023207819
+    },
+    "mcp__filesystem__read_text_file": {
+      "usageCount": 81,
+      "lastUsedAt": 1772151799914
+    },
+    "mcp__filesystem__read_multiple_files": {
+      "usageCount": 39,
+      "lastUsedAt": 1772106801293
+    },
+    "mcp__filesystem__search_files": {
+      "usageCount": 3,
+      "lastUsedAt": 1771972268433
+    },
+    "TaskOutput": {
+      "usageCount": 24,
+      "lastUsedAt": 1772158899723
+    },
+    "Write": {
+      "usageCount": 219,
+      "lastUsedAt": 1772073590989
+    },
+    "EnterPlanMode": {
+      "usageCount": 3,
+      "lastUsedAt": 1772025464115
+    },
+    "mcp__filesystem__list_directory_with_sizes": {
+      "usageCount": 2,
+      "lastUsedAt": 1771972371503
+    },
+    "mcp__puppeteer__puppeteer_navigate": {
+      "usageCount": 28,
+      "lastUsedAt": 1772072942049
+    },
+    "mcp__puppeteer__puppeteer_screenshot": {
+      "usageCount": 58,
+      "lastUsedAt": 1772072948142
+    },
+    "mcp__puppeteer__puppeteer_evaluate": {
+      "usageCount": 37,
+      "lastUsedAt": 1772027832730
+    },
+    "mcp__puppeteer__puppeteer_fill": {
+      "usageCount": 5,
+      "lastUsedAt": 1772025273092
+    },
+    "AskUserQuestion": {
+      "usageCount": 49,
+      "lastUsedAt": 1772072845775
+    },
+    "mcp__sequential-thinking__sequentialthinking": {
+      "usageCount": 25,
+      "lastUsedAt": 1772025758973
+    },
+    "mcp__filesystem__create_directory": {
+      "usageCount": 49,
+      "lastUsedAt": 1772152570209
+    },
+    "mcp__filesystem__write_file": {
+      "usageCount": 167,
+      "lastUsedAt": 1772158647579
+    },
+    "TaskStop": {
+      "usageCount": 10,
+      "lastUsedAt": 1772073594746
+    },
+    "mcp__puppeteer__puppeteer_click": {
+      "usageCount": 2,
+      "lastUsedAt": 1772025089017
+    },
+    "TaskList": {
+      "usageCount": 3,
+      "lastUsedAt": 1772152954191
+    }
+  },
+  "remoteDialogSeen": true,
+  "remoteControlAtStartup": true,
+  "subscriptionNoticeCount": 0,
+  "hasAvailableSubscription": false,
+  "oauthAccount": {
+    "accountUuid": "1f985a36-821f-4730-a874-2b75898dff63",
+    "emailAddress": "y6j4xscdrc@privaterelay.appleid.com",
+    "organizationUuid": "0e714d1f-2f2f-4c21-91c1-17b70825dbc6",
+    "hasExtraUsageEnabled": false,
+    "billingType": "apple_subscription",
+    "accountCreatedAt": "2025-05-16T16:37:53.703337Z",
+    "subscriptionCreatedAt": "2025-11-28T12:46:37.195233Z",
+    "displayName": "RickH",
+    "organizationRole": "admin",
+    "workspaceRole": null,
+    "organizationName": "y6j4xscdrc@privaterelay.appleid.com's Organization"
+  },
+  "hasUsedBackslashReturn": true
+}

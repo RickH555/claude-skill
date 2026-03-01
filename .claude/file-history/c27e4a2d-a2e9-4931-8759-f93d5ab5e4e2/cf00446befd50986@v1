@@ -1,0 +1,17 @@
+import PageHeader from '@/components/layout/PageHeader';
+import KpiCards from '@/components/merchant/KpiCards';
+
+export default function MerchantHome() {
+  // MVP: static data until Supabase is connected
+  return (
+    <div className="space-y-8">
+      <PageHeader title="Tableau de bord" description="Vue d'ensemble de votre activité fidélité." />
+      <KpiCards data={{
+        activeClients: 0,
+        transactionsToday: 0,
+        activePrograms: 0,
+        totalPoints: 0,
+      }} />
+    </div>
+  );
+}

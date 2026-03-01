@@ -1,0 +1,425 @@
+import React from 'react';
+import { Sparkles, TrendingUp, Target, Award, MousePointerClick, ArrowRight, ScanLine, Code2, Globe2, Fuel, Zap, Star, Check, Search, Bot, BrainCircuit, Database, Share2, Layers, Infinity, Radio, Globe, Droplet } from 'lucide-react';
+import { User } from '../types';
+
+interface HomeProps {
+  onNavigate: (view: 'analyze' | 'login' | 'recharge' | 'directory') => void;
+  user: User | null;
+  onDirectRecharge?: (packId: number) => void;
+}
+
+const Home: React.FC<HomeProps> = ({ onNavigate, user, onDirectRecharge }) => {
+
+  const handleStartAnalysis = () => {
+    if (user) {
+      onNavigate('analyze');
+    } else {
+      onNavigate('login');
+    }
+  };
+
+  const handleSelectPlan = (packId: number) => {
+    if (user) {
+      if (onDirectRecharge) {
+        onDirectRecharge(packId);
+      } else {
+        onNavigate('recharge');
+      }
+    } else {
+      onNavigate('login');
+    }
+  };
+
+  const plans = [
+    {
+      id: 1,
+      name: "Le Jerrican",
+      credits: 50,
+      price: 15,
+      icon: <Droplet size={24} />,
+      popular: false,
+      features: ["Idéal pour tester", "1 Audit complet", "Valable 1 an"]
+    },
+    {
+      id: 2,
+      name: "La Pompe",
+      credits: 200,
+      price: 49,
+      icon: <Fuel size={24} />,
+      popular: true,
+      features: ["Pour optimiser sérieusement", "Support prioritaire", "+10% Bonus offert"]
+    },
+    {
+      id: 3,
+      name: "La Citerne",
+      credits: 1000,
+      price: 199,
+      icon: <Database size={24} />,
+      popular: false,
+      features: ["Usage intensif / Agence", "Accès API Beta", "+20% Bonus offert"]
+    }
+  ];
+
+  return (
+    <div className="max-w-[1200px] mx-auto px-6 pt-16 pb-32 overflow-hidden relative">
+
+      {/* ── HERO SECTION ── */}
+      <div className="text-center mb-36 relative">
+        {/* Ambient gradient orbs */}
+        <div className="glow-orb w-[800px] h-[600px] bg-purple-600/[0.07] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{filter:'blur(150px)'}}></div>
+        <div className="glow-orb w-[300px] h-[300px] bg-indigo-500/[0.08] -top-20 -left-20 animate-float" style={{filter:'blur(100px)', animationDelay:'0s'}}></div>
+        <div className="glow-orb w-[250px] h-[250px] bg-fuchsia-500/[0.06] -bottom-10 -right-10 animate-float" style={{filter:'blur(100px)', animationDelay:'3s'}}></div>
+
+        {/* Dot grid background */}
+        <div className="absolute inset-0 dot-grid opacity-40 -z-[5]"></div>
+
+        <div className="relative z-10">
+          <div className="section-badge mb-10 mx-auto w-fit">
+            <Sparkles size={12} />
+            <span>Plateforme AEO / GEO</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-6xl md:text-[5.5rem] font-sans font-extrabold tracking-tight text-white leading-[1.05] mb-8">
+            Faites-vous citer{' '}
+            <br className="hidden md:block" />
+            par les <span className="gradient-text">IA Génératives</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-14">
+            La première plateforme d'optimisation AEO. Analysez et influencez la façon dont ChatGPT, Claude et Gemini perçoivent votre marque.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button onClick={handleStartAnalysis} className="btn-gradient text-base px-8 py-4 flex items-center gap-2.5 shadow-lg shadow-purple-600/20">
+              Lancer un Audit Gratuit <ArrowRight size={18} />
+            </button>
+            <button onClick={() => onNavigate('directory')} className="px-8 py-4 rounded-full border border-white/[0.08] text-gray-300 text-base font-medium hover:bg-white/[0.04] hover:border-white/[0.15] transition-all duration-300 backdrop-blur-sm">
+              Explorer l'Annuaire
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── STATS BAR ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-36">
+        {[
+          { value: '50%', label: 'des recherches vont vers l\'IA', sublabel: 'd\'ici 2026' },
+          { value: '24h', label: 'pour être cité', sublabel: 'premier audit' },
+          { value: '0', label: 'clic nécessaire', sublabel: 'réponse directe' },
+          { value: '3x', label: 'plus de conversions', sublabel: 'vs SEO classique' },
+        ].map((stat, i) => (
+          <div key={i} className="ninja-card p-6 md:p-8 text-center group">
+            <div className="text-3xl md:text-4xl font-extrabold gradient-text mb-2.5">{stat.value}</div>
+            <p className="text-sm text-gray-300 font-medium">{stat.label}</p>
+            <p className="text-xs text-gray-600 mt-1.5">{stat.sublabel}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── FEATURES GRID ── */}
+      <div className="mb-36">
+        <div className="text-center mb-16">
+          <div className="section-badge mb-6 mx-auto w-fit">
+            <Zap size={12} />
+            <span>Outils</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-sans font-extrabold text-white tracking-tight mb-5">
+            Vos outils de <span className="gradient-text">visibilité IA</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+            Tout ce dont vous avez besoin pour dominer les réponses génératives.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            {
+              icon: <ScanLine size={26} />,
+              title: "Simulateur de Perception",
+              desc: "Visualisez comment les LLMs (GPT-4, Claude 3) 'voient' votre entité en temps réel.",
+              accent: "from-purple-500/20 to-indigo-500/10"
+            },
+            {
+              icon: <Code2 size={26} />,
+              title: "Code Sémantique",
+              desc: "Générez automatiquement les données structurées (JSON-LD) que les robots préfèrent.",
+              accent: "from-violet-500/20 to-purple-500/10"
+            },
+            {
+              icon: <Globe2 size={26} />,
+              title: "Annuaire Indexé",
+              desc: "Inscrivez votre marque dans le Knowledge Graph CitedBy pour forcer la découverte.",
+              accent: "from-fuchsia-500/20 to-purple-500/10"
+            }
+          ].map((item, i) => (
+            <div key={i} className="ninja-card p-8 group cursor-default">
+              <div className="icon-box mb-7">
+                {item.icon}
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-white group-hover:text-purple-300 transition-colors duration-300">{item.title}</h3>
+              <p className="text-gray-500 leading-relaxed text-[15px]">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── SEO vs AEO COMPARISON ── */}
+      <div className="mb-36">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-sans font-extrabold mb-5 text-white tracking-tight">
+            Le Changement de <span className="gradient-text">Paradigme</span>
+          </h2>
+          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+            Nous passons de l'ère de la recherche (Google) à l'ère de la réponse (IA).
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 relative">
+          {/* VS Badge */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full flex items-center justify-center font-bold text-white z-10 text-lg shadow-2xl shadow-black/60" style={{background:'linear-gradient(135deg, #1a1a1a, #111)'}}>
+            <span className="relative z-10">VS</span>
+            <div className="absolute inset-0 rounded-full border border-white/[0.1]"></div>
+          </div>
+
+          {/* SEO Classic Card */}
+          <div className="ninja-card p-8 md:p-10 opacity-50 hover:opacity-80 transition-all duration-500">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-gray-500">
+                <Search size={22} />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-400">SEO Classique</h3>
+            </div>
+            <ul className="space-y-5">
+              {[
+                "Optimise pour des mots-clés.",
+                "Vise la liste de liens (SERP).",
+                "Trafic de \"navigation\" (Clicks).",
+                "Contenu long pour retenir l'utilisateur."
+              ].map((text, i) => (
+                <li key={i} className="flex items-start gap-3 text-gray-500">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-700 mt-2.5 shrink-0"></div>
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* AEO Card - Gradient Border */}
+          <div className="gradient-border p-8 md:p-10 relative">
+            <div className="absolute top-0 right-0 px-5 py-1.5 text-xs font-bold rounded-bl-2xl rounded-tr-[1.15rem] bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white">Le Futur</div>
+            <div className="flex items-center gap-4 mb-8">
+              <div className="icon-box">
+                <Bot size={22} />
+              </div>
+              <h3 className="text-2xl font-bold text-white">AEO & GEO</h3>
+            </div>
+            <ul className="space-y-5">
+              {[
+                "Optimise pour des entités et des faits.",
+                "Vise la réponse unique (Citations).",
+                "Trafic de \"conviction\" (Autorité).",
+                "Format \"Answer-First\" structuré pour les LLMs."
+              ].map((text, i) => (
+                <li key={i} className="flex items-start gap-3 text-gray-300">
+                  <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <Check size={12} className="text-purple-400" />
+                  </div>
+                  <span>{text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* ── THE 3 PILLARS ── */}
+      <div className="mb-36">
+        <div className="text-center mb-16">
+          <div className="section-badge mb-6 mx-auto w-fit">
+            <Layers size={12} />
+            <span>Méthodologie</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-sans font-extrabold mb-5 text-white tracking-tight">
+            Les 3 Piliers de <span className="gradient-text">l'Autorité IA</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">Comment CitedBy structure votre présence pour convaincre les algorithmes.</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {[
+            {
+              icon: <Database size={26} />,
+              num: "01",
+              title: "Identité (Graph)",
+              desc: "Les IA ne raisonnent pas en pages web, mais en concepts. Nous définissons votre \"Entité Nommée\" dans le Knowledge Graph pour que GPT sache exactement qui vous êtes."
+            },
+            {
+              icon: <BrainCircuit size={26} />,
+              num: "02",
+              title: "Sémantique (RAG)",
+              desc: "Pour être cité, votre contenu doit être \"ingérable\". Nous transformons votre site avec le pattern Answer-First et des données structurées JSON-LD."
+            },
+            {
+              icon: <Share2 size={26} />,
+              num: "03",
+              title: "Ubiquité (Signal)",
+              desc: "Une IA confirme une information en la croisant. Nous multiplions les signaux de corroboration via notre Annuaire AEO et optimisons vos fichiers techniques."
+            }
+          ].map((pillar, i) => (
+            <div key={i} className="ninja-card p-8 group relative">
+              {/* Step number */}
+              <div className="absolute top-6 right-6 text-[4rem] font-extrabold leading-none text-white/[0.03] group-hover:text-purple-500/[0.06] transition-colors duration-500 select-none">{pillar.num}</div>
+
+              <div className="relative z-10">
+                <div className="icon-box mb-7">
+                  {pillar.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4">{pillar.title}</h3>
+                <p className="text-gray-500 text-[15px] leading-relaxed mb-6">{pillar.desc}</p>
+                <div className="h-[2px] w-10 rounded-full bg-gradient-to-r from-purple-500/40 to-transparent group-hover:w-20 transition-all duration-500"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── PROCESS SECTION ── */}
+      <div className="mb-36 max-w-4xl mx-auto relative">
+        {/* Ambient glow */}
+        <div className="glow-orb w-[500px] h-[400px] bg-purple-600/[0.04] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{filter:'blur(120px)'}}></div>
+
+        <div className="gradient-border p-8 md:p-12 relative overflow-hidden">
+          {/* Subtle grid */}
+          <div className="absolute inset-0 dot-grid opacity-30"></div>
+
+          <div className="relative z-10">
+            <h3 className="text-2xl md:text-3xl font-extrabold text-center mb-12 text-white">Votre parcours d'optimisation</h3>
+
+            <div className="space-y-0">
+              {[
+                {
+                  step: '01',
+                  title: 'Analyse de Perception',
+                  desc: 'Notre scanner interroge les principaux LLMs pour établir votre score de visibilité actuel et identifier les "trous" dans leur connaissance de votre marque.',
+                  active: true
+                },
+                {
+                  step: '02',
+                  title: 'Génération du "Source of Truth"',
+                  desc: 'Nous créons les fichiers llm.txt et llm.json qui serviront de référence canonique pour les robots d\'indexation.',
+                  active: false
+                },
+                {
+                  step: '03',
+                  title: 'Monitoring Continu',
+                  desc: 'Les modèles d\'IA changent chaque semaine. CitedBy surveille vos positions et vous alerte si une hallucination concernant votre marque apparaît.',
+                  active: false
+                }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-6 md:gap-8">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-all ${
+                      item.active
+                        ? 'bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-600/30'
+                        : 'bg-white/[0.04] border border-white/[0.08] text-gray-500'
+                    }`}>
+                      {item.step}
+                    </div>
+                    {i < 2 && <div className="w-px h-full bg-gradient-to-b from-white/[0.06] to-transparent my-2"></div>}
+                  </div>
+                  <div className="pb-10">
+                    <h4 className="text-lg font-bold text-white mb-2">{item.title}</h4>
+                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── PRICING SECTION ── */}
+      <div className="mb-12 relative">
+        {/* Background glows */}
+        <div className="glow-orb w-[600px] h-[500px] bg-purple-600/[0.05] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{filter:'blur(140px)'}}></div>
+
+        <div className="text-center mb-16 relative z-10">
+          <div className="section-badge mb-6 mx-auto w-fit">
+            <Fuel size={12} />
+            <span>Carburant Algorithmique</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-sans font-extrabold text-white tracking-tight mb-5">
+            Rechargez votre <span className="gradient-text">GTO Gas</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto text-lg">
+            Notre monnaie virtuelle pour exécuter les audits, générer les correctifs et valider votre entité.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto items-stretch relative z-10">
+          {plans.map((plan, idx) => (
+            <div
+              key={idx}
+              className={`relative flex flex-col h-full ${
+                plan.popular
+                  ? 'gradient-border p-8 md:scale-[1.03] z-10'
+                  : 'ninja-card p-8'
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 btn-gradient text-xs font-bold px-5 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-purple-600/30 whitespace-nowrap">
+                  Le Choix Expert
+                </div>
+              )}
+
+              <div className="mb-6 flex items-center justify-between pt-2">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                  plan.popular
+                    ? 'bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/20'
+                    : 'bg-white/[0.04] border border-white/[0.06] text-gray-500'
+                }`}>
+                  {plan.icon}
+                </div>
+                <div className="text-right">
+                  <span className="block text-3xl font-extrabold gradient-text">{plan.credits}</span>
+                  <span className="text-[11px] text-gray-600 uppercase font-bold tracking-wider">Crédits Gas</span>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+              <div className="flex items-baseline gap-1 mb-8">
+                <span className="text-4xl font-extrabold text-white">{plan.price}€</span>
+                <span className="text-sm text-gray-600">HT</span>
+              </div>
+
+              <ul className="space-y-3.5 mb-8 flex-1">
+                {plan.features.map((feat, i) => (
+                  <li key={i} className="flex items-start gap-3 text-[15px] text-gray-400">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${plan.popular ? 'bg-purple-500/10' : 'bg-white/[0.03]'}`}>
+                      <Check size={12} className={plan.popular ? 'text-purple-400' : 'text-gray-600'} />
+                    </div>
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => handleSelectPlan(plan.id)}
+                className={`w-full py-3.5 rounded-full font-bold flex items-center justify-center gap-2 transition-all text-[15px] ${
+                  plan.popular
+                    ? 'btn-gradient shadow-lg shadow-purple-600/20'
+                    : 'bg-white/[0.03] border border-white/[0.06] text-gray-300 hover:bg-white/[0.06] hover:border-white/[0.1] hover:text-white'
+                }`}
+              >
+                {user ? 'Recharger' : 'Créer un compte'} <ArrowRight size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+};
+
+export default Home;

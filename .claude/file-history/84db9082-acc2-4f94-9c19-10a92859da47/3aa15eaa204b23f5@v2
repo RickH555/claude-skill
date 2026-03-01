@@ -1,0 +1,90 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: surveyId } = await params;
+    const supabase = createServiceClient();
+
+    // Check if survey is active (no auth required for public responses)
+    const { data: survey, error: surveyError } = await supabase
+      .from('surveys')
+      .select('id, status, settings')
+      .eq('id', surveyId)
+      .single();
+
+    if (surveyError || !survey) {
+      return NextResponse.json({ error: 'Survey not found' }, { status: 404 });
+    }
+
+    if (survey.status !== 'active') {
+      return NextResponse.json({ error: 'Survey is not accepting responses' }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const { answers, respondent_email } = body;
+
+    if (!answers || typeof answers !== 'object') {
+      return NextResponse.json({ error: 'Answers are required' }, { status: 400 });
+    }
+
+    const { data, error } = await supabase
+      .from('survey_responses')
+      .insert({
+        survey_id: surveyId,
+        answers,
+        respondent_email: respondent_email || null,
+        metadata: {
+          user_agent: request.headers.get('user-agent'),
+          timestamp: new Date().toISOString(),
+        },
+      })
+      .select()
+      .single();
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // Increment response count (best-effort)
+    try {
+      const { data: current } = await supabase
+        .from('surveys')
+        .select('response_count')
+        .eq('id', surveyId)
+        .single();
+      await supabase
+        .from('surveys')
+        .update({ response_count: ((current?.response_count as number) || 0) + 1 })
+        .eq('id', surveyId);
+    } catch { /* best-effort */ }
+
+    return NextResponse.json({ data }, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: surveyId } = await params;
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const { data, error } = await supabase
+      .from('survey_responses')
+      .select('*')
+      .eq('survey_id', surveyId)
+      .order('created_at', { ascending: false });
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ data });
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -1,0 +1,74 @@
+import { chromium } from 'playwright';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const APP = 'https://nexus-ai-silk-six.vercel.app';
+const SURVEY_ID = '02023306-325a-4eac-bd57-39c01be98291';
+const SS = (name) => path.join(__dirname, `ui-${name}.png`);
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+
+  // Login
+  console.log('Logging in...');
+  await page.goto(`${APP}/login`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', 'admin@nexusai.app');
+  await page.fill('input[type="password"]', 'NexusAdmin2026!');
+  await page.click('button[type="submit"]');
+  await page.waitForURL('**/dashboard**', { timeout: 15000 });
+  console.log('Logged in.');
+
+  // Go to survey detail
+  await page.goto(`${APP}/dashboard/surveys/${SURVEY_ID}`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000);
+
+  // Click AI Analysis tab
+  const analysisTab = page.locator('[role="tab"]:has-text("AI Analysis"), button:has-text("AI Analysis")').first();
+  if (await analysisTab.count() > 0) {
+    await analysisTab.click();
+    await page.waitForTimeout(3000);
+  }
+
+  // Take screenshots
+  await page.screenshot({ path: SS('01-analysis-top'), fullPage: false });
+
+  // Check for key UI elements
+  const body = await page.textContent('body');
+  const hasExecutiveSummary = body.includes('Executive Summary');
+  const hasSentiment = body.includes('Sentiment Distribution');
+  const hasThemes = body.includes('Key Themes');
+  const hasRecommendations = body.includes('AI Recommendations');
+  const hasRawJson = body.includes('"summary"') || body.includes('"sentiment"');
+
+  console.log(`\nUI Check Results:`);
+  console.log(`  Executive Summary card: ${hasExecutiveSummary ? 'YES' : 'NO'}`);
+  console.log(`  Sentiment Distribution chart: ${hasSentiment ? 'YES' : 'NO'}`);
+  console.log(`  Key Themes section: ${hasThemes ? 'YES' : 'NO'}`);
+  console.log(`  AI Recommendations: ${hasRecommendations ? 'YES' : 'NO'}`);
+  console.log(`  Raw JSON visible: ${hasRawJson ? 'YES (BAD)' : 'NO (GOOD)'}`);
+
+  // Scroll to see full analysis
+  for (let s = 1; s <= 4; s++) {
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS(`0${s+1}-analysis-scroll${s}`) });
+  }
+
+  // Also check Charts tab
+  const chartsTab = page.locator('[role="tab"]:has-text("Charts"), button:has-text("Charts")').first();
+  if (await chartsTab.count() > 0) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await chartsTab.click();
+    await page.waitForTimeout(2000);
+    await page.screenshot({ path: SS('06-charts'), fullPage: false });
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: SS('07-charts-scroll') });
+  }
+
+  await browser.close();
+  console.log('\nDone! Screenshots saved.');
+})();

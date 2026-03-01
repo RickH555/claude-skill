@@ -1,0 +1,15 @@
+'use client';
+export const dynamic = 'force-dynamic';
+import { useAppContext } from '@/lib/app-context';
+import AlertsPage from '@/views/v3/AlertsPage';
+
+export default function V3AlertsPageWrapper() {
+  const { goBack, user, navigateTo } = useAppContext();
+  return (
+    <AlertsPage
+      onBack={goBack}
+      user={user}
+      onNavigate={navigateTo}
+    />
+  );
+}

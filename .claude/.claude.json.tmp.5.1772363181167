@@ -1,0 +1,13 @@
+{
+  "cachedGrowthBookFeatures": {
+    "tengu_coral_whistle": false
+  },
+  "toolUsage": {
+    "mcp__cowork__request_cowork_directory": {
+      "usageCount": 1,
+      "lastUsedAt": 1772363177272
+    }
+  },
+  "userID": "4ff5e21123dd40e0dd0981f27fdd434bfa2339dfa11e0cb7ae9de1bd84040170",
+  "cachedExtraUsageDisabledReason": "org_level_disabled"
+}

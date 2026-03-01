@@ -1,0 +1,120 @@
+# Plan : Combler les 4 lacunes concurrentielles CitedBy.ai
+
+## Contexte
+Apres analyse de 46+ concurrents (Profound, Evertune, Semrush, Frase...), 4 lacunes identifiees :
+1. Pas de tracking quotidien automatise
+2. Pas d'integration GA4/Search Console
+3. Pas de retargeting sur URLs citees
+4. Pas d'API publique
+
+## Fichiers a creer (10 fichiers)
+
+| Fichier | Feature | ~Lignes |
+|---------|---------|---------|
+| `types/scheduling.ts` | F1 - Types planning | ~30 |
+| `services/scheduling.ts` | F1 - CRUD localStorage + execution | ~120 |
+| `types/integrations.ts` | F2 - Types connexions/metriques | ~50 |
+| `services/integrations.ts` | F2 - OAuth simule + data GA4/SC | ~180 |
+| `pages/Integrations.tsx` | F2 - Page Integrations complete | ~450 |
+| `types/retargeting.ts` | F3 - Types retargeting/pixels | ~45 |
+| `services/retargeting.ts` | F3 - Pixel gen, CSV, budget calc | ~150 |
+| `types/api-developer.ts` | F4 - Types API keys/webhooks | ~55 |
+| `services/api-developer.ts` | F4 - Key mgmt, endpoints, usage | ~250 |
+| `pages/ApiDeveloper.tsx` | F4 - Developer Hub complet | ~600 |
+
+## Fichiers a modifier (4 fichiers)
+
+| Fichier | Changements |
+|---------|------------|
+| `App.tsx` | +2 lazy imports, +2 views union type, +2 command palette, +2 sidebar NavItems, +2 breadcrumbs, +2 render blocks, +import Link2 |
+| `pages/AiMonitoring.tsx` | F1: section Planification (formulaire freq/heure + grille marques planifiees + historique scans auto). F3: onglet Retargeting dans resultats (URLs citees, pixel code, connexions pub, estimateur budget, export CSV) |
+| `pages/Account.tsx` | +lien "Documentation API complete" dans section API Key |
+| `pages/GenerativeTools.tsx` | +carte API Developer Hub dans la grille |
+
+## Feature 1 : Tracking Quotidien Automatise
+
+**Dans AiMonitoring.tsx** — pas de nouvelle page
+
+- Section "Planification automatique" sous le formulaire de scan :
+  - Selecteur frequence : Quotidien / Hebdomadaire / Mensuel
+  - Selecteur heure (input time)
+  - Selecteur jour (conditionnel: jour semaine ou jour mois)
+  - Toggle notification email (UI only, "Backend a venir")
+  - Bouton "Planifier ce scan" (0 Gas, chaque execution = 5 Gas)
+- Grille "Marques planifiees" :
+  - Cartes avec nom marque, URL, badge frequence colore
+  - "Prochaine execution" + "Derniere execution"
+  - Toggle pause/resume + bouton supprimer
+- Historique scans automatiques (timeline)
+- localStorage : `citedby_monitoring_schedules`, `citedby_scheduled_scan_history`
+- Sur mount : `checkAndRunPendingScans()` simule l'execution des scans en retard
+
+## Feature 2 : Integrations GA4 & Search Console
+
+**Nouvelle page : `pages/Integrations.tsx`** — sidebar GESTION
+
+- 2 cartes de connexion (GA4 + Search Console) avec flux OAuth simule (2s)
+- Dashboard attribution (visible si >= 1 connexion) :
+  - 4 KPI : Visites IA, Conversions IA, Part trafic IA, CTR moyen IA
+  - AreaChart trafic par source (ChatGPT/Perplexity/Claude/Gemini/Copilot)
+  - Table attribution : source, visites, pages vues, duree, taux rebond, conversions, tendance
+  - Top requetes IA (Search Console) avec badge isAIReferral
+- Selecteur periode : 7j / 30j / 90j
+- 3 Gas par chargement dashboard
+- localStorage : `citedby_integrations`
+
+## Feature 3 : Retargeting IA sur URLs Citees
+
+**Dans AiMonitoring.tsx** — nouvel onglet dans resultats
+
+- Tab bar "Vue d'ensemble | Retargeting IA" apres un scan
+- Onglet Retargeting :
+  - 3 cartes connexion pub (Google Ads, Meta Ads, LinkedIn Ads)
+  - Tableau URLs citees = opportunites retargeting :
+    - URL, moteur, audience estimee, "Copier le pixel", code expandable
+  - Estimateur budget :
+    - Selecteur plateforme + slider budget quotidien (10-500 EUR)
+    - KPIs temps reel : portee, clics, CPC, CPM
+  - Export CSV audience
+- 0 Gas (derive des donnees du scan deja paye)
+- localStorage : `citedby_ad_connections`
+
+## Feature 4 : API Developer Hub
+
+**Nouvelle page : `pages/ApiDeveloper.tsx`** — sidebar OUTILS
+
+4 onglets internes :
+
+**Documentation** :
+- Banniere rate limits (free=100/j, pro=1000/j, enterprise=10000/j)
+- 5 endpoints en accordeon (GET /audit, GET /monitoring, GET /citations, POST /schema, GET /credits)
+- Chaque endpoint : methode badge, path, description, table params, exemple reponse, cout Gas
+- Exemples code : curl | JavaScript | Python avec bouton copier
+
+**Cles API** :
+- Table cles existantes (nom, cle tronquee, date, statut, copier, revoquer, regenerer)
+- Formulaire creation nouvelle cle
+
+**Webhooks** :
+- Liste webhooks (URL, events badges, toggle, derniere livraison, supprimer)
+- Formulaire ajout (URL + selection events : audit.completed, monitoring.scan_completed, monitoring.alert, credits.low, citations.new)
+
+**Usage** :
+- 3 KPI (requetes/j, erreurs, latence)
+- BarChart 30j (succes vert, erreurs rouge)
+- Section SDK : npm install @citedby/sdk + pip install citedby
+
+localStorage : `citedby_api_keys`, `citedby_webhooks`
+
+## Ordre d'implementation
+
+1. **F1 Tracking** (2 fichiers, modif AiMonitoring) — risque minimal
+2. **F4 API Hub** (3 fichiers, nouvelle page) — autonome
+3. **F2 Integrations** (3 fichiers, nouvelle page) — autonome
+4. **F3 Retargeting** (2 fichiers, modif AiMonitoring) — apres F1
+
+## Verification
+
+1. `npm run build` — 0 erreurs
+2. Puppeteer : tester chaque feature visuellement
+3. localStorage : verifier persistance des donnees apres refresh

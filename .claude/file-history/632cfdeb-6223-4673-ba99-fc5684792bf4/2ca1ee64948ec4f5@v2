@@ -1,0 +1,56 @@
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
+import { deepScore, quickScore } from "@/services/content_scorer"
+
+export const maxDuration = 30
+
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: "Non authentifie" }, { status: 401 })
+    }
+
+    const body = await req.json()
+    const { content, contentType, brandName, language, mode } = body
+
+    if (!content) {
+      return NextResponse.json(
+        { error: "Le champ 'content' est requis" },
+        { status: 400 }
+      )
+    }
+
+    // Quick mode = rule-based only (instant, no API call)
+    if (mode === "quick") {
+      const result = quickScore(content)
+      return NextResponse.json({
+        success: true,
+        score: result.score,
+        flags: result.flags,
+        mode: "quick",
+      })
+    }
+
+    // Deep mode = AI-powered analysis
+    const result = await deepScore(
+      content,
+      contentType || "general",
+      brandName,
+      language || "fr"
+    )
+
+    return NextResponse.json({
+      success: true,
+      ...result,
+      mode: "deep",
+    })
+  } catch (error) {
+    console.error("Content scoring error:", error)
+    return NextResponse.json(
+      { error: "Erreur lors du scoring" },
+      { status: 500 }
+    )
+  }
+}

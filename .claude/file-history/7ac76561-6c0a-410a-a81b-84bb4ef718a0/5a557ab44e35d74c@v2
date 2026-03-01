@@ -1,0 +1,135 @@
+import React from 'react';
+import { AnalysisResult, CategoryScore } from '../types';
+import ScoreRing from '../components/ScoreRing';
+import { ArrowLeft, Globe, ShieldCheck, Award, TrendingUp, CheckCircle2, Activity, Share2 } from 'lucide-react';
+
+interface Props {
+  data: AnalysisResult;
+  onBack: () => void;
+}
+
+const DirectoryEntity: React.FC<Props> = ({ data, onBack }) => {
+  const hostname = new URL(data.url).hostname;
+  // Extraction des points forts (critères réussis)
+  const categoryScores = Object.values(data.categories) as CategoryScore[];
+  const strengths = categoryScores
+    .flatMap(c => c.items.filter(i => i.status === 'success'))
+    .slice(0, 6); // On en garde 6 max
+
+  return (
+    <div className="w-full px-4 py-10 animate-in fade-in duration-500">
+      
+      {/* Navigation */}
+      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-white mb-8 transition-colors group">
+        <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" /> 
+        Retour
+      </button>
+
+      {/* Header Profile */}
+      <div className="ninja-card p-8 rounded-2xl border border-white/[0.08] mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/[0.04] blur-[80px] rounded-full pointer-events-none"></div>
+        
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 relative z-10">
+            {/* Logo Placeholder */}
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/[0.08] flex items-center justify-center text-white font-sans font-bold text-4xl shadow-inner shrink-0">
+                {hostname.charAt(0).toUpperCase()}
+            </div>
+
+            <div className="text-center md:text-left flex-1">
+                <div className="flex flex-col md:flex-row items-center gap-4 mb-2">
+                    <h1 className="text-3xl font-sans font-bold text-white">{hostname}</h1>
+                    <span className="px-3 py-1 bg-purple-500/10 border border-white/[0.1] text-purple-300 text-xs font-bold rounded-full flex items-center gap-1.5 uppercase tracking-wider">
+                        <ShieldCheck size={12} /> Entité Certifiée
+                    </span>
+                </div>
+                
+                <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white text-sm flex items-center justify-center md:justify-start gap-2 mb-6 transition-colors">
+                    <Globe size={14} /> {data.url}
+                </a>
+
+                <p className="text-gray-300 text-sm leading-relaxed max-w-2xl">
+                    {data.aiCitation.after} Cette entreprise a structuré ses données pour garantir une visibilité optimale sur les moteurs de réponse (ChatGPT, Gemini, Claude).
+                </p>
+            </div>
+
+            <div className="flex gap-2">
+                <button className="p-3 rounded-2xl bg-white/[0.04] hover:bg-purple-500/10 border border-white/[0.08] text-gray-500 hover:text-white transition-colors" title="Partager">
+                    <Share2 size={20} />
+                </button>
+            </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-12 gap-8">
+          
+          {/* Colonne Gauche : Scoring */}
+          <div className="md:col-span-4">
+              <div className="ninja-card p-8 rounded-2xl border border-white/[0.08] flex flex-col items-center justify-center h-full min-h-[400px]">
+                  <h3 className="text-gray-500 font-medium uppercase tracking-wider text-sm mb-8">Score AEO / GEO</h3>
+                  
+                  <div className="relative mb-8">
+                      <ScoreRing score={data.globalScore} size={200} strokeWidth={16} />
+                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-[#000000] px-4 py-1 rounded-full border border-white/[0.08] text-xs font-bold text-gray-300 whitespace-nowrap">
+                          Indice de Confiance IA
+                      </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-purple-300 bg-white/[0.04] px-4 py-2 rounded-full border border-white/[0.08]">
+                      <TrendingUp size={16} />
+                      <span className="font-bold text-sm">Excellent</span>
+                  </div>
+              </div>
+          </div>
+
+          {/* Colonne Droite : Points Forts */}
+          <div className="md:col-span-8 flex flex-col gap-6">
+              
+              <div className="ninja-card p-8 rounded-2xl border border-white/[0.08] flex-1">
+                  <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                      <Award size={22} className="text-purple-400" />
+                      Points Forts & Signaux d'Autorité
+                  </h3>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                      {strengths.map((item, idx) => (
+                          <div key={idx} className="flex items-start gap-3 p-4 rounded-2xl bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.1] transition-colors">
+                              <div className="mt-0.5">
+                                  <CheckCircle2 size={18} className="text-purple-400" />
+                              </div>
+                              <span className="text-sm text-gray-200">{item.message}</span>
+                          </div>
+                      ))}
+                      {strengths.length === 0 && (
+                          <p className="text-gray-500 italic col-span-2">Analyse en cours de traitement...</p>
+                      )}
+                  </div>
+              </div>
+
+              {/* Métriques secondaires */}
+              <div className="grid grid-cols-2 gap-6">
+                  <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+                      <div className="flex items-center gap-3 mb-2 text-blue-400">
+                          <Activity size={20} />
+                          <span className="font-bold text-sm uppercase tracking-wide">Citations</span>
+                      </div>
+                      <div className="text-3xl font-sans font-bold text-white">Élevée</div>
+                      <p className="text-xs text-gray-500 mt-1">Probabilité de mention directe</p>
+                  </div>
+                  <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+                      <div className="flex items-center gap-3 mb-2 text-purple-400">
+                          <ShieldCheck size={20} />
+                          <span className="font-bold text-sm uppercase tracking-wide">Knowledge Graph</span>
+                      </div>
+                      <div className="text-3xl font-sans font-bold text-white">Validé</div>
+                      <p className="text-xs text-gray-500 mt-1">Entité reconnue par Google</p>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+
+    </div>
+  );
+};
+
+export default DirectoryEntity;

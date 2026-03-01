@@ -1,0 +1,566 @@
+import React, { useState, useEffect } from 'react';
+import { AnalysisResult, SourceOfTruthData, User, SMCContent } from '../types';
+import { LLM_TRUTH_TEMPLATES } from '../services/llm_templates';
+import { ArrowLeft, FileText, Download, Copy, Sparkles, Check, Plus, Trash2, Building2, MapPin, Calendar, ChevronDown, History, RefreshCw, Save, RotateCcw, Loader2, Zap, BookOpen, FolderOpen, FileCode, ShieldCheck, Lock, Eye, Archive, Server, Globe } from 'lucide-react';
+
+interface Props {
+  onBack: () => void;
+  history: AnalysisResult[];
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+  savedFiles: SMCContent[];
+  onSaveFile: (item: SMCContent) => void;
+}
+
+const SourceOfTruth: React.FC<Props> = ({ onBack, history, user, onDeductCredits, savedFiles, onSaveFile }) => {
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
+  const [format, setFormat] = useState<'txt' | 'json'>('txt');
+  const [copied, setCopied] = useState(false);
+  const [selectedAnalysisIndex, setSelectedAnalysisIndex] = useState<number>(0);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [hasGenerated, setHasGenerated] = useState(false);
+
+  const GENERATION_COST = 10;
+
+  // Fonction pour simuler l'extraction de données basée sur l'URL analysée
+  const extractDataFromUrl = (url: string): SourceOfTruthData => {
+    try {
+        const hostname = new URL(url).hostname;
+        const nameParts = hostname.replace('www.', '').split('.');
+        const rawName = nameParts[0];
+        const formattedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        
+        return {
+          description: `${formattedName} est une référence dans son secteur, offrant des solutions optimisées pour les utilisateurs modernes. Notre plateforme garantit fiabilité et performance.`,
+          type: 'Entreprise de services numériques',
+          founded: '2020',
+          location: 'Paris, France',
+          services: [
+            { name: `Offre ${formattedName} Pro`, description: `Solution complète pour les professionnels utilisant ${formattedName}.`, category: 'B2B' },
+            { name: 'Support Expert', description: 'Assistance technique et accompagnement stratégique.', category: 'Service Client' }
+          ],
+          faqs: [
+            { question: `Qu'est-ce que ${formattedName} ?`, answer: `${formattedName} est une plateforme digitale innovante conçue pour simplifier vos opérations.` },
+            { question: 'Comment accéder au service ?', answer: 'Le service est accessible via notre portail web sécurisé et notre API.' }
+          ]
+        };
+    } catch (e) {
+        return {
+            description: '',
+            type: '',
+            founded: '',
+            location: '',
+            services: [],
+            faqs: []
+        };
+    }
+  };
+
+  // État pour les données actuelles (modifiables)
+  const [data, setData] = useState<SourceOfTruthData>(() => {
+    if (history.length > 0) {
+        return extractDataFromUrl(history[0].url);
+    }
+    return {
+        description: '',
+        type: 'SaaS B2B',
+        founded: new Date().getFullYear().toString(),
+        location: 'Paris, France',
+        services: [{ name: 'Service Principal', description: 'Description du service...', category: 'Core' }],
+        faqs: [{ question: 'Question fréquente ?', answer: 'Réponse factuelle...' }]
+    };
+  });
+
+  // État pour conserver les données d'origine (pour le reset)
+  const [originalData, setOriginalData] = useState<SourceOfTruthData | null>(null);
+
+  useEffect(() => {
+    if (history.length > 0 && history[selectedAnalysisIndex]) {
+        const extracted = extractDataFromUrl(history[selectedAnalysisIndex].url);
+        setData(extracted);
+        setOriginalData(extracted);
+        // Reset generated state when changing project context to force regeneration/validation
+        setHasGenerated(false);
+        setActiveTab('edit');
+    }
+  }, [selectedAnalysisIndex, history]);
+
+  const currentProjectName = history.length > 0 
+    ? new URL(history[selectedAnalysisIndex].url).hostname 
+    : "Mon Projet";
+
+  const currentProjectDomain = history.length > 0 
+    ? new URL(history[selectedAnalysisIndex].url).origin 
+    : "https://monsite.com";
+  
+  const currentHostname = history.length > 0 
+    ? new URL(history[selectedAnalysisIndex].url).hostname
+    : "monsite.com";
+
+  const handleServiceChange = (idx: number, field: string, value: string) => {
+    const newServices = [...data.services];
+    (newServices[idx] as any)[field] = value;
+    setData({ ...data, services: newServices });
+  };
+
+  const handleFaqChange = (idx: number, field: string, value: string) => {
+    const newFaqs = [...data.faqs];
+    (newFaqs[idx] as any)[field] = value;
+    setData({ ...data, faqs: newFaqs });
+  };
+
+  const addService = () => setData({ ...data, services: [...data.services, { name: '', description: '', category: '' }] });
+  const removeService = (idx: number) => setData({ ...data, services: data.services.filter((_, i) => i !== idx) });
+
+  const addFaq = () => setData({ ...data, faqs: [...data.faqs, { question: '', answer: '' }] });
+  const removeFaq = (idx: number) => setData({ ...data, faqs: data.faqs.filter((_, i) => i !== idx) });
+
+  const handleReset = () => {
+    if (originalData) {
+        if (window.confirm("Voulez-vous vraiment restaurer les données d'origine issues de l'analyse ? Vos modifications seront perdues.")) {
+            setData(originalData);
+        }
+    }
+  };
+
+  const handleGenerate = async () => {
+    // La vérification de connexion et de solde est gérée par onDeductCredits
+    if (onDeductCredits(GENERATION_COST)) {
+      setIsGenerating(true);
+      
+      // Simulation du temps de génération/traitement des nouvelles données
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const content = generateContent();
+      
+      // Sauvegarde dans l'historique
+      onSaveFile({
+        id: `truth_${Date.now()}`,
+        type: 'brief', // Using brief generic type as it fits text content
+        title: `Source of Truth - ${currentProjectName}`,
+        content: content,
+        timestamp: new Date().toISOString()
+      });
+
+      setIsGenerating(false);
+      setHasGenerated(true);
+      setActiveTab('preview');
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+    }
+  };
+
+  const generateContent = () => {
+    const projectInfo = { name: currentProjectName, domain: currentProjectDomain };
+    return format === 'json' 
+      ? LLM_TRUTH_TEMPLATES.json(projectInfo, data)
+      : LLM_TRUTH_TEMPLATES.txt(projectInfo, data);
+  };
+
+  const handleCopy = (txt?: string) => {
+    navigator.clipboard.writeText(txt || generateContent());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = (filename?: string, content?: string) => {
+    const blob = new Blob([content || generateContent()], { type: format === 'json' ? 'application/json' : 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || `llm.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-10 animate-in fade-in duration-500 min-h-screen relative">
+      
+      {/* Success Message Toast */}
+      {showSuccessMessage && (
+        <div className="fixed top-24 right-8 z-50 bg-purple-400 text-white px-6 py-3 rounded-xl font-bold shadow-2xl animate-in slide-in-from-right fade-in flex items-center gap-2">
+            <Check size={20} />
+            Fichiers mis à jour avec succès
+        </div>
+      )}
+
+      <button onClick={onBack} className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors">
+        <ArrowLeft size={18} className="mr-2" /> Retour
+      </button>
+
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+          <h1 className="text-3xl font-sans font-bold text-white mb-2 flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 border border-purple-500/30">
+              <FileText size={24} />
+            </div>
+            LLM <span className="gradient-text">Source of Truth</span>
+          </h1>
+          <p className="text-gray-400">Générez et maintenez le fichier de référence (llm.txt / llm.json) pour les moteurs d'IA.</p>
+        </div>
+
+        {/* Analysis Selector & Actions */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+             {history.length > 0 ? (
+                 <div className="relative group">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                        <History size={16} />
+                    </div>
+                    <select 
+                      value={selectedAnalysisIndex}
+                      onChange={(e) => setSelectedAnalysisIndex(Number(e.target.value))}
+                      className="appearance-none bg-purple-500/5 border border-white/10 text-white pl-10 pr-10 py-2.5 rounded-xl focus:outline-none focus:border-purple-500/50 w-full min-w-[250px] cursor-pointer hover:bg-white/10 transition-colors"
+                    >
+                      {history.map((analysis, idx) => (
+                        <option key={idx} value={idx} className="bg-[#1a1d24]">
+                            {new URL(analysis.url).hostname} - {new Date(analysis.timestamp).toLocaleDateString()}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                 </div>
+             ) : (
+                <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-200 text-xs flex items-center gap-2">
+                    <Sparkles size={14} /> Aucune analyse disponible. <span className="underline cursor-pointer" onClick={onBack}>Lancer un audit</span> pour pré-remplir.
+                </div>
+             )}
+             
+             <div className="flex bg-purple-500/5 rounded-xl p-1 border border-white/10">
+                <button onClick={() => setActiveTab('edit')} className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'edit' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}>Éditer</button>
+                <button 
+                  onClick={() => hasGenerated && setActiveTab('preview')}
+                  disabled={!hasGenerated}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                    activeTab === 'preview' 
+                      ? 'bg-purple-500/20 text-purple-300 shadow-sm' 
+                      : !hasGenerated 
+                        ? 'text-gray-600 cursor-not-allowed opacity-50' 
+                        : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  {!hasGenerated && <Lock size={12} />} Aperçu
+                </button>
+             </div>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-12 gap-8">
+         {/* Main Content Area */}
+         <div className="lg:col-span-8">
+            <div className="ninja-card rounded-2xl overflow-hidden border border-white/10 min-h-[600px] flex flex-col transition-all duration-500">
+                
+                {activeTab === 'edit' ? (
+                    <div className="flex flex-col h-full">
+                        <div className="p-8 space-y-8 flex-1">
+                            {/* Toolbar */}
+                            <div className="flex justify-end mb-4">
+                                <button 
+                                    onClick={handleReset}
+                                    className="text-xs text-gray-500 hover:text-red-400 flex items-center gap-2 transition-colors px-3 py-2 rounded-lg hover:bg-purple-500/5"
+                                    title="Revenir aux données extraites de l'URL"
+                                >
+                                    <RotateCcw size={14} /> Restaurer les données d'origine
+                                </button>
+                            </div>
+
+                            {/* Identity Section */}
+                            <section className="space-y-4">
+                                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2 border-b border-white/5 pb-2">
+                                <Building2 size={16} /> Identité Organisation
+                                </h4>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                <div className="md:col-span-2">
+                                    <div className="flex justify-between mb-1.5">
+                                        <label className="block text-xs font-medium text-gray-400">Description courte (Optimisée pour Context Window)</label>
+                                        <span className="text-[10px] text-purple-300 flex items-center gap-1"><Sparkles size={10} /> Générée par IA</span>
+                                    </div>
+                                    <textarea 
+                                    value={data.description}
+                                    onChange={(e) => setData({...data, description: e.target.value})}
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:border-purple-500/50 outline-none h-24 text-sm transition-colors"
+                                    placeholder="Décrivez votre organisation en 2-3 phrases factuelles..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-400 mb-1.5">Type d'organisation</label>
+                                    <input 
+                                    type="text" value={data.type}
+                                    onChange={(e) => setData({...data, type: e.target.value})}
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-purple-500/50 outline-none transition-colors" 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-400 mb-1.5">Année de création</label>
+                                    <div className="relative">
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                                    <input 
+                                        type="text" value={data.founded}
+                                        onChange={(e) => setData({...data, founded: e.target.value})}
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 pl-10 text-white text-sm focus:border-purple-500/50 outline-none transition-colors" 
+                                    />
+                                    </div>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-xs font-medium text-gray-400 mb-1.5">Localisation / Siège</label>
+                                    <div className="relative">
+                                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                                    <input 
+                                        type="text" value={data.location}
+                                        onChange={(e) => setData({...data, location: e.target.value})}
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 pl-10 text-white text-sm focus:border-purple-500/50 outline-none transition-colors" 
+                                    />
+                                    </div>
+                                </div>
+                                </div>
+                            </section>
+
+                            {/* Services Section */}
+                            <section className="space-y-4 pt-4">
+                                <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                                    <Sparkles size={16} /> Services & Offres Clés
+                                </h4>
+                                <button onClick={addService} className="text-xs flex items-center gap-1 text-gray-400 hover:text-white bg-purple-500/5 px-2 py-1 rounded hover:bg-white/10 transition-colors"><Plus size={14} /> Ajouter</button>
+                                </div>
+                                {data.services.map((service, idx) => (
+                                <div key={idx} className="bg-white/[0.02] p-5 rounded-xl border border-white/5 hover:border-white/10 transition-colors group relative">
+                                    <button onClick={() => removeService(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1"><Trash2 size={16} /></button>
+                                    <div className="grid md:grid-cols-2 gap-4 mb-3">
+                                    <input 
+                                        placeholder="Nom du service"
+                                        value={service.name}
+                                        onChange={(e) => handleServiceChange(idx, 'name', e.target.value)}
+                                        className="bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white focus:border-purple-500/30 outline-none"
+                                    />
+                                    <input 
+                                        placeholder="Catégorie (ex: Analytics)"
+                                        value={service.category}
+                                        onChange={(e) => handleServiceChange(idx, 'category', e.target.value)}
+                                        className="bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white focus:border-purple-500/30 outline-none"
+                                    />
+                                    </div>
+                                    <textarea 
+                                    placeholder="Description factuelle (ce que l'IA doit retenir)..."
+                                    value={service.description}
+                                    onChange={(e) => handleServiceChange(idx, 'description', e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white h-20 focus:border-purple-500/30 outline-none resize-none"
+                                    />
+                                </div>
+                                ))}
+                            </section>
+
+                            {/* FAQ Section */}
+                            <section className="space-y-4 pt-4">
+                                <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                                    <FileText size={16} /> FAQ (Knowledge Graph)
+                                </h4>
+                                <button onClick={addFaq} className="text-xs flex items-center gap-1 text-gray-400 hover:text-white bg-purple-500/5 px-2 py-1 rounded hover:bg-white/10 transition-colors"><Plus size={14} /> Ajouter</button>
+                                </div>
+                                {data.faqs.map((faq, idx) => (
+                                <div key={idx} className="bg-white/[0.02] p-5 rounded-xl border border-white/5 hover:border-white/10 transition-colors group relative">
+                                    <button onClick={() => removeFaq(idx)} className="absolute top-4 right-4 text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-1"><Trash2 size={16} /></button>
+                                    <input 
+                                    placeholder="Question fréquente ?"
+                                    value={faq.question}
+                                    onChange={(e) => handleFaqChange(idx, 'question', e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white mb-3 font-medium focus:border-purple-500/30 outline-none"
+                                    />
+                                    <textarea 
+                                    placeholder="Réponse de référence..."
+                                    value={faq.answer}
+                                    onChange={(e) => handleFaqChange(idx, 'answer', e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-gray-300 h-20 focus:border-purple-500/30 outline-none resize-none"
+                                    />
+                                </div>
+                                ))}
+                            </section>
+                        </div>
+                        
+                        {/* Generate Button Footer */}
+                        <div className="p-6 border-t border-white/10 bg-black sticky bottom-0 z-10 flex justify-end">
+                             <div className="flex items-center gap-4">
+                                {user && (
+                                   <p className="text-xs text-gray-500">
+                                      Crédits disponibles: <span className="font-bold text-white">{user.credits}</span>
+                                   </p>
+                                )}
+                                <button 
+                                    onClick={handleGenerate}
+                                    disabled={isGenerating}
+                                    className="btn-gradient py-3 px-6 flex items-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <Zap size={20} className="fill-white" />}
+                                    {isGenerating ? 'Mise à jour...' : `Générer les fichiers (-${GENERATION_COST})`}
+                                </button>
+                             </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="h-full flex flex-col">
+                        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black">
+                            <div className="flex items-center gap-4">
+                            <button onClick={() => setFormat('txt')} className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${format === 'txt' ? 'bg-purple-500 text-white' : 'text-gray-500 hover:text-white bg-purple-500/5'}`}>llm.txt</button>
+                            <button onClick={() => setFormat('json')} className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${format === 'json' ? 'bg-purple-500 text-white' : 'text-gray-500 hover:text-white bg-purple-500/5'}`}>llm.json</button>
+                            </div>
+                            <div className="flex gap-2">
+                            <button onClick={() => handleCopy()} className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/5 hover:bg-white/10 rounded-lg text-xs font-medium text-white border border-white/10 transition-colors">
+                                {copied ? <Check size={14} className="text-purple-300" /> : <Copy size={14} />}
+                                {copied ? 'Copié' : 'Copier'}
+                            </button>
+                            <button onClick={() => handleDownload()} className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-violet-600 text-white hover:from-purple-600 hover:to-violet-700 rounded-lg text-xs font-bold transition-colors shadow-lg shadow-purple-500/10">
+                                <Download size={14} /> Télécharger
+                            </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 bg-black p-8 overflow-auto">
+                            <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap">{generateContent()}</pre>
+                        </div>
+                    </div>
+                )}
+            </div>
+         </div>
+
+         {/* GUIDE D'IMPLEMENTATION - RIGHT SIDEBAR (Always visible but blurred if not generated) */}
+         <div className="lg:col-span-4 animate-in slide-in-from-right duration-700 space-y-6">
+            <div className="mb-2">
+                <h2 className="text-xl font-sans font-bold text-white flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/5 flex items-center justify-center text-gray-300 border border-white/10">
+                        <BookOpen size={18} />
+                    </div>
+                    Guide d'implémentation
+                </h2>
+            </div>
+
+            <div className={`relative transition-all duration-700 ${!hasGenerated ? 'filter blur-sm opacity-50 pointer-events-none select-none grayscale' : ''}`}>
+                
+                {/* Overlay Lock when not generated */}
+                {!hasGenerated && (
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center p-6">
+                        <div className="w-12 h-12 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center text-white mb-2 border border-white/10 shadow-xl">
+                            <Lock size={20} />
+                        </div>
+                        <p className="text-white font-bold text-sm bg-black/50 px-3 py-1 rounded-full border border-white/10">Générer pour débloquer</p>
+                    </div>
+                )}
+
+                {/* Step 1: Hébergement Standard */}
+                <div className="ninja-card p-5 rounded-xl border border-white/10 relative overflow-hidden mb-6">
+                    <div className="absolute top-0 right-0 p-3 opacity-5">
+                        <Server size={48} />
+                    </div>
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold border border-blue-500/30 text-sm">1</div>
+                        <h3 className="text-base font-bold text-white">Hébergement Racine</h3>
+                    </div>
+                    <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                        Le fichier doit impérativement être accessible à la racine de votre domaine pour être découvert par les bots respectant le standard <code>llm.txt</code>.
+                    </p>
+                    <div className="bg-black/40 p-2.5 rounded-lg border border-white/5 font-mono text-[10px] text-purple-300 break-all flex items-center gap-2">
+                        <Globe size={12} className="text-gray-500" />
+                        https://{currentHostname}/llm.txt
+                    </div>
+                </div>
+
+                {/* Step 2: Déclaration HTML */}
+                <div className="ninja-card p-5 rounded-xl border border-white/10 relative overflow-hidden mb-6">
+                    <div className="absolute top-0 right-0 p-3 opacity-5">
+                        <FileCode size={48} />
+                    </div>
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold border border-purple-500/30 text-sm">2</div>
+                        <h3 className="text-base font-bold text-white">Discovery Link</h3>
+                    </div>
+                    <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                        Ajoutez cette balise dans le <code>&lt;head&gt;</code> de votre page d'accueil pour signaler explicitement le fichier aux crawlers IA.
+                    </p>
+                    <div className="bg-black/40 p-2.5 rounded-lg border border-white/5 font-mono text-[10px] text-purple-300 break-all">
+                        &lt;link rel="llm-text" href="/llm.txt" /&gt;
+                    </div>
+                </div>
+
+                {/* Step 3: Conformité Technique */}
+                <div className="ninja-card p-5 rounded-xl border border-white/10 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-3 opacity-5">
+                        <ShieldCheck size={48} />
+                    </div>
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-400/20 flex items-center justify-center text-purple-300 font-bold border border-purple-400/30 text-sm">3</div>
+                        <h3 className="text-base font-bold text-white">Standards Requis</h3>
+                    </div>
+                    <ul className="space-y-3 text-[10px] text-gray-400">
+                        <li className="flex items-start gap-2">
+                            <Check size={12} className="text-purple-400 mt-0.5"/> 
+                            <span>Format <strong>Markdown</strong> standardisé</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <Check size={12} className="text-purple-400 mt-0.5"/> 
+                            <span>Encodage <strong>UTF-8</strong> obligatoire</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <Check size={12} className="text-purple-400 mt-0.5"/> 
+                            <span>MIME Type : <code>text/plain</code> ou <code>text/markdown</code></span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <Check size={12} className="text-purple-400 mt-0.5"/> 
+                            <span>Ne pas bloquer via <strong>robots.txt</strong></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+         </div>
+      </div>
+
+      {/* HISTORIQUE DES FICHIERS */}
+      {savedFiles.length > 0 && (
+        <div className="mt-12 border-t border-white/10 pt-10">
+            <h3 className="text-xl font-sans font-bold text-white mb-6 flex items-center gap-2">
+                <Archive size={20} className="text-gray-400" />
+                Historique des versions
+            </h3>
+            
+            <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {savedFiles.map((file) => (
+                    <div key={file.id} className="ninja-card p-5 rounded-xl border border-white/10 hover:border-purple-500/30 transition-all flex flex-col">
+                        <div className="flex justify-between items-start mb-3">
+                            <span className="text-[10px] font-bold px-2 py-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase">
+                                llm.{format}
+                            </span>
+                            <span className="text-xs text-gray-500">{new Date(file.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <h4 className="font-bold text-white mb-2 text-sm line-clamp-1">{file.title}</h4>
+                        
+                        <div className="bg-black p-3 rounded border border-white/5 mb-4 flex-1 overflow-hidden relative h-20">
+                            <p className="text-[10px] text-gray-500 font-mono line-clamp-3">{file.content}</p>
+                            <div className="absolute bottom-0 left-0 w-full h-6 bg-gradient-to-t from-[#050208] to-transparent"></div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => handleCopy(file.content)}
+                                className="flex-1 py-1.5 bg-purple-500/5 hover:bg-white/10 rounded text-[10px] font-medium text-gray-300 transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Copy size={10} /> Copier
+                            </button>
+                            <button 
+                                onClick={() => handleDownload(`llm_archive_${file.id}.${format}`, file.content)}
+                                className="flex-1 py-1.5 bg-purple-500/5 hover:bg-white/10 rounded text-[10px] font-medium text-gray-300 transition-colors flex items-center justify-center gap-1"
+                            >
+                                <Download size={10} /> DL
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SourceOfTruth;

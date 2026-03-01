@@ -1,0 +1,578 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  ArrowLeft,
+  Link2,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Target,
+  Percent,
+  MousePointerClick,
+  Search,
+  Bot,
+  Unplug,
+} from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import { User } from '../types';
+import {
+  Integration,
+  IntegrationType,
+  AttributionKPI,
+  TrafficDataPoint,
+  AttributionRow,
+  AIQuery,
+} from '../types/integrations';
+import {
+  getIntegrations,
+  connectIntegration,
+  disconnectIntegration,
+  getAttributionKPIs,
+  getTrafficData,
+  getAttributionTable,
+  getAIQueries,
+} from '../services/integrations';
+import PageHeader from '../components/layout/PageHeader';
+
+interface Props {
+  onBack: () => void;
+  user: User | null;
+  onDeductCredits: (amount: number) => boolean;
+}
+
+const SOURCE_STYLES: Record<string, { color: string; bg: string; border: string }> = {
+  ChatGPT: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+  Perplexity: { color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+  Claude: { color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+  Gemini: { color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+  Copilot: { color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
+  'AI Overviews': { color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' },
+};
+
+const CHART_COLORS: Record<string, string> = {
+  chatgpt: '#10b981',
+  perplexity: '#3b82f6',
+  claude: '#a855f7',
+  gemini: '#f59e0b',
+  copilot: '#06b6d4',
+  aiOverviews: '#f43f5e',
+};
+
+const Integrations: React.FC<Props> = ({ onBack, user, onDeductCredits }) => {
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [connecting, setConnecting] = useState<IntegrationType | null>(null);
+  const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
+  const [kpis, setKpis] = useState<AttributionKPI | null>(null);
+  const [trafficData, setTrafficData] = useState<TrafficDataPoint[]>([]);
+  const [tableData, setTableData] = useState<AttributionRow[]>([]);
+  const [queries, setQueries] = useState<AIQuery[]>([]);
+
+  const hasAnyConnection = integrations.some((i) => i.status === 'connected');
+
+  const refreshIntegrations = useCallback(() => {
+    setIntegrations(getIntegrations());
+  }, []);
+
+  // Load integrations on mount
+  useEffect(() => {
+    refreshIntegrations();
+  }, [refreshIntegrations]);
+
+  // Load dashboard data when connected and period changes
+  useEffect(() => {
+    if (!hasAnyConnection) return;
+    setKpis(getAttributionKPIs(period));
+    setTrafficData(getTrafficData(period));
+    setTableData(getAttributionTable());
+    setQueries(getAIQueries());
+  }, [hasAnyConnection, period]);
+
+  const handleConnect = async (type: IntegrationType) => {
+    const credited = onDeductCredits(3);
+    if (!credited) return;
+
+    setConnecting(type);
+    try {
+      await connectIntegration(type);
+      refreshIntegrations();
+    } catch (err) {
+      console.error('Connection failed', err);
+    } finally {
+      setConnecting(null);
+    }
+  };
+
+  const handleDisconnect = (id: string) => {
+    disconnectIntegration(id);
+    refreshIntegrations();
+  };
+
+  const ga4 = integrations.find((i) => i.type === 'ga4' && i.status === 'connected');
+  const sc = integrations.find((i) => i.type === 'search-console' && i.status === 'connected');
+
+  const periodLabel = (p: string) => {
+    if (p === '7d') return '7j';
+    if (p === '30d') return '30j';
+    return '90j';
+  };
+
+  // ---- Render ----
+  return (
+    <div className="text-gray-100">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition mb-6"
+        >
+          <ArrowLeft size={18} />
+          <span className="text-sm">Retour</span>
+        </button>
+
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+            <Link2 size={22} className="text-purple-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">
+              <span className="gradient-text">Integrations</span>
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+              Connectez vos comptes Google pour suivre le trafic IA en temps reel
+            </p>
+          </div>
+          <span className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20 rounded-full px-3 py-1">
+            <Unplug size={13} /> 3 Gas / sync
+          </span>
+        </div>
+
+        {/* Connection cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-10">
+          {/* GA4 Card */}
+          <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+            <div className="flex items-start gap-4">
+              <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                <BarChart3 size={20} className="text-amber-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-white">Google Analytics 4</h3>
+                <p className="text-gray-500 text-sm mt-0.5">
+                  Importez vos donnees de trafic et conversions IA
+                </p>
+
+                {ga4 ? (
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 size={15} className="text-emerald-400" />
+                      <span className="text-emerald-400 font-medium">Connecte</span>
+                    </div>
+                    <p className="text-xs text-gray-500 truncate">{ga4.email}</p>
+                    <p className="text-xs text-gray-400 truncate">{ga4.property}</p>
+                    <button
+                      onClick={() => handleDisconnect(ga4.id)}
+                      className="mt-3 flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition"
+                    >
+                      <XCircle size={14} /> Deconnecter
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleConnect('ga4')}
+                    disabled={connecting !== null}
+                    className="mt-4 btn-gradient text-sm flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {connecting === 'ga4' ? (
+                      <>
+                        <Loader2 size={15} className="animate-spin" /> Connexion...
+                      </>
+                    ) : (
+                      'Connecter'
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Search Console Card */}
+          <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+            <div className="flex items-start gap-4">
+              <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                <Search size={20} className="text-blue-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-white">Google Search Console</h3>
+                <p className="text-gray-500 text-sm mt-0.5">
+                  Analysez vos requetes et positions liees a l'IA
+                </p>
+
+                {sc ? (
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 size={15} className="text-emerald-400" />
+                      <span className="text-emerald-400 font-medium">Connecte</span>
+                    </div>
+                    <p className="text-xs text-gray-500 truncate">{sc.email}</p>
+                    <p className="text-xs text-gray-400 truncate">{sc.property}</p>
+                    <button
+                      onClick={() => handleDisconnect(sc.id)}
+                      className="mt-3 flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 transition"
+                    >
+                      <XCircle size={14} /> Deconnecter
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleConnect('search-console')}
+                    disabled={connecting !== null}
+                    className="mt-4 btn-gradient text-sm flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {connecting === 'search-console' ? (
+                      <>
+                        <Loader2 size={15} className="animate-spin" /> Connexion...
+                      </>
+                    ) : (
+                      'Connecter'
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Attribution Dashboard */}
+        {hasAnyConnection && kpis && (
+          <div className="space-y-8 animate-in">
+            {/* Period selector */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-white">Attribution IA</h2>
+              <div className="flex gap-1 bg-[#111111] rounded-xl p-1 border border-white/[0.06]">
+                {(['7d', '30d', '90d'] as const).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPeriod(p)}
+                    className={`px-4 py-1.5 text-sm rounded-lg font-medium transition ${
+                      period === p
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {periodLabel(p)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <KpiCard
+                icon={<Users size={18} className="text-purple-400" />}
+                label="Visites IA"
+                value={kpis.aiVisits.toLocaleString('fr-FR')}
+              />
+              <KpiCard
+                icon={<Target size={18} className="text-emerald-400" />}
+                label="Conversions IA"
+                value={kpis.aiConversions.toLocaleString('fr-FR')}
+              />
+              <KpiCard
+                icon={<Percent size={18} className="text-blue-400" />}
+                label="Part trafic IA"
+                value={`${kpis.aiTrafficShare}%`}
+              />
+              <KpiCard
+                icon={<MousePointerClick size={18} className="text-amber-400" />}
+                label="CTR moyen IA"
+                value={`${kpis.aiAvgCTR}%`}
+              />
+            </div>
+
+            {/* Area Chart */}
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4">
+                Trafic IA par source
+              </h3>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={trafficData}>
+                    <defs>
+                      {Object.entries(CHART_COLORS).map(([key, color]) => (
+                        <linearGradient key={key} id={`grad-${key}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+                          <stop offset="100%" stopColor={color} stopOpacity={0} />
+                        </linearGradient>
+                      ))}
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fill: '#6b7280', fontSize: 11 }}
+                      tickFormatter={(v: string) => {
+                        const d = new Date(v);
+                        return `${d.getDate()}/${d.getMonth() + 1}`;
+                      }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fill: '#6b7280', fontSize: 11 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: '#1a1a1a',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        color: '#e5e7eb',
+                        fontSize: 12,
+                      }}
+                      labelFormatter={(label: string) => {
+                        const d = new Date(label);
+                        return d.toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        });
+                      }}
+                    />
+                    <Legend
+                      wrapperStyle={{ fontSize: 12, color: '#9ca3af' }}
+                      iconType="circle"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="chatgpt"
+                      name="ChatGPT"
+                      stackId="1"
+                      stroke={CHART_COLORS.chatgpt}
+                      fill={`url(#grad-chatgpt)`}
+                      strokeWidth={2}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="perplexity"
+                      name="Perplexity"
+                      stackId="1"
+                      stroke={CHART_COLORS.perplexity}
+                      fill={`url(#grad-perplexity)`}
+                      strokeWidth={2}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="claude"
+                      name="Claude"
+                      stackId="1"
+                      stroke={CHART_COLORS.claude}
+                      fill={`url(#grad-claude)`}
+                      strokeWidth={2}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="gemini"
+                      name="Gemini"
+                      stackId="1"
+                      stroke={CHART_COLORS.gemini}
+                      fill={`url(#grad-gemini)`}
+                      strokeWidth={2}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="copilot"
+                      name="Copilot"
+                      stackId="1"
+                      stroke={CHART_COLORS.copilot}
+                      fill={`url(#grad-copilot)`}
+                      strokeWidth={2}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="aiOverviews"
+                      name="AI Overviews"
+                      stackId="1"
+                      stroke={CHART_COLORS.aiOverviews}
+                      fill={`url(#grad-aiOverviews)`}
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Attribution Table */}
+            <div className="ninja-card rounded-2xl border border-white/[0.08] overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/[0.06]">
+                <h3 className="text-sm font-semibold text-gray-300">
+                  Attribution par source IA
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-gray-500 text-xs uppercase tracking-wider">
+                      <th className="text-left px-6 py-3 font-medium">Source</th>
+                      <th className="text-right px-4 py-3 font-medium">Visites</th>
+                      <th className="text-right px-4 py-3 font-medium">Pages vues</th>
+                      <th className="text-right px-4 py-3 font-medium">Duree</th>
+                      <th className="text-right px-4 py-3 font-medium">Taux de rebond</th>
+                      <th className="text-right px-4 py-3 font-medium">Conversions</th>
+                      <th className="text-right px-6 py-3 font-medium">Tendance</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.04]">
+                    {tableData.map((row) => {
+                      const style = SOURCE_STYLES[row.source] || SOURCE_STYLES.ChatGPT;
+                      return (
+                        <tr key={row.source} className="hover:bg-white/[0.02] transition">
+                          <td className="px-6 py-3">
+                            <span
+                              className={`inline-flex items-center gap-2 text-sm font-medium ${style.color}`}
+                            >
+                              <span
+                                className={`w-2 h-2 rounded-full ${style.bg} ${style.border} border`}
+                              />
+                              {row.source}
+                            </span>
+                          </td>
+                          <td className="text-right px-4 py-3 text-gray-300 font-medium">
+                            {row.visits.toLocaleString('fr-FR')}
+                          </td>
+                          <td className="text-right px-4 py-3 text-gray-400">
+                            {row.pageViews.toLocaleString('fr-FR')}
+                          </td>
+                          <td className="text-right px-4 py-3 text-gray-400">
+                            {row.avgDuration}
+                          </td>
+                          <td className="text-right px-4 py-3 text-gray-400">
+                            {row.bounceRate}%
+                          </td>
+                          <td className="text-right px-4 py-3 text-gray-300 font-medium">
+                            {row.conversions}
+                          </td>
+                          <td className="text-right px-6 py-3">
+                            <span
+                              className={`inline-flex items-center gap-1 text-xs font-medium ${
+                                row.trend >= 0 ? 'text-emerald-400' : 'text-red-400'
+                              }`}
+                            >
+                              {row.trend >= 0 ? (
+                                <TrendingUp size={13} />
+                              ) : (
+                                <TrendingDown size={13} />
+                              )}
+                              {row.trend >= 0 ? '+' : ''}
+                              {row.trend}%
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* AI Queries */}
+            <div className="ninja-card p-6 rounded-2xl border border-white/[0.08]">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
+                <Bot size={16} className="text-purple-400" />
+                Top requetes IA
+              </h3>
+              <div className="space-y-2">
+                {queries.map((q, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition"
+                  >
+                    <span className="text-gray-500 text-xs font-mono w-5 text-right shrink-0">
+                      {idx + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-200 truncate">{q.query}</span>
+                        {q.isAIReferral && (
+                          <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/20 rounded-full px-2 py-0.5">
+                            IA
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6 text-xs text-gray-500 shrink-0">
+                      <span>
+                        <span className="text-gray-300 font-medium">{q.clicks}</span> clics
+                      </span>
+                      <span>
+                        <span className="text-gray-300 font-medium">
+                          {q.impressions.toLocaleString('fr-FR')}
+                        </span>{' '}
+                        imp.
+                      </span>
+                      <span>
+                        CTR{' '}
+                        <span className="text-gray-300 font-medium">{q.ctr}%</span>
+                      </span>
+                      <span>
+                        Pos.{' '}
+                        <span className="text-gray-300 font-medium">{q.position}</span>
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Empty state when nothing connected */}
+        {!hasAnyConnection && (
+          <div className="ninja-card p-12 rounded-2xl border border-white/[0.08] text-center">
+            <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-4">
+              <BarChart3 size={28} className="text-purple-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">
+              Aucune integration connectee
+            </h3>
+            <p className="text-gray-500 text-sm max-w-md mx-auto">
+              Connectez Google Analytics 4 ou Search Console pour debloquer le tableau
+              de bord d'attribution IA et suivre vos performances.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// --- Sub-components ---
+
+function KpiCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="ninja-card p-5 rounded-2xl border border-white/[0.08]">
+      <div className="flex items-center gap-2 mb-3">{icon}<span className="text-xs text-gray-500 font-medium">{label}</span></div>
+      <p className="text-2xl font-bold text-white">{value}</p>
+    </div>
+  );
+}
+
+export default Integrations;

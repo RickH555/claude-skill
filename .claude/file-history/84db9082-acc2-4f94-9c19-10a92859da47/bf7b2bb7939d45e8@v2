@@ -1,0 +1,154 @@
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Footer } from '@/components/landing/footer';
+import { FileText, MessageSquare, Key, Upload, BarChart3, Settings, BookOpen, Code, Zap } from 'lucide-react';
+
+const guides = [
+  {
+    title: 'Getting Started',
+    description: 'Create your account, set up your workspace, and process your first document in under 5 minutes.',
+    icon: Zap,
+    href: '/signup',
+  },
+  {
+    title: 'DocAI - Document Processing',
+    description: 'Upload PDFs, images, or scanned documents. Our GPT-4o Vision AI extracts structured data with confidence scores.',
+    icon: FileText,
+    href: '/dashboard/documents/upload',
+  },
+  {
+    title: 'Extraction Templates',
+    description: 'Create reusable templates to define exactly which fields to extract from your documents.',
+    icon: Upload,
+    href: '/dashboard/templates',
+  },
+  {
+    title: 'FeedbackAI - Survey Builder',
+    description: 'Build professional surveys with 6 question types: Rating, NPS, Multiple Choice, Single Choice, Open Ended, and Yes/No.',
+    icon: MessageSquare,
+    href: '/dashboard/surveys/create',
+  },
+  {
+    title: 'AI Analysis',
+    description: 'Run GPT-4o powered analysis on survey responses to get sentiment, themes, and actionable recommendations.',
+    icon: BarChart3,
+    href: '/dashboard/surveys',
+  },
+  {
+    title: 'Team Management',
+    description: 'Invite team members with different roles (Owner, Admin, Member) to collaborate on your workspace.',
+    icon: Settings,
+    href: '/dashboard/settings/team',
+  },
+];
+
+const apiEndpoints = [
+  { method: 'POST', path: '/api/documents/process', description: 'Upload and process a document' },
+  { method: 'GET', path: '/api/documents', description: 'List all documents' },
+  { method: 'POST', path: '/api/surveys', description: 'Create a new survey' },
+  { method: 'GET', path: '/api/surveys/[id]/responses', description: 'Get survey responses' },
+  { method: 'POST', path: '/api/surveys/[id]/analyze', description: 'Run AI analysis on responses' },
+];
+
+export default function DocsPage() {
+  return (
+    <div className="min-h-screen">
+      <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <span className="text-sm font-bold text-primary-foreground">N</span>
+              </div>
+              <span className="text-lg font-bold">NexusAI</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost">
+                <Link href="/login">Sign In</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/signup">Get Started</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 mb-4 rounded-full bg-blue-50 dark:bg-blue-950 px-4 py-1.5">
+            <BookOpen className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-600">Documentation</span>
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight">NexusAI Documentation</h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            Everything you need to know about using NexusAI for document processing and feedback analysis.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-16">
+          {guides.map((guide) => (
+            <Link key={guide.title} href={guide.href}>
+              <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-primary/10 p-2">
+                      <guide.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <CardTitle className="text-lg">{guide.title}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{guide.description}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <Code className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold">API Reference</h2>
+          </div>
+          <Card>
+            <CardContent className="p-0">
+              <div className="divide-y">
+                {apiEndpoints.map((ep) => (
+                  <div key={ep.path} className="flex items-center gap-4 p-4">
+                    <span className={`text-xs font-mono font-bold px-2 py-1 rounded ${
+                      ep.method === 'GET' ? 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400' : 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400'
+                    }`}>
+                      {ep.method}
+                    </span>
+                    <code className="text-sm font-mono flex-1">{ep.path}</code>
+                    <span className="text-sm text-muted-foreground">{ep.description}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          <p className="mt-4 text-sm text-muted-foreground">
+            API access requires a Pro or Enterprise plan.{' '}
+            <Link href="/dashboard/settings/api-keys" className="text-primary hover:underline">
+              Manage your API keys
+            </Link>
+          </p>
+        </div>
+
+        <div className="text-center py-8">
+          <h3 className="text-xl font-semibold mb-2">Need help?</h3>
+          <p className="text-muted-foreground mb-4">
+            Contact our support team for personalized assistance.
+          </p>
+          <Button asChild>
+            <Link href="/contact">Contact Support</Link>
+          </Button>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}

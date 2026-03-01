@@ -1,0 +1,10 @@
+import PageHeader from '@/components/layout/PageHeader';
+
+export default function CustomerSettingsPage() {
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Mon profil" description="Gérez vos informations personnelles." />
+      <p className="text-[var(--text-tertiary)]">Bientôt disponible.</p>
+    </div>
+  );
+}

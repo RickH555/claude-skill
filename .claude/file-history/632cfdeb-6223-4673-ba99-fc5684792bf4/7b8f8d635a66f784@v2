@@ -1,0 +1,121 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+import { useWorkspace } from "@/lib/workspace-context";
+import { toast } from "sonner";
+import { Save, Building2, Globe, Shield } from "lucide-react";
+
+export default function SettingsPage() {
+  const { workspace } = useWorkspace();
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    // TODO: Save to Supabase
+    await new Promise((r) => setTimeout(r, 500));
+    toast.success("Parametres enregistres");
+    setSaving(false);
+  };
+
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+      <header className="mb-8">
+        <h1 className="text-3xl font-serif font-bold text-white mb-2">Parametres</h1>
+        <p className="text-white/50">Gerez les parametres de votre espace de travail.</p>
+      </header>
+
+      <div className="space-y-6">
+        {/* Organization */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 size={18} className="text-primary" />
+              Organisation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              label="Nom de l'organisation"
+              defaultValue={workspace?.name || ""}
+              placeholder="Mon Entreprise"
+            />
+            <Select
+              label="Secteur d'activite"
+              options={[
+                { value: "saas", label: "SaaS / Tech" },
+                { value: "ecommerce", label: "E-commerce" },
+                { value: "finance", label: "Finance" },
+                { value: "sante", label: "Sante" },
+                { value: "immobilier", label: "Immobilier" },
+                { value: "education", label: "Education" },
+                { value: "other", label: "Autre" },
+              ]}
+              placeholder="Choisir un secteur"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Preferences */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe size={18} className="text-primary" />
+              Preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Select
+              label="Langue par defaut"
+              options={[
+                { value: "fr", label: "Francais" },
+                { value: "en", label: "English" },
+                { value: "es", label: "Espanol" },
+              ]}
+              defaultValue="fr"
+            />
+            <Select
+              label="Fuseau horaire"
+              options={[
+                { value: "Europe/Paris", label: "Europe/Paris (UTC+1)" },
+                { value: "America/New_York", label: "America/New_York (UTC-5)" },
+                { value: "America/Los_Angeles", label: "America/Los_Angeles (UTC-8)" },
+              ]}
+              defaultValue="Europe/Paris"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Security */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield size={18} className="text-primary" />
+              Securite
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              label="Email du compte"
+              type="email"
+              disabled
+              defaultValue="user@example.com"
+            />
+            <Button variant="outline" size="sm">
+              Changer le mot de passe
+            </Button>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end">
+          <Button onClick={handleSave} isLoading={saving}>
+            <Save size={16} /> Enregistrer
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

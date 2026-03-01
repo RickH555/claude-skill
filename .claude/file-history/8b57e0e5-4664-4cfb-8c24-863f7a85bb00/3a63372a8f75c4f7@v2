@@ -1,0 +1,25 @@
+import React from 'react';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+
+export const metadata: Metadata = {
+  title: "CitedBy.ai - AEO Optimization Platform",
+  description: "Monitor and optimize your brand visibility in AI responses.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="fr" className="dark">
+      <body className={`${inter.variable} font-sans antialiased bg-[#0F172A] text-white`}>
+        {children}
+      </body>
+    </html>
+  );
+}

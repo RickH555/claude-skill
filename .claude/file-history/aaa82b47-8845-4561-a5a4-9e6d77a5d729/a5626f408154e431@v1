@@ -1,0 +1,122 @@
+import React, { useState, useEffect } from 'react';
+import { Search, ShieldCheck, TrendingUp, Sparkles, Globe, Bot, BarChart3, CheckCircle } from 'lucide-react';
+import PageHeader from '../components/layout/PageHeader';
+
+const analysisSteps = [
+  { icon: Globe, label: 'Crawl du site web...', duration: 2000 },
+  { icon: Bot, label: 'Interrogation des IA (ChatGPT, Claude, Gemini, AI Overviews)...', duration: 3000 },
+  { icon: BarChart3, label: 'Analyse des 50+ critères AEO...', duration: 2500 },
+  { icon: CheckCircle, label: 'Génération du rapport...', duration: 1500 },
+];
+
+interface AnalyzeProps {
+  onAnalyze: (url: string) => void;
+  isAnalyzing: boolean;
+}
+
+const Analyze: React.FC<AnalyzeProps> = ({ onAnalyze, isAnalyzing }) => {
+  const [inputUrl, setInputUrl] = useState('');
+  const [currentStep, setCurrentStep] = useState(0);
+
+  useEffect(() => {
+    if (!isAnalyzing) { setCurrentStep(0); return; }
+    let step = 0;
+    setCurrentStep(0);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let accumulated = 0;
+    analysisSteps.forEach((s, i) => {
+      if (i > 0) {
+        accumulated += analysisSteps[i - 1].duration;
+        timers.push(setTimeout(() => setCurrentStep(i), accumulated));
+      }
+    });
+    return () => timers.forEach(clearTimeout);
+  }, [isAnalyzing]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputUrl && !isAnalyzing) {
+      onAnalyze(inputUrl);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center page-enter">
+      <div className="text-center mb-10 space-y-4">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-[var(--accent-text)] text-[13px] font-medium">
+          <Sparkles size={14} />
+          <span>Audit AEO & GEO Instantané</span>
+        </div>
+        <h1 className="text-4xl md:text-5xl font-semibold text-[var(--text-primary)] tracking-tight">
+          Analysez votre <span className="text-[var(--accent-text)]">visibilité IA</span>
+        </h1>
+        <p className="text-lg text-[var(--text-tertiary)] max-w-2xl mx-auto">
+          Découvrez comment les moteurs de réponse perçoivent votre contenu et obtenez un plan d'action pour être cité.
+        </p>
+      </div>
+
+      <div className="w-full max-w-3xl relative z-10">
+        <div className="absolute inset-0 bg-[var(--accent)]/10 blur-3xl rounded-full opacity-20 -z-10"></div>
+        <form onSubmit={handleSubmit}>
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-8">
+            <div className="flex items-center gap-3">
+              <Search className="text-[var(--text-disabled)] shrink-0" size={24} />
+              <input
+                type="url"
+                required
+                placeholder="https://votre-site.com"
+                className="w-full bg-[var(--bg-base)] border border-white/[0.06] rounded-lg focus:ring-1 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]/30 text-[var(--text-primary)] placeholder-[var(--text-disabled)] text-lg px-4 py-4"
+                value={inputUrl}
+                onChange={(e) => setInputUrl(e.target.value)}
+                autoFocus
+              />
+              <button
+                type="submit"
+                disabled={isAnalyzing}
+                className={`px-8 py-4 shrink-0 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-all ${isAnalyzing ? '!bg-white/[0.06] !text-[var(--text-disabled)] cursor-not-allowed opacity-60' : ''}`}
+              >
+                {isAnalyzing ? 'Analyse...' : 'Lancer l\'audit'}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        {!isAnalyzing && (
+          <div className="flex justify-center gap-8 mt-8 text-[13px] text-[var(--text-tertiary)]">
+            <span className="flex items-center gap-2"><ShieldCheck size={16} className="text-[var(--accent-text)]"/> Analyse Sécurisée</span>
+            <span className="flex items-center gap-2"><TrendingUp size={16} className="text-[var(--accent-text)]"/> +50 Critères GEO</span>
+          </div>
+        )}
+
+        {isAnalyzing && (
+          <div className="mt-8 w-full max-w-md mx-auto space-y-3">
+            {analysisSteps.map((step, i) => {
+              const StepIcon = step.icon;
+              const isActive = i === currentStep;
+              const isDone = i < currentStep;
+              return (
+                <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-500 ${
+                  isActive ? 'bg-[var(--accent-subtle)] border border-[var(--accent)]/20' : isDone ? 'bg-white/[0.03] border border-[var(--border-subtle)]' : 'opacity-40 border border-transparent'
+                }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
+                    isDone ? 'bg-[var(--success)]/20' : isActive ? 'bg-[var(--accent-subtle)]' : 'bg-white/[0.03]'
+                  }`}>
+                    {isDone ? <CheckCircle size={16} className="text-[var(--success)]" /> : <StepIcon size={16} className={isActive ? 'text-[var(--accent-text)] animate-pulse' : 'text-[var(--text-disabled)]'} />}
+                  </div>
+                  <span className={`text-[13px] font-medium transition-colors duration-300 ${isDone ? 'text-[var(--success)]' : isActive ? 'text-[var(--accent-text)]' : 'text-[var(--text-disabled)]'}`}>{step.label}</span>
+                  {isActive && <div className="ml-auto w-4 h-4 border-2 border-[var(--accent-text)] border-t-transparent rounded-full animate-spin" />}
+                </div>
+              );
+            })}
+            <div className="mt-4 w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+              <div className="h-full bg-[var(--accent)] rounded-full transition-all duration-1000 ease-out" style={{ width: `${((currentStep + 1) / analysisSteps.length) * 100}%` }} />
+            </div>
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+};
+
+export default Analyze;

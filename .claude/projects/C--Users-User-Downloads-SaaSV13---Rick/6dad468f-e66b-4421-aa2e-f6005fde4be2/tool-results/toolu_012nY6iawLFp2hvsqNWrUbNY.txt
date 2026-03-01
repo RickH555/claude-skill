@@ -1,0 +1,232 @@
+C:\Users\User\Downloads\SaaSV13 - Rick\components\AICitationPreview.tsx-21-    return () => clearTimeout(timer);
+C:\Users\User\Downloads\SaaSV13 - Rick\components\AICitationPreview.tsx-22-  }, [mode]);
+C:\Users\User\Downloads\SaaSV13 - Rick\components\AICitationPreview.tsx-23-
+C:\Users\User\Downloads\SaaSV13 - Rick\components\AICitationPreview.tsx:24:  const hostname = new URL(analysis.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\components\AICitationPreview.tsx-25-  const brandName = hostname.split('.')[0].charAt(0).toUpperCase() + hostname.split('.')[0].slice(1);
+C:\Users\User\Downloads\SaaSV13 - Rick\components\AICitationPreview.tsx-26-
+C:\Users\User\Downloads\SaaSV13 - Rick\components\AICitationPreview.tsx-27-  // Metrics Data
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-120-            Plan d'Action AEO
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-121-        </h1>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-122-        <p className="text-gray-400">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx:123:            Générez les correctifs techniques et sémantiques pour {new URL(data.url).hostname}.
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-124-        </p>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-125-      </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\ActionPlan.tsx-126-
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-58-
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-59-  // Protect /app routes
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-60-  if (request.nextUrl.pathname.startsWith('/app') && !user) {
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts:61:    return NextResponse.redirect(new URL('/login', request.url))
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-62-  }
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-63-
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-64-  // Redirect logged in users away from auth pages
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-65-  if ((request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register') && user) {
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts:66:    return NextResponse.redirect(new URL('/app', request.url))
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-67-  }
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-68-
+C:\Users\User\Downloads\SaaSV13 - Rick\lib\supabase\middleware.ts-69-  return response
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-9-}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-10-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-11-const DirectoryEntity: React.FC<Props> = ({ data, onBack }) => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx:12:  const hostname = new URL(data.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-13-  // Extraction des points forts (critères réussis)
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-14-  const categoryScores = Object.values(data.categories) as CategoryScore[];
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\DirectoryEntity.tsx-15-  const strengths = categoryScores
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-84-    
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-85-    history.forEach(h => {
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-86-        let hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:87:        try { hostname = new URL(h.url).hostname; } catch(e) { hostname = h.url; }
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-88-        
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-89-        const analysisDate = new Date(h.timestamp);
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-90-        
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-183-    if (user) {
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-184-        const limit = PLAN_LIMITS[user.plan] || 1;
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-185-        let hostname = url;
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:186:        try { hostname = new URL(url).hostname; } catch(e) {}
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-187-
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-188-        // On vérifie si c'est un projet déjà existant dans l'historique global
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-189-        const isExistingProject = history.some(h => {
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx:190:            try { return new URL(h.url).hostname === hostname; } 
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-191-            catch(e) { return false; }
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-192-        });
+C:\Users\User\Downloads\SaaSV13 - Rick\App.tsx-193-
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-36-  ];
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-37-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-38-  const tableData = history.length > 0 ? history.map(h => ({
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx:39:    url: new URL(h.url).hostname + new URL(h.url).pathname,
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-40-    score: h.globalScore,
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-41-    citation: `${h.aiCitation.probability}%`,
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Dashboard.tsx-42-    date: new Date(h.timestamp).toLocaleDateString(),
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-25-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-26-// Helper to convert AnalysisResult to Project format
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-27-const mapAnalysisToProject = (analysis: AnalysisResult, index: number): Project => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx:28:  const hostname = new URL(analysis.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-29-  return {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-30-    id: `proj_${index}_${hostname}`,
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-31-    name: hostname,
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-61-      const uniqueMap = new Map<string, AnalysisResult>();
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-62-      history.forEach(item => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-63-        try {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx:64:            const host = new URL(item.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-65-            if (!uniqueMap.has(host) || new Date(item.timestamp) > new Date(uniqueMap.get(host)!.timestamp)) {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-66-                uniqueMap.set(host, item);
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-67-            }
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-88-  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-89-    if (initialUrl && projects.length > 0) {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-90-        try {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx:91:            const targetHost = new URL(initialUrl).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-92-            // The projects mapping uses hostname as name
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-93-            const found = projects.find(p => p.name === targetHost);
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-94-            if (found) return found.id;
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-109-  const projectHistory = useMemo(() => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-110-    return history
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-111-      .filter(h => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx:112:          try { return new URL(h.url).hostname === currentProject.name; }
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-113-          catch(e) { return false; }
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-114-      })
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Projects.tsx-115-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-63-      ) : (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-64-        <div className="space-y-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-65-          {history.map((item, idx) => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx:66:            const hostname = new URL(item.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-67-            return (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-68-              <div key={idx} className="glass-panel rounded-xl border border-white/10 overflow-hidden group hover:border-white/20 transition-all">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\History.tsx-69-                {/* Header Card */}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-63-        heightLeft -= pdfHeight;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-64-      }
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-65-      
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:66:      const hostname = new URL(data.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-67-      pdf.save(`Audit_AEO_${hostname}_${new Date().toISOString().split('T')[0]}.pdf`);
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-68-    } catch (err) {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-69-      console.error('PDF Export failed', err);
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-98-      {/* Header */}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-99-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6 pt-6">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-100-        <div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:101:          <h1 className="text-3xl font-serif font-bold text-white mb-2">{new URL(data.url).hostname}</h1>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-102-          <p className="text-gray-400 text-sm">Analysé le {new Date(data.timestamp).toLocaleDateString()} à {new Date(data.timestamp).toLocaleTimeString()}</p>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-103-        </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-104-        
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-178-                  {/* Title Section */}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-179-                  <div className="text-center mt-20 mb-20">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-180-                      <h1 className="text-5xl font-serif font-bold text-gray-900 mb-6 tracking-tight">Audit de Visibilité Générative</h1>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:181:                      <p className="text-2xl text-gray-500">{new URL(data.url).hostname}</p>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-182-                  </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-183-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-184-                  {/* Score Hero */}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-211-                          <Info size={20} className="text-[#10b981]" /> Synthèse de l'analyste
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-212-                      </h3>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-213-                      <p className="text-gray-600 leading-relaxed mb-4">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx:214:                          L'analyse de <strong>{new URL(data.url).hostname}</strong> révèle une probabilité de citation par les assistants IA de <strong>{data.aiCitation.probability}%</strong>. 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-215-                          {data.globalScore < 50 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-216-                              ? " L'entité manque actuellement de signaux structurés pour être correctement identifiée par les Knowledge Graphs."
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\Results.tsx-217-                              : " L'entité possède une base solide mais nécessite des optimisations sémantiques pour garantir la primauté de la réponse."}
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-200-            >
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-201-                {history.map((analysis, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-202-                <option key={idx} value={idx} className="bg-[#1a1d24]">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx:203:                    {new URL(analysis.url).hostname}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-204-                </option>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-205-                ))}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-206-            </select>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-380-                    <div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-381-                        <h4 className="font-bold text-white text-sm">Vérification Post-Install</h4>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-382-                        <p className="text-xs text-gray-400 mt-1">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx:383:                            Accédez à <code>{history.length > 0 ? new URL(history[selectedAnalysisIndex].url).origin : 'votre-site.com'}/robots.txt</code> pour confirmer que le nouveau contenu est bien en ligne.
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-384-                        </p>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-385-                    </div>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\RobotsTxt.tsx-386-                </div>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-32-  useEffect(() => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-33-    if (history.length > 0) {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-34-      const latest = history[0];
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx:35:      const urlObj = new URL(latest.url);
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-36-      const hostname = urlObj.hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-37-      const name = hostname.replace('www.', '').split('.')[0];
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SchemaOrg.tsx-38-      const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-26-  // Fonction pour simuler l'extraction de données basée sur l'URL analysée
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-27-  const extractDataFromUrl = (url: string): SourceOfTruthData => {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-28-    try {
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:29:        const hostname = new URL(url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-30-        const nameParts = hostname.replace('www.', '').split('.');
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-31-        const rawName = nameParts[0];
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-32-        const formattedName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-87-  }, [selectedAnalysisIndex, history]);
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-88-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-89-  const currentProjectName = history.length > 0 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:90:    ? new URL(history[selectedAnalysisIndex].url).hostname 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-91-    : "Mon Projet";
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-92-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-93-  const currentProjectDomain = history.length > 0 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:94:    ? new URL(history[selectedAnalysisIndex].url).origin 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-95-    : "https://monsite.com";
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-96-  
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-97-  const currentHostname = history.length > 0 
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:98:    ? new URL(history[selectedAnalysisIndex].url).hostname
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-99-    : "monsite.com";
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-100-
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-101-  const handleServiceChange = (idx: number, field: string, value: string) => {
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-217-                    >
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-218-                      {history.map((analysis, idx) => (
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-219-                        <option key={idx} value={idx} className="bg-[#1a1d24]">
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx:220:                            {new URL(analysis.url).hostname} - {new Date(analysis.timestamp).toLocaleDateString()}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-221-                        </option>
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-222-                      ))}
+C:\Users\User\Downloads\SaaSV13 - Rick\pages\SourceOfTruth.tsx-223-                    </select>
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\analyzer.ts-20-
+C:\Users\User\Downloads\SaaSV13 - Rick\services\analyzer.ts-21-  // Deterministic simulation based on URL length to vary results slightly
+C:\Users\User\Downloads\SaaSV13 - Rick\services\analyzer.ts-22-  const seed = url.length;
+C:\Users\User\Downloads\SaaSV13 - Rick\services\analyzer.ts:23:  const hostname = new URL(url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\services\analyzer.ts-24-  const isGoodUrl = url.includes('citedby') || url.includes('stripe') || url.includes('google');
+C:\Users\User\Downloads\SaaSV13 - Rick\services\analyzer.ts-25-  
+C:\Users\User\Downloads\SaaSV13 - Rick\services\analyzer.ts-26-  // Initialize categories based on repository
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-50-    // Let's iterate and keep the latest analysis for the project metadata.
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-51-    history.forEach(item => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-52-        try {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts:53:            const host = new URL(item.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-54-            if (!uniqueMap.has(host) || new Date(item.timestamp) > new Date(uniqueMap.get(host)!.timestamp)) {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-55-                uniqueMap.set(host, item);
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-56-            }
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-58-    });
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-59-    
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-60-    return Array.from(uniqueMap.values()).map((analysis, index) => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts:61:        const hostname = new URL(analysis.url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-62-        return {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-63-            id: `proj_${hostname}`, // ID stable based on hostname
+C:\Users\User\Downloads\SaaSV13 - Rick\services\database.ts-64-            name: hostname,
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-13-
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-14-// Fallback simulation in case API key is missing or request fails
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-15-const fallbackSimulation = async (rec: Recommendation, url: string): Promise<GeneratedSolution> => {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts:16:  const hostname = new URL(url).hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-17-  await new Promise(resolve => setTimeout(resolve, 1500));
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-18-
+C:\Users\User\Downloads\SaaSV13 - Rick\services\generator.ts-19-  // Determine language based on rec ID (simplified logic)
+--
+C:\Users\User\Downloads\SaaSV13 - Rick\services\robots_service.ts-65-  let protocol = 'https';
+C:\Users\User\Downloads\SaaSV13 - Rick\services\robots_service.ts-66-  
+C:\Users\User\Downloads\SaaSV13 - Rick\services\robots_service.ts-67-  try {
+C:\Users\User\Downloads\SaaSV13 - Rick\services\robots_service.ts:68:    const urlObj = new URL(urlStr.startsWith('http') ? urlStr : `https://${urlStr}`);
+C:\Users\User\Downloads\SaaSV13 - Rick\services\robots_service.ts-69-    hostname = urlObj.hostname;
+C:\Users\User\Downloads\SaaSV13 - Rick\services\robots_service.ts-70-    protocol = urlObj.protocol.replace(':', '');
+C:\Users\User\Downloads\SaaSV13 - Rick\services\robots_service.ts-71-  } catch (e) {

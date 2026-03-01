@@ -1,0 +1,671 @@
+# PROMPT CLAUDE CODE — LANDING PAGE & CAMPAGNE DE LANCEMENT CITEDBY.AI
+#
+# Lis /mnt/skills/public/frontend-design/SKILL.md AVANT de coder.
+# Lis CLAUDE_RULES.md pour les règles de sécurité.
+#
+# Cette landing page est un fichier SÉPARÉ du SaaS.
+# Elle vit dans un dossier landing/ à la racine du projet.
+# Elle ne partage AUCUN code avec l'application (pas d'imports de services/).
+
+---
+
+## CONTEXTE STRATÉGIQUE
+
+### Le marché
+
+L'Answer Engine Optimization (AEO) est le nouveau SEO. ChatGPT, Perplexity, Gemini et les AI Overviews de Google remplacent les résultats de recherche classiques. Les entreprises qui n'optimisent pas leur contenu pour être citées par ces moteurs IA deviennent invisibles. C'est un marché naissant, sans leader établi. Semrush et Ahrefs n'ont pas de solution AEO dédiée. C'est exactement ce que CitedBy.ai comble.
+
+### Le positionnement
+
+```
+CitedBy.ai = le Semrush de l'ère IA.
+
+Semrush analyse votre visibilité sur Google.
+CitedBy.ai analyse votre visibilité sur ChatGPT, Perplexity et Gemini.
+
+Semrush vous aide à ranker dans les résultats de recherche.
+CitedBy.ai vous aide à être CITÉ dans les réponses IA.
+```
+
+### La cible B2B
+
+```
+PERSONA PRIMAIRE : Responsable SEO / Head of Content / Growth Manager
+  - Entreprise 10-500 employés (PME et ETI)
+  - Budget marketing digital > 2 000€/mois
+  - Utilise déjà Semrush, Ahrefs, ou SE Ranking
+  - Commence à voir du trafic IA dans Google Analytics
+  - Ne sait pas comment optimiser pour les moteurs IA
+  - Douleur : "Mes concurrents sont cités par ChatGPT et pas moi"
+
+PERSONA SECONDAIRE : Agence SEO / Freelance SEO
+  - Gère 5-50 clients
+  - Cherche un avantage compétitif ("on fait de l'AEO")
+  - Veut un outil white-label pour ses rapports
+  - Douleur : "Mes clients me demandent pourquoi ils ne sont pas sur ChatGPT"
+
+PERSONA TERTIAIRE : Fondateur / CEO de startup
+  - Entreprise early-stage
+  - Marketing hands-on
+  - Sensible au ROI et au prix
+  - Douleur : "Comment être visible sans budget publicitaire massif"
+```
+
+---
+
+## DIRECTION ARTISTIQUE
+
+### Tonalité
+
+```
+PAS : "L'IA va révolutionner votre business !!!" (hype creux)
+PAS : "Solution innovante de pointe" (corporate vide)
+PAS : "Boostez votre visibilité" (générique)
+
+OUI : Confiance technique. Preuves visuelles. Données concrètes.
+      Le ton d'un rapport d'analyste, pas d'un vendeur de tapis.
+      Stripe pour la clarté, Linear pour l'élégance, Ahrefs pour la crédibilité data.
+```
+
+### Esthétique
+
+```
+THÈME : Sombre (comme le SaaS), avec des accents de lumière stratégiques.
+         Le fond sombre = sérieux, tech, pro. Pas un SaaS pastel pour marketeurs junior.
+
+PALETTE :
+  Background : #09090B (zinc-950) — profond, presque noir
+  Surfaces   : #18181B (zinc-900) — cards, sections alternées
+  Texte      : #FAFAFA (zinc-50) pour titres, #A1A1AA (zinc-400) pour corps
+  Accent 1   : #3B82F6 (blue-500) — CTAs, liens, highlights
+  Accent 2   : #22C55E (green-500) — succès, métriques positives
+  Gradient hero : from-blue-600/20 via-transparent to-purple-600/10
+                  (subtil, pas criard — un halo de lumière, pas un arc-en-ciel)
+
+TYPO :
+  Display (H1, H2) : Instrument Serif ou Fraunces (serif élégant, inhabituel pour du SaaS)
+    → CDN : https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap
+  Body : Geist Sans ou Plus Jakarta Sans (net, lisible)
+    → CDN : https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap
+  Mono (code, métriques) : Geist Mono ou JetBrains Mono
+    → CDN : https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap
+
+  Le mélange serif (titres) + sans-serif (corps) est la signature visuelle.
+  Ça dit : "On est sérieux ET moderne."
+
+ANIMATIONS :
+  - Hero : apparition staggered (titre → sous-titre → CTA → image, 100ms de délai entre chaque)
+  - Sections : fade-in-up au scroll (IntersectionObserver)
+  - Métriques : compteurs animés quand visibles (0 → 78 en 1.5s, easing out)
+  - Cards features : hover lift subtil (translateY -2px, shadow augmente)
+  - PAS de parallax lourd, PAS d'animations qui ralentissent la page
+```
+
+---
+
+## STRUCTURE DE LA PAGE
+
+La landing page suit la structure AIDA (Attention → Interest → Desire → Action) adaptée au B2B SaaS.
+
+```
+FICHIER UNIQUE : landing/index.html
+  - HTML + CSS + JS vanilla (PAS de React, PAS de bundler)
+  - Fichier autonome, déployable sur n'importe quel hébergeur
+  - Responsive : mobile-first
+  - Performance : < 200 KB total, First Paint < 1s
+  - SEO : meta tags complets, Open Graph, structured data
+```
+
+---
+
+### SECTION 1 — NAVIGATION (sticky)
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  ◆ CitedBy.ai                                                   │
+│                     Fonctionnalités  Tarifs  FAQ    [Essai gratuit]│
+└──────────────────────────────────────────────────────────────────┘
+
+  - Position : sticky top-0, z-50
+  - Background : transparent au top, bg-[#09090B]/80 backdrop-blur-xl après scroll
+  - Transition au scroll (JS : IntersectionObserver sur le hero)
+  - Logo à gauche, liens au centre, CTA à droite
+  - CTA "Essai gratuit" : bg-white text-black rounded-lg px-4 py-2 text-sm font-semibold
+  - Mobile : hamburger menu
+```
+
+---
+
+### SECTION 2 — HERO (above the fold)
+
+C'est LA section décisive. L'utilisateur décide en 3 secondes s'il reste ou part.
+
+```
+                    🏷️ BADGE
+        Lancé en 2025 — Le premier outil AEO complet
+
+                    📌 HEADLINE (H1)
+        Vos concurrents sont cités par
+        ChatGPT. Pas vous.
+
+                    📝 SOUS-TITRE
+        CitedBy.ai analyse votre contenu sur 50 critères AEO,
+        vérifie vos citations dans les moteurs IA,
+        et génère les corrections pour être recommandé
+        par ChatGPT, Perplexity et Gemini.
+
+        [Analyser mon site gratuitement]    [Voir la démo →]
+
+                    📊 SOCIAL PROOF
+        ✓ 50 critères analysés   ✓ 3 moteurs IA   ✓ Résultats en 30 secondes
+```
+
+**Specs du Hero :**
+
+```
+LAYOUT :
+  min-h-[90vh] flex flex-col items-center justify-center text-center
+  padding : px-6 pt-32 pb-20
+  position : relative overflow-hidden
+
+BACKGROUND :
+  Gradient radial subtil centré en haut :
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.15), transparent)
+  Grille de points ultra-légère en overlay :
+    background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px)
+    background-size: 24px 24px
+  (L'effet combiné = un "sky" technologique, pas un fond plat ennuyeux)
+
+BADGE :
+  inline-flex items-center gap-2 px-3 py-1 rounded-full
+  bg-blue-500/10 border border-blue-500/20
+  text-[13px] text-blue-400 font-medium
+  Animation : fadeIn 0.6s ease-out
+
+HEADLINE (H1) :
+  font-family: 'Fraunces', serif
+  text-5xl md:text-6xl lg:text-7xl font-bold
+  tracking-tight leading-[1.1]
+  text-white
+  max-w-4xl mx-auto
+  
+  "Vos concurrents sont cités par" → text-white
+  "ChatGPT" → text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-300
+  "Pas vous." → text-white, affiché sur une nouvelle ligne, plus petit (text-4xl md:text-5xl)
+                avec un point final qui pèse.
+  
+  Animation : fadeInUp 0.6s ease-out, delay 0.1s
+
+SOUS-TITRE :
+  font-family: 'Plus Jakarta Sans', sans-serif
+  text-lg md:text-xl text-zinc-400
+  max-w-2xl mx-auto mt-6
+  leading-relaxed
+  Animation : fadeInUp 0.6s ease-out, delay 0.2s
+
+CTA PRIMAIRE :
+  bg-white text-black font-semibold
+  px-8 py-3.5 rounded-lg text-base
+  hover:bg-gray-200 hover:scale-[1.02]
+  transition-all duration-200
+  shadow-[0_0_20px_rgba(255,255,255,0.1)]
+  (Le bouton blanc qui brille légèrement sur fond sombre = signature Vercel)
+
+CTA SECONDAIRE :
+  text-zinc-400 font-medium
+  hover:text─────────────────┘
+
+  SPECS :
+    max-w-5xl mx-auto mt-[-40px] (chevauche légèrement le hero)
+    rounded-xl border border-zinc-800
+    shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)]
+    overflow-hidden
+    
+    LE SCREENSHOT EST UN MOCKUP HTML/CSS (pas une image).
+    Construis un faux dashboard avec de vraies données :
+    - Score AEO : 78/100 avec barre circulaire animée
+    - 3 scores moteurs avec barres colorées
+    - Un mini graphique (SVG path) montrant une courbe ascendante
+    - 3-4 critères avec ✓ vert et ✗ rouge
+    - Tout en fond #18181B avec les couleurs du design system
+
+    Animation : fadeInUp + scale de 0.95 à 1.0 au scroll
+```
+
+---
+
+### SECTION 4 — PROBLÈME / SOLUTION (transition émotionnelle)
+
+```
+                Le SEO traditionnel ne suffit plus.
+
+  ┌────────────────────────┐         ┌────────────────────────┐
+  │     AVANT               │         │     APRÈS              │
+  │                          │         │                        │
+  │  ❌ Invisible sur        │   →     │  ✅ Cité dans les      │
+  │     ChatGPT              │         │     réponses IA        │
+  │                          │         │                        │
+  │  ❌ Pas de données       │   →     │  ✅ Score AEO mesuré   │
+  │     sur les moteurs IA   │         │     par moteur         │
+  │                          │         │                        │
+  │  ❌ Corrections à        │   →     │  ✅ Code prêt à        │
+  │     deviner              │         │     copier-coller      │
+  │                          │         │                        │
+  │  ❌ Aucun suivi          │   →     │  ✅ Monitoring temps    │
+  │     de citations         │         │     réel des citations │
+  └────────────────────────┘         └────────────────────────┘
+
+  DESIGN :
+    2 colonnes sur desktop, 1 sur mobile
+    Colonne AVANT : bg-red-500/5 border border-red-500/10 rounded-xl p-8
+    Colonne APRÈS : bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-8
+    Flèche centrale : → en text-zinc-600, rotate-90 sur mobile
+    Chaque ligne : flex gap-3, icône + texte
+    Icônes AVANT : text-red-400
+    Icônes APRÈS : text-emerald-400
+    Animation : les 2 colonnes apparaissent en slide (gauche→droite, droite→gauche) au scroll
+```
+
+---
+
+### SECTION 5 — FONCTIONNALITÉS (3 piliers)
+
+```
+        Comment CitedBy.ai vous rend visible dans l'ère IA
+
+  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+  │   🔍 ANALYSER    │ │   🛠️ CORRIGER    │ │   📊 MESURER     │
+  │                   │ │                   │ │                   │
+  │  Audit de 50     │ │  Génération de    │ │  Vérification    │
+  │  critères AEO    │ │  solutions prêtes │ │  de vos          │
+  │  avec score par  │ │  à implémenter :  │ │  citations dans  │
+  │  moteur IA       │ │  FAQ, Schema.org, │ │  ChatGPT,        │
+  │  (ChatGPT,       │ │  meta tags, intro │ │  Perplexity,     │
+  │  Perplexity,     │ │  answer-first...  │ │  Gemini          │
+  │  Gemini)         │ │                   │ │                   │
+  │                   │ │  Code HTML/JSON-  │ │  Taux de         │
+  │  Score dynamique │ │  LD prêt à        │ │  citation,       │
+  │  avec impact     │ │  copier-coller    │ │  position,       │
+  │  projeté         │ │                   │ │  benchmark       │
+  │                   │ │                   │ │  concurrentiel   │
+  └─────────────────┘ └─────────────────┘ └─────────────────┘
+
+  DESIGN :
+    Section bg-[#0F0F12] (légèrement plus clair que le fond)
+    py-24 px-6
+    
+    Titre section : font-family Fraunces, text-4xl md:text-5xl, text-center
+    Sous-titre : text-zinc-400, max-w-2xl mx-auto
+    
+    3 cards : grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-16
+    
+    CHAQUE CARD :
+      bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8
+      hover:border-zinc-700 hover:translateY(-2px)
+      transition-all duration-300
+      
+      ICÔNE EN HAUT :
+        w-12 h-12 rounded-xl flex items-center justify-center mb-6
+        Card 1 : bg-blue-500/10, icône text-blue-400
+        Card 2 : bg-emerald-500/10, icône text-emerald-400
+        Card 3 : bg-purple-500/10, icône text-purple-400
+      
+      TITRE CARD :
+        text-xl font-semibold text-white mb-3
+      
+      DESCRIPTION :
+        text-[15px] text-zinc-400 leading-relaxed
+    re : text-4xl md:text-5xl font-bold text-white font-mono (JetBrains Mono)
+               Compteur animé : de 0 au nombre final en 1.5s (easeOutExpo)
+               Se déclenche quand visible (IntersectionObserver)
+      Label : text-[13px] text-zinc-500 uppercase tracking-wider mt-2
+      
+    Animation JS du compteur :
+      function animateCounter(element, target, duration) {
+        let start = 0;
+        const startTime = performance.now();
+        function update(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 4); // easeOutQuart
+          element.textContent = Math.round(target * eased);
+          if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+      }
+```
+
+---
+
+### SECTION 7 — COMMENT ÇA MARCHE (3 étapes)
+
+```
+        Vos premières citations en 3 étapes
+
+        ①                    ②                    ③
+    Entrez votre URL     Implémentez les       Mesurez l'impact
+                         corrections
+    
+    CitedBy analyse     Chaque solution        Le monitoring
+    votre contenu       est livrée avec        vérifie si
+    en 30 secondes      du code prêt à         ChatGPT, Perplexity
+    et note chaque      copier-coller :        et Gemini vous
+    critère par         FAQ, Schema.org,       citent. Suivez
+    moteur IA.          meta tags...           votre progression.
+
+  DESIGN :
+    py-24
+    3 colonnes avec numéros circulaires connectés par une ligne pointillée
+    
+    NUMÉRO : 
+      w-10 h-10 rounded-full border-2 border-blue-500/30 
+      flex items-center justify-center
+      text-blue-400 font-mono font-bold text-lg
+    
+    LIGNE CONNECTRICE :
+      Trait pointillé horizontal entre les numéros
+      border-t-2 border-dashed border-zinc-800
+      (Seulement sur desktop, pas sur mobile)
+    
+    TITRE ÉTAPE : text-lg font-semibold text-white mt-4
+    DESCRIPTION : text-[15px] text-zinc-4                                 │
+        │  🟣 Gemini     : 58/100  ██████████████░░░░░░░░░  │
+        │     Priorité : Schema.org, données structurées    │
+        │                                                    │
+        └────────────────────────────────────────────────────┘
+
+  DESIGN :
+    Card bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-3xl mx-auto
+    
+    CHAQUE MOTEUR :
+      flex items-center gap-4 py-4 border-b border-zinc-800/50 last:border-0
+      
+      PASTILLE :
+        w-3 h-3 rounded-full
+        ChatGPT : bg-emerald-500
+        Perplexity : bg-blue-500
+        Gemini : bg-purple-500
+      
+      NOM : text-white font-medium w-24
+      SCORE : font-mono font-bold text-white
+      
+      BARRE :
+        flex-1 h-2 rounded-full bg-zinc-800
+        Fill : hauteur 100%, rounded-full
+        ChatGPT : bg-emerald-500
+        Perplexity : bg-blue-500
+        Gemini : bg-purple-500
+        Animation : largeur de 0% à X% en 1s au scroll
+      
+      DESCRIPTION : text-[13px] text-zinc-500 mt-1
+```
+
+---
+
+### SECTION 9 — TARIFS
+
+```
+        Choisissez votre plan
+
+  ┌──────────────┐  ┌──────────────────┐  ┌──────────────┐
+  │   STARTER     │  │     PRO           │  │   AGENCE      │
+  │               │  │   ⭐ Populaire    │  │               │
+  │   29€/mois    │  │   79€/mois        │  │   199€/mois   │
+  │               │  │                    │  │               │
+  │  50 crédits   │  │  200 crédits      │  │  1000 crédits │
+  │  5 audits/m   │  │  Audits illimités │  │  Illimité     │
+  │  1 projet     │  │  5 projets        │  │  Projets ∞    │
+  │  3 moteurs    │  │  3 moteurs        │  │  3 moteurs    │
+  │               │  │  Citations V3     │  │  Citations V3 │
+  │               │  │  Benchmark        │  │  Benchmark    │
+  │               │  │                    │  │  API access   │
+  │               │  │                    │  │  White label  │
+  │               │  │                    │  │  Support prio │
+  │               │  │                    │  │               │
+  │  [Commencer]  │  │  [Essai 14j →]    │  │  [Contacter]  │
+  └──────────────┘  └──────────────────┘  └──────────────┘
+
+  DESIGN :
+    grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto
+
+    CARD STARTER & AGENCE :
+      bg-zinc-900/30 border border-zinc-800 rounded-2xl p-8
+    
+    CARD PRO (mise en avant) :
+      bg-zinc-900 border border-blue-500/30 rounded-2xl p-8
+      ring-1 ring-blue-500/10
+      Position relative, badge "Populaire" :
+        absolute -top-3 left-1/2 -translate-x-1/2
+        bg-blue-500 text-white text-[11px] font-bold uppercase tracking-wider
+        px-3 py-1 rounded-full
+    
+    PRIX :
+      text-4xl font-bold text-white
+      "€" text-lg text-zinc-400
+      "/mois" text-sm text-zinc-500
+    
+    FEATURES LISTE :
+      mt-6 space-y-3
+      Chaque feature : flex gap-2 text-[14px] text-zinc-400
+      Icône ✓ : text-emerald-500 w-4 h-4 flex-shrink-0
+      Feature exclusive au plan supérieur : text-zinc-600 (grisé)
+    
+    CTA :
+      mt-8 w-full
+      PRO : bg-white text-black (primary)
+      Starter/Agence : bg-transparent border border-zinc-700 text-zinc-300 (secondary)
+```
+
+---
+
+### SECTION 10 — FAQ
+
+```
+        Questions fréquentes
+
+        ▸ Qu'est-ce que l'AEO exactement ?
+        ▸ Comment CitedBy.ai vérifie les citations ?
+        ▸ Combien de temps pour voir des résultats ?
+        ▸ Quels moteurs IA sont supportés ?
+        ▸ Puis-je utiliser CitedBy.ai si je ne code pas ?
+        ▸ Y a-t-il un essai gratuit ?
+        ▸ Comment fonctionne le système de crédits ?
+        ▸ Quelle différence avec Semrush ou Ahrefs ?
+
+  DESIGN :
+    max-w-3xl mx-auto
+    Chaque question : accordion (clic pour ouvrir/fermer)
+    
+    FERMÉ :
+      border-b border-zinc-800 py-5
+      flex justify-between items-center cursor-pointer
+      Question : text-[15px] text-zinc-300 font-medium
+      Chevron : w-4 h-4 text-zinc-600, rotation 180° quand ouvert
+    
+    OUVERT :
+      Réponse : text-[15px] text-zinc-500 leading-relaxed mt-3 pb-5
+      Animation : max-height transition + opacity
+    
+    JS Accordion :
+      Vanilla JS, pas de dépendance
+      Un seul ouvert à la fois (ferme les autres)
+```
+
+**CONTENU DES RÉPONSES FAQ :**
+
+```
+Q: Qu'est-ce que l'AEO exactement ?
+R: L'Answer Engine Optimization est l'optimisation de votre contenu web pour être cité dans les réponses des moteurs IA comme ChatGPT, Perplexity et Gemini. Contrairement au SEO classique qui vise les résultats de recherche Google, l'AEO vise à faire de votre site une source de référence que les IA recommandent directement à leurs utilisateurs.
+
+Q: Comment CitedBy.ai vérifie les citations ?
+R: Notre système interroge directement les APIs de ChatGPT, Perplexity et Gemini avec des requêtes pertinentes pour votre domaine. Il analyse les réponses pour détecter si votre marque, votre URL ou vos contenus sont mentionnés, cités ou recommandés. Le taux de citation est calculé sur plusieurs requêtes pour garantir la fiabilité statistique.
+
+Q: Combien de temps pour voir des résultats ?
+R: L'audit est instantané (30 secondes). Les effets des optimisations AEO sur vos citations réelles dépendent de la fréquence de mise à jour des modèles IA, mais nos utilisateurs constatent en moyenne une amélioration du taux de citation de 20 à 40% en 4 à 8 semaines après implémentation des corrections.
+
+Q: Quels moteurs IA sont supportés ?
+R: ChatGPT (OpenAI), Perplexity et Gemini (Google). Chaque moteur a ses propres critères de sélection des sources, c'est pourquoi CitedBy.ai calcule un score pondéré spécifique à chaque moteur.
+
+Q: Puis-je utiliser CitedBy.ai si je ne code pas ?
+R: Oui. Chaque solution générée est livrée avec du code prêt à copier-coller (HTML, JSON-LD) et des instructions d'implémentation pas à pas. Pour les CMS comme WordPress, Shopify ou Webflow, les instructions sont adaptées à votre plateforme.
+
+Q: Y a-t-il un essai gratuit ?
+R: Oui, le premier audit est gratuit. Vous pouvez analyser une URL sans créer de compte et voir votre score AEO, le détail des 50 critères et les scores par moteur. Les solutions détaillées et le monitoring de citations sont disponibles avec un abonnement.
+
+Q: Comment fonctionne le système de crédits ?
+R: Chaque action consomme des crédits : un audit (1 crédit), une vérification de citation (2 crédits), la génération d'une solution (1 crédit). Votre plan mensuel inclut un volume de crédits, et vous pouvez en acheter davantage à la demande.
+
+Q: Quelle différence avec Semrush ou Ahrefs ?
+R: Semrush et Ahrefs analysent votre visibilité sur les moteurs de recherche traditionnels (Google, Bing). CitedBy.ai analyse votre visibilité sur les moteurs IA (ChatGPT, Perplexity, Gemini). Les deux sont complémentaires : le SEO pour le trafic de recherche, l'AEO pour les citations IA.
+```
+
+---
+
+### SECTION 11 — CTA FINAL
+
+```
+        Vos concurrents optimisent déjà pour l'IA.
+
+        Le premier audit est gratuit.
+        Découvrez votre score AEO en 30 secondes.
+
+        [Analyser mon site gratuitement]
+
+        Pas de carte bancaire requise.
+
+  DESIGN :
+    py-24 text-center
+    Background : léger gradient radial bleu (même que le hero, moins intense)
+    
+    Titre : Fraunces, text-3xl md:text-4xl, text-white
+    Sous-titre : text-zinc-400, text-lg, mt-4
+    CTA : même style que le hero (blanc, grand, lumineux)
+    Mention : text-[13px] text-zinc-600 mt-4
+```
+
+---
+
+### SECTION 12 — FOOTER
+
+```
+  ┌─────────────────────── └──────────────────────────────────────────────────────────────┘
+
+  DESIGN :
+    bg-[#0A0A0C] border-t border-zinc-800/50 py-16
+    grid grid-cols-1 md:grid-cols-4 gap-12 max-w-5xl mx-auto
+    
+    Logo colonne : col-span-1
+    3 colonnes de liens
+    
+    Titre colonne : text-[11px] uppercase tracking-wider text-zinc-600 font-medium mb-4
+    Liens : text-[14px] text-zinc-500 hover:text-zinc-300 block py-1
+    
+    Copyright : border-t border-zinc-800/30 mt-12 pt-8
+                text-[13px] text-zinc-700
+```
+
+---
+
+## META TAGS ET SEO
+
+```html
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CitedBy.ai — Soyez cité par ChatGPT, Perplexity et Gemini</title>
+  <meta name="description" content="Analysez votre contenu sur 50 critères AEO, vérifiez vos citations dans les moteurs IA, et générez les corrections pour être recommandé par ChatGPT, Perplexity et Gemini.">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://citedby.ai">
+  <meta property="og:title" content="CitedBy.ai — Le Semrush de l'ère IA">
+  <meta property="og:description" content="Vos concurrents sont cités par ChatGPT. Pas vous. Analysez et optimisez votre visibilité dans les moteurs IA.">
+  <meta property="og:image" content="https://citedby.ai/og-image.png">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CitedBy.ai — Soyez cité par ChatGPT, Perplexity et Gemini">
+  <meta name="twitter:description" content="Le premier outil d'Answer Engine Optimization complet.">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CitedBy.ai",
+    "description": "Plateforme d'Answer Engine Optimization (AEO) pour être cité par les moteurs IA",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "29",
+      "highPrice": "199",
+      "priceCurrency": "EUR",
+      "offerCount": "3"
+    }
+  }
+  </script>
+</head>
+```
+
+---
+
+## EXÉCUTION
+
+```
+1. Créer le dossier landing/ à la racine
+2. Créer landing/index.html — fichier unique HTML + CSS + JS
+3. Le fichier fait ~800-1200 lignes (c'est normal pour une landing page complète)
+4. Toutes les animations en CSS + JS vanilla (pas de framework)
+5. Responsive : tester mentalement mobile, tablette, desktop
+6. Performance : pas d'images lourdes, tout est HTML/CSS/SVG
+
+STRUCTURE DU FICHIER :
+  <!DOCTYPE html>
+  <html lang="fr">
+  <head>
+    <!-- Meta tags -->
+    <!-- Fonts -->
+    <style> /* TOUT le CSS inline */ </style>
+  </head>
+  <body>
+    <!-- Nav -->
+    <!-- Hero -->
+    <!-- Product Screenshot (HTML mockup) -->
+    <!-- Problème/Solution -->
+    <!-- Fonctionnalités -->
+    <!-- Métriques -->
+    <!-- Comment ça marche -->
+    <!-- Scoring par moteur -->
+    <!-- Tarifs -->
+    <!-- FAQ -->
+    <!-- CTA final -->
+    <!-- Footer -->
+    <script> /* TOUT le JS inline */ </script>
+  </body>
+  </html>
+```
+
+```bash
+# Après création
+git add -A
+git commit -m "Add landing page — CitedBy.ai launch campaign"
+git tag "landing-v1"
+```
+
+### Checklist :
+
+```
+[ ] Le fichier landing/index.html existe et s'ouvre dans un navigateur
+[ ] La nav sticky change d'apparence au scroll
+[ ] Le hero a l'animation staggered (badge → titre → sous-titre → CTA)
+[ ] Le H1 contient "ChatGPT" en gradient vert
+[ ] Le mockup dashboard est en HTML (pas une image)
+[ ] Les 4 métriques s'animent (compteur) quand visibles
+[ ] Les barres de score par moteur s'animent au scroll
+[ ] L'accordion FAQ fonctionne (ouvrir/fermer)
+[ ] Les 3 plans tarifaires sont affichés, PRO mis en avant
+[ ] Le CTA final est présent avec "Pas de carte bancaire requise"
+[ ] Le footer a les 3 colonnes de liens
+[ ] Responsive : pas de scr

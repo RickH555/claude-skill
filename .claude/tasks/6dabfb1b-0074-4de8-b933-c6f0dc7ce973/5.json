@@ -1,0 +1,9 @@
+{
+  "id": "5",
+  "subject": "Phase 4: Nettoyage léger",
+  "description": "Mettre à jour CLAUDE.md, vérifier tsconfig.json",
+  "activeForm": "Nettoyant les artefacts de migration",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "content": "AUDIT 1 — Sécurité (clés, XSS, RLS, validation, deps)",
+    "status": "in_progress",
+    "activeForm": "Audit sécurité"
+  },
+  {
+    "content": "AUDIT 2 — Structure du projet",
+    "status": "pending",
+    "activeForm": "Audit structure"
+  },
+  {
+    "content": "AUDIT 3 — Qualité du code",
+    "status": "pending",
+    "activeForm": "Audit qualité code"
+  },
+  {
+    "content": "AUDIT 4 — Performance",
+    "status": "pending",
+    "activeForm": "Audit performance"
+  },
+  {
+    "content": "AUDIT 5 — API et réseau",
+    "status": "pending",
+    "activeForm": "Audit API/réseau"
+  },
+  {
+    "content": "AUDIT 6 — Boucles infinies et mémoire",
+    "status": "pending",
+    "activeForm": "Audit boucles/mémoire"
+  },
+  {
+    "content": "AUDIT 7 — Accessibilité",
+    "status": "pending",
+    "activeForm": "Audit accessibilité"
+  },
+  {
+    "content": "AUDIT 8 — Gestion d'état et données",
+    "status": "pending",
+    "activeForm": "Audit état/données"
+  },
+  {
+    "content": "AUDIT 9 — Cohérence et standards",
+    "status": "pending",
+    "activeForm": "Audit cohérence"
+  },
+  {
+    "content": "AUDIT 10 — Déploiement et production",
+    "status": "pending",
+    "activeForm": "Audit déploiement"
+  },
+  {
+    "content": "Compiler AUDIT_REPORT.md",
+    "status": "pending",
+    "activeForm": "Compilation rapport"
+  }
+]

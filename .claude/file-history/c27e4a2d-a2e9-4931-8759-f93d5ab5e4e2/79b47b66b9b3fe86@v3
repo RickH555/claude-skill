@@ -1,0 +1,311 @@
+'use client';
+
+import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { toast } from 'sonner';
+import { CheckCircle, Search, QrCode, Mail, Gift } from 'lucide-react';
+import type { LoyaltyProgram } from '@/lib/supabase/types';
+
+interface ManualScannerProps {
+  programs: LoyaltyProgram[];
+  merchantId: string;
+  rewards?: Array<{ id: string; name: string; program_id: string; discount_type: string; discount_value: number }>;
+}
+
+type SearchMode = 'email' | 'qr';
+
+export default function ManualScanner({ programs, merchantId, rewards = [] }: ManualScannerProps) {
+  const [mode, setMode] = useState<SearchMode>('email');
+  const [email, setEmail] = useState('');
+  const [qrInput, setQrInput] = useState('');
+  const [selectedProgram, setSelectedProgram] = useState(programs[0]?.id || '');
+  const [amount, setAmount] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [foundCard, setFoundCard] = useState<any>(null);
+  const [redeemLoading, setRedeemLoading] = useState<string | null>(null);
+
+  const searchByEmail = async () => {
+    if (!email.trim()) return;
+    setSearchLoading(true);
+    setFoundCard(null);
+    const supabase = createClient();
+
+    const { data: customer } = await supabase
+      .from('customers')
+      .select('id, email, name')
+      .eq('email', email.trim())
+      .single();
+
+    if (!customer) {
+      toast.error('Client non trouve.');
+      setSearchLoading(false);
+      return;
+    }
+
+    const { data: card } = await supabase
+      .from('customer_cards')
+      .select('*, loyalty_programs(name, type, stamp_goal, points_per_euro)')
+      .eq('customer_id', customer.id)
+      .eq('program_id', selectedProgram)
+      .single();
+
+    if (!card) {
+      toast.error("Ce client n'est pas inscrit a ce programme.");
+      setSearchLoading(false);
+      return;
+    }
+
+    setFoundCard({ ...card, customer });
+    setSearchLoading(false);
+  };
+
+  const searchByQr = async () => {
+    if (!qrInput.trim()) return;
+    setSearchLoading(true);
+    setFoundCard(null);
+
+    try {
+      const parsed = JSON.parse(qrInput.trim());
+      if (parsed.type !== 'customer' || !parsed.id || !parsed.key) {
+        toast.error('QR code invalide.');
+        setSearchLoading(false);
+        return;
+      }
+
+      const res = await fetch('/api/scan/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_qr_id: parsed.id,
+          secret_key: parsed.key,
+          program_id: selectedProgram,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Erreur de validation');
+        setSearchLoading(false);
+        return;
+      }
+
+      if (data.card) {
+        setFoundCard({ ...data.card, customer: data.customer });
+      } else {
+        toast.error("Ce client n'est pas inscrit a ce programme.");
+      }
+    } catch {
+      toast.error('Format QR invalide. Collez le contenu du QR code.');
+    }
+
+    setSearchLoading(false);
+  };
+
+  const addPoints = async () => {
+    if (!foundCard) return;
+    setLoading(true);
+
+    const res = await fetch('/api/scan/earn', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        card_id: foundCard.id,
+        amount,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.error || 'Erreur');
+      setLoading(false);
+      return;
+    }
+
+    const program = foundCard.loyalty_programs;
+    toast.success(`+${amount} ${program.type === 'stamp' ? 'tampon(s)' : 'point(s)'} ajoute(s) !`);
+    const balanceField = program.type === 'stamp' ? 'current_stamps' : 'current_points';
+    setFoundCard({ ...foundCard, [balanceField]: data.new_balance });
+    setLoading(false);
+  };
+
+  const redeemReward = async (rewardId: string) => {
+    if (!foundCard) return;
+    setRedeemLoading(rewardId);
+
+    const res = await fetch('/api/rewards/redeem', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        card_id: foundCard.id,
+        reward_id: rewardId,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.error || 'Erreur');
+      setRedeemLoading(null);
+      return;
+    }
+
+    toast.success(`Recompense "${data.reward_name}" utilisee !`);
+    const program = foundCard.loyalty_programs;
+    const redeemBalanceField = program.type === 'stamp' ? 'current_stamps' : 'current_points';
+    setFoundCard({ ...foundCard, [redeemBalanceField]: data.new_balance });
+    setRedeemLoading(null);
+  };
+
+  if (programs.length === 0) {
+    return (
+      <Card className="text-center py-12">
+        <p className="text-[var(--text-tertiary)]">Creez d&apos;abord un programme pour utiliser le scanner.</p>
+      </Card>
+    );
+  }
+
+  const programRewards = rewards.filter(r => r.program_id === selectedProgram);
+
+  return (
+    <div className="space-y-6 max-w-lg">
+      {/* Mode toggle */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => { setMode('email'); setFoundCard(null); }}
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            mode === 'email'
+              ? 'bg-[var(--accent)] text-white'
+              : 'bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-secondary)]'
+          }`}
+        >
+          <Mail className="w-4 h-4" /> Par email
+        </button>
+        <button
+          onClick={() => { setMode('qr'); setFoundCard(null); }}
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            mode === 'qr'
+              ? 'bg-[var(--accent)] text-white'
+              : 'bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-secondary)]'
+          }`}
+        >
+          <QrCode className="w-4 h-4" /> Par QR code
+        </button>
+      </div>
+
+      <Card padding="lg">
+        <h3 className="text-[15px] font-semibold text-[var(--text-primary)] mb-4">Chercher un client</h3>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-medium text-[var(--text-secondary)]">Programme</label>
+            <select
+              value={selectedProgram}
+              onChange={e => { setSelectedProgram(e.target.value); setFoundCard(null); }}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--text-primary)]"
+            >
+              {programs.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          </div>
+
+          {mode === 'email' ? (
+            <>
+              <Input
+                label="Email du client"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="client@exemple.com"
+              />
+              <Button onClick={searchByEmail} loading={searchLoading} variant="secondary" icon={Search}>
+                Rechercher
+              </Button>
+            </>
+          ) : (
+            <>
+              <Input
+                label="Contenu du QR code client"
+                value={qrInput}
+                onChange={e => setQrInput(e.target.value)}
+                placeholder='{"type":"customer","id":"...","key":"..."}'
+              />
+              <Button onClick={searchByQr} loading={searchLoading} variant="secondary" icon={QrCode}>
+                Valider QR
+              </Button>
+            </>
+          )}
+        </div>
+      </Card>
+
+      {foundCard && (
+        <Card padding="lg" className="page-enter">
+          <div className="flex items-center gap-3 mb-4">
+            <CheckCircle className="w-5 h-5 text-[var(--success)]" />
+            <div>
+              <p className="text-[13px] font-medium text-[var(--text-primary)]">
+                {foundCard.customer.name || foundCard.customer.email}
+              </p>
+              <p className="text-[12px] text-[var(--text-tertiary)]">
+                Solde: {foundCard.loyalty_programs.type === 'stamp' ? foundCard.current_stamps : foundCard.current_points} / {foundCard.loyalty_programs.type === 'stamp' ? (foundCard.loyalty_programs.stamp_goal || 10) : (foundCard.loyalty_programs.points_per_euro || 100)}
+                {' '}{foundCard.loyalty_programs.type === 'stamp' ? 'tampons' : 'points'}
+              </p>
+            </div>
+            <Badge variant="accent" className="ml-auto">{foundCard.tier}</Badge>
+          </div>
+
+          <div className="space-y-4">
+            <Input
+              label={foundCard.loyalty_programs.type === 'stamp' ? 'Tampons a ajouter' : 'Points a ajouter'}
+              type="number" min={1}
+              value={String(amount)}
+              onChange={e => setAmount(parseInt(e.target.value) || 1)}
+            />
+            <Button onClick={addPoints} loading={loading}>
+              Ajouter {amount} {foundCard.loyalty_programs.type === 'stamp' ? 'tampon(s)' : 'point(s)'}
+            </Button>
+          </div>
+
+          {/* Redeem rewards section */}
+          {programRewards.length > 0 && (() => {
+            const currentBal = foundCard.loyalty_programs.type === 'stamp' ? foundCard.current_stamps : foundCard.current_points;
+            const goal = foundCard.loyalty_programs.type === 'stamp' ? (foundCard.loyalty_programs.stamp_goal || 10) : (foundCard.loyalty_programs.points_per_euro || 100);
+            return currentBal >= goal;
+          })() && (
+            <div className="mt-6 pt-4 border-t border-[var(--border-default)]">
+              <h4 className="text-[13px] font-semibold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                <Gift className="w-4 h-4 text-[var(--accent)]" /> Utiliser une recompense
+              </h4>
+              <div className="space-y-2">
+                {programRewards.map(reward => (
+                  <div key={reward.id} className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)]">
+                    <div>
+                      <p className="text-[13px] font-medium text-[var(--text-primary)]">{reward.name}</p>
+                      <p className="text-[11px] text-[var(--text-tertiary)]">
+                        {reward.discount_type === 'freebie' ? 'Gratuit' :
+                         reward.discount_type === 'percentage' ? `-${reward.discount_value}%` :
+                         `-${reward.discount_value}€`}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => redeemReward(reward.id)}
+                      loading={redeemLoading === reward.id}
+                    >
+                      Utiliser
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+    </div>
+  );
+}
